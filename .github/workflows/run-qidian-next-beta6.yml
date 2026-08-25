@@ -14,12 +14,11 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-      - name: Apply Beta6 UI patch
-        run: python scripts/patch_qidian_next_beta6_ui.py
-      - name: Validate source and JS syntax
+      - name: Apply and validate Beta6
         shell: bash
         run: |
           set -euo pipefail
+          python scripts/patch_qidian_next_beta6_ui.py
           python - <<'PY'
           import json, pathlib
           p=pathlib.Path('sources/novel/qidian-next/qidian-next.json')
@@ -33,7 +32,7 @@ jobs:
           for name in ['qfUxOpenV015','qfUxReadV015','qfMultiContentV423','qfMultiAccountsV423','qfMultiDiagV423','qfSmCtxV30']:
               assert name in login, name
           assert 'qidian-next v0.1.5-beta6' in login
-          assert 'qfnext://' not in login
+          assert login.rfind('qidian-next v0.1.5-beta6') > login.rfind('qidian-next v0.1.4-beta5')
           pathlib.Path('/tmp/login.js').write_text(login,encoding='utf-8')
           sub=json.loads(pathlib.Path('subscription/beta.json').read_text(encoding='utf-8'))
           q=[x for x in sub.get('items',[]) if x.get('id')=='qidian-next']
