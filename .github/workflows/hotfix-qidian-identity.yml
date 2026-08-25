@@ -1,0 +1,51 @@
+name: hotfix-qidian-identity
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hotfix-qidian-identity.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Restore runtime-safe Qidian identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -c "import json,pathlib; p=pathlib.Path('sources/novel/qidian/qidian-official.json'); a=json.loads(p.read_text(encoding='utf-8')); assert isinstance(a,list) and len(a)==1 and a[0].get('bookSourceName')=='起点官方生态'; a[0]['bookSourceUrl']='https://m.qidian.com/?qf_source=v2922_audio_webview_crypto_bridge_fix'; p.write_text(json.dumps(a,ensure_ascii=False,separators=(',',':')),encoding='utf-8')"
+          python -c "import json,pathlib; p=pathlib.Path('bundles/all-beta.json'); a=json.loads(p.read_text(encoding='utf-8')); [x.__setitem__('bookSourceUrl','https://m.qidian.com/?qf_source=v2922_audio_webview_crypto_bridge_fix') for x in a if x.get('bookSourceName')=='起点官方生态']; p.write_text(json.dumps(a,ensure_ascii=False,separators=(',',':')),encoding='utf-8')"
+          python -c "import json,pathlib; p=pathlib.Path('manifest.json'); m=json.loads(p.read_text(encoding='utf-8')); [x.__setitem__('bookSourceUrl','https://m.qidian.com/?qf_source=v2922_audio_webview_crypto_bridge_fix') for x in m.get('sources',[]) if x.get('id')=='qidian-official']; m['updatedAt']='2026-08-25T20:35:00+08:00'; p.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8')"
+          python -c "import json,pathlib; p=pathlib.Path('rss/data/details/qidian-official.json'); d=json.loads(p.read_text(encoding='utf-8')); [s.__setitem__('text','https://m.qidian.com/?qf_source=v2922_audio_webview_crypto_bridge_fix') for s in d.get('sections',[]) if s.get('title')=='唯一身份']; p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8')"
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('docs/DEVELOPMENT_RULES.md')
+          s=p.read_text(encoding='utf-8')
+          old='6. When migrating a legacy source that relies on `bookSourceUrl` as a relative-URL base, do not blindly replace it. First convert those request paths to explicit real hosts or a separate runtime base constant, then switch to the project identity URL.\n7. Once an identity URL has been published, keep it stable across future versions unless a collision or serious migration issue requires a deliberate compatibility plan.'
+          new='6. When migrating a legacy source that relies on `bookSourceUrl` for same-origin cookies, WebView login, relative URL resolution or runtime base behavior, do not replace it with the `.invalid` namespace. Preserve a same-origin identity and make it unique with a stable query/path marker.\n7. Existing mature sources should preserve their already-working identity URL when that also preserves upgrade continuity in Legado. For Qidian official ecosystem, the permanent Stable/Beta identity is `https://m.qidian.com/?qf_source=v2922_audio_webview_crypto_bridge_fix`.\n8. Once an identity URL has been published and real-device confirmed, keep it stable across future versions unless a collision or serious migration issue requires a deliberate compatibility plan.'
+          if old in s: s=s.replace(old,new)
+          p.write_text(s,encoding='utf-8')
+          p=Path('docs/KNOWN_ISSUES.md')
+          s=p.read_text(encoding='utf-8')
+          note='''\n## 12. Qidian `.invalid` identity broke runtime behavior — fixed in Beta hotfix\n\nObserved on-device after repository import:\n\n- source imported successfully,\n- book detail showed `书籍信息获取失败`,\n- login/settings page could not open.\n\nCause:\n\n- the publisher replaced the mature Qidian `bookSourceUrl` with `https://sc8d7.invalid/...`;\n- this source uses a Qidian same-origin identity for runtime base/Cookie/WebView compatibility;\n- the original working baseline used `https://m.qidian.com/?qf_source=v2922_audio_webview_crypto_bridge_fix`.\n\nFix:\n\n- restore that mature same-origin identity for both Beta and future Stable;\n- keep uniqueness through its stable `qf_source` marker instead of a fake host;\n- do not blindly apply the generic `.invalid` namespace to sources with same-origin runtime dependencies.\n\nStatus: fixed in repository Beta, pending user real-device re-test.\n'''
+          if 'Qidian `.invalid` identity broke runtime behavior' not in s: s=s.rstrip()+note+'\n'
+          p.write_text(s,encoding='utf-8')
+          p=Path('docs/RELEASE_LOG.md')
+          s=p.read_text(encoding='utf-8')
+          block='''## 2026-08-25 — Qidian v4.2.1-alpha2 identity hotfix\n\nStatus: Beta/Test; awaiting user real-device confirmation.\n\nChanges:\n\n- Reverted the repository-only `.invalid` `bookSourceUrl` experiment after real-device failure.\n- Restored the mature same-origin identity `https://m.qidian.com/?qf_source=v2922_audio_webview_crypto_bridge_fix`.\n- No Qidian business rules were changed.\n- Synchronized complete source JSON, Beta Bundle, Manifest and RSS detail metadata.\n- Stable/Beta will keep this same identity after confirmation.\n\n'''
+          if 'Qidian v4.2.1-alpha2 identity hotfix' not in s:
+              lines=s.splitlines(True)
+              s=(lines[0]+'\n'+block+''.join(lines[1:])) if lines else block
+          p.write_text(s,encoding='utf-8')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian/qidian-official.json bundles/all-beta.json manifest.json rss/data/details/qidian-official.json docs/DEVELOPMENT_RULES.md docs/KNOWN_ISSUES.md docs/RELEASE_LOG.md
+          git rm .github/workflows/hotfix-qidian-identity.yml
+          git commit -m 'fix: restore Qidian runtime-safe source identity'
+          git push origin main
