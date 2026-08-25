@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-25T23:35:17+08:00",
+  "updatedAt": "2026-08-25T23:59:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -49,9 +49,9 @@
       "name": "🌈 起点助手·新架构",
       "category": "novel",
       "channel": "beta",
-      "version": "0.1.4-beta5",
-      "versionCode": 1405,
-      "updatedAt": "2026-08-25T23:35:17+08:00",
+      "version": "0.1.5-beta6",
+      "versionCode": 1506,
+      "updatedAt": "2026-08-25T23:59:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next.json",
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
@@ -67,12 +67,13 @@
         "多正文 Provider"
       ],
       "changelog": [
-        "修复神魔登录 ReferenceError：恢复历史误删的 qfSmCtxV30 / qfSmInputV30 / qfSmTrimV30 / qfSmSaveCredsV30",
-        "账号动作列表真正随 Provider 动态变化",
-        "神魔只显示登录 / 检测 / 后台 / 退出，不再出现不支持的网页登录",
-        "更新一级登录页版本标题；其它阅读业务模块保持不变"
+        "二级设置 UI 重构第一阶段：统一卡片、轻量渐变头部、暗色模式与操作提示",
+        "正文设置：策略胶囊 + 当前类别 Provider + 实时路线概览 + 独立 STV 专区",
+        "账号管理：情无/神魔/晴天/同人标签页 + 当前 Provider 专属字段 + 动作按钮组",
+        "诊断工具：常用诊断优先，高级诊断折叠；动作仍在点 ✓ 返回后执行",
+        "一级双列首页及搜索/详情/目录/正文/评论业务逻辑保持不变"
       ],
-      "sha256": "f694d686980a2c1aa71d86313eb16931ca578e9c23e18dd136a1c175955d8341"
+      "sha256": "60e175bc11986157e9a69be57990cefe0c1855b7e90f07b0a5cca1d0ef3be8b6"
     }
   ]
 }

@@ -1,5 +1,20 @@
 # RELEASE LOG
 
+## 2026-08-25 — Qidian Next v0.1.5-beta6
+
+Status: Beta/Test; secondary-settings UX phase 1 awaiting user real-device confirmation.
+
+Changes:
+
+- Redesigned Content, Account Management and Diagnostics secondary pages with one card-based visual system.
+- Content uses strategy/Provider chips, live route summary and a conditional STV card.
+- Accounts use Provider tabs, Provider-specific fields and compact action buttons.
+- Diagnostics prioritize common tools and collapse advanced actions.
+- Preserved the real-device-compatible `startBrowserAwait` + browser ✓ return/save/execute mechanism.
+- First-level login UI and reading business modules remain unchanged.
+- SHA256: `60e175bc11986157e9a69be57990cefe0c1855b7e90f07b0a5cca1d0ef3be8b6`.
+
+
 ## 2026-08-25 — Qidian Next v0.1.4-beta5
 
 Status: Beta/Test; Shenmo account dependency repair awaiting user real-device confirmation.

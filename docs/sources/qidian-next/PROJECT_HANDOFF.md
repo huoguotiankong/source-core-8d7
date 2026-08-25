@@ -7,10 +7,10 @@
 - Repository id: `qidian-next`
 - Display name: `🌈 起点助手·新架构`
 - Channel: Beta/Test
-- Current version: `0.1.4-beta5`
+- Current version: `0.1.5-beta6`
 - Source path: `sources/novel/qidian-next/qidian-next.json`
 - Permanent Legado identity: `https://m.qidian.com/?qf_source=qidian_next_8d7`
-- SHA256: `f694d686980a2c1aa71d86313eb16931ca578e9c23e18dd136a1c175955d8341`
+- SHA256: `60e175bc11986157e9a69be57990cefe0c1855b7e90f07b0a5cca1d0ef3be8b6`
 
 ## Baseline
 
@@ -67,3 +67,20 @@ Beta3 removed the incompatible custom scheme but exposed an oversized Provider×
 Real-device Beta4 exposed `ReferenceError: qfSmCtxV30 未定义` when executing Shenmo login. Historical working Qidian versions contained four account helper functions (`qfSmCtxV30`, `qfSmInputV30`, `qfSmTrimV30`, `qfSmSaveCredsV30`), while later source cleanup retained `qfSmLoginV30` / check / backend / logout callers but removed those dependencies. Beta5 restores the mature helpers unchanged.
 
 The account action selector now follows the active Provider. Shenmo exposes only login/check/backend/logout; unsupported web-login is no longer shown. Reading business modules are unchanged.
+
+## Secondary settings UI redesign plan
+
+User approved a staged redesign on 2026-08-25. Keep the confirmed two-column static first-level login page. Secondary pages use one visual system: compact gradient header, grouped cards, direct controls, clear current state, and a unified footer explaining that the browser ✓ returns/saves and executes any chosen native action. Do not return to large dynamic `@js:` loginUi or custom-scheme bridges.
+
+Phases:
+
+1. Beta6: Account Management, Diagnostics, Content/Provider settings.
+2. Next phase: Review/Display settings, Interface/Prompt settings, Book-variable guide and Help.
+3. Final polish: spacing, typography, button states, consistent copy, then remove obsolete UI compatibility blocks after real-device confirmation.
+
+## Beta6 secondary settings UI phase 1
+
+- Content: strategy chips, Provider chips, live route summary, STV card shown only for STV.
+- Accounts: four Provider tabs; only the active Provider card is shown; actions are direct two-column buttons and are executed only after ✓ return.
+- Diagnostics: common tools are visible first; deep trace / reset are under an advanced disclosure; selected action is clearly displayed.
+- Runtime reading modules are untouched.
