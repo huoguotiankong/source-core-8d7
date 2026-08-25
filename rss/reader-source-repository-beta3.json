@@ -1,0 +1,32 @@
+[
+  {
+    "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository-beta.json",
+    "sourceName": "🌈 阅读书源仓库 · Beta",
+    "sourceIcon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/reader-repo-icon.jpg",
+    "sourceGroup": "书源仓库",
+    "sourceComment": "UI Beta 3：纯 HTTPS 数据驱动分类，统一列表解析与独立详情 JSON。",
+    "enabled": true,
+    "enabledCookieJar": true,
+    "singleUrl": false,
+    "articleStyle": 0,
+    "jsLib": "",
+    "loginUi": "[]",
+    "loginUrl": "function login(){}",
+    "ruleArticles": "@js:\nlet o={};try{o=JSON.parse(result)}catch(e){o={items:[]}}\nlet xs=Array.isArray(o.items)?o.items:[];\nxs.map(function(x){return JSON.stringify({title:x.name||'未命名',date:x.updatedAt||'',desc:x.summary||'',image:x.icon||'',url:x.detailUrl||x.sourceUrl||''})})",
+    "ruleNextPage": "",
+    "ruleTitle": "$.title",
+    "rulePubDate": "$.date",
+    "ruleDescription": "$.desc",
+    "ruleImage": "$.image",
+    "ruleLink": "$.url",
+    "ruleContent": "@js:\nlet d={};try{d=JSON.parse(result)}catch(e){d={kind:'error',title:'页面解析失败',summary:String(e)}}\nfunction esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;')}\nconst RAW='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/';\nconst CDN='https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/';\nlet title=d.title||'🌈 阅读书源仓库',summary=d.summary||'',badges=Array.isArray(d.badges)?d.badges:[],sections=Array.isArray(d.sections)?d.sections:[],kind=d.kind||'info',action='';\nif(kind==='rss'&&d.rssUrl){action='<a class=\\\"btn\\\" href=\\\"legado://import/rssSource?src='+esc(d.rssUrl)+'\\\">重新导入最新版订阅源</a>'}\nif(kind==='bundle'&&d.bundlePath){let u=RAW+d.bundlePath,b=CDN+d.bundlePath;action='<a class=\\\"btn\\\" href=\\\"legado://import/bookSource?src='+u+'\\\">主线路批量导入</a><a class=\\\"btn alt\\\" href=\\\"legado://import/bookSource?src='+b+'\\\">备用线路批量导入</a>'}\nif(kind==='source'&&d.sourceUrl){let u=d.sourceUrl,b=d.backupUrl||'';action='<a class=\\\"btn\\\" href=\\\"legado://import/bookSource?src='+esc(u)+'\\\">导入 / 更新书源</a>';if(b)action+='<a class=\\\"btn alt\\\" href=\\\"legado://import/bookSource?src='+esc(b)+'\\\">备用线路导入</a>'}\nlet badgeHtml=badges.map(function(x){return '<i>'+esc(x)+'</i>'}).join('');\nlet sectionHtml=sections.map(function(x){return '<div class=\\\"card\\\"><b>'+esc(x.title||'说明')+'</b><p>'+esc(x.text||'').replace(/\\n/g,'<br>')+'</p></div>'}).join('');\n`<!doctype html><html><head><meta name=\\\"viewport\\\" content=\\\"width=device-width,initial-scale=1\\\"><style>:root{color-scheme:light dark;--bg:#f6f7fb;--card:#fff;--text:#202532;--muted:#727b8d;--line:#e6e9f0;--p1:#5d6dff;--p2:#9a5cff}@media(prefers-color-scheme:dark){:root{--bg:#10131a;--card:#191e27;--text:#eef2f8;--muted:#9ba5b7;--line:#2b3240;--p1:#7180ff;--p2:#a46cff}}*{box-sizing:border-box}body{margin:0;padding:18px;background:var(--bg);color:var(--text);font-family:sans-serif}.wrap{max-width:720px;margin:auto}.hero{padding:22px;border-radius:22px;color:#fff;background:linear-gradient(135deg,var(--p1),var(--p2));box-shadow:0 12px 30px rgba(80,80,160,.18)}h1{font-size:23px;margin:0 0 9px}.hero p{line-height:1.65;margin:0;opacity:.94}.badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}.badges i{font-style:normal;font-size:12px;padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.18)}.card{margin-top:14px;padding:16px;border:1px solid var(--line);background:var(--card);border-radius:17px}.card p{color:var(--muted);line-height:1.7;margin-bottom:0}.btn{display:block;margin-top:14px;padding:14px 16px;text-align:center;text-decoration:none;color:#fff;font-weight:700;border-radius:14px;background:linear-gradient(135deg,var(--p1),var(--p2))}.btn.alt{background:var(--card);color:var(--p1);border:1px solid var(--p1)}.foot{text-align:center;color:var(--muted);font-size:12px;padding:20px 0}</style></head><body><div class=\\\"wrap\\\"><div class=\\\"hero\\\"><h1>${esc(title)}</h1><p>${esc(summary)}</p><div class=\\\"badges\\\">${badgeHtml}</div></div>${sectionHtml}${action}<div class=\\\"foot\\\">🌈 阅读书源仓库 · 0.2.2-beta3</div></div></body></html>`",
+    "nextContentUrl": "",
+    "enableJs": true,
+    "loadWithBaseUrl": true,
+    "sortUrl": "🏠 首页::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/home.json\n⭐ 正式版::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json\n🧪 测试版::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/beta.json\n📦 批量导入::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/bundle.json\n📖 使用说明::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/help.json",
+    "type": 0,
+    "preload": false,
+    "cacheFirst": false,
+    "lastUpdateTime": 1787647200000
+  }
+]
