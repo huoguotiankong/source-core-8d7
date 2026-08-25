@@ -49,12 +49,30 @@ Main objects:
 - `bundles/all-stable.json`: stable batch import bundle.
 - `bundles/all-beta.json`: beta batch import bundle.
 - `rss/reader-source-repository.json`: current stable Legado RSS repository entry.
-- `rss/reader-source-repository-beta.json`: UI/interaction test channel for the repository RSS source.
+- `rss/reader-source-repository-beta.json`: stable identity URL of the repository UI Beta source.
+- `rss/reader-source-repository-beta2.json`: current Beta 2 import file.
+- `rss/data/`: HTTPS-backed static payloads used by repository UI categories/details.
+- `assets/reader-repo-icon.jpg`: repository subscription icon.
 - `sources/`: independent complete book-source JSON files as they are migrated in.
 
 Stable and Beta are separate channels. A source must not enter Stable until the user has confirmed it in the real Legado app or explicitly requests a stable release.
 
-## 6. RSS repository UI direction
+## 6. Stable identity model
+
+Legado book sources are treated as the same source when they share the same stable `bookSourceUrl` identity.
+
+Project policy:
+
+- Same source Stable/Beta -> exactly the same `bookSourceUrl`.
+- Version and channel are never encoded into that identity.
+- Do not use the original website homepage as the default identity URL.
+- Project namespace: `https://sc8d7.invalid/legado/<source-id>-8d7`.
+- Actual network hosts stay in runtime/search/discovery/content rules, not in the identity namespace.
+- Legacy sources that rely on `bookSourceUrl` as a relative URL base must migrate that runtime dependency before adopting the project identity URL.
+
+This ensures Stable/Beta imports update the same Legado source instead of creating duplicate sources.
+
+## 7. RSS repository UI direction
 
 The repository UI should combine native Legado browsing with lightweight HTML detail pages:
 
@@ -65,6 +83,7 @@ The repository UI should combine native Legado browsing with lightweight HTML de
 - GitHub Raw is primary distribution; jsDelivr can be used as a manual fallback line.
 - Avoid turning the whole RSS repository into a heavy remote webpage.
 - Avoid remote JS as a required runtime dependency for the RSS source itself.
+- RSS navigation/detail request URLs must be HTTP/HTTPS. Do not use `data:` in AnalyzeUrl-driven category/detail paths.
 
 Reference-source lessons:
 
@@ -72,39 +91,43 @@ Reference-source lessons:
 - Borrow simple classification and route-fallback ideas from lightweight feed sources.
 - Do not copy activation/remote-code architectures that reduce independence or maintainability.
 
-## 7. Current status
+## 8. Current status
 
 Completed:
 
 - Repository `source-core-8d7` created and connected.
 - Manifest / Stable / Beta / Bundle skeleton created.
 - `🌈 阅读书源仓库` RSS source created.
-- User confirmed the RSS source can be imported into Legado.
+- User confirmed the stable RSS source can be imported into Legado.
 - `landing` branch created, cleaned to a neutral entry only, and set as the GitHub default branch by the user.
 - Long-term project documents initialized.
+- RSS UI Beta 1 real-device test exposed the `data:` URL navigation incompatibility.
+- RSS UI Beta 2 prepared with HTTPS-only category/detail navigation and a dedicated repository icon.
+- Stable `bookSourceUrl` identity convention defined for future book-source publication.
 
 In progress:
 
-- Repository RSS UI Beta: native list + styled detail page + dual channel + batch import + fallback line.
+- RSS UI Beta 2 real-device verification.
 
 Not yet completed:
 
 - No real book source has completed the full repository loop yet.
 - Stable/Beta lists and bundles are currently framework-level and will be populated as sources are migrated.
 
-## 8. Next roadmap
+## 9. Next roadmap
 
 ### Phase A — RSS repository UI
 
-1. Publish a separate RSS UI Beta without replacing the confirmed current RSS source.
-2. Test category switching, empty-state display, detail pages, light/dark themes, route switching and one-click import behavior on a real device.
-3. After user confirmation, promote the UI to the stable RSS path while preserving the existing stable source identity/URL where practical.
+1. Import/test RSS UI Beta 2.
+2. Verify home, Stable, Beta, Bundle and Help categories.
+3. Verify detail pages, light/dark themes, repository icon, route switching and one-click import behavior.
+4. After user confirmation, promote the UI to the stable RSS path while preserving stable RSS source identity.
 
 ### Phase B — first end-to-end source
 
 Select one already verified source and complete:
 
-`source JSON -> Beta/Stable entry -> Manifest -> Bundle -> RSS listing -> one-click import -> user real-device test`
+`source JSON -> permanent source ID/bookSourceUrl -> Beta/Stable entry -> Manifest -> Bundle -> RSS listing -> one-click import -> user real-device test`
 
 Do not bulk-migrate many sources before this loop is proven.
 
@@ -116,7 +139,7 @@ Migrate verified sources one by one. Preserve independent complete JSON files. D
 
 Every release updates the relevant source file plus Manifest / Subscription / Bundle / Release Log.
 
-## 9. Qidian project note
+## 10. Qidian project note
 
 The Qidian ecosystem source is a large independent engineering project. Historical v4.1 handoff material exists, but it must not automatically be treated as the latest current state because development continued after that report.
 
