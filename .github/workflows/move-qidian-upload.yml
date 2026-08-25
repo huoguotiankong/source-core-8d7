@@ -1,0 +1,32 @@
+name: move-qidian-root-upload
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'bookSource_起点官方生态.json'
+      - '.github/workflows/move-qidian-upload.yml'
+permissions:
+  contents: write
+jobs:
+  move:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Move root upload into incoming
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC='bookSource_起点官方生态.json'
+          if [ ! -f "$SRC" ]; then
+            echo 'No root Qidian upload to move; nothing to do.'
+            exit 0
+          fi
+          mkdir -p incoming
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git mv "$SRC" "incoming/$SRC"
+          git commit -m 'chore: stage Qidian upload for validation'
+          git push origin main
