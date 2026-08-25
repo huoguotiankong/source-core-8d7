@@ -1,0 +1,6 @@
+Large source intake directory.
+
+Upload exactly one original JSON file here on the main branch.
+The repository workflow validates the expected source, assigns the permanent Legado identity, publishes the complete Beta source, updates Manifest / Subscription / Bundle / RSS detail metadata, and removes the uploaded intake file after successful publication.
+
+Do not edit or rename the source content before upload unless the current project task explicitly requires it.
