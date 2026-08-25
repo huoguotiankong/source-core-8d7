@@ -19,12 +19,12 @@ Imported book sources remain complete local Legado JSON sources. Normal reading 
 
 ## 3. Branch model
 
+- `landing`: GitHub default branch. Neutral low-discoverability landing branch containing only a generic entry file.
 - `main`: actual development / documentation / distribution branch.
-- `landing`: neutral low-discoverability landing branch. It contains only a generic entry file.
 
-The existing RSS subscription and raw URLs continue to use `main`; changing the default branch must not change those raw URLs.
+All RSS subscription and Raw distribution URLs continue to use `main`. Changing the default branch does not change those URLs.
 
-Target state: set `landing` as the GitHub default branch while keeping `main` as the real project branch.
+The user confirmed on 2026-08-25 that the repository default branch has been switched to `landing`.
 
 ## 4. Core repository documents
 
@@ -48,12 +48,31 @@ Main objects:
 - `subscription/beta.json`: beta/test channel listing.
 - `bundles/all-stable.json`: stable batch import bundle.
 - `bundles/all-beta.json`: beta batch import bundle.
-- `rss/reader-source-repository.json`: Legado RSS source used as the repository UI/entry.
+- `rss/reader-source-repository.json`: current stable Legado RSS repository entry.
+- `rss/reader-source-repository-beta.json`: UI/interaction test channel for the repository RSS source.
 - `sources/`: independent complete book-source JSON files as they are migrated in.
 
 Stable and Beta are separate channels. A source must not enter Stable until the user has confirmed it in the real Legado app or explicitly requests a stable release.
 
-## 6. Current status
+## 6. RSS repository UI direction
+
+The repository UI should combine native Legado browsing with lightweight HTML detail pages:
+
+- Native top categories and native article list for speed and familiar interaction.
+- HTML detail page for source metadata, status, version, tags, changelog and import buttons.
+- Stable / Beta are clearly separated.
+- Batch import is a separate category.
+- GitHub Raw is primary distribution; jsDelivr can be used as a manual fallback line.
+- Avoid turning the whole RSS repository into a heavy remote webpage.
+- Avoid remote JS as a required runtime dependency for the RSS source itself.
+
+Reference-source lessons:
+
+- Borrow detail-page/import-button/update-log ideas from mature repository-style RSS sources.
+- Borrow simple classification and route-fallback ideas from lightweight feed sources.
+- Do not copy activation/remote-code architectures that reduce independence or maintainability.
+
+## 7. Current status
 
 Completed:
 
@@ -61,22 +80,25 @@ Completed:
 - Manifest / Stable / Beta / Bundle skeleton created.
 - `🌈 阅读书源仓库` RSS source created.
 - User confirmed the RSS source can be imported into Legado.
-- `landing` branch created and cleaned to a neutral entry only.
+- `landing` branch created, cleaned to a neutral entry only, and set as the GitHub default branch by the user.
 - Long-term project documents initialized.
+
+In progress:
+
+- Repository RSS UI Beta: native list + styled detail page + dual channel + batch import + fallback line.
 
 Not yet completed:
 
-- GitHub default branch has not yet been switched to `landing`.
 - No real book source has completed the full repository loop yet.
 - Stable/Beta lists and bundles are currently framework-level and will be populated as sources are migrated.
 
-## 7. Next roadmap
+## 8. Next roadmap
 
-### Phase A — repository foundation
+### Phase A — RSS repository UI
 
-1. Switch GitHub default branch to `landing`.
-2. Keep all actual files and raw subscription URLs on `main`.
-3. Verify the existing imported RSS source still loads after the default-branch switch.
+1. Publish a separate RSS UI Beta without replacing the confirmed current RSS source.
+2. Test category switching, empty-state display, detail pages, light/dark themes, route switching and one-click import behavior on a real device.
+3. After user confirmation, promote the UI to the stable RSS path while preserving the existing stable source identity/URL where practical.
 
 ### Phase B — first end-to-end source
 
@@ -94,7 +116,7 @@ Migrate verified sources one by one. Preserve independent complete JSON files. D
 
 Every release updates the relevant source file plus Manifest / Subscription / Bundle / Release Log.
 
-## 8. Qidian project note
+## 9. Qidian project note
 
 The Qidian ecosystem source is a large independent engineering project. Historical v4.1 handoff material exists, but it must not automatically be treated as the latest current state because development continued after that report.
 
