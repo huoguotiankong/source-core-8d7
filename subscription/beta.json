@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-25T22:23:08+08:00",
+  "updatedAt": "2026-08-25T22:35:22+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -41,7 +41,7 @@
       "summary": "起点全新架构主线：官方搜索/目录/评论体系 + 多正文 Provider；登录设置使用静态双列首页与多级设置页。",
       "icon": "",
       "channel": "beta",
-      "version": "0.1.0-beta1",
+      "version": "0.1.1-beta2",
       "updatedAt": "2026-08-25",
       "tags": [
         "起点",
@@ -54,11 +54,10 @@
         "多正文 Provider"
       ],
       "changelog": [
-        "建立独立于旧起点官方生态的全新开发主线",
-        "采用已真机验证的 loginfix4 双列静态登录首页",
-        "二级设置页使用 java.startBrowserAwait，规避动态 @js: loginUi 兼容问题",
-        "首版业务能力保持 v4.2.1-alpha2 基线，避免同时改动其它稳定模块",
-        "使用独立起点同源永久身份，后续 Beta/Stable 保持不变"
+        "修复账号管理与诊断工具动作回传失效",
+        "中文设置字段使用 Unicode 唯一控件 ID，消除同长度中文键碰撞",
+        "账号/诊断动作改用 qfnext:// WebView 拦截桥接",
+        "保持 beta1 搜索、目录、正文、评论和 Provider 业务不变"
       ],
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json",

@@ -1,5 +1,17 @@
 # RELEASE LOG
 
+## 2026-08-25 — Qidian Next v0.1.1-beta2
+
+Status: Beta/Test; account/diagnostic compatibility fix awaiting user real-device confirmation.
+
+Changes:
+
+- Fixed duplicate DOM ids generated from Chinese setting keys.
+- Reworked Account Management and Diagnostics actions to use `qfnext://` WebView interception instead of mutated-DOM action return.
+- Kept search/detail/catalog/content/review/Provider business logic unchanged from Beta1.
+- SHA256: `031677a7889e2eab926c9a508b422fde85864527dc37bb44c807088a496d2ff3`.
+
+
 ## 2026-08-25 — Qidian Next v0.1.0-beta1
 
 Status: Beta/Test; published to the subscription repository, awaiting full user real-device regression.

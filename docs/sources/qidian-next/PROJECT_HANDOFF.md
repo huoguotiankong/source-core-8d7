@@ -7,10 +7,10 @@
 - Repository id: `qidian-next`
 - Display name: `🌈 起点助手·新架构`
 - Channel: Beta/Test
-- Current version: `0.1.0-beta1`
+- Current version: `0.1.1-beta2`
 - Source path: `sources/novel/qidian-next/qidian-next.json`
 - Permanent Legado identity: `https://m.qidian.com/?qf_source=qidian_next_8d7`
-- SHA256: `708e871bfae7fc50cac55e19fa73b34b63bb6710494295d12aa712a218548064`
+- SHA256: `031677a7889e2eab926c9a508b422fde85864527dc37bb44c807088a496d2ff3`
 
 ## Baseline
 
@@ -45,3 +45,12 @@ Still requires regression testing after repository import:
 ## Development rule
 
 Continue new work on this independent source line. Do not overwrite the old `qidian-official` source by default. Promote to Stable only after explicit user real-device confirmation.
+## Beta2 account/diagnostic fix
+
+Real-device testing of Beta1 was broadly normal, but Account Management and Diagnostics were faulty. Root causes identified in the login HTML layer:
+
+- Chinese setting keys were converted to underscore-only DOM ids, so same-length Chinese keys collided.
+- account/diagnostic actions relied on returning mutated DOM state from `startBrowserAwait`, which is not reliable in the current Legado WebView path.
+
+Beta2 uses Unicode-derived unique DOM ids and a `qfnext://` custom-URL bridge intercepted by `shouldOverrideUrlLoading`. Business reading modules are unchanged.
+
