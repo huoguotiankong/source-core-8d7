@@ -227,3 +227,13 @@ Fix in Beta10:
 
 Status: published to RSS UI Beta10; awaiting user real-device confirmation.
 
+## 17. 情无账号会话有效但 VIP 正文被服务端拒绝 — 1.0.1-beta1 修复中
+
+真机现象：账号管理显示情无登录/检测成功，但固定情无读取 VIP 章节仍返回 `Service request failed. Reference: ...`。
+
+定位：登录层使用情无自己的 UA/Referer，但 lazy `limited_qw` 正文模块退化成仅发送 `Accept: application/json`；历史已验证版本要求 `/qd/content.php` 显式使用情无 UA + `Referer: <base>/ranking.html`。当前代码还会对所有 VIP 失败无条件续签，导致服务业务失败也被误判为登录问题。
+
+Beta 修复：恢复情无正文专属 UA/Referer/Accept；只对明确认证错误续签；将“账号会话有效”和“VIP正文已验证”拆成两层状态；保留服务端 Reference 供后续排查。
+
+Status: `🌈 起点增强 1.0.1-beta1` 待真机验证；Stable 1.0.0 未修改。
+

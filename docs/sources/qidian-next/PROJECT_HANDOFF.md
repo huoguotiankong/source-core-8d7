@@ -95,3 +95,12 @@ Distribution rule after Stable 1.0.0:
 - Future test versions must use `sources/novel/qidian-next/qidian-next-beta.json` (or another explicitly beta-only path) while preserving the same `bookSourceUrl`.
 - Stable and Beta subscription entries may therefore point to different files but represent the same Legado source identity.
 - RSS source detail is a current-state introduction, not a per-version history. Replace the current-version section on release; keep historical changes only in `docs/RELEASE_LOG.md`.
+
+## Active Beta 1.0.1-beta1 — 情无 VIP 认证修复
+
+Stable remains `1.0.0` at `sources/novel/qidian-next/qidian-next.json`. Beta path: `sources/novel/qidian-next/qidian-next-beta.json`.
+
+Real-device trigger: 情无账号登录/检测成功，但固定情无读取 VIP 章节返回 `Service request failed. Reference: ...`. Historical working builds required an explicit 情无 User-Agent + Referer for `/qd/content.php`; the current lazy module had regressed to Accept-only headers. `/auth.php?action=me` validates the account session but does not prove that VIP content is accepted.
+
+Beta changes: restore 情无-specific content headers; retry only authentication-like failures; mark VIP verification only after real paid content succeeds; keep service Reference visible on non-auth failures; keep Stable and all unrelated reading domains unchanged.
+

@@ -1,0 +1,22 @@
+{
+  "kind": "source",
+  "title": "🌈 起点增强 · Beta",
+  "summary": "起点增强测试版：本版只修情无账号会话与 VIP 正文认证/请求头链路。",
+  "badges": [
+    "Beta",
+    "1.0.1-beta1",
+    "情无专项"
+  ],
+  "sections": [
+    {
+      "title": "本次测试",
+      "text": "恢复情无正文请求的独立 UA/Referer/Accept；登录成功只表示账号会话有效，实际 VIP 正文成功后才视为正文链验证通过。"
+    },
+    {
+      "title": "测试重点",
+      "text": "固定情无打开同一 VIP 章节；若仍失败，请保留 Service request failed 后面的 Reference。"
+    }
+  ],
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=10101",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=10101"
+}

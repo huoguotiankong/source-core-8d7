@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-26T00:23:32+08:00",
+  "updatedAt": "2026-08-26T07:36:18+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -34,6 +34,31 @@
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@111c2fa8b25e8717e78fe9e39944c5177e8c9f63/sources/novel/qidian/qidian-official.json",
       "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/111c2fa8b25e8717e78fe9e39944c5177e8c9f63/sources/novel/qidian/qidian-official.json",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/qidian-official.json"
+    },
+    {
+      "id": "qidian-next-beta",
+      "name": "🌈 起点增强 · Beta",
+      "summary": "起点增强测试版：本版只修情无账号会话与 VIP 正文认证/请求头链路。",
+      "icon": "",
+      "channel": "beta",
+      "version": "1.0.1-beta1",
+      "updatedAt": "2026-08-26",
+      "tags": [
+        "起点",
+        "测试版",
+        "情无",
+        "VIP正文",
+        "认证修复",
+        "多正文 Provider"
+      ],
+      "changelog": [
+        "恢复情无 content.php 专属 User-Agent / Referer / Accept，避免继承起点全局请求环境",
+        "账号登录/检测不再等同于 VIP 正文可用；首次真实 VIP 正文成功后才标记已验证"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=10101",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=10101",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=10101",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?v=10101"
     }
   ]
 }

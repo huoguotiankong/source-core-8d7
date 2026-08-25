@@ -1,5 +1,18 @@
 # RELEASE LOG
 
+## 2026-08-26 — 起点增强 1.0.1-beta1
+
+Status: Beta/Test; 情无账号/VIP正文专项修复，等待真机确认。
+
+Changes:
+
+- 恢复情无 `/qd/content.php` 的独立 User-Agent / Referer / Accept 请求头。
+- 登录/检测只表示账号会话有效；真实 VIP 正文成功后才记录“VIP正文已验证”。
+- 仅明确认证错误触发一次自动续签；普通 `Service request failed. Reference: ...` 不再盲目重登。
+- Stable `1.0.0` 文件与正式通道保持不变。
+- Beta SHA256: `1d4ee73540cc01747ddc1a1a3925343bbc4fae2541791088ee7a2237991d8cf7`.
+
+
 ## 2026-08-26 — RSS repository UI 0.3.0-beta10
 
 Status: Beta/Test; repository self-update/channel-isolation fix awaiting real-device confirmation.
