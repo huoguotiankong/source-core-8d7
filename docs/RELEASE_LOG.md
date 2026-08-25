@@ -1,34 +1,43 @@
 # RELEASE LOG
 
-## 2026-08-25 — RSS repository UI Beta 2
+## 2026-08-25 — RSS repository UI Beta 3
 
 Status: Beta/Test; awaiting user real-device confirmation.
 
 Changes:
 
-- Fixed the Beta 1 navigation failure caused by using `data:` URLs in RSS category/detail request paths.
-- Added HTTPS-backed payload endpoints:
-  - `rss/data/home.json`
-  - `rss/data/bundle.json`
-  - `rss/data/help.json`
-- All Beta 2 top categories now resolve through HTTP/HTTPS only.
-- Detail navigation also avoids `data:` request URLs.
-- Added a dedicated repository icon asset.
-- Added stable Legado source identity policy:
-  - same source Stable/Beta share one `bookSourceUrl`,
-  - version/channel are not encoded in the identity,
-  - project identity namespace uses `https://sc8d7.invalid/legado/<source-id>-8d7`,
-  - legacy sources that depend on `bookSourceUrl` as runtime base must migrate their request base before adopting the identity URL.
-- Beta 2 import file keeps the same internal Beta RSS `sourceUrl` identity as Beta 1 so importing Beta 2 should update the existing Beta subscription rather than create another one.
+- Investigated Beta 2 after the user reported that Home / Bundle / Help still failed while Stable/Beta loaded.
+- Confirmed the HTTPS payload files themselves were valid.
+- Identified the Beta 2 helper-context bug: nested `q() -> repo()` calls lost the expected `this.source` binding.
+- Rebuilt Home / Bundle / Help as data-driven HTTPS lists with explicit `detailUrl` fields.
+- Added independent HTTPS detail JSON files under `rss/data/details/`.
+- Simplified the RSS list parser so all categories share one generic path.
+- Removed dynamic helper chaining from category navigation.
+- Kept the same internal Beta RSS `sourceUrl` identity so Beta 3 updates the existing Beta subscription.
+- Repository icon remains at `assets/reader-repo-icon.jpg`.
 
 Pending real-device verification:
 
-- home / bundle / help categories,
+- all five top categories,
 - detail-page opening,
-- repository icon display,
-- Raw/jsDelivr switching,
-- RSS update button,
-- future book-source import button behavior.
+- icon display,
+- RSS update action,
+- bundle import action.
+
+## 2026-08-25 — RSS repository UI Beta 2
+
+Status: Beta/Test; superseded by Beta 3 after real-device failure.
+
+Changes:
+
+- Replaced Beta 1 `data:` category URLs with HTTPS payloads.
+- Added repository icon asset.
+- Added stable Legado source identity policy.
+
+Real-device result:
+
+- Stable/Beta categories loaded.
+- Home / Bundle / Help still failed due to the helper-context bug later fixed in Beta 3.
 
 ## 2026-08-25 — RSS repository UI Beta preparation
 
@@ -44,10 +53,7 @@ Completed:
   - styled HTML detail page for metadata and import actions,
   - explicit Stable / Beta separation,
   - separate batch-import area,
-  - GitHub Raw primary line with jsDelivr manual fallback,
   - no required remote-JS runtime dependency for the repository RSS source.
-- Extended subscription metadata schema for version, tags, changelog and backup URL.
-- Prepared a separate RSS UI Beta path so the existing confirmed RSS source is not overwritten before real-device testing.
 
 ## 2026-08-25 — Repository foundation
 
@@ -61,14 +67,10 @@ Completed:
 - Added Stable and Beta subscription-channel skeletons.
 - Added Stable and Beta batch Bundle skeletons.
 - Added `🌈 阅读书源仓库` RSS source.
-- Corrected the RSS import workflow: Raw JSON URL is used inside Legado's import dialog; `legado://import/...` is reserved for external one-click import.
+- Corrected the RSS import workflow.
 - User confirmed the RSS source imports successfully in the real Legado app.
-- Created a neutral `landing` branch for low casual discoverability while preserving real distribution on `main`.
-- Added long-term project documents:
-  - `PROJECT_PLAN.md`
-  - `DEVELOPMENT_RULES.md`
-  - `KNOWN_ISSUES.md`
-  - `RELEASE_LOG.md`
+- Created a neutral `landing` branch and later made it the default branch.
+- Added long-term project documents.
 
 ## Release policy
 
