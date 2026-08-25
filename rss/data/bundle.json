@@ -1,1 +1,19 @@
-{"type":"bundle"}
+{
+  "type": "bundle",
+  "name": "批量导入",
+  "updatedAt": "2026-08-25T16:40:00+08:00",
+  "items": [
+    {
+      "name": "⭐ 一键导入全部正式版",
+      "summary": "只包含已经确认进入 Stable 的书源。",
+      "updatedAt": "Stable",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/bundle-stable.json"
+    },
+    {
+      "name": "🧪 一键导入全部测试版",
+      "summary": "包含当前 Beta / 测试通道书源。",
+      "updatedAt": "Beta",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/bundle-beta.json"
+    }
+  ]
+}
