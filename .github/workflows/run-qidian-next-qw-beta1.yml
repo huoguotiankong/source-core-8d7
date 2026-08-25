@@ -18,6 +18,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          echo 'trigger: beta1-qingwu-auth'
           BEFORE=$(sha256sum sources/novel/qidian-next/qidian-next.json | awk '{print $1}')
           test "$BEFORE" = "d64937b9dc4e528795d3818834a6ddab1828df1af84bb483b16961a40d8286ec"
           python scripts/patch_qidian_next_qw_1_0_1_beta1.py
