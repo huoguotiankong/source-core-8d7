@@ -1,0 +1,7 @@
+{
+  "kind": "bundle",
+  "title": "⭐ 全部正式版",
+  "summary": "批量导入所有已确认进入 Stable 的书源。",
+  "badges": ["Stable"],
+  "bundlePath": "bundles/all-stable.json"
+}
