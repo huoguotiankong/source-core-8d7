@@ -1,39 +1,12 @@
 {
-  "kind": "source",
-  "title": "🌈 起点增强",
-  "summary": "起点增强型完整书源：官方搜索/详情/目录/评论体系 + 多正文 Provider；设置采用静态双列首页与卡片化多级页面。",
-  "badges": [
-    "Stable",
-    "1.0.0",
-    "小说",
-    "增强版"
-  ],
+  "kind": "info",
+  "title": "🌈 起点增强 · 测试条目已结束",
+  "summary": "该旧测试条目已经结束，正式版请从「⭐ 正式版」分类进入。",
+  "badges": ["已转正式"],
   "sections": [
     {
-      "title": "定位",
-      "text": "独立于旧「起点官方生态」和「起点助手」的增强型起点书源，长期维护官方数据与多正文 Provider 的组合能力。"
-    },
-    {
-      "title": "核心能力",
-      "text": "官方搜索、书籍详情、目录、段评、本章说、作者说等数据链保持起点体系；正文支持多 Provider、STV 与既有切源策略。"
-    },
-    {
-      "title": "设置架构",
-      "text": "一级页使用静态双列宫格；二级设置使用卡片化 startBrowserAwait 页面。当前正文设置、账号管理、诊断工具已完成第一阶段重构。"
-    },
-    {
-      "title": "当前版本",
-      "text": "1.0.0 Stable。由 v0.1.5-beta6 按用户明确要求晋升；本次主要完成正式命名、正式通道发布和仓库结构整理。"
-    },
-    {
-      "title": "发布说明",
-      "text": "这里以后只展示当前版本与长期能力，不逐版累加历史介绍。完整版本历史统一记录在仓库 Release Log。"
-    },
-    {
-      "title": "唯一身份",
-      "text": "https://m.qidian.com/?qf_source=qidian_next_8d7"
+      "title": "通道说明",
+      "text": "此页面保留仅用于兼容旧缓存，不再提供任何书源导入按钮。"
     }
-  ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json"
+  ]
 }
