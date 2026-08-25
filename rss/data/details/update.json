@@ -1,0 +1,7 @@
+{
+  "kind": "rss",
+  "title": "🔄 更新仓库订阅源",
+  "summary": "当前测试界面版本 0.2.2-beta3。",
+  "badges": ["Beta 3"],
+  "rssUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository-beta3.json"
+}
