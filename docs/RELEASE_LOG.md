@@ -1,5 +1,29 @@
 # RELEASE LOG
 
+## 2026-08-25 — RSS repository UI Beta 6
+
+Status: Beta/Test; awaiting user real-device icon verification.
+
+Changes:
+
+- Kept the Beta 3 HTTPS-only category/navigation baseline already confirmed on the user's device.
+- Added a real compact 96×96 PNG asset at `assets/reader-repo-icon.png`.
+- Changed `sourceIcon` from Base64/Raw experiments to the jsDelivr CDN URL for the PNG asset.
+- Updated the stable Beta identity file `rss/reader-source-repository-beta.json` without changing its internal `sourceUrl` identity.
+- Added snapshot `rss/reader-source-repository-beta6.json`.
+
+## 2026-08-25 — Large source direct-upload publisher
+
+Status: infrastructure ready; Qidian Beta publication waiting for one original JSON upload into `main/incoming/`.
+
+Changes:
+
+- Replaced the slow multi-part ChatGPT-to-GitHub staging approach with a direct GitHub upload intake.
+- Added `incoming/UPLOAD_HERE.txt` as the large-source intake location.
+- Updated `.github/workflows/assemble-qidian.yml` to watch `incoming/*.json` on `main`.
+- The workflow verifies the original Qidian file SHA256, assigns the permanent Legado identity URL, validates the final SHA256, and automatically updates the complete Beta source, Manifest, Beta Subscription, Beta Bundle, RSS detail metadata and Release Log.
+- Failed integrity checks stop publication before an incomplete/corrupt source can enter the Beta channel.
+
 ## 2026-08-25 — RSS repository UI Beta 4
 
 Status: Beta/Test; icon fix awaiting user real-device confirmation.
