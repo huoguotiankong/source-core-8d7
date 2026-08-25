@@ -1,45 +1,58 @@
-name: assemble-qidian
+name: publish-qidian-upload
 on:
   push:
     branches: [main]
     paths:
-      - '.staging/qidian/READY'
+      - 'incoming/*.json'
 permissions:
   contents: write
 jobs:
-  assemble:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-      - name: Assemble and publish Qidian beta
+      - name: Validate and publish Qidian beta
         shell: bash
         run: |
           set -euo pipefail
+          mapfile -t files < <(find incoming -maxdepth 1 -type f -name '*.json' | sort)
+          if [ "${#files[@]}" -ne 1 ]; then
+            echo "Expected exactly one JSON file in incoming/, got ${#files[@]}" >&2
+            exit 1
+          fi
+          export INCOMING_FILE="${files[0]}"
           mkdir -p sources/novel/qidian bundles rss/data/details
-          cat .staging/qidian/part-* > /tmp/qidian.xz.b64
-          base64 -d /tmp/qidian.xz.b64 | xz -d > sources/novel/qidian/qidian-official.json
           python - <<'PY'
-          import json, hashlib, pathlib
+          import os,json,hashlib,pathlib,re
           ROOT=pathlib.Path('.')
-          p=ROOT/'sources/novel/qidian/qidian-official.json'
-          raw=p.read_bytes()
-          expected='c952233cc72468a79bd94b784cfe34c0101b0eacecb39b52bff7b9fab691a8a3'
-          got=hashlib.sha256(raw).hexdigest()
-          assert got==expected,(got,expected)
-          data=json.loads(raw)
+          incoming=ROOT/os.environ['INCOMING_FILE']
+          original=incoming.read_bytes()
+          expected_original='7b97e89b2c80457eb3f24e377eb47671ff563d6f63305e3a29408461a19698fd'
+          got_original=hashlib.sha256(original).hexdigest()
+          assert got_original==expected_original,(got_original,expected_original)
+          data=json.loads(original)
           assert isinstance(data,list) and len(data)==1
           src=data[0]
           assert src.get('bookSourceName')=='起点官方生态'
-          assert src.get('bookSourceUrl')=='https://sc8d7.invalid/legado/qidian-official-8d7'
+          identity='https://sc8d7.invalid/legado/qidian-official-8d7'
+          src['bookSourceUrl']=identity
+          raw=json.dumps(data,ensure_ascii=False,separators=(',',':')).encode('utf-8')
+          expected_final='c952233cc72468a79bd94b784cfe34c0101b0eacecb39b52bff7b9fab691a8a3'
+          got_final=hashlib.sha256(raw).hexdigest()
+          assert got_final==expected_final,(got_final,expected_final)
+          target=ROOT/'sources/novel/qidian/qidian-official.json'
+          target.write_bytes(raw)
           version='4.2.1-alpha2'
+          comment=str(src.get('bookSourceComment') or '')
+          m=re.search(r'v(\d+\.\d+\.\d+-alpha\d+)',comment)
+          if m: version=m.group(1)
           now='2026-08-25T19:36:00+08:00'
           day='2026-08-25'
           raw_url='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian/qidian-official.json'
           backup='https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian/qidian-official.json'
-          identity='https://sc8d7.invalid/legado/qidian-official-8d7'
           detail_url='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/qidian-official.json'
           summary='起点官方生态大型书源：官方搜索/目录/评论体系 + 多正文 Provider；本测试版新增 STV 独立正文入口。'
           tags=['起点','官方目录','段评','本章说','作者说','书友圈','STV','多正文 Provider']
@@ -60,15 +73,15 @@ jobs:
           old=rp.read_text(encoding='utf-8')
           marker='## 2026-08-25 — Qidian official ecosystem v4.2.1-alpha2 Beta'
           if marker not in old:
-            block=(marker+'\n\nStatus: Beta/Test; generated and SHA256 verified, awaiting user real-device confirmation.\n\nChanges:\n\n- Published the current uploaded `起点官方生态` baseline to the Beta channel.\n- Assigned permanent Legado identity `https://sc8d7.invalid/legado/qidian-official-8d7`.\n- Kept the existing business rules unchanged; only the top-level identity URL was replaced before publication.\n- Published complete source JSON, Beta catalog entry, Beta bundle, Manifest metadata and RSS detail payload.\n- Assembly SHA256: `'+got+'`.\n\n')
+            block=(marker+'\n\nStatus: Beta/Test; uploaded source validated and SHA256 verified, awaiting user real-device confirmation.\n\nChanges:\n\n- Published the current uploaded `起点官方生态` baseline to the Beta channel.\n- Assigned permanent Legado identity `https://sc8d7.invalid/legado/qidian-official-8d7`.\n- Kept existing business rules unchanged; only the top-level identity URL was replaced before publication.\n- Published complete source JSON, Beta catalog entry, Beta bundle, Manifest metadata and RSS detail payload.\n- Final SHA256: `'+got_final+'`.\n\n')
             lines=old.splitlines(True)
             old=(lines[0]+'\n'+block+''.join(lines[1:])) if lines and lines[0].startswith('# RELEASE LOG') else block+old
             rp.write_text(old,encoding='utf-8')
-          print('published',len(raw),'bytes sha256',got)
+          incoming.unlink()
+          print('published',len(raw),'bytes','version',version,'sha256',got_final)
           PY
-          rm -rf .staging/qidian
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add -A sources/novel/qidian/qidian-official.json bundles/all-beta.json subscription/beta.json manifest.json rss/data/details/qidian-official.json docs/RELEASE_LOG.md .staging/qidian
+          git add -A incoming sources/novel/qidian/qidian-official.json bundles/all-beta.json subscription/beta.json manifest.json rss/data/details/qidian-official.json docs/RELEASE_LOG.md
           git commit -m 'feat: publish Qidian ecosystem beta source'
           git push origin main
