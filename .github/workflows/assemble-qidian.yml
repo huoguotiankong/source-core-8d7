@@ -4,7 +4,7 @@ on:
     branches: [main]
     paths:
       - 'incoming/*.json'
-      - '.github/workflows/assemble-qidian.yml'
+      - 'bookSource_起点官方生态.json'
 permissions:
   contents: write
 jobs:
@@ -19,71 +19,119 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mapfile -t files < <(find incoming -maxdepth 1 -type f -name '*.json' | sort)
-          if [ "${#files[@]}" -eq 0 ]; then
-            echo 'No incoming JSON; nothing to publish.'
-            exit 0
-          fi
-          if [ "${#files[@]}" -ne 1 ]; then
-            echo "Expected exactly one JSON file in incoming/, got ${#files[@]}" >&2
-            exit 1
-          fi
-          export INCOMING_FILE="${files[0]}"
-          mkdir -p sources/novel/qidian bundles rss/data/details
           python - <<'PY'
-          import os,json,hashlib,pathlib,re
+          import json,hashlib,pathlib,re
+          from datetime import datetime,timezone,timedelta
+
           ROOT=pathlib.Path('.')
-          incoming=ROOT/os.environ['INCOMING_FILE']
+          candidates=[]
+          root_file=ROOT/'bookSource_起点官方生态.json'
+          if root_file.exists(): candidates.append(root_file)
+          candidates += sorted((ROOT/'incoming').glob('*.json')) if (ROOT/'incoming').exists() else []
+          if not candidates:
+              print('No Qidian source upload found; nothing to publish.')
+              raise SystemExit(0)
+          if len(candidates)!=1:
+              raise SystemExit(f'Expected exactly one Qidian JSON upload, got {len(candidates)}: {candidates}')
+
+          incoming=candidates[0]
           original=incoming.read_bytes()
-          expected_original='7b97e89b2c80457eb3f24e377eb47671ff563d6f63305e3a29408461a19698fd'
-          got_original=hashlib.sha256(original).hexdigest()
-          assert got_original==expected_original,(got_original,expected_original)
+          original_sha=hashlib.sha256(original).hexdigest()
           data=json.loads(original)
-          assert isinstance(data,list) and len(data)==1
+          assert isinstance(data,list) and len(data)==1, 'Qidian upload must contain exactly one source'
           src=data[0]
-          assert src.get('bookSourceName')=='起点官方生态'
-          identity='https://sc8d7.invalid/legado/qidian-official-8d7'
+          assert src.get('bookSourceName')=='起点官方生态', src.get('bookSourceName')
+
+          # This source needs a Qidian same-origin identity for Cookie/WebView/baseUrl behavior.
+          # Stable and Beta must keep this exact identity permanently.
+          identity='https://m.qidian.com/?qf_source=v2922_audio_webview_crypto_bridge_fix'
           src['bookSourceUrl']=identity
           raw=json.dumps(data,ensure_ascii=False,separators=(',',':')).encode('utf-8')
-          expected_final='c952233cc72468a79bd94b784cfe34c0101b0eacecb39b52bff7b9fab691a8a3'
-          got_final=hashlib.sha256(raw).hexdigest()
-          assert got_final==expected_final,(got_final,expected_final)
+          final_sha=hashlib.sha256(raw).hexdigest()
+
           target=ROOT/'sources/novel/qidian/qidian-official.json'
+          target.parent.mkdir(parents=True,exist_ok=True)
           target.write_bytes(raw)
-          version='4.2.1-alpha2'
+          (ROOT/'bundles').mkdir(parents=True,exist_ok=True)
+          (ROOT/'bundles/all-beta.json').write_bytes(raw)
+
           comment=str(src.get('bookSourceComment') or '')
-          m=re.search(r'v(\d+\.\d+\.\d+-alpha\d+)',comment)
-          if m: version=m.group(1)
-          now='2026-08-25T19:58:00+08:00'
-          day='2026-08-25'
+          m=re.search(r'v(\d+\.\d+\.\d+(?:-[A-Za-z0-9.]+)?)',comment)
+          version=m.group(1) if m else 'unknown-beta'
+          vm=re.match(r'(\d+)\.(\d+)\.(\d+)(?:-alpha(\d+))?',version)
+          version_code=0
+          if vm:
+              ma,mi,pa,al=vm.groups()
+              version_code=int(ma)*10000+int(mi)*1000+int(pa)*100+int(al or 0)
+
+          now_dt=datetime.now(timezone(timedelta(hours=8)))
+          now=now_dt.isoformat(timespec='seconds')
+          day=now_dt.date().isoformat()
           raw_url='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian/qidian-official.json'
           backup='https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian/qidian-official.json'
           detail_url='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/qidian-official.json'
-          summary='起点官方生态大型书源：官方搜索/目录/评论体系 + 多正文 Provider；本测试版新增 STV 独立正文入口。'
-          tags=['起点','官方目录','段评','本章说','作者说','书友圈','STV','多正文 Provider']
-          changes=['基于 v4.2.0 Stable 的 STV 接入测试主线','登录页补充 STV API 密钥设置','正文启动源类别新增 STV·自动 / STV·qidian','STV 不加入限免/优选/兜底及 9=全源智能','保持官方搜索、详情、目录、评论等其它域不变']
-          (ROOT/'bundles/all-beta.json').write_bytes(raw)
-          beta={'schemaVersion':1,'channel':'beta','name':'测试版','updatedAt':now,'items':[{'id':'qidian-official','name':'🔅 起点官方生态','summary':summary,'icon':str(src.get('bookSourceIcon') or ''),'channel':'beta','version':version,'updatedAt':day,'tags':tags,'changelog':changes,'sourceUrl':raw_url,'backupUrl':backup,'importUrl':'legado://import/bookSource?src='+raw_url,'detailUrl':detail_url}]}
+          summary='起点官方生态大型书源：官方搜索、目录、评论体系与多正文 Provider。'
+          if 'STV' in comment: summary+=' 当前测试主线包含 STV 独立正文入口。'
+          tags=['起点','官方目录','段评','本章说','作者说','书友圈','多正文 Provider']
+          if 'STV' in comment: tags.append('STV')
+          changes=[comment] if comment else ['更新起点官方生态测试版']
+
+          beta={
+              'schemaVersion':1,'channel':'beta','name':'测试版','updatedAt':now,
+              'items':[{
+                  'id':'qidian-official','name':'🔅 起点官方生态','summary':summary,
+                  'icon':str(src.get('bookSourceIcon') or ''),'channel':'beta','version':version,
+                  'updatedAt':day,'tags':tags,'changelog':changes,
+                  'sourceUrl':raw_url,'backupUrl':backup,
+                  'importUrl':'legado://import/bookSource?src='+raw_url,'detailUrl':detail_url
+              }]
+          }
+          (ROOT/'subscription').mkdir(parents=True,exist_ok=True)
           (ROOT/'subscription/beta.json').write_text(json.dumps(beta,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          detail={'kind':'source','title':'🔅 起点官方生态','summary':summary,'badges':['Beta',version,'小说','STV'],'sections':[{'title':'主要能力','text':'官方搜索、详情、目录、免费正文、段评、本章说、作者说、角色卡、彩蛋、书友圈，以及多正文 Provider。'},{'title':'本版更新','text':'\n'.join('• '+x for x in changes)},{'title':'发布状态','text':'当前为 Beta / 测试通道。请在阅读真机验证后再晋升 Stable。'},{'title':'唯一身份','text':identity}],'sourceUrl':raw_url,'backupUrl':backup}
-          (ROOT/'rss/data/details/qidian-official.json').write_text(json.dumps(detail,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          detail={
+              'kind':'source','title':'🔅 起点官方生态','summary':summary,
+              'badges':['Beta',version,'小说']+(['STV'] if 'STV' in comment else []),
+              'sections':[
+                  {'title':'主要能力','text':'官方搜索、详情、目录、免费正文、段评、本章说、作者说、角色卡、彩蛋、书友圈，以及多正文 Provider。'},
+                  {'title':'本版更新','text':'\n'.join('• '+x for x in changes)},
+                  {'title':'发布状态','text':'当前为 Beta / 测试通道。请在阅读真机验证后再晋升 Stable。'},
+                  {'title':'唯一身份','text':identity}
+              ],
+              'sourceUrl':raw_url,'backupUrl':backup
+          }
+          detail_path=ROOT/'rss/data/details/qidian-official.json'
+          detail_path.parent.mkdir(parents=True,exist_ok=True)
+          detail_path.write_text(json.dumps(detail,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
           mp=ROOT/'manifest.json'
           manifest=json.loads(mp.read_text(encoding='utf-8'))
           manifest['updatedAt']=now
-          entry={'id':'qidian-official','name':'起点官方生态','category':'novel','channel':'beta','version':version,'versionCode':42102,'updatedAt':now,'sourcePath':'sources/novel/qidian/qidian-official.json','sourceUrl':raw_url,'bookSourceUrl':identity,'summary':summary,'tags':tags,'changelog':changes}
+          entry={
+              'id':'qidian-official','name':'起点官方生态','category':'novel','channel':'beta',
+              'version':version,'versionCode':version_code,'updatedAt':now,
+              'sourcePath':'sources/novel/qidian/qidian-official.json','sourceUrl':raw_url,
+              'bookSourceUrl':identity,'summary':summary,'tags':tags,'changelog':changes
+          }
           arr=manifest.setdefault('sources',[])
           arr[:]=[x for x in arr if x.get('id')!='qidian-official']+[entry]
           mp.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
           rp=ROOT/'docs/RELEASE_LOG.md'
           old=rp.read_text(encoding='utf-8')
-          marker='## 2026-08-25 — Qidian official ecosystem v4.2.1-alpha2 Beta'
+          marker=f'## {day} — Qidian official ecosystem {version} Beta publish'
           if marker not in old:
-            block=(marker+'\n\nStatus: Beta/Test; uploaded source validated and SHA256 verified, awaiting user real-device confirmation.\n\nChanges:\n\n- Published the current uploaded `起点官方生态` baseline to the Beta channel.\n- Assigned permanent Legado identity `https://sc8d7.invalid/legado/qidian-official-8d7`.\n- Kept existing business rules unchanged; only the top-level identity URL was replaced before publication.\n- Published complete source JSON, Beta catalog entry, Beta bundle, Manifest metadata and RSS detail payload.\n- Final SHA256: `'+got_final+'`.\n\n')
-            lines=old.splitlines(True)
-            old=(lines[0]+'\n'+block+''.join(lines[1:])) if lines and lines[0].startswith('# RELEASE LOG') else block+old
-            rp.write_text(old,encoding='utf-8')
+              block=(marker+'\n\nStatus: Beta/Test; awaiting user real-device confirmation.\n\nChanges:\n\n'
+                     f'- Published uploaded `起点官方生态` baseline to Beta.\n'
+                     f'- Preserved runtime-safe permanent identity `{identity}`.\n'
+                     f'- Original SHA256: `{original_sha}`.\n- Published SHA256: `{final_sha}`.\n\n')
+              lines=old.splitlines(True)
+              old=(lines[0]+'\n'+block+''.join(lines[1:])) if lines and lines[0].startswith('# RELEASE LOG') else block+old
+              rp.write_text(old,encoding='utf-8')
+
+          # Remove only the uploaded intake file after a successful publish.
           incoming.unlink()
-          print('published',len(raw),'bytes','version',version,'sha256',got_final)
+          print('published',len(raw),'bytes','version',version,'sha256',final_sha)
           PY
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
