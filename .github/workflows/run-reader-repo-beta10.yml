@@ -1,0 +1,52 @@
+name: run-reader-repo-beta10
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/run-reader-repo-beta10.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Apply repository Beta10 repair
+        run: python scripts/fix_reader_repo_beta10.py
+      - name: Validate routing
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, pathlib
+          r=json.loads(pathlib.Path('rss/reader-source-repository-beta.json').read_text(encoding='utf-8'))[0]
+          assert '0.3.0-beta10' in r['ruleContent']
+          assert "legado://import/rssSource?src=" in r['ruleContent']
+          assert '?v=10' in r['sortUrl']
+          assert 'home-beta.json?v=10' in r['sortUrl']
+          st=json.loads(pathlib.Path('subscription/stable.json').read_text(encoding='utf-8'))
+          sx=[x for x in st['items'] if x.get('id')=='qidian-next'][0]
+          assert sx['sourceUrl'].endswith('/sources/novel/qidian-next/qidian-next.json')
+          assert '/rss/data/details/stable/qidian-next.json?v=100' in sx['detailUrl']
+          beta=json.loads(pathlib.Path('subscription/beta.json').read_text(encoding='utf-8'))
+          assert not any(x.get('id')=='qidian-next' for x in beta['items'])
+          upd=json.loads(pathlib.Path('rss/data/details/update-beta.json').read_text(encoding='utf-8'))
+          assert upd['rssUrl'].endswith('/rss/reader-source-repository-beta.json')
+          sd=json.loads(pathlib.Path('rss/data/details/stable/qidian-next.json').read_text(encoding='utf-8'))
+          assert sd['badges'][0]=='Stable' and sd['badges'][1]=='1.0.0'
+          assert all('Beta3' not in x.get('title','') and 'Beta4' not in x.get('title','') and 'Beta5' not in x.get('title','') and 'Beta6' not in x.get('title','') for x in sd['sections'])
+          print('validation ok')
+          PY
+      - name: Commit Beta10 repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add rss/reader-source-repository-beta.json rss/reader-source-repository-beta10.json rss/data/home-beta.json rss/data/details/update-beta.json rss/data/details/overview.json rss/data/details/stable/qidian-next.json subscription/stable.json subscription/beta.json docs/DEVELOPMENT_RULES.md docs/KNOWN_ISSUES.md docs/RELEASE_LOG.md
+          git diff --cached --stat
+          git commit -m 'fix: reader repository beta10 channel isolation'
+          git push origin main
