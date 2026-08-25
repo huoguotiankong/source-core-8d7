@@ -1,0 +1,7 @@
+{
+  "kind": "bundle",
+  "title": "🧪 全部测试版",
+  "summary": "批量导入当前 Beta / 测试通道书源。",
+  "badges": ["Beta"],
+  "bundlePath": "bundles/all-beta.json"
+}
