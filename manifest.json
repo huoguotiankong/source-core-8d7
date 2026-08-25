@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-25T20:35:00+08:00",
+  "updatedAt": "2026-08-25T22:23:08+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -43,6 +43,37 @@
         "STV 不加入限免/优选/兜底及 9=全源智能",
         "保持官方搜索、详情、目录、评论等其它域不变"
       ]
+    },
+    {
+      "id": "qidian-next",
+      "name": "🌈 起点助手·新架构",
+      "category": "novel",
+      "channel": "beta",
+      "version": "0.1.0-beta1",
+      "versionCode": 1001,
+      "updatedAt": "2026-08-25T22:23:08+08:00",
+      "sourcePath": "sources/novel/qidian-next/qidian-next.json",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
+      "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
+      "summary": "起点全新架构主线：官方搜索/目录/评论体系 + 多正文 Provider；登录设置使用静态双列首页与多级设置页。",
+      "tags": [
+        "起点",
+        "新架构",
+        "静态登录UI",
+        "多级设置",
+        "官方目录",
+        "段评",
+        "STV",
+        "多正文 Provider"
+      ],
+      "changelog": [
+        "建立独立于旧起点官方生态的全新开发主线",
+        "采用已真机验证的 loginfix4 双列静态登录首页",
+        "二级设置页使用 java.startBrowserAwait，规避动态 @js: loginUi 兼容问题",
+        "首版业务能力保持 v4.2.1-alpha2 基线，避免同时改动其它稳定模块",
+        "使用独立起点同源永久身份，后续 Beta/Stable 保持不变"
+      ],
+      "sha256": "708e871bfae7fc50cac55e19fa73b34b63bb6710494295d12aa712a218548064"
     }
   ]
 }

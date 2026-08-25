@@ -168,3 +168,19 @@ Fix:
 
 Status: fixed in repository Beta, pending user real-device re-test.
 
+## 13. Large dynamic Qidian `loginUi` fails before rendering in current Legado build
+
+Observed during v4.2.1-alpha2 recovery testing:
+
+- search remained functional;
+- a minimal static login UI opened normally;
+- the original large dynamic `@js:` login UI, a reduced dynamic version, and a try/catch diagnostic wrapper all failed before any page content appeared.
+
+Confirmed compatible direction:
+
+- use pure static `loginUi` for the first-level settings page;
+- use `java.startBrowserAwait` for multi-level HTML settings pages;
+- keep business runtime logic in existing `jsLib/loginUrl` helpers instead of evaluating a large dynamic login UI at page-open time.
+
+Status: adopted by `qidian-next` 0.1.0-beta1; further real-device regression testing pending.
+

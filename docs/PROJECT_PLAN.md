@@ -144,3 +144,14 @@ Every release updates the relevant source file plus Manifest / Subscription / Bu
 The Qidian ecosystem source is a large independent engineering project. Historical v4.1 handoff material exists, but it must not automatically be treated as the latest current state because development continued after that report.
 
 Before the next major Qidian task, rebuild or refresh `docs/sources/qidian/PROJECT_HANDOFF.md` from the latest user-confirmed stable source and the latest real-device test state. Do not overwrite newer decisions with the older v4.1 report.
+
+## 11. Qidian next-generation source line
+
+A new independent source line `qidian-next` was started on 2026-08-25 at the user's request.
+
+- First Beta: `0.1.0-beta1`.
+- UI baseline: user-selected loginfix4 two-column static login page plus `java.startBrowserAwait` multi-level settings.
+- Functional baseline: current v4.2.1-alpha2 Qidian official ecosystem business rules.
+- Goal: continue future Qidian refactoring/optimization on the new line without destabilizing the old `qidian-official` source.
+- Release policy: Beta until full user real-device confirmation.
+

@@ -1,0 +1,39 @@
+{
+  "kind": "source",
+  "title": "🌈 起点助手·新架构",
+  "summary": "起点全新架构主线：官方搜索/目录/评论体系 + 多正文 Provider；登录设置使用静态双列首页与多级设置页。",
+  "badges": [
+    "Beta",
+    "0.1.0-beta1",
+    "小说",
+    "新架构"
+  ],
+  "sections": [
+    {
+      "title": "定位",
+      "text": "这是独立于旧“起点官方生态”的全新开发主线。旧源继续保留，用于对照与回退。"
+    },
+    {
+      "title": "登录设置架构",
+      "text": "一级页使用纯静态 loginUi，主功能采用双列宫格；正文、评论、账号、界面、诊断等二级页通过 java.startBrowserAwait 打开。"
+    },
+    {
+      "title": "功能基线",
+      "text": "首版暂时继承 v4.2.1-alpha2 的官方搜索、详情、目录、免费/VIP 正文、多 Provider、段评、本章说、作者说、角色卡、彩蛋与书友圈能力。"
+    },
+    {
+      "title": "测试重点",
+      "text": "优先验证登录首页、各二级设置页、设置保存、搜索、书籍详情、目录和正文；发现问题后继续在本新主线上优化。"
+    },
+    {
+      "title": "发布状态",
+      "text": "Beta / 测试通道。未经过完整真机回归，不进入 Stable。"
+    },
+    {
+      "title": "唯一身份",
+      "text": "https://m.qidian.com/?qf_source=qidian_next_8d7"
+    }
+  ],
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json"
+}

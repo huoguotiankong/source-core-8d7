@@ -1,5 +1,20 @@
 # RELEASE LOG
 
+## 2026-08-25 — Qidian Next v0.1.0-beta1
+
+Status: Beta/Test; published to the subscription repository, awaiting full user real-device regression.
+
+Changes:
+
+- Started independent source line `qidian-next` / `🌈 起点助手·新架构` instead of overwriting the existing Qidian source.
+- Used the user-selected loginfix4 static two-column login page as the first UI baseline.
+- Kept the v4.2.1-alpha2 search/detail/catalog/content/review/Provider business baseline unchanged.
+- Secondary settings use `java.startBrowserAwait`; large dynamic `@js:` login UI is no longer used.
+- Published complete source JSON, Beta catalog entry, Beta bundle entry, Manifest metadata, RSS detail payload and source handoff.
+- Permanent identity: `https://m.qidian.com/?qf_source=qidian_next_8d7`.
+- SHA256: `708e871bfae7fc50cac55e19fa73b34b63bb6710494295d12aa712a218548064`.
+
+
 ## 2026-08-25 — Qidian v4.2.1-alpha2 identity hotfix
 
 Status: Beta/Test; awaiting user real-device confirmation.
