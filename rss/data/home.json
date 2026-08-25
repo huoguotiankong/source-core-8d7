@@ -1,1 +1,32 @@
-{"type":"home"}
+{
+  "type": "home",
+  "name": "首页",
+  "updatedAt": "2026-08-25T16:40:00+08:00",
+  "items": [
+    {
+      "name": "🌈 阅读书源仓库",
+      "summary": "统一管理正式版、测试版、批量导入和更新说明。",
+      "updatedAt": "UI 0.2.2-beta3",
+      "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/reader-repo-icon.jpg",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/overview.json"
+    },
+    {
+      "name": "📡 仓库线路",
+      "summary": "GitHub Raw 主线路，jsDelivr 备用线路。",
+      "updatedAt": "双线路",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/line.json"
+    },
+    {
+      "name": "⭐ Stable / 🧪 Beta",
+      "summary": "新版本先测试，真机确认后再进入正式通道。",
+      "updatedAt": "发布规则",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/policy.json"
+    },
+    {
+      "name": "🔄 更新仓库订阅源",
+      "summary": "重新导入最新版仓库订阅源定义。",
+      "updatedAt": "Beta 3",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/update.json"
+    }
+  ]
+}
