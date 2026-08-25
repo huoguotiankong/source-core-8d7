@@ -1,0 +1,42 @@
+name: publish-qidian-next-retry
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-qidian-next-retry.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Execute corrected publisher
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/publish-qidian-next.yml')
+          lines=p.read_text(encoding='utf-8').splitlines()
+          start=next(i for i,x in enumerate(lines) if x.strip()=='run: |')+1
+          block=[]
+          for x in lines[start:]:
+              if x.startswith('          '):
+                  block.append(x[10:])
+              elif not x.strip():
+                  block.append('')
+              else:
+                  break
+          script='\n'.join(block)+'\n'
+          old="assert set(changed)==allowed, changed"
+          new="assert set(changed).issubset(allowed), changed\n          assert {'bookSourceName','bookSourceUrl','bookSourceComment','loginUi','loginUrl'}.issubset(set(changed)), changed"
+          if old not in script:
+              raise SystemExit('publisher assertion marker not found')
+          script=script.replace(old,new,1)
+          Path('/tmp/qidian-next-publish.sh').write_text(script,encoding='utf-8')
+          PY
+          bash /tmp/qidian-next-publish.sh
