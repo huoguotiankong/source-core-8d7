@@ -31,8 +31,10 @@ jobs:
           open('bundles/all-beta.json','wb').write(raw)
           print('sha256', hashlib.sha256(raw).hexdigest(), 'bytes', len(raw))
           PY
+          rm -rf .staging/qidian
+          rm -f .github/workflows/assemble-qidian.yml
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add sources/novel/qidian/qidian-official.json bundles/all-beta.json
+          git add -A sources/novel/qidian/qidian-official.json bundles/all-beta.json .staging/qidian .github/workflows/assemble-qidian.yml
           git commit -m 'feat: publish Qidian ecosystem beta source'
           git push origin main
