@@ -2,12 +2,7 @@
   "kind": "source",
   "title": "🔅 起点官方生态",
   "summary": "起点官方生态大型书源：官方搜索/目录/评论体系 + 多正文 Provider；本测试版新增 STV 独立正文入口。",
-  "badges": [
-    "Beta",
-    "4.2.1-alpha2",
-    "小说",
-    "STV"
-  ],
+  "badges": ["Beta","4.2.1-alpha2","小说","STV"],
   "sections": [
     {
       "title": "主要能力",
@@ -19,13 +14,13 @@
     },
     {
       "title": "发布状态",
-      "text": "当前为 Beta / 测试通道。请在阅读真机验证后再晋升 Stable。"
+      "text": "当前为 Beta / 测试通道。仓库导入地址暂时固定到已校验提交，用于排除缓存影响。"
     },
     {
       "title": "唯一身份",
       "text": "https://m.qidian.com/?qf_source=v2922_audio_webview_crypto_bridge_fix"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian/qidian-official.json",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian/qidian-official.json"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/111c2fa8b25e8717e78fe9e39944c5177e8c9f63/sources/novel/qidian/qidian-official.json",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@111c2fa8b25e8717e78fe9e39944c5177e8c9f63/sources/novel/qidian/qidian-official.json"
 }
