@@ -1,5 +1,18 @@
 # RELEASE LOG
 
+## 2026-08-25 — Qidian Next v0.1.4-beta5
+
+Status: Beta/Test; Shenmo account dependency repair awaiting user real-device confirmation.
+
+Changes:
+
+- Restored `qfSmCtxV30`, `qfSmInputV30`, `qfSmTrimV30`, and `qfSmSaveCredsV30` from the mature historical Shenmo account implementation.
+- Fixed the real-device `ReferenceError: qfSmCtxV30 未定义` path.
+- Made account actions Provider-specific; Shenmo no longer exposes unsupported web-login.
+- Search/detail/catalog/content/review/Provider reading logic remains unchanged.
+- SHA256: `f694d686980a2c1aa71d86313eb16931ca578e9c23e18dd136a1c175955d8341`.
+
+
 ## 2026-08-25 — Qidian Next v0.1.3-beta4
 
 Status: Beta/Test; compact account/diagnostic UX awaiting user real-device confirmation.

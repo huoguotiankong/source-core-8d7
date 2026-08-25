@@ -197,3 +197,8 @@ Fix in `0.1.2-beta3`: do not use custom schemes for settings actions. Encode the
 
 Status: Beta fix pending real-device confirmation.
 
+## 15. Shenmo account helpers removed while callers remained — fixed in qidian-next Beta5
+
+Observed on real device in `0.1.3-beta4`: Shenmo login failed with `ReferenceError: qfSmCtxV30 未定义`. Historical working versions showed that four helper functions had been removed during later cleanup while `qfSmLoginV30`, check, backend and logout still called them.
+
+Fix: restore the mature `qfSmCtxV30 / qfSmInputV30 / qfSmTrimV30 / qfSmSaveCredsV30` implementations and keep Provider-specific account actions. Status: Beta fix pending real-device confirmation.

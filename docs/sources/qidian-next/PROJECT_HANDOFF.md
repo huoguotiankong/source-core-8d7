@@ -7,10 +7,10 @@
 - Repository id: `qidian-next`
 - Display name: `🌈 起点助手·新架构`
 - Channel: Beta/Test
-- Current version: `0.1.3-beta4`
+- Current version: `0.1.4-beta5`
 - Source path: `sources/novel/qidian-next/qidian-next.json`
 - Permanent Legado identity: `https://m.qidian.com/?qf_source=qidian_next_8d7`
-- SHA256: `9c8b63ce4c000456d47bfd3d2284416680292ee66dfbc3d358395eedff28b896`
+- SHA256: `f694d686980a2c1aa71d86313eb16931ca578e9c23e18dd136a1c175955d8341`
 
 ## Baseline
 
@@ -61,3 +61,9 @@ Beta2 proved that custom `qfnext://` navigation from a `data:` page opened by `s
 ## Beta4 account UX
 
 Beta3 removed the incompatible custom scheme but exposed an oversized Provider×action selector. Beta4 keeps the proven return-and-execute mechanism while splitting the UI into a short Provider selector and short action selector; only the active Provider card is shown. Diagnostics use the same compact return-and-execute pattern.
+
+## Beta5 Shenmo account dependency repair
+
+Real-device Beta4 exposed `ReferenceError: qfSmCtxV30 未定义` when executing Shenmo login. Historical working Qidian versions contained four account helper functions (`qfSmCtxV30`, `qfSmInputV30`, `qfSmTrimV30`, `qfSmSaveCredsV30`), while later source cleanup retained `qfSmLoginV30` / check / backend / logout callers but removed those dependencies. Beta5 restores the mature helpers unchanged.
+
+The account action selector now follows the active Provider. Shenmo exposes only login/check/backend/logout; unsupported web-login is no longer shown. Reading business modules are unchanged.
