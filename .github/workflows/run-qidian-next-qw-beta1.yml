@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.github/workflows/run-qidian-next-qw-beta1.yml'
+      - '.staging/run-qidian-next-qw-beta1.trigger'
 permissions:
   contents: write
 jobs:
@@ -18,7 +18,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          echo 'trigger: beta1-qingwu-auth'
           BEFORE=$(sha256sum sources/novel/qidian-next/qidian-next.json | awk '{print $1}')
           test "$BEFORE" = "d64937b9dc4e528795d3818834a6ddab1828df1af84bb483b16961a40d8286ec"
           python scripts/patch_qidian_next_qw_1_0_1_beta1.py
@@ -53,6 +52,6 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add sources/novel/qidian-next/qidian-next-beta.json bundles/all-beta.json subscription/beta.json manifest.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/KNOWN_ISSUES.md docs/sources/qidian-next/PROJECT_HANDOFF.md
-          git diff --cached -- sources/novel/qidian-next/qidian-next.json | grep -q '^$' || { echo 'Stable file unexpectedly staged'; exit 1; }
+          test -z "$(git diff --cached --name-only -- sources/novel/qidian-next/qidian-next.json)"
           git commit -m 'fix: qidian enhanced beta1 qingwu VIP auth chain'
           git push origin main
