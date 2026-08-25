@@ -1,0 +1,12 @@
+{
+  "kind": "info",
+  "title": "⬇️ 导入与更新",
+  "summary": "GitHub 负责分发，书源导入阅读后完整保存在本地。",
+  "badges": ["Local Runtime"],
+  "sections": [
+    {
+      "title": "更新关系",
+      "text": "同一个书源 Stable / Beta 使用同一个唯一身份 URL，因此导入新版会识别为同一书源的更新。"
+    }
+  ]
+}
