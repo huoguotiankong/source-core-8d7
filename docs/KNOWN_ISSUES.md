@@ -54,26 +54,31 @@ Current rule:
 - Beta UI keeps a stable internal `sourceUrl` identity so newer Beta import files update the same RSS source instead of producing duplicates.
 - Promote only after user confirmation.
 
-## 6. `data:` URL in RSS category/detail request path — fixed in Beta 2, awaiting device test
+## 6. RSS category request compatibility — Beta 3 redesign, awaiting device test
 
-Observed on UI Beta 1:
+Beta 1 failure:
 
-- `⭐ 正式版` and `🧪 测试版` worked because they used HTTPS Raw URLs.
-- `🏠 首页`, `📦 批量导入`, `📖 使用说明` failed with:
+- `首页 / 批量导入 / 使用说明` used `data:` URLs.
+- Legado passed them into OkHttp and failed with `Expected URL scheme 'http' or 'https' but was 'data'`.
 
-  `Expected URL scheme 'http' or 'https' but was 'data'`
+Beta 2 changed those categories to HTTPS, but the same three categories still failed on the user's device.
 
-Cause:
+Root cause found in Beta 2:
 
-Legado's RSS AnalyzeUrl path sends these navigation/detail URLs through OkHttp, so `data:` cannot be used as a normal request URL in this path.
+- The category rules called `q()`.
+- `q()` called `repo()` as a plain nested function.
+- `repo()` depended on `this.source`.
+- The nested call lost the expected `this` binding, so only the categories that used `q()` failed; Stable/Beta did not use that path and continued loading.
 
-Fix in Beta 2:
+Beta 3 redesign:
 
-- Added HTTPS-backed JSON payloads under `rss/data/`.
-- All `sortUrl` category entries now use HTTP/HTTPS only.
-- Detail links also avoid `data:` and use HTTPS URLs with query parameters.
+- Removed the `q() -> repo()` category-link chain.
+- Category JSON now contains explicit HTTPS `detailUrl` values.
+- Home / Bundle / Help use the same generic list parser.
+- Each detail item has its own HTTPS JSON file under `rss/data/details/`.
+- `sortUrl` now contains literal HTTPS URLs only.
 
-Still requires user real-device confirmation.
+Awaiting user real-device verification.
 
 ## 7. Book-source identity URL must remain stable across Stable/Beta
 
@@ -98,11 +103,9 @@ For RSS UI Beta specifically verify:
 
 - category switching,
 - native list rendering,
-- empty-state cards,
 - light/dark theme detail page,
 - `legado://import/bookSource` button behavior,
-- `legado://import/rssSource` update button behavior,
-- manual Raw/jsDelivr route switching.
+- `legado://import/rssSource` update button behavior.
 
 ## 9. Historical Qidian handoff is not the latest project state
 
