@@ -1,5 +1,35 @@
 # RELEASE LOG
 
+## 2026-08-25 — RSS repository UI Beta 2
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Changes:
+
+- Fixed the Beta 1 navigation failure caused by using `data:` URLs in RSS category/detail request paths.
+- Added HTTPS-backed payload endpoints:
+  - `rss/data/home.json`
+  - `rss/data/bundle.json`
+  - `rss/data/help.json`
+- All Beta 2 top categories now resolve through HTTP/HTTPS only.
+- Detail navigation also avoids `data:` request URLs.
+- Added a dedicated repository icon asset.
+- Added stable Legado source identity policy:
+  - same source Stable/Beta share one `bookSourceUrl`,
+  - version/channel are not encoded in the identity,
+  - project identity namespace uses `https://sc8d7.invalid/legado/<source-id>-8d7`,
+  - legacy sources that depend on `bookSourceUrl` as runtime base must migrate their request base before adopting the identity URL.
+- Beta 2 import file keeps the same internal Beta RSS `sourceUrl` identity as Beta 1 so importing Beta 2 should update the existing Beta subscription rather than create another one.
+
+Pending real-device verification:
+
+- home / bundle / help categories,
+- detail-page opening,
+- repository icon display,
+- Raw/jsDelivr switching,
+- RSS update button,
+- future book-source import button behavior.
+
 ## 2026-08-25 — RSS repository UI Beta preparation
 
 Status: Beta/Test UI work; no book-source Stable release yet.
@@ -18,15 +48,6 @@ Completed:
   - no required remote-JS runtime dependency for the repository RSS source.
 - Extended subscription metadata schema for version, tags, changelog and backup URL.
 - Prepared a separate RSS UI Beta path so the existing confirmed RSS source is not overwritten before real-device testing.
-
-Pending real-device verification:
-
-- category switching,
-- empty-channel display,
-- detail-page light/dark layout,
-- book-source one-click import,
-- RSS-source update link,
-- Raw/jsDelivr line switching.
 
 ## 2026-08-25 — Repository foundation
 
