@@ -1,0 +1,12 @@
+{
+  "kind": "info",
+  "title": "⭐ Stable / 🧪 Beta",
+  "summary": "新版本先进入测试通道，真机确认后再进入正式通道。",
+  "badges": ["Release Policy"],
+  "sections": [
+    {
+      "title": "发布规则",
+      "text": "同一个书源的正式版与测试版保持同一个唯一身份 URL；测试通过后直接升级覆盖，不制造重复源。"
+    }
+  ]
+}
