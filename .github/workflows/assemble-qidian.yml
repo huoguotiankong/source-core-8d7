@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'incoming/*.json'
+      - '.github/workflows/assemble-qidian.yml'
 permissions:
   contents: write
 jobs:
@@ -19,6 +20,10 @@ jobs:
         run: |
           set -euo pipefail
           mapfile -t files < <(find incoming -maxdepth 1 -type f -name '*.json' | sort)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo 'No incoming JSON; nothing to publish.'
+            exit 0
+          fi
           if [ "${#files[@]}" -ne 1 ]; then
             echo "Expected exactly one JSON file in incoming/, got ${#files[@]}" >&2
             exit 1
@@ -49,7 +54,7 @@ jobs:
           comment=str(src.get('bookSourceComment') or '')
           m=re.search(r'v(\d+\.\d+\.\d+-alpha\d+)',comment)
           if m: version=m.group(1)
-          now='2026-08-25T19:36:00+08:00'
+          now='2026-08-25T19:58:00+08:00'
           day='2026-08-25'
           raw_url='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian/qidian-official.json'
           backup='https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian/qidian-official.json'
@@ -58,7 +63,7 @@ jobs:
           tags=['起点','官方目录','段评','本章说','作者说','书友圈','STV','多正文 Provider']
           changes=['基于 v4.2.0 Stable 的 STV 接入测试主线','登录页补充 STV API 密钥设置','正文启动源类别新增 STV·自动 / STV·qidian','STV 不加入限免/优选/兜底及 9=全源智能','保持官方搜索、详情、目录、评论等其它域不变']
           (ROOT/'bundles/all-beta.json').write_bytes(raw)
-          beta={'schemaVersion':1,'channel':'beta','name':'测试版','updatedAt':now,'items':[{'id':'qidian-official','name':'🔅 起点官方生态','summary':summary,'icon':'','channel':'beta','version':version,'updatedAt':day,'tags':tags,'changelog':changes,'sourceUrl':raw_url,'backupUrl':backup,'importUrl':'legado://import/bookSource?src='+raw_url,'detailUrl':detail_url}]}
+          beta={'schemaVersion':1,'channel':'beta','name':'测试版','updatedAt':now,'items':[{'id':'qidian-official','name':'🔅 起点官方生态','summary':summary,'icon':str(src.get('bookSourceIcon') or ''),'channel':'beta','version':version,'updatedAt':day,'tags':tags,'changelog':changes,'sourceUrl':raw_url,'backupUrl':backup,'importUrl':'legado://import/bookSource?src='+raw_url,'detailUrl':detail_url}]}
           (ROOT/'subscription/beta.json').write_text(json.dumps(beta,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           detail={'kind':'source','title':'🔅 起点官方生态','summary':summary,'badges':['Beta',version,'小说','STV'],'sections':[{'title':'主要能力','text':'官方搜索、详情、目录、免费正文、段评、本章说、作者说、角色卡、彩蛋、书友圈，以及多正文 Provider。'},{'title':'本版更新','text':'\n'.join('• '+x for x in changes)},{'title':'发布状态','text':'当前为 Beta / 测试通道。请在阅读真机验证后再晋升 Stable。'},{'title':'唯一身份','text':identity}],'sourceUrl':raw_url,'backupUrl':backup}
           (ROOT/'rss/data/details/qidian-official.json').write_text(json.dumps(detail,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
@@ -82,6 +87,10 @@ jobs:
           PY
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add -A incoming sources/novel/qidian/qidian-official.json bundles/all-beta.json subscription/beta.json manifest.json rss/data/details/qidian-official.json docs/RELEASE_LOG.md
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No repository changes to commit.'
+            exit 0
+          fi
           git commit -m 'feat: publish Qidian ecosystem beta source'
           git push origin main
