@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-24T09:14:00+08:00",
+  "updatedAt": "2026-08-25T19:58:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -13,5 +13,36 @@
     }
   },
   "rssSource": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository.json",
-  "sources": []
+  "sources": [
+    {
+      "id": "qidian-official",
+      "name": "起点官方生态",
+      "category": "novel",
+      "channel": "beta",
+      "version": "4.2.1-alpha2",
+      "versionCode": 42102,
+      "updatedAt": "2026-08-25T19:58:00+08:00",
+      "sourcePath": "sources/novel/qidian/qidian-official.json",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian/qidian-official.json",
+      "bookSourceUrl": "https://sc8d7.invalid/legado/qidian-official-8d7",
+      "summary": "起点官方生态大型书源：官方搜索/目录/评论体系 + 多正文 Provider；本测试版新增 STV 独立正文入口。",
+      "tags": [
+        "起点",
+        "官方目录",
+        "段评",
+        "本章说",
+        "作者说",
+        "书友圈",
+        "STV",
+        "多正文 Provider"
+      ],
+      "changelog": [
+        "基于 v4.2.0 Stable 的 STV 接入测试主线",
+        "登录页补充 STV API 密钥设置",
+        "正文启动源类别新增 STV·自动 / STV·qidian",
+        "STV 不加入限免/优选/兜底及 9=全源智能",
+        "保持官方搜索、详情、目录、评论等其它域不变"
+      ]
+    }
+  ]
 }

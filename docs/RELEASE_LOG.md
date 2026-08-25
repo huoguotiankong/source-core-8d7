@@ -1,5 +1,18 @@
 # RELEASE LOG
 
+## 2026-08-25 — Qidian official ecosystem v4.2.1-alpha2 Beta
+
+Status: Beta/Test; uploaded source validated and SHA256 verified, awaiting user real-device confirmation.
+
+Changes:
+
+- Published the current uploaded `起点官方生态` baseline to the Beta channel.
+- Assigned permanent Legado identity `https://sc8d7.invalid/legado/qidian-official-8d7`.
+- Kept existing business rules unchanged; only the top-level identity URL was replaced before publication.
+- Published complete source JSON, Beta catalog entry, Beta bundle, Manifest metadata and RSS detail payload.
+- Final SHA256: `c952233cc72468a79bd94b784cfe34c0101b0eacecb39b52bff7b9fab691a8a3`.
+
+
 ## 2026-08-25 — RSS repository UI Beta 6
 
 Status: Beta/Test; awaiting user real-device icon verification.
