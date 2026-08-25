@@ -1,5 +1,18 @@
 # RELEASE LOG
 
+## 2026-08-25 — Qidian Next v0.1.3-beta4
+
+Status: Beta/Test; compact account/diagnostic UX awaiting user real-device confirmation.
+
+Changes:
+
+- Split Account Management into Provider selection and short action selection instead of one oversized combined list.
+- Show only the active Provider account card.
+- Reset the selected action after execution to prevent accidental repeat operations.
+- Simplified Diagnostics to the same compact return-and-execute flow.
+- Reading business modules remain unchanged.
+- SHA256: `9c8b63ce4c000456d47bfd3d2284416680292ee66dfbc3d358395eedff28b896`.
+
 ## 2026-08-25 — Qidian Next v0.1.2-beta3
 
 Status: Beta/Test; account/diagnostic action-return fix awaiting user real-device confirmation.

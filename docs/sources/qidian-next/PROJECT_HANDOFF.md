@@ -7,10 +7,10 @@
 - Repository id: `qidian-next`
 - Display name: `🌈 起点助手·新架构`
 - Channel: Beta/Test
-- Current version: `0.1.2-beta3`
+- Current version: `0.1.3-beta4`
 - Source path: `sources/novel/qidian-next/qidian-next.json`
 - Permanent Legado identity: `https://m.qidian.com/?qf_source=qidian_next_8d7`
-- SHA256: `a27682beb478c9523c554024650d9fffd72ef669692c49db839f6dbeb6dd3187`
+- SHA256: `9c8b63ce4c000456d47bfd3d2284416680292ee66dfbc3d358395eedff28b896`
 
 ## Baseline
 
@@ -57,3 +57,7 @@ Beta2 uses Unicode-derived unique DOM ids and a `qfnext://` custom-URL bridge in
 
 Beta2 proved that custom `qfnext://` navigation from a `data:` page opened by `startBrowserAwait` is handled as an Android external-app scheme rather than by the book source's `shouldOverrideUrlLoading`. Beta3 removes that bridge completely. Account and diagnostic actions are represented as normal select values inside the already-working HTML settings-return path; after the user taps the browser ✓ button, `loginUrl` reads the returned value and executes the native source action.
 
+
+## Beta4 account UX
+
+Beta3 removed the incompatible custom scheme but exposed an oversized Provider×action selector. Beta4 keeps the proven return-and-execute mechanism while splitting the UI into a short Provider selector and short action selector; only the active Provider card is shown. Diagnostics use the same compact return-and-execute pattern.
