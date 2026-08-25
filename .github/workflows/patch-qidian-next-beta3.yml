@@ -1,0 +1,26 @@
+name: patch-qidian-next-beta3
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/patch-qidian-next-beta3.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Patch qidian-next beta3
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/patch_qidian_next_beta3.py
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next.json bundles/all-beta.json subscription/beta.json manifest.json rss/data/details/qidian-next.json docs/sources/qidian-next/PROJECT_HANDOFF.md docs/KNOWN_ISSUES.md docs/RELEASE_LOG.md
+          git commit -m 'fix: qidian-next beta3 account and diagnostics return flow'
+          git push origin main
