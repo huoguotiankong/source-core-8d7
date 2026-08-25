@@ -1,8 +1,28 @@
 # RELEASE LOG
 
+## 2026-08-25 — RSS repository UI Beta 4
+
+Status: Beta/Test; icon fix awaiting user real-device confirmation.
+
+Changes:
+
+- User confirmed Beta 3 no longer reports the Home / Bundle / Help category loading errors.
+- Kept the Beta 3 HTTPS-only data-driven navigation as the new RSS UI baseline.
+- Beta 3 remote `sourceIcon` still rendered as Legado's default RSS icon on the user's device.
+- Beta 4 changes only the subscription icon strategy: the project icon is embedded directly as compact Base64 JPEG data.
+- Updated the stable Beta identity path `rss/reader-source-repository-beta.json` to the Beta 4 definition.
+- Added versioned snapshot `rss/reader-source-repository-beta4.json`.
+
+Pending real-device verification:
+
+- repository icon display,
+- detail-page opening,
+- RSS update action,
+- bundle import action.
+
 ## 2026-08-25 — RSS repository UI Beta 3
 
-Status: Beta/Test; awaiting user real-device confirmation.
+Status: Beta/Test; category compatibility confirmed by user on real device.
 
 Changes:
 
@@ -14,15 +34,11 @@ Changes:
 - Simplified the RSS list parser so all categories share one generic path.
 - Removed dynamic helper chaining from category navigation.
 - Kept the same internal Beta RSS `sourceUrl` identity so Beta 3 updates the existing Beta subscription.
-- Repository icon remains at `assets/reader-repo-icon.jpg`.
 
-Pending real-device verification:
+Real-device result:
 
-- all five top categories,
-- detail-page opening,
-- icon display,
-- RSS update action,
-- bundle import action.
+- User confirmed the previous category loading errors are gone.
+- Remote repository icon still did not display, leading to the Beta 4 Base64 icon fix.
 
 ## 2026-08-25 — RSS repository UI Beta 2
 
