@@ -1,1 +1,19 @@
-{"type":"help"}
+{
+  "type": "help",
+  "name": "使用说明",
+  "updatedAt": "2026-08-25T16:40:00+08:00",
+  "items": [
+    {
+      "name": "📖 使用说明",
+      "summary": "顶部切换正式版、测试版和批量导入；点击条目进入详情页。",
+      "updatedAt": "快速上手",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/help-usage.json"
+    },
+    {
+      "name": "⬇️ 导入与更新",
+      "summary": "书源导入后保存在阅读本地，仓库只负责发布与更新。",
+      "updatedAt": "本地运行",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/help-update.json"
+    }
+  ]
+}
