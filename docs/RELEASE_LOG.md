@@ -1,5 +1,18 @@
 # RELEASE LOG
 
+## 2026-08-25 — Qidian v4.2.1-alpha2 identity hotfix
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Changes:
+
+- Reverted the repository-only `.invalid` `bookSourceUrl` experiment after real-device failure.
+- Restored the mature same-origin identity `https://m.qidian.com/?qf_source=v2922_audio_webview_crypto_bridge_fix`.
+- No Qidian business rules were changed.
+- Synchronized complete source JSON, Beta Bundle, Manifest and RSS detail metadata.
+- Stable/Beta will keep this same identity after confirmation.
+
+
 ## 2026-08-25 — RSS repository UI Beta 7
 
 Status: Beta/Test; awaiting user real-device verification.

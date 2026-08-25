@@ -146,4 +146,25 @@ The landing-branch strategy only reduces accidental discovery. Anyone who knows 
 - Symptom: source/detail entries displayed only summary text; HTML buttons were not rendered.
 - Fix: open generated HTML through `java.startBrowser(data:text/html;base64, ...)` and use `legado://import/importonline?src=...`.
 - Status: fixed in RSS UI Beta 7, pending real-device confirmation.
+## 12. Qidian `.invalid` identity broke runtime behavior — fixed in Beta hotfix
+
+Observed on-device after repository import:
+
+- source imported successfully,
+- book detail showed `书籍信息获取失败`,
+- login/settings page could not open.
+
+Cause:
+
+- the publisher replaced the mature Qidian `bookSourceUrl` with `https://sc8d7.invalid/...`;
+- this source uses a Qidian same-origin identity for runtime base/Cookie/WebView compatibility;
+- the original working baseline used `https://m.qidian.com/?qf_source=v2922_audio_webview_crypto_bridge_fix`.
+
+Fix:
+
+- restore that mature same-origin identity for both Beta and future Stable;
+- keep uniqueness through its stable `qf_source` marker instead of a fake host;
+- do not blindly apply the generic `.invalid` namespace to sources with same-origin runtime dependencies.
+
+Status: fixed in repository Beta, pending user real-device re-test.
 

@@ -142,8 +142,9 @@ For every book source published by this project:
    `https://sc8d7.invalid/legado/qidian-official-8d7`
 
 5. `sc8d7.invalid` is only a stable identity namespace. Actual network requests must use explicit real endpoints in search/discovery/rule JS/runtime configuration.
-6. When migrating a legacy source that relies on `bookSourceUrl` as a relative-URL base, do not blindly replace it. First convert those request paths to explicit real hosts or a separate runtime base constant, then switch to the project identity URL.
-7. Once an identity URL has been published, keep it stable across future versions unless a collision or serious migration issue requires a deliberate compatibility plan.
+6. When migrating a legacy source that relies on `bookSourceUrl` for same-origin cookies, WebView login, relative URL resolution or runtime base behavior, do not replace it with the `.invalid` namespace. Preserve a same-origin identity and make it unique with a stable query/path marker.
+7. Existing mature sources should preserve their already-working identity URL when that also preserves upgrade continuity in Legado. For Qidian official ecosystem, the permanent Stable/Beta identity is `https://m.qidian.com/?qf_source=v2922_audio_webview_crypto_bridge_fix`.
+8. Once an identity URL has been published and real-device confirmed, keep it stable across future versions unless a collision or serious migration issue requires a deliberate compatibility plan.
 
 The same principle applies to RSS sources via their `sourceUrl`: a released subscription source keeps a stable identity URL even if the downloadable JSON file path or version changes.
 
