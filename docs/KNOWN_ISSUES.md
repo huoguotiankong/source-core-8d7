@@ -51,10 +51,46 @@ However, changes to the RSS source's own rules, UI logic, category layout or det
 Current rule:
 
 - Keep the already imported `rss/reader-source-repository.json` as the stable RSS definition until a new UI is real-device confirmed.
-- Develop new UI behavior in `rss/reader-source-repository-beta.json`.
+- Beta UI keeps a stable internal `sourceUrl` identity so newer Beta import files update the same RSS source instead of producing duplicates.
 - Promote only after user confirmation.
 
-## 6. HTML detail pages and one-click import need real-device verification
+## 6. `data:` URL in RSS category/detail request path — fixed in Beta 2, awaiting device test
+
+Observed on UI Beta 1:
+
+- `⭐ 正式版` and `🧪 测试版` worked because they used HTTPS Raw URLs.
+- `🏠 首页`, `📦 批量导入`, `📖 使用说明` failed with:
+
+  `Expected URL scheme 'http' or 'https' but was 'data'`
+
+Cause:
+
+Legado's RSS AnalyzeUrl path sends these navigation/detail URLs through OkHttp, so `data:` cannot be used as a normal request URL in this path.
+
+Fix in Beta 2:
+
+- Added HTTPS-backed JSON payloads under `rss/data/`.
+- All `sortUrl` category entries now use HTTP/HTTPS only.
+- Detail links also avoid `data:` and use HTTPS URLs with query parameters.
+
+Still requires user real-device confirmation.
+
+## 7. Book-source identity URL must remain stable across Stable/Beta
+
+Legado uses `bookSourceUrl` to distinguish book sources.
+
+Project rule:
+
+- Same source Stable/Beta -> exactly the same `bookSourceUrl`.
+- Do not encode version or channel in `bookSourceUrl`.
+- Do not default to the original website homepage.
+- Project namespace: `https://sc8d7.invalid/legado/<source-id>-8d7`.
+
+Important compatibility caveat:
+
+Some legacy sources use `bookSourceUrl` as a relative URL base. Such sources must first migrate their runtime base/request URLs before changing identity URL, otherwise search/detail/content may break.
+
+## 8. HTML detail pages and one-click import need real-device verification
 
 Static JSON/JavaScript validation cannot prove that every WebView behavior works in the user's Legado build.
 
@@ -68,7 +104,7 @@ For RSS UI Beta specifically verify:
 - `legado://import/rssSource` update button behavior,
 - manual Raw/jsDelivr route switching.
 
-## 7. Historical Qidian handoff is not the latest project state
+## 9. Historical Qidian handoff is not the latest project state
 
 A v4.1 engineering handoff report dated 2026-08-16 exists and contains important architectural principles, including module isolation, complete single-JSON delivery, diagnostics, regression checks and real-device confirmation.
 
@@ -76,7 +112,7 @@ However, Qidian development continued after that report. Therefore it must be tr
 
 Before the next major Qidian task, refresh `docs/sources/qidian/PROJECT_HANDOFF.md` using the latest user-confirmed stable source and current test status.
 
-## 8. Public repository low discoverability is not access control
+## 10. Public repository low discoverability is not access control
 
 The repository is public so Raw distribution works without authentication.
 
