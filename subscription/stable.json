@@ -2,6 +2,37 @@
   "schemaVersion": 1,
   "channel": "stable",
   "name": "正式版",
-  "updatedAt": "2026-08-24T09:14:00+08:00",
-  "items": []
+  "updatedAt": "2026-08-26T00:12:17+08:00",
+  "items": [
+    {
+      "id": "qidian-next",
+      "name": "🌈 起点增强",
+      "summary": "起点增强型完整书源：官方搜索/详情/目录/评论体系 + 多正文 Provider；设置采用静态双列首页与卡片化多级页面。",
+      "icon": "",
+      "channel": "stable",
+      "version": "1.0.0",
+      "updatedAt": "2026-08-26",
+      "tags": [
+        "起点",
+        "正式版",
+        "官方目录",
+        "段评",
+        "本章说",
+        "作者说",
+        "多正文 Provider",
+        "STV",
+        "多级设置"
+      ],
+      "changelog": [
+        "第一版正式版，基于已使用的 v0.1.5-beta6 主线晋升",
+        "正式名称改为「🌈 起点增强」，与「起点助手」明确区分",
+        "保留静态双列一级设置页与卡片化多级二级设置架构",
+        "搜索/详情/目录/正文/评论业务逻辑不因正式版晋升而改变"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/qidian-next.json"
+    }
+  ]
 }

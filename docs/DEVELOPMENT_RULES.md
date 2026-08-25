@@ -161,3 +161,14 @@ The repository may remain public. The goal is low casual discoverability, not se
 Do not publish private credentials, tokens, cookies, passwords or user-specific sensitive data.
 
 Low-discoverability measures must never break normal Raw access, subscription updates or imported sources.
+
+## 13. Subscription source-detail maintenance
+
+RSS/source detail pages are current-state introductions, not release-history documents.
+
+- Do not append one new detail section for every Beta/Stable version.
+- Keep long-lived sections such as positioning, core capabilities, setup architecture, current version/status and import identity.
+- On release, replace the current-version/change summary instead of accumulating historical version cards.
+- Full chronological history belongs in `docs/RELEASE_LOG.md`.
+
+This prevents source detail pages from growing without bound after dozens or hundreds of releases.

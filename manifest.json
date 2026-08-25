@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-25T23:59:00+08:00",
+  "updatedAt": "2026-08-26T00:12:17+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -46,34 +46,34 @@
     },
     {
       "id": "qidian-next",
-      "name": "🌈 起点助手·新架构",
+      "name": "🌈 起点增强",
       "category": "novel",
-      "channel": "beta",
-      "version": "0.1.5-beta6",
-      "versionCode": 1506,
-      "updatedAt": "2026-08-25T23:59:00+08:00",
+      "channel": "stable",
+      "version": "1.0.0",
+      "versionCode": 10000,
+      "updatedAt": "2026-08-26T00:12:17+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next.json",
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "起点全新架构主线：官方搜索/目录/评论体系 + 多正文 Provider；登录设置使用静态双列首页与多级设置页。",
+      "summary": "起点增强型完整书源：官方搜索/详情/目录/评论体系 + 多正文 Provider；设置采用静态双列首页与卡片化多级页面。",
       "tags": [
         "起点",
-        "新架构",
-        "静态登录UI",
-        "多级设置",
+        "正式版",
         "官方目录",
         "段评",
+        "本章说",
+        "作者说",
+        "多正文 Provider",
         "STV",
-        "多正文 Provider"
+        "多级设置"
       ],
       "changelog": [
-        "二级设置 UI 重构第一阶段：统一卡片、轻量渐变头部、暗色模式与操作提示",
-        "正文设置：策略胶囊 + 当前类别 Provider + 实时路线概览 + 独立 STV 专区",
-        "账号管理：情无/神魔/晴天/同人标签页 + 当前 Provider 专属字段 + 动作按钮组",
-        "诊断工具：常用诊断优先，高级诊断折叠；动作仍在点 ✓ 返回后执行",
-        "一级双列首页及搜索/详情/目录/正文/评论业务逻辑保持不变"
+        "第一版正式版，基于已使用的 v0.1.5-beta6 主线晋升",
+        "正式名称改为「🌈 起点增强」，与「起点助手」明确区分",
+        "保留静态双列一级设置页与卡片化多级二级设置架构",
+        "搜索/详情/目录/正文/评论业务逻辑不因正式版晋升而改变"
       ],
-      "sha256": "60e175bc11986157e9a69be57990cefe0c1855b7e90f07b0a5cca1d0ef3be8b6"
+      "sha256": "d64937b9dc4e528795d3818834a6ddab1828df1af84bb483b16961a40d8286ec"
     }
   ]
 }

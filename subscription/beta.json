@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-25T23:59:00+08:00",
+  "updatedAt": "2026-08-26T00:12:17+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -34,36 +34,6 @@
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@111c2fa8b25e8717e78fe9e39944c5177e8c9f63/sources/novel/qidian/qidian-official.json",
       "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/111c2fa8b25e8717e78fe9e39944c5177e8c9f63/sources/novel/qidian/qidian-official.json",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/qidian-official.json"
-    },
-    {
-      "id": "qidian-next",
-      "name": "🌈 起点助手·新架构",
-      "summary": "起点全新架构主线：官方搜索/目录/评论体系 + 多正文 Provider；登录设置使用静态双列首页与多级设置页。",
-      "icon": "",
-      "channel": "beta",
-      "version": "0.1.5-beta6",
-      "updatedAt": "2026-08-25",
-      "tags": [
-        "起点",
-        "新架构",
-        "静态登录UI",
-        "多级设置",
-        "官方目录",
-        "段评",
-        "STV",
-        "多正文 Provider"
-      ],
-      "changelog": [
-        "二级设置 UI 重构第一阶段：统一卡片、轻量渐变头部、暗色模式与操作提示",
-        "正文设置：策略胶囊 + 当前类别 Provider + 实时路线概览 + 独立 STV 专区",
-        "账号管理：情无/神魔/晴天/同人标签页 + 当前 Provider 专属字段 + 动作按钮组",
-        "诊断工具：常用诊断优先，高级诊断折叠；动作仍在点 ✓ 返回后执行",
-        "一级双列首页及搜索/详情/目录/正文/评论业务逻辑保持不变"
-      ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/qidian-next.json"
     }
   ]
 }

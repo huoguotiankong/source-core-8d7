@@ -1,5 +1,20 @@
 # RELEASE LOG
 
+## 2026-08-26 — 起点增强 v1.0.0 Stable
+
+Status: Stable; promoted by explicit user request from the v0.1.5-beta6 baseline.
+
+Changes:
+
+- Renamed the source from `🌈 起点助手·新架构` to `🌈 起点增强` to distinguish it from 起点助手.
+- Promoted the current Beta6 baseline to Stable 1.0.0 without changing reading business logic.
+- Moved the source from Beta catalog/bundle to Stable catalog/bundle.
+- Kept permanent Legado identity `https://m.qidian.com/?qf_source=qidian_next_8d7` for in-place updates.
+- Simplified RSS source detail to current-state information; per-version history is no longer accumulated there.
+- Reserved the Stable raw file; future Beta development must use a separate beta file path.
+- SHA256: `d64937b9dc4e528795d3818834a6ddab1828df1af84bb483b16961a40d8286ec`.
+
+
 ## 2026-08-25 — Qidian Next v0.1.5-beta6
 
 Status: Beta/Test; secondary-settings UX phase 1 awaiting user real-device confirmation.

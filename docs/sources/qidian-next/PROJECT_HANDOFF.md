@@ -5,12 +5,12 @@
 ## Current line
 
 - Repository id: `qidian-next`
-- Display name: `🌈 起点助手·新架构`
-- Channel: Beta/Test
-- Current version: `0.1.5-beta6`
+- Display name: `🌈 起点增强`
+- Channel: Stable
+- Current version: `1.0.0`
 - Source path: `sources/novel/qidian-next/qidian-next.json`
 - Permanent Legado identity: `https://m.qidian.com/?qf_source=qidian_next_8d7`
-- SHA256: `60e175bc11986157e9a69be57990cefe0c1855b7e90f07b0a5cca1d0ef3be8b6`
+- SHA256: `d64937b9dc4e528795d3818834a6ddab1828df1af84bb483b16961a40d8286ec`
 
 ## Baseline
 
@@ -84,3 +84,14 @@ Phases:
 - Accounts: four Provider tabs; only the active Provider card is shown; actions are direct two-column buttons and are executed only after ✓ return.
 - Diagnostics: common tools are visible first; deep trace / reset are under an advanced disclosure; selected action is clearly displayed.
 - Runtime reading modules are untouched.
+
+## Stable 1.0.0 promotion
+
+User explicitly requested promotion of the Beta6 baseline to the first Stable release. Display name changed to `🌈 起点增强`; permanent `bookSourceUrl` remains unchanged so Legado upgrades in place.
+
+Distribution rule after Stable 1.0.0:
+
+- `sources/novel/qidian-next/qidian-next.json` is the Stable file and must not be overwritten by an unconfirmed Beta.
+- Future test versions must use `sources/novel/qidian-next/qidian-next-beta.json` (or another explicitly beta-only path) while preserving the same `bookSourceUrl`.
+- Stable and Beta subscription entries may therefore point to different files but represent the same Legado source identity.
+- RSS source detail is a current-state introduction, not a per-version history. Replace the current-version section on release; keep historical changes only in `docs/RELEASE_LOG.md`.
