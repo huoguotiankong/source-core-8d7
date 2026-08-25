@@ -124,13 +124,36 @@ Publishing a source requires synchronized maintenance of the relevant:
 - Bundle,
 - Release Log.
 
-## 10. Repository architecture
+## 10. Stable identity URL for book sources
+
+Legado distinguishes book sources by the source identity URL (`bookSourceUrl`).
+
+For every book source published by this project:
+
+1. Stable and Beta/Test versions of the same source MUST use the same `bookSourceUrl`.
+2. The identity URL MUST NOT contain a version number or release-channel name.
+3. Different sources MUST use different identity URLs.
+4. Do not use the original website homepage as the identity URL by default. Use the project namespace format instead:
+
+   `https://sc8d7.invalid/legado/<source-id>-8d7`
+
+   Example:
+
+   `https://sc8d7.invalid/legado/qidian-official-8d7`
+
+5. `sc8d7.invalid` is only a stable identity namespace. Actual network requests must use explicit real endpoints in search/discovery/rule JS/runtime configuration.
+6. When migrating a legacy source that relies on `bookSourceUrl` as a relative-URL base, do not blindly replace it. First convert those request paths to explicit real hosts or a separate runtime base constant, then switch to the project identity URL.
+7. Once an identity URL has been published, keep it stable across future versions unless a collision or serious migration issue requires a deliberate compatibility plan.
+
+The same principle applies to RSS sources via their `sourceUrl`: a released subscription source keeps a stable identity URL even if the downloadable JSON file path or version changes.
+
+## 11. Repository architecture
 
 `main` is the actual project branch. `landing` is only a neutral default landing branch for low discoverability.
 
 Do not casually change existing raw distribution URLs after users have imported them. If a path must move, provide a compatibility period or explicit migration path.
 
-## 11. Public repository policy
+## 12. Public repository policy
 
 The repository may remain public. The goal is low casual discoverability, not secrecy.
 
