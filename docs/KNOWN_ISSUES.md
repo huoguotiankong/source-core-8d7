@@ -140,3 +140,10 @@ Before the next major Qidian task, refresh `docs/sources/qidian/PROJECT_HANDOFF.
 The repository is public so Raw distribution works without authentication.
 
 The landing-branch strategy only reduces accidental discovery. Anyone who knows the exact repository or Raw URL can still access it. This is expected and is not considered a bug.
+
+## Resolved — RSS detail HTML returned as plain article text
+
+- Symptom: source/detail entries displayed only summary text; HTML buttons were not rendered.
+- Fix: open generated HTML through `java.startBrowser(data:text/html;base64, ...)` and use `legado://import/importonline?src=...`.
+- Status: fixed in RSS UI Beta 7, pending real-device confirmation.
+

@@ -1,5 +1,16 @@
 # RELEASE LOG
 
+## 2026-08-25 — RSS repository UI Beta 7
+
+Status: Beta/Test; awaiting user real-device verification.
+
+Changes:
+
+- RSS detail cards now open explicitly with `java.startBrowser(data:text/html;base64, ...)`.
+- Source, bundle and repository-update buttons use `legado://import/importonline?src=...`.
+- Qidian Beta can be imported/updated from its repository detail card.
+
+
 ## 2026-08-25 — Qidian official ecosystem v4.2.1-alpha2 Beta
 
 Status: Beta/Test; uploaded source validated and SHA256 verified, awaiting user real-device confirmation.
