@@ -1,5 +1,33 @@
 # RELEASE LOG
 
+## 2026-08-25 — RSS repository UI Beta preparation
+
+Status: Beta/Test UI work; no book-source Stable release yet.
+
+Completed:
+
+- User switched GitHub default branch to neutral `landing`.
+- Actual project and Raw distribution remain on `main`.
+- Reviewed three reference RSS sources supplied by the user.
+- Adopted a combined UI direction:
+  - native Legado categories and list for browsing,
+  - styled HTML detail page for metadata and import actions,
+  - explicit Stable / Beta separation,
+  - separate batch-import area,
+  - GitHub Raw primary line with jsDelivr manual fallback,
+  - no required remote-JS runtime dependency for the repository RSS source.
+- Extended subscription metadata schema for version, tags, changelog and backup URL.
+- Prepared a separate RSS UI Beta path so the existing confirmed RSS source is not overwritten before real-device testing.
+
+Pending real-device verification:
+
+- category switching,
+- empty-channel display,
+- detail-page light/dark layout,
+- book-source one-click import,
+- RSS-source update link,
+- Raw/jsDelivr line switching.
+
 ## 2026-08-25 — Repository foundation
 
 Status: infrastructure / no book-source Stable release yet.
@@ -20,11 +48,6 @@ Completed:
   - `DEVELOPMENT_RULES.md`
   - `KNOWN_ISSUES.md`
   - `RELEASE_LOG.md`
-
-Pending:
-
-- Change repository default branch from `main` to `landing` in GitHub settings.
-- Complete the first real source end-to-end publication loop.
 
 ## Release policy
 
