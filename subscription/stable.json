@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "stable",
   "name": "正式版",
-  "updatedAt": "2026-08-26T00:12:17+08:00",
+  "updatedAt": "2026-08-26T00:23:32+08:00",
   "items": [
     {
       "id": "qidian-next",
@@ -24,15 +24,13 @@
         "多级设置"
       ],
       "changelog": [
-        "第一版正式版，基于已使用的 v0.1.5-beta6 主线晋升",
-        "正式名称改为「🌈 起点增强」，与「起点助手」明确区分",
-        "保留静态双列一级设置页与卡片化多级二级设置架构",
-        "搜索/详情/目录/正文/评论业务逻辑不因正式版晋升而改变"
+        "当前正式版：1.0.0",
+        "完整版本历史请查看 Release Log"
       ],
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json",
       "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/qidian-next.json"
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json?v=100"
     }
   ]
 }

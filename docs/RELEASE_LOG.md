@@ -1,5 +1,18 @@
 # RELEASE LOG
 
+## 2026-08-26 — RSS repository UI 0.3.0-beta10
+
+Status: Beta/Test; repository self-update/channel-isolation fix awaiting real-device confirmation.
+
+Changes:
+
+- Fixed RSS self-update URI to `legado://import/rssSource?src=...`.
+- Added Beta-specific home/update payload and pointed update to the stable Beta RSS identity file.
+- Bumped repository category cache revision from v9 to v10.
+- Moved `🌈 起点增强` Stable detail to a new Stable-only path so stale Beta detail cache cannot import Stable.
+- Codified separate Stable/Beta source and detail paths for future qidian-next releases.
+- Source detail pages remain current-state only; version history stays in Release Log.
+
 ## 2026-08-26 — 起点增强 v1.0.0 Stable
 
 Status: Stable; promoted by explicit user request from the v0.1.5-beta6 baseline.

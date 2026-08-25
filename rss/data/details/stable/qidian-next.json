@@ -1,0 +1,27 @@
+{
+  "kind": "source",
+  "title": "🌈 起点增强",
+  "summary": "起点增强型完整书源：官方搜索/详情/目录/评论体系 + 多正文 Provider；设置采用静态双列首页与卡片化多级页面。",
+  "badges": [
+    "Stable",
+    "1.0.0",
+    "小说",
+    "增强版"
+  ],
+  "sections": [
+    {
+      "title": "核心能力",
+      "text": "官方搜索、书籍详情、目录、段评、本章说、作者说等数据链保持起点体系；正文支持多 Provider、STV 与既有切源策略。"
+    },
+    {
+      "title": "设置架构",
+      "text": "一级页使用静态双列宫格；二级设置使用卡片化多级页面。"
+    },
+    {
+      "title": "当前版本",
+      "text": "1.0.0 Stable。后续这里只替换当前状态，不累计 Beta3/Beta4/Beta5 等历史介绍。"
+    }
+  ],
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json"
+}

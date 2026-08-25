@@ -202,3 +202,28 @@ Status: Beta fix pending real-device confirmation.
 Observed on real device in `0.1.3-beta4`: Shenmo login failed with `ReferenceError: qfSmCtxV30 未定义`. Historical working versions showed that four helper functions had been removed during later cleanup while `qfSmLoginV30`, check, backend and logout still called them.
 
 Fix: restore the mature `qfSmCtxV30 / qfSmInputV30 / qfSmTrimV30 / qfSmSaveCredsV30` implementations and keep Provider-specific account actions. Status: Beta fix pending real-device confirmation.
+## 16. Repository self-update and Stable/Beta route collision — fixed in RSS UI Beta10
+
+Observed on real device after `🌈 起点增强 1.0.0` promotion:
+
+- repository subscription update page did not import/update the RSS definition;
+- old qidian-next detail still showed accumulated Beta3-Beta6 sections;
+- an old cached Beta page could import the newly promoted Stable file.
+
+Root causes:
+
+- Beta9 used `legado://import/importonline` for RSS self-update instead of `legado://import/rssSource`;
+- update metadata still pointed to an obsolete Beta3 definition;
+- Stable reused the same qidian-next detail/source URLs that old Beta entries had referenced, so cached Beta entries could resolve to Stable after promotion;
+- RSS category query revision remained `v=9`, allowing stale channel payloads to persist.
+
+Fix in Beta10:
+
+- RSS self-update uses the RSS-specific import URI;
+- Beta home/update metadata points to the stable Beta identity file `reader-source-repository-beta.json`;
+- category cache revision bumped to `v=10`;
+- Stable qidian-next detail moved to a new Stable-only physical path;
+- future qidian-next Beta releases must use separate Beta source/detail paths.
+
+Status: published to RSS UI Beta10; awaiting user real-device confirmation.
+

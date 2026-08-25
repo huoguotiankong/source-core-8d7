@@ -172,3 +172,18 @@ RSS/source detail pages are current-state introductions, not release-history doc
 - Full chronological history belongs in `docs/RELEASE_LOG.md`.
 
 This prevents source detail pages from growing without bound after dozens or hundreds of releases.
+## 14. Stable/Beta physical distribution separation
+
+For a source that has entered Stable, Stable and Beta may share the same Legado `bookSourceUrl` identity, but MUST NOT share the same downloadable JSON path or RSS detail path.
+
+For `qidian-next` / `🌈 起点增强`:
+
+- Stable source: `sources/novel/qidian-next/qidian-next.json`
+- Future Beta source: `sources/novel/qidian-next/qidian-next-beta.json`
+- Stable detail: `rss/data/details/stable/qidian-next.json`
+- Future Beta detail: `rss/data/details/beta/qidian-next.json`
+
+A Beta catalog entry must point only to the Beta source/detail paths. A Stable catalog entry must point only to the Stable paths. Never let an old Beta detail URL start importing the current Stable file after promotion.
+
+When repository channel/detail payloads change in a way that may be cached by Legado/Raw, bump the query revision in the RSS definition (`?v=N`) or move to a new channel-specific detail path.
+
