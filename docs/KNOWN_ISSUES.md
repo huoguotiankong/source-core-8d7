@@ -184,3 +184,16 @@ Confirmed compatible direction:
 
 Status: adopted by `qidian-next` 0.1.0-beta1; further real-device regression testing pending.
 
+## 14. `startBrowserAwait(data:)` custom scheme is treated as external app navigation
+
+Observed in qidian-next Beta2 on real device:
+
+- Account HTML buttons did not execute source actions.
+- Diagnostic buttons using `qfnext://...` displayed Android's "open another app" prompt and then "no app can perform this action".
+
+Cause: custom-scheme navigation from the `data:` page is not routed through the source's `shouldOverrideUrlLoading` in this Legado/WebView path.
+
+Fix in `0.1.2-beta3`: do not use custom schemes for settings actions. Encode the chosen action as ordinary HTML form/select state, return with the browser ✓ button, then execute the corresponding `loginUrl` function.
+
+Status: Beta fix pending real-device confirmation.
+

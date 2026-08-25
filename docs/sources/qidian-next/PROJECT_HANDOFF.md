@@ -7,10 +7,10 @@
 - Repository id: `qidian-next`
 - Display name: `🌈 起点助手·新架构`
 - Channel: Beta/Test
-- Current version: `0.1.1-beta2`
+- Current version: `0.1.2-beta3`
 - Source path: `sources/novel/qidian-next/qidian-next.json`
 - Permanent Legado identity: `https://m.qidian.com/?qf_source=qidian_next_8d7`
-- SHA256: `031677a7889e2eab926c9a508b422fde85864527dc37bb44c807088a496d2ff3`
+- SHA256: `a27682beb478c9523c554024650d9fffd72ef669692c49db839f6dbeb6dd3187`
 
 ## Baseline
 
@@ -53,4 +53,7 @@ Real-device testing of Beta1 was broadly normal, but Account Management and Diag
 - account/diagnostic actions relied on returning mutated DOM state from `startBrowserAwait`, which is not reliable in the current Legado WebView path.
 
 Beta2 uses Unicode-derived unique DOM ids and a `qfnext://` custom-URL bridge intercepted by `shouldOverrideUrlLoading`. Business reading modules are unchanged.
+## Beta3 account/diagnostic fix
+
+Beta2 proved that custom `qfnext://` navigation from a `data:` page opened by `startBrowserAwait` is handled as an Android external-app scheme rather than by the book source's `shouldOverrideUrlLoading`. Beta3 removes that bridge completely. Account and diagnostic actions are represented as normal select values inside the already-working HTML settings-return path; after the user taps the browser ✓ button, `loginUrl` reads the returned value and executes the native source action.
 

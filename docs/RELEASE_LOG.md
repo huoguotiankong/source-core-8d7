@@ -1,5 +1,19 @@
 # RELEASE LOG
 
+## 2026-08-25 — Qidian Next v0.1.2-beta3
+
+Status: Beta/Test; account/diagnostic action-return fix awaiting user real-device confirmation.
+
+Changes:
+
+- Removed the Beta2 `qfnext://` custom-scheme bridge after real-device confirmation that Android treats it as external-app navigation.
+- Account Management now saves fields and chooses one action inside the HTML page; the action runs only after tapping the browser ✓ button to return.
+- Diagnostics now uses the same proven select-and-return mechanism.
+- Kept the Unicode unique DOM id fix from Beta2.
+- Search/detail/catalog/content/review/Provider business logic is unchanged.
+- SHA256: `a27682beb478c9523c554024650d9fffd72ef669692c49db839f6dbeb6dd3187`.
+
+
 ## 2026-08-25 — Qidian Next v0.1.1-beta2
 
 Status: Beta/Test; account/diagnostic compatibility fix awaiting user real-device confirmation.
