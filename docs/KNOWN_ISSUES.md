@@ -19,18 +19,16 @@ Current rule:
 
 User confirmed the current Raw RSS URL imports successfully.
 
-## 2. Default branch is still `main` — pending manual repository setting
+## 2. Default branch low-discoverability setup — resolved
 
-A neutral `landing` branch has been created and cleaned.
+The neutral `landing` branch is now the GitHub default branch.
 
-Target:
+Current model:
 
-- Default branch: `landing`
-- Actual project/distribution branch: `main`
+- Default branch / public landing: `landing`
+- Actual project / distribution branch: `main`
 
-This reduces casual discovery through the repository homepage/default-branch search while preserving all existing Raw URLs on `main`.
-
-The connector used for project maintenance cannot currently change the repository default-branch setting, so this step requires a GitHub repository setting change by the user.
+The `landing` branch contains only a neutral entry file. Existing Raw URLs intentionally continue to use `main`.
 
 ## 3. Repository framework has no real migrated book source yet
 
@@ -42,9 +40,35 @@ Do not bulk-migrate many sources until one end-to-end source proves the architec
 
 The currently imported RSS source and its channel URLs use `main`.
 
-Do not rename or remove these paths casually. Switching the GitHub default branch to `landing` does not require changing Raw URLs and should not break the already imported RSS source.
+Do not rename or remove these paths casually. The default branch is now `landing`, but distribution stays on `main` by design.
 
-## 5. Historical Qidian handoff is not the latest project state
+## 5. RSS UI changes require re-importing the RSS source definition
+
+Channel data (`subscription/stable.json`, `subscription/beta.json`) can update without changing the RSS source definition.
+
+However, changes to the RSS source's own rules, UI logic, category layout or detail-page rendering require the RSS source definition to be re-imported/updated in Legado.
+
+Current rule:
+
+- Keep the already imported `rss/reader-source-repository.json` as the stable RSS definition until a new UI is real-device confirmed.
+- Develop new UI behavior in `rss/reader-source-repository-beta.json`.
+- Promote only after user confirmation.
+
+## 6. HTML detail pages and one-click import need real-device verification
+
+Static JSON/JavaScript validation cannot prove that every WebView behavior works in the user's Legado build.
+
+For RSS UI Beta specifically verify:
+
+- category switching,
+- native list rendering,
+- empty-state cards,
+- light/dark theme detail page,
+- `legado://import/bookSource` button behavior,
+- `legado://import/rssSource` update button behavior,
+- manual Raw/jsDelivr route switching.
+
+## 7. Historical Qidian handoff is not the latest project state
 
 A v4.1 engineering handoff report dated 2026-08-16 exists and contains important architectural principles, including module isolation, complete single-JSON delivery, diagnostics, regression checks and real-device confirmation.
 
@@ -52,7 +76,7 @@ However, Qidian development continued after that report. Therefore it must be tr
 
 Before the next major Qidian task, refresh `docs/sources/qidian/PROJECT_HANDOFF.md` using the latest user-confirmed stable source and current test status.
 
-## 6. Public repository low discoverability is not access control
+## 8. Public repository low discoverability is not access control
 
 The repository is public so Raw distribution works without authentication.
 
