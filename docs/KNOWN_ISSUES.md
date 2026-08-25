@@ -54,7 +54,7 @@ Current rule:
 - Beta UI keeps a stable internal `sourceUrl` identity so newer Beta import files update the same RSS source instead of producing duplicates.
 - Promote only after user confirmation.
 
-## 6. RSS category request compatibility — Beta 3 redesign, awaiting device test
+## 6. RSS category request compatibility — resolved in Beta 3
 
 Beta 1 failure:
 
@@ -73,14 +73,35 @@ Root cause found in Beta 2:
 Beta 3 redesign:
 
 - Removed the `q() -> repo()` category-link chain.
-- Category JSON now contains explicit HTTPS `detailUrl` values.
+- Category JSON contains explicit HTTPS `detailUrl` values.
 - Home / Bundle / Help use the same generic list parser.
 - Each detail item has its own HTTPS JSON file under `rss/data/details/`.
-- `sortUrl` now contains literal HTTPS URLs only.
+- `sortUrl` contains literal HTTPS URLs only.
 
-Awaiting user real-device verification.
+Real-device result on 2026-08-25:
 
-## 7. Book-source identity URL must remain stable across Stable/Beta
+- User confirmed Beta 3 no longer reports the category loading errors.
+
+This pattern is now the baseline for repository RSS navigation.
+
+## 7. RSS repository icon remote-loading issue — Beta 4 fix pending confirmation
+
+Observed on Beta 3:
+
+- Repository categories load normally.
+- The subscription grid still shows Legado's default orange RSS icon instead of the project icon.
+
+The remote `sourceIcon` URL itself exists, so the practical compatibility decision is to avoid depending on remote image loading for the RSS source icon.
+
+Beta 4:
+
+- `sourceIcon` is embedded as a compact `data:image/jpeg;base64,...` value.
+- The Beta identity path `rss/reader-source-repository-beta.json` now points to the Beta 4 definition.
+- `rss/reader-source-repository-beta4.json` is retained as the versioned snapshot.
+
+Awaiting user real-device confirmation of icon display.
+
+## 8. Book-source identity URL must remain stable across Stable/Beta
 
 Legado uses `bookSourceUrl` to distinguish book sources.
 
@@ -95,19 +116,18 @@ Important compatibility caveat:
 
 Some legacy sources use `bookSourceUrl` as a relative URL base. Such sources must first migrate their runtime base/request URLs before changing identity URL, otherwise search/detail/content may break.
 
-## 8. HTML detail pages and one-click import need real-device verification
+## 9. HTML detail pages and one-click import need real-device verification
 
 Static JSON/JavaScript validation cannot prove that every WebView behavior works in the user's Legado build.
 
 For RSS UI Beta specifically verify:
 
-- category switching,
 - native list rendering,
 - light/dark theme detail page,
 - `legado://import/bookSource` button behavior,
 - `legado://import/rssSource` update button behavior.
 
-## 9. Historical Qidian handoff is not the latest project state
+## 10. Historical Qidian handoff is not the latest project state
 
 A v4.1 engineering handoff report dated 2026-08-16 exists and contains important architectural principles, including module isolation, complete single-JSON delivery, diagnostics, regression checks and real-device confirmation.
 
@@ -115,7 +135,7 @@ However, Qidian development continued after that report. Therefore it must be tr
 
 Before the next major Qidian task, refresh `docs/sources/qidian/PROJECT_HANDOFF.md` using the latest user-confirmed stable source and current test status.
 
-## 10. Public repository low discoverability is not access control
+## 11. Public repository low discoverability is not access control
 
 The repository is public so Raw distribution works without authentication.
 
