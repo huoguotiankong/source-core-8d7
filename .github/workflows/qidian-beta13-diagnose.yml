@@ -19,21 +19,25 @@ jobs:
           python - <<'PY'
           import json, pathlib
           p=pathlib.Path('sources/novel/qidian-next/qidian-next-beta.json')
-          data=json.loads(p.read_text(encoding='utf-8'))
-          src=data[0]
+          src=json.loads(p.read_text(encoding='utf-8'))[0]
           print('BOOK_SOURCE', src.get('bookSourceName'), src.get('bookSourceUrl'))
-          print('TOP_KEYS', sorted(src.keys()))
-          terms=['qfMultiContentV423','⚡ 正文设置','作品数据','qf_updateTime_v1112','qfDateCandidateV1111','qfTimeSuspiciousV1111','qfPublishSuspiciousV1111','safeUpdateTime','safePublishDate','首发','更新']
-          for k,v in src.items():
+          for field in ['ruleBookInfo','customButton','loginUrl','jsLib']:
+              v=src.get(field,'')
               if not isinstance(v,str):
-                  continue
-              hits=[t for t in terms if t in v]
-              if not hits:
-                  continue
-              print('\n=== FIELD',k,'LEN',len(v),'HITS',hits,'===')
-              for t in hits:
-                  pos=v.find(t)
-                  a=max(0,pos-1300); b=min(len(v),pos+2600)
-                  print('\n--- TERM',t,'AT',pos,'---')
-                  print(v[a:b])
+                  print('FIELD',field,'NONSTRING',type(v).__name__); continue
+              print('\n=== FIELD',field,'LEN',len(v),'===')
+              terms=['⚡ 正文设置','正文源','作品数据','qf_updateTime_v1112','qfDateCandidateV1111','qfTimeSuspiciousV1111','qfPublishSuspiciousV1111','safeUpdateTime','safePublishDate','首发','上架','更新','qfMultiContentV423']
+              seen=[]
+              for t in terms:
+                  start=0
+                  while True:
+                      pos=v.find(t,start)
+                      if pos<0: break
+                      if all(abs(pos-x)>800 for x in seen):
+                          seen.append(pos)
+                          a=max(0,pos-1800); b=min(len(v),pos+3600)
+                          print('\n--- TERM',t,'AT',pos,'---')
+                          print(v[a:b])
+                      start=pos+len(t)
+                  if len(seen)>=12: break
           PY
