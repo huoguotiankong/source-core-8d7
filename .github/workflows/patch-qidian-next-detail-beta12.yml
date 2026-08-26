@@ -21,6 +21,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/scripts/patch_qidian_next_detail_beta12.py')
+          s=p.read_text(encoding='utf-8')
+          old="intro=once(intro,old_grid,new_grid,'pre metrics')"
+          new="ga=intro.index('function dataCell(');gb=intro.index('function chips(',ga);intro=intro[:ga]+new_grid+intro[gb:]"
+          assert old in s
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
           python .github/scripts/patch_qidian_next_detail_beta12.py
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
