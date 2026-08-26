@@ -1,0 +1,27 @@
+name: cleanup-rss-beta14
+
+on:
+  push:
+    paths:
+      - 'hotfix/rss-clean-v14/READY'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Publish RSS Beta14 cleanup
+        run: |
+          python tools/cleanup_rss_catalog_beta14.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add rss/reader-source-repository-beta.json subscription/rss.json subscription/comic.json subscription/stable.json rss/data/details/rss/repository-current.json manifest.json docs/DEVELOPMENT_RULES.md docs/KNOWN_ISSUES.md docs/PROJECT_PLAN.md docs/RELEASE_LOG.md
+          git diff --cached --check
+          git commit -m 'fix: consolidate repository RSS and clear stale catalog identities'
+          git push origin main
