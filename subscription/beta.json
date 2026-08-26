@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-26T12:01:47+08:00",
+  "updatedAt": "2026-08-26T13:06:30+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -38,29 +38,29 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "详情 beta4：严格修复标签结构碎片；信息稀疏时最多一次起点官方书页补全，兼顾信息量与速度。",
+      "summary": "详情 beta5：严格标签清洗保留；稀疏详情官方补全硬化为物理最多一次请求。",
       "icon": "",
       "channel": "beta",
-      "version": "1.1.0-beta4",
+      "version": "1.1.0-beta5",
       "updatedAt": "2026-08-26",
       "tags": [
         "起点",
         "测试版",
         "详情页",
-        "官方补全",
+        "单请求",
         "标签修复",
         "性能优化",
         "情无"
       ],
       "changelog": [
-        "标签只接受可见人类文本，过滤 :true / :50001 等对象碎片",
-        "详情过稀时最多一次起点 PC 官方书页请求，2.6 秒超时且无第二 fallback",
-        "复用成熟 qdParseBookInfo 补全评分/推荐/收藏/粉丝/状态/作者等级/标签",
-        "保留情无 VIP 正文认证修复及其它业务模块"
+        "修复 beta4 通用请求 helper 可能 ajax→get 双请求的问题",
+        "详情补全优先单次 get；仅无 get 能力时单次 ajax",
+        "2.6 秒单次超时 + 30 分钟尝试标记保持不变",
+        "严格标签清洗与情无 VIP 正文认证修复保持不变"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11004",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11004",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11004",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11005",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11005",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11005",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
     }
   ]

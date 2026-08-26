@@ -305,3 +305,8 @@ Status: Beta 1.1.0-beta3 published for real-device confirmation.
 Real-device beta3 showed correct tags on some books, but another book displayed fragments such as `:true`, `:50001`, `:0`, `:50005`; both test books exposed only month-ticket data in the custom works-data block. Root cause: generic array-string extraction could return values from structured objects even after field-name filtering, while the zero-extra-request policy had become too restrictive for information density.
 
 Beta4 removes generic tag/honor array extraction, validates human-visible tag text, and conditionally allows exactly one official Qidian PC book-page request parsed by the mature `qdParseBookInfo` routine. No multi-endpoint fallback is restored. Status: Beta, pending real-device confirmation.
+
+
+## 25. Detail beta4 single-enrichment path could physically issue two transport attempts — fixed in 1.1.0-beta5
+
+Code review found `qfAjaxTextV20()` tries `ajax()` first and then `get()` when the first result is empty, so beta4's nominal one enrichment call could become two HTTP attempts and approach 5.2 seconds worst-case. Beta5 makes the detail enrichment transport mutually exclusive: one `get()` when available, otherwise one `ajax()`, with no failure fallback. The 2.6-second timeout and 30-minute per-book attempt marker remain. Status: Beta, pending real-device confirmation.

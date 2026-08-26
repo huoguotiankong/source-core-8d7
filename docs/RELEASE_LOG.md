@@ -362,3 +362,9 @@ A generated or statically validated version must not be logged as Stable unless 
 - Detail-only Beta: reject structured tag fragments (`:true`, numeric ids, internal keys) and accept only visible human-readable tags.
 - Sparse detail pages may perform one official Qidian PC book-page enrichment request (2.6s timeout) and reuse `qdParseBookInfo`; no secondary fallback.
 - Adds trustworthy missing detail fields when available while keeping Stable 1.0.0 and non-detail domains untouched.
+
+
+### 2026-08-26 — 🌈 起点增强 1.1.0-beta5
+- Detail-only hardening: eliminate beta4's possible `ajax -> get` double transport attempt.
+- Official PC enrichment is now physically at most one request: prefer `get`, use `ajax` only when `get` is unavailable; no failure fallback.
+- Keep strict visible-tag sanitation, 2.6s timeout, 30-minute attempt marker, Stable 1.0.0, and all non-detail modules unchanged.

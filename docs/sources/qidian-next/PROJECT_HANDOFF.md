@@ -133,3 +133,13 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - Current response/cache remains first priority. When reliable detail metrics are sparse, the detail path may issue at most one request to `https://www.qidian.com/book/<bookId>/` with a 2.6s timeout and reuse the existing `qdParseBookInfo(html, baseUrl)` parser.
 - There is no second detail fallback and no APP/Atom/third-party enrichment chain. A per-book 30-minute attempt marker prevents repeated slow probes.
 - Stable 1.0.0 and search/catalog/content/review modules remain unchanged.
+
+
+## Detail single-request hardening 1.1.0-beta5 (2026-08-26)
+
+- Static code review found beta4 called the generic `qfAjaxTextV20`, which can execute `ajax()` and then `get()` when the first transport returns empty; nominal one enrichment call therefore did not guarantee one physical request.
+- Beta5 uses a detail-local mutually exclusive transport: one `get()` when available; only when the runtime has no `get` function is one `ajax()` used. A thrown/empty request does not trigger a second transport attempt.
+- Single timeout remains 2.6 seconds; the per-book 30-minute attempt marker remains.
+- Beta4 visible-human-text tag sanitation and sparse-enrichment policy remain unchanged.
+- Source-level validation asserts only `bookSourceComment` and `ruleBookInfo.init` changed; `jsLib`, source identity, search/catalog/content/review/Provider and 情无 logic are byte-for-byte preserved in this patch.
+- Status: Beta, pending real-device confirmation.
