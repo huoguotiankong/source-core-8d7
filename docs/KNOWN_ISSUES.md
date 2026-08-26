@@ -320,3 +320,11 @@ Real-device beta5 showed title/author/category/latest chapter, works metadata, m
 ## 27. Beta6 synopsis repair still blank on real device — investigating in 1.1.0-beta7
 
 Real-device retest on `同时穿越：继承万界遗产` still showed no 内容简介 while works metadata, month tickets, shortcuts and tags rendered. This disproves the Beta6 assumption that Qidian `bookInfo/BookInfo` can be treated as a scalar synopsis field. Beta7 uses the existing single enrichment request slot for Qidian's official TTS page when synopsis is missing, because that server-rendered page exposes a visible `作品简介`; it also adds DOM/meta/JSON-LD/book-related-script parsing. If no synopsis is found, a low-sensitivity diagnostic line is rendered. No second network request is added. Status: Beta, pending real-device feedback.
+
+## 28. Beta9 rich detail restored, but cold detail load still waits — optimized in 1.1.0-beta10
+
+Real-device Beta9 confirmed that synopsis and rich metrics are finally present, and the user reported a clear speed improvement over the old multi-fallback detail chain. Remaining issue: first opening a book can still pause while enrichment requests complete.
+
+Beta10 keeps the proven Beta9 data result but changes request priority: QidianTu is attempted only when core metadata is sparse; APP bookDetailInfo is no longer a mandatory first request and runs only if core data remains insufficient. QidianTu/search timeouts are reduced to 3.2s/2.8s. Detail HTML is also compacted without using the table layout that previously broke on-device.
+
+Status: Beta published for real-device confirmation.

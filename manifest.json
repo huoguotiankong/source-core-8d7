@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-26T16:26:24+08:00",
+  "updatedAt": "2026-08-26T16:37:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -80,31 +80,31 @@
       "name": "🌈 起点增强 · Beta",
       "category": "novel",
       "channel": "beta",
-      "version": "1.1.0-beta9",
-      "versionCode": 11009,
-      "updatedAt": "2026-08-26T16:26:24+08:00",
+      "version": "1.1.0-beta10",
+      "versionCode": 11010,
+      "updatedAt": "2026-08-26T16:37:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11009",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11010",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "详情 beta9：APP 后仍稀疏则按需恢复起点图富数据，并以起点官方搜索页按 bookId 补简介/在看/总推荐。",
+      "summary": "详情 beta10：Beta9 富数据真机已恢复；本版优化详情排版与冷启动请求顺序，起点图优先、APP 仅核心数据兜底，并收紧补全超时。",
       "tags": [
         "起点",
         "测试版",
         "详情页",
-        "完整数据",
-        "起点图",
-        "官方搜索",
+        "富数据",
+        "排版优化",
+        "冷启动优化",
         "按需补全",
         "缓存"
       ],
       "changelog": [
-        "APP bookDetailInfo 仍保留为第一层快速补全，但失败不再阻断后续富数据链",
-        "稀疏详情按需恢复起点图：收藏、真实粉丝、总推荐、盟主、评分、首订、上架、作者等级、标签、状态、荣誉等",
-        "简介/在看/总推荐仍为空时，用起点官方移动搜索页按 bookId 精确锚定补全",
-        "起点图正缓存12小时、官方搜索正缓存6小时，失败只短缓存10分钟",
-        "不增加推书君第三请求；搜索、目录、正文、评论及账号链保持不变"
+        "Beta9 真机确认作品简介与富数据已恢复，详情数据链作为本版稳定基线",
+        "详情排版收紧段间距，作品数据增加分隔线，作品标签/作者标签/作品荣誉分层展示，简介增加首行缩进",
+        "冷启动先判断核心富数据是否稀疏，仅稀疏时请求起点图；起点图后仍缺核心数据才调用 APP bookDetailInfo",
+        "起点图超时由 4.2 秒收紧至 3.2 秒，官方搜索由 4.2 秒收紧至 2.8 秒；缓存策略保持不变",
+        "不新增接口；搜索、目录、正文 Provider、评论、角色卡、书友圈、账号与情无 VIP 链全部冻结"
       ],
-      "sha256": "d866eb0da45f0c08c8374208e03027f9a1fe0d919c0070bd64288622bd2461a5"
+      "sha256": "aa21a7378323fa7f28159785747661a505296dbd9398678abfd2a40af1eb6b7e"
     }
   ]
 }

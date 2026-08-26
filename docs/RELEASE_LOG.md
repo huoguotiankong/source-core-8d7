@@ -413,3 +413,11 @@ A generated or statically validated version must not be logged as Stable unless 
 - When synopsis is missing, reuse the one official enrichment request slot for Qidian's server-rendered TTS book page and extract its visible 作品简介.
 - Add DOM/meta description/JSON-LD/book-related script JSON parsing and a low-sensitivity fallback diagnostic.
 - Keep the physical one-request ceiling, 2.6s timeout, 30-minute suppression, Stable 1.0.0 and all non-detail modules unchanged.
+
+### 2026-08-26 — 🌈 起点增强 1.1.0-beta10
+- Beta9 真机确认详情富数据和内容简介恢复，且整体速度较旧版明显提升；本版以 Beta9 为详情数据基线。
+- 详情 UI 收紧段间距，作品数据增加轻量中线分隔，标签/作者标签/荣誉分层，简介首行缩进。
+- 冷启动改为核心数据判定：核心稀疏才请求起点图；起点图后仍不足才调用 APP，避免 Beta8 已证明低命中率的 APP 请求固定占据首段等待。
+- 起点图超时收紧至 3.2 秒，官方移动搜索收紧至 2.8 秒；缓存策略不变，不新增接口。
+- Stable 1.0.0 与所有非详情业务域保持不变。
+- SHA256: `aa21a7378323fa7f28159785747661a505296dbd9398678abfd2a40af1eb6b7e`.

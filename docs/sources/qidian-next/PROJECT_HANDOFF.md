@@ -163,3 +163,13 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - Parser also checks intro DOM, meta description, JSON-LD and current-book-related script JSON. If all fail, `introDiag` temporarily shows only response length/structure/script count/hit length.
 - Source guard: only `bookSourceComment` and `ruleBookInfo.init/intro` change; `jsLib`, source identity, search/catalog/content/review/Provider and 情无 logic remain unchanged.
 - Status: Beta pending real-device feedback.
+
+## Detail layout/performance 1.1.0-beta10 (2026-08-26)
+
+- Beta9 real-device result is positive: synopsis and rich metrics are restored; user reports materially better speed than the older detail chain, though cold load still waits.
+- Beta10 treats Beta9 data extraction as frozen and changes only detail presentation plus enrichment ordering.
+- Core-richness check excludes synopsis-only incompleteness. QidianTu runs only when core metrics/tags/status are sparse; APP bookDetailInfo becomes a second-line fallback rather than the fixed first call.
+- QidianTu timeout: 3.2s. Official mobile search timeout: 2.8s. Existing caches remain unchanged.
+- UI: tighter section spacing, separated metric columns, separate tag/author-tag/honor blocks, indented synopsis.
+- Search/catalog/content/review/community/account/QW-VIP domains remain frozen.
+- Status: Beta pending real-device layout/performance confirmation.

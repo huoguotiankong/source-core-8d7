@@ -1,35 +1,35 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "详情 beta9：APP 后仍稀疏则按需恢复起点图富数据，并以起点官方搜索页按 bookId 补简介/在看/总推荐。",
+  "summary": "详情 beta10：Beta9 富数据真机已恢复；本版优化详情排版与冷启动请求顺序，起点图优先、APP 仅核心数据兜底，并收紧补全超时。",
   "badges": [
     "Beta",
-    "1.1.0-beta9",
-    "详情富数据"
+    "1.1.0-beta10",
+    "排版 / 冷启动"
   ],
   "sections": [
     {
-      "title": "Beta8 真机结论",
-      "text": "单独恢复官方 APP bookDetailInfo 后，真机仍只出现月票、作者等级、分类等少数字段；因此不能把它作为唯一详情补全链。"
+      "title": "Beta9 真机结论",
+      "text": "作品简介及总推荐、收藏、粉丝、盟主、首订等富数据已经恢复；用户反馈详情速度较旧版明显提升，但首次冷启动仍有可感等待。"
     },
     {
-      "title": "多层回归",
-      "text": "当前页面/缓存优先；稀疏时先尝试官方 APP，再按需恢复旧版已使用的起点图富数据。"
+      "title": "排版优化",
+      "text": "减少标题后的空白；作品数据两列之间增加轻量分隔；作品标签、作者标签、作品荣誉分层；内容简介增加首行缩进，整体更紧凑。"
     },
     {
-      "title": "简介与在看",
-      "text": "若起点图后简介、在看或总推荐仍缺失，再请求一次起点官方移动搜索页，并按当前 bookId 精确锚定结果，避免串书。"
+      "title": "冷启动优化",
+      "text": "不再固定先请求 APP。只有核心富数据稀疏时才请求起点图；起点图后仍不足才调用 APP bookDetailInfo。这样保留兜底能力，同时跳过当前真机环境中命中率较低的无效等待。"
     },
     {
-      "title": "性能控制",
-      "text": "起点图成功缓存12小时，官方搜索成功缓存6小时；失败仅短缓存10分钟。不引入推书君第三请求。"
+      "title": "超时控制",
+      "text": "起点图超时 4.2s→3.2s，起点官方移动搜索 4.2s→2.8s；不新增接口，现有缓存策略保持不变。"
     },
     {
       "title": "冻结范围",
-      "text": "搜索、发现、目录、正文 Provider、段评/本章说、角色卡、书友圈与情无 VIP 认证链不变。"
+      "text": "搜索、发现、目录、正文 Provider、段评/本章说、角色卡、书友圈、账号与情无 VIP 认证链均不修改。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11009",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11009",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11009"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11010",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11010",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11010"
 }
