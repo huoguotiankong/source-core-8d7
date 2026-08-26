@@ -214,13 +214,15 @@ Unless the user explicitly requests local-only delivery, every newly created or 
 
 ## 17. Concise source display naming
 
-`bookSourceName` / RSS source display names should be short and recognizable. Default format:
+`bookSourceName` / RSS source display names should be short and recognizable. New source-core sources use the shared project brand mark by default:
 
-`<one distinctive icon> <source/platform name>`
+`◈ <source/platform name>`
 
-Examples: `🍥 哔咔漫画`, `🌈 起点增强`.
+Example: `◈ 哔咔漫画`. The matching repository artwork is `assets/source-core-source-icon.svg`.
 
 - Do not append Beta/Stable, version numbers, APP/Web route descriptions, long capability lists or marketing-style suffixes to the in-app source name.
 - Put channel, version, route architecture and feature descriptions in `bookSourceComment`, Manifest/Subscription metadata, tags and changelog instead.
 - Add a textual suffix only when two independently installable sources would otherwise be genuinely ambiguous, and keep that suffix short.
 - When renaming an existing source, preserve its stable `bookSourceUrl` identity so updates continue in place.
+- Do not pick a different decorative emoji for each newly written source. Use the shared `◈` source-core mark unless the user explicitly requests another public identity.
+- Existing mature sources are not bulk-renamed only for branding; adopt the shared mark when they are deliberately renamed or newly rebuilt, so stable user-facing names are not churned unnecessarily.

@@ -375,3 +375,18 @@ Latest upstream master was rechecked on 2026-08-26: ReadMenu still has tvCustomB
 Rule: do not keep mutating customButton/eventListener inside image-source content rules expecting MangaMenu to render a missing control. Preserve bookSourceType=2 for correct manga UX. Source-side customButton remains useful on the detail page. A true manga-reader custom button requires an app-side MangaMenu implementation change.
 
 Status: upstream/app capability gap; not fixable by a standalone Legado source JSON without changing image-book reading mode.
+
+## Picacg BookInfo customButton used the wrong browser thread path — Beta8 fix
+
+Real-device Beta6/Beta7: the custom button was visible on BookInfoActivity but tapping it did not open the comment UI, while the inline “查看评论” button worked.
+
+Root cause from current Legado source:
+
+- BookInfoActivity dispatches `CLICK_CUSTOM_BUTTON` through `SourceCallBack.callBackBtn`.
+- `SourceCallBack.callBackBtn` executes `ruleContent.callBackJs` on `Dispatchers.IO` and supplies `SourceLoginJsExtensions` as `java`.
+- generic `JsExtensions.showBrowser` marshals to `runOnUiThread`, but `SourceLoginJsExtensions.showBrowser` overrides it and directly calls `showDialogFragment`.
+- therefore a callback that directly calls `java.showBrowser` can fail from the IO callback path even though the same comment opener works from normal rule/UI execution.
+
+Beta8 rule: prepare comment data in the callback background thread, then call the existing BottomWebView opener through the current Activity's `runOnUiThread`. Do not guess alternate event names; the event is confirmed as `clickCustomButton`.
+
+Recommendation note: Picacg `/recommendation` is treated as a one-shot recommendation set, not a Legado-paginated feed. Each opened recommendation session may load that endpoint once, then must return empty on subsequent Explore pages.

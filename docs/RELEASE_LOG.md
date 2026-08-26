@@ -1,5 +1,20 @@
 # RELEASE LOG
 
+## 2026-08-26 — Picacg 1.0.0-beta8 custom-button thread fix + recommendation session de-dup
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Changes:
+
+- 详情页顶部 customButton 回调按 SourceCallBack 的 IO 线程模型修复：数据准备在后台完成，showBrowser 显式切回 Activity 主线程
+- 相关推荐每次打开生成 session id，同一 session 仅返回一次推荐集合，阻止阅读发现页自动翻页重复追加
+- 推荐结果同时按漫画 ID 与“标题 + 封面 + 作者”签名去重
+- 书源显示名改为「◈ 哔咔漫画」，仓库新增 source-core 专属阅读源 SVG 图标
+- 漫画正文 MangaMenu 本身仍没有 customButton；本版只修复详情页顶部已有定制按钮
+- 其它核心链冻结
+- Published SHA256: `d0d586c8259910f176ced7e79626b9cb42b1e4421b9a7ac3a1c198446b061c4b`.
+
+
 ## 2026-08-26 — Picacg 1.0.0-beta6 interaction order + concise source naming
 
 Status: Beta/Test; awaiting user real-device confirmation.

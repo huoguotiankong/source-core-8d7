@@ -1,43 +1,40 @@
 {
   "kind": "source",
-  "title": "🍥 哔咔漫画",
-  "summary": "Beta6：互动区改为评论/推荐同排、点赞/收藏同排；书源显示名精简为「🍥 哔咔漫画」；漫画正文 customButton 已确认受 MangaMenu 上游限制。",
+  "title": "◈ 哔咔漫画",
+  "summary": "Beta8：修复详情页顶部定制按钮无法打开评论；相关推荐改为单会话单次加载并按 ID/标题封面双重去重；启用阅读源统一品牌标识。",
   "badges": [
     "BETA",
-    "1.0.0-beta6",
+    "1.0.0-beta8",
     "漫画源",
-    "互动区优化"
+    "评论/推荐修复"
   ],
   "sections": [
     {
-      "title": "正文定制按钮结论",
-      "text": "已再次核对阅读当前上游源码：文本正文 ReadMenu 明确包含 tvCustomBtn，会按 BookSource.customButton 显示并分发 CLICK_CUSTOM_BUTTON；图片漫画正文使用 MangaMenu，而 MangaMenu 当前没有对应控件、显示判断和回调。因此原生漫画正文不能仅靠书源 JSON 增加定制按钮。详情页定制按钮不受此限制，继续保留并直达评论。"
+      "title": "详情定制按钮",
+      "text": "已定位真实线程差异：BookInfo 顶部 customButton 经 SourceCallBack 在 IO 线程执行，而 SourceLoginJsExtensions.showBrowser 不负责切回主线程。本版先完成评论数据/HTML准备，再通过当前 Activity.runOnUiThread 打开原评论 BottomWebView。"
     },
     {
-      "title": "互动与操作",
-      "text": "按使用关系重新排成 2×2：第一行「查看评论 / 相关推荐」，第二行「点赞作品 / 收藏作品」。"
+      "title": "相关推荐",
+      "text": "哔咔 recommendation 是一次性推荐集合，不按阅读发现页的页码分页。本版每次打开生成独立 session，同一 session 只返回一次；同时按 ID 与标题/封面/作者签名双重去重。"
     },
     {
-      "title": "显示名称",
-      "text": "书源名精简为「🍥 哔咔漫画」。APP/网页双线路、Beta、版本号等信息继续存在于说明和仓库元数据中，不再占用书源列表名称。"
-    },
-    {
-      "title": "作品信息",
-      "text": "作品数据、描述、作者、汉化组、上传者、分类、标签、更新时间、上传时间及权限展示保持不变；作者/汉化组/分类/标签继续可点击。"
+      "title": "品牌标识",
+      "text": "source-core 阅读源统一使用「◈」作为文字前缀，并配套独立开卷 + 菱形核心图标。后续新写阅读源默认使用同一品牌标识，版本/线路等信息继续放说明而不塞进名称。"
     },
     {
       "title": "核心保护",
-      "text": "账号、签到、收藏、点赞、评论中心、楼中楼、目录、漫画图片正文及 APP/Web 双线路不改。"
+      "text": "详情互动区、作品数据、作者/汉化组/标签、账号、签到、收藏、点赞、评论楼中楼、目录、漫画图片正文及 APP/Web 双线路保持原逻辑。"
     },
     {
       "title": "发布状态",
-      "text": "Beta / 测试版；等待真机确认互动区和短名称显示。"
+      "text": "Beta / 测试版；等待真机确认。"
     },
     {
       "title": "唯一身份",
       "text": "https://sc8d7.invalid/legado/picacg-8d7"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json?v=10006",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/picacg/picacg-beta.json?v=10006"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json?v=10008",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/picacg/picacg-beta.json?v=10008",
+  "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
 }

@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "type": "comic",
   "name": "漫画源",
-  "updatedAt": "2026-08-26T19:59:55+08:00",
+  "updatedAt": "2026-08-26T20:28:59+08:00",
   "items": [
     {
       "id": "picacg",
-      "name": "🍥 哔咔漫画",
-      "summary": "Beta6：互动区改为评论/推荐同排、点赞/收藏同排；书源显示名精简为「🍥 哔咔漫画」；漫画正文 customButton 已确认受 MangaMenu 上游限制。",
-      "icon": "",
+      "name": "◈ 哔咔漫画",
+      "summary": "Beta8：修复详情页顶部定制按钮无法打开评论；相关推荐改为单会话单次加载并按 ID/标题封面双重去重；启用阅读源统一品牌标识。",
+      "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg",
       "channel": "beta",
-      "version": "1.0.0-beta6",
+      "version": "1.0.0-beta8",
       "updatedAt": "2026-08-26",
       "tags": [
         "哔咔",
@@ -18,21 +18,22 @@
         "APP API",
         "网页线路",
         "评论",
-        "详情增强",
-        "简洁命名",
-        "MangaMenu",
+        "相关推荐",
+        "去重",
+        "定制按钮",
+        "品牌图标",
         "双线路"
       ],
       "changelog": [
-        "互动与操作重排：第一行查看评论 + 相关推荐，第二行点赞作品 + 收藏作品",
-        "书源显示名精简为「🍥 哔咔漫画」，不再把 APP/网页双线路、Beta 等状态塞进 bookSourceName",
-        "再次核对阅读当前上游：文本 ReadMenu 有 customButton 控件与 CLICK_CUSTOM_BUTTON 分发，图片 MangaMenu 没有，漫画正文无法仅靠书源 JSON 增加该按钮",
-        "详情页定制按钮仍保留并直达评论；作品数据、作者/汉化组/分类/标签点击能力保持不变",
-        "账号、评论、楼中楼、目录、漫画图片正文及 APP/Web 双线路核心链冻结"
+        "修复详情页顶部定制按钮：SourceCallBack 在 IO 线程执行，回调改为显式切回 Activity 主线程后再调用 showBrowser 打开评论中心",
+        "相关推荐每次打开生成独立 session id；同一 session 只允许推荐接口返回一次，阻止 ExploreShowActivity 自动翻页重复追加同一批结果",
+        "推荐结果按漫画 ID 与“标题 + 封面 + 作者”签名双重去重，处理 API 返回不同 ID 但视觉内容相同的重复项",
+        "阅读源统一品牌标识启用：书源名改为「◈ 哔咔漫画」，仓库新增专属 source-core 图标资产",
+        "详情互动区、作品数据、账号、评论、楼中楼、目录、漫画图片正文和 APP/Web 双线路核心链保持不变"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json?v=10006",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/picacg/picacg-beta.json?v=10006",
-      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json?v=10006",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json?v=10008",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/picacg/picacg-beta.json?v=10008",
+      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json?v=10008",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/picacg.json?v=10005",
       "type": "comic"
     }
