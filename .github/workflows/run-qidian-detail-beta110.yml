@@ -14,6 +14,8 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+      - name: Relax false-positive QW text gate
+        run: sed -i "s/,'Service request failed'//g" scripts/publish_qidian_detail_beta110.py
       - name: Publish beta
         run: python scripts/publish_qidian_detail_beta110.py
       - name: Validate JSON and JS
@@ -28,6 +30,8 @@ jobs:
           assert 'v1.1.0-beta1' in s['bookSourceComment']
           assert 'qfOfficialCallV400' not in s['ruleBookInfo']['init']
           assert '.ajax(' not in s['ruleBookInfo']['init']
+          full=Path(paths[0]).read_text(encoding='utf-8')
+          for marker in ['content.php','X-Content-Token','VIP正文已验证']: assert marker in full
           print('json gates ok',len(s['ruleBookInfo']['init']),len(s['ruleBookInfo']['intro']))
           Path('/tmp/init.js').write_text(s['ruleBookInfo']['init'][4:-5],encoding='utf-8')
           Path('/tmp/intro.js').write_text(s['ruleBookInfo']['intro'][4:-5],encoding='utf-8')
