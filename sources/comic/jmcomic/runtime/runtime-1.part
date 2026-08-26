@@ -35,7 +35,7 @@ function jmForm(obj){var a=[];for(var k in obj){if(obj.hasOwnProperty(k)&&obj[k]
 function jmNow(){return String(Math.floor(Date.now()/1000));}
 function jmUniq(a){var o=[],s={};for(var i=0;i<(a||[]).length;i++){var x=jmStr(a[i]).trim();if(x&&!s[x]){s[x]=1;o.push(x);}}return o;}
 function jmUrlHost(u){var m=jmStr(u).match(/^https?:\/\/([^\/]+)/i);return m?m[1]:"";}
-function jmAbs(base,u){u=jmStr(u).trim();if(!u)return "";if(/^https?:\/\//i.test(u))return u;if(u.indexOf("//")===0)return "https:"+u;return base.replace(/\/+$/," ").trim()+"/"+u.replace(/^\/+/,");}
+function jmAbs(base,u){u=jmStr(u).trim();if(!u)return "";if(/^https?:\/\//i.test(u))return u;if(u.indexOf("//")===0)return "https:"+u;return base.replace(/\/+$/,"")+"/"+u.replace(/^\/+/,"");}
 function jmHtmlHeaders(base){return {"User-Agent":JM_UA_WEB,"Referer":base+"/","Accept-Language":"zh-CN,zh;q=0.9","Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"};}
 function jmApiHeaders(ts,secret,ver){return {"User-Agent":JM_UA_APP,"Accept-Encoding":"gzip, deflate","token":java.md5Encode(ts+secret),"tokenparam":ts+","+(ver===undefined?JM_APP_VERSION:ver)};}
 
@@ -55,7 +55,7 @@ function jmDecodeEnvelope(raw,ts){
  if(typeof enc==="object")return enc;
  var dec=jmAesDecode(enc,ts,JM_DATA_SECRET);return jmJson(dec,dec);
 }
-function jmNormalizeHost(x){x=jmStr(x).trim();if(!x)return "";x=x.replace(/^https?:\/\//i,"").replace(/\/.*$/," ").trim();return x;}
+function jmNormalizeHost(x){x=jmStr(x).trim();if(!x)return "";x=x.replace(/^https?:\/\//i,"").replace(/\/.*$/,"");return x;}
 
 function jmRefreshApiDomains(ctx,force){
  if(!force){
@@ -83,7 +83,7 @@ function jmTryFinalUrl(url){
  try{
    var r=java.connect(url);
    var u=jmStr(r.url());
-   if(/^https?:\/\//i.test(u))return u.replace(/\/+$/," ").trim();
+   if(/^https?:\/\//i.test(u))return u.replace(/\/+$/,"");
  }catch(e){}
  return "";
 }
@@ -96,7 +96,7 @@ function jmExtractWebDomains(html){
    /href=["'](https?:\/\/[^"'<> ]+)["']/ig,
    /(https?:\/\/(?:18comic|jmcomic|jm-comic|jm365)[^<"' ]+)/ig
  ];
- for(var p=0;p<pats.length;p++){while((m=pats[p].exec(html))){var u=jmStr(m[1]||m[0]).replace(/&amp;/g,"&").replace(/\/+$/," ").trim();if(/^https?:\/\//i.test(u))out.push(u);}}
+ for(var p=0;p<pats.length;p++){while((m=pats[p].exec(html))){var u=jmStr(m[1]||m[0]).replace(/&amp;/g,"&").replace(/\/+$/,"");if(/^https?:\/\//i.test(u))out.push(u);}}
  return jmUniq(out);
 }
 function jmProbeWeb(u){
