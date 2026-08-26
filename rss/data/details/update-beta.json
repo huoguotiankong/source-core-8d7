@@ -4,7 +4,7 @@
   "summary": "重新导入当前仓库 Beta 定义；内部 sourceUrl 身份保持不变，会覆盖更新现有订阅源。",
   "badges": [
     "RSS",
-    "UI Beta 11",
+    "UI Beta 12",
     "自更新"
   ],
   "sections": [
@@ -13,8 +13,8 @@
       "text": "书源列表数据会自动刷新；只有仓库自身的分类、详情规则或界面发生变化时，才需要重新导入订阅源定义。"
     },
     {
-      "title": "本次整理",
-      "text": "清理旧分类缓存造成的重复显示，恢复卡片化详情页，并强化 Stable/Beta 分流。"
+      "title": "本次修复",
+      "text": "详情页不再二次调用 startBrowser，而是在当前详情页直接渲染卡片 HTML；修复返回后残留空白页的问题。"
     }
   ],
   "rssUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository-beta.json"
