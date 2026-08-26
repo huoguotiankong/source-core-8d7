@@ -1,0 +1,237 @@
+name: publish-staged-reader-source
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'incoming/*/READY'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Publish staged reader source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64, hashlib, json, pathlib
+          from datetime import datetime, timezone, timedelta
+
+          ROOT = pathlib.Path('.')
+          ready = sorted((ROOT/'incoming').glob('*/READY'))
+          if not ready:
+              raise SystemExit('No READY marker found.')
+          if len(ready) != 1:
+              raise SystemExit(f'Expected one READY marker, got {len(ready)}: {ready}')
+          stage = ready[0].parent
+          meta_path = stage/'meta.json'
+          if not meta_path.exists():
+              raise SystemExit('Missing meta.json')
+          meta = json.loads(meta_path.read_text(encoding='utf-8'))
+          parts = sorted(stage.glob('source.b64.*'))
+          if not parts:
+              raise SystemExit('No source.b64.* parts found')
+          encoded = ''.join(p.read_text(encoding='ascii').strip() for p in parts)
+          raw = base64.b64decode(encoded)
+          sha = hashlib.sha256(raw).hexdigest()
+          if meta.get('sha256') and sha != meta['sha256']:
+              raise SystemExit(f'SHA256 mismatch: {sha} != {meta["sha256"]}')
+          data = json.loads(raw.decode('utf-8'))
+          if not isinstance(data, list) or len(data) != 1:
+              raise SystemExit('Book source must contain exactly one source object')
+          src = data[0]
+          expected_identity = meta['bookSourceUrl']
+          if src.get('bookSourceUrl') != expected_identity:
+              raise SystemExit(f'Identity mismatch: {src.get("bookSourceUrl")} != {expected_identity}')
+          if meta.get('bookSourceName') and src.get('bookSourceName') != meta['bookSourceName']:
+              raise SystemExit(f'Name mismatch: {src.get("bookSourceName")}')
+
+          target = ROOT/meta['sourcePath']
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_bytes(raw)
+
+          now_dt = datetime.now(timezone(timedelta(hours=8)))
+          now = now_dt.isoformat(timespec='seconds')
+          day = now_dt.date().isoformat()
+          raw_url = f"https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/{meta['sourcePath']}"
+          backup_url = f"https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/{meta['sourcePath']}"
+          detail_path = meta['detailPath']
+          detail_url = f"https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/{detail_path}"
+
+          entry = {
+              'id': meta['id'], 'name': meta['displayName'], 'category': meta['category'],
+              'artifactType': 'bookSource', 'channel': meta['channel'],
+              'version': meta['version'], 'versionCode': meta['versionCode'], 'updatedAt': now,
+              'sourcePath': meta['sourcePath'], 'sourceUrl': raw_url,
+              'bookSourceUrl': expected_identity, 'summary': meta['summary'],
+              'tags': meta.get('tags', []), 'changelog': meta.get('changelog', []),
+              'sha256': sha,
+          }
+          mp = ROOT/'manifest.json'
+          manifest = json.loads(mp.read_text(encoding='utf-8'))
+          manifest['updatedAt'] = now
+          sources = manifest.setdefault('sources', [])
+          sources[:] = [x for x in sources if x.get('id') != meta['id']] + [entry]
+          manifest.setdefault('typeCatalogs', {})['comic'] = 'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/comic.json'
+          manifest.setdefault('typeCatalogs', {})['rss'] = 'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/rss.json'
+          mp.write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+
+          cat_path = ROOT/f"subscription/{meta['channel']}.json"
+          catalog = json.loads(cat_path.read_text(encoding='utf-8'))
+          catalog['updatedAt'] = now
+          item = {
+              'id': meta['id'], 'name': meta['displayName'], 'summary': meta['summary'], 'icon': '',
+              'channel': meta['channel'], 'version': meta['version'], 'updatedAt': day,
+              'tags': meta.get('tags', []), 'changelog': meta.get('changelog', []),
+              'sourceUrl': raw_url, 'backupUrl': backup_url,
+              'importUrl': 'legado://import/bookSource?src='+raw_url,
+              'detailUrl': detail_url,
+          }
+          items = catalog.setdefault('items', [])
+          items[:] = [x for x in items if x.get('id') != meta['id']] + [item]
+          cat_path.write_text(json.dumps(catalog, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+
+          comic_path = ROOT/'subscription/comic.json'
+          if comic_path.exists():
+              comic = json.loads(comic_path.read_text(encoding='utf-8'))
+          else:
+              comic = {'schemaVersion':1,'type':'comic','name':'漫画源','updatedAt':now,'items':[]}
+          comic['updatedAt'] = now
+          ci = dict(item)
+          ci['type'] = 'comic'
+          comic_items = comic.setdefault('items', [])
+          comic_items[:] = [x for x in comic_items if x.get('id') != meta['id']] + [ci]
+          comic_path.write_text(json.dumps(comic, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+
+          dp = ROOT/detail_path
+          dp.parent.mkdir(parents=True, exist_ok=True)
+          detail = {
+              'kind':'source','title':meta['displayName'],'summary':meta['summary'],
+              'badges':[meta['channel'].upper(), meta['version'], '漫画源', 'APP / 网页双线路'],
+              'sections':[
+                  {'title':'核心能力','text':'登录、账户中心、签到、收藏、搜索、分类、排行榜、随机推荐、完整目录与漫画图片。'},
+                  {'title':'评论社区','text':'详情页与阅读页定制按钮双入口；支持评论分页、热门/最新、楼中楼、评论点赞、发表与回复。'},
+                  {'title':'线路','text':'APP API 与网页 API 双线路隔离；自动模式优先最近成功线路，失败时切换另一条。'},
+                  {'title':'发布状态','text':'当前为 Beta / 测试版，等待阅读真机完整回归后再晋升 Stable。'},
+                  {'title':'唯一身份','text':expected_identity},
+              ],
+              'sourceUrl':raw_url,'backupUrl':backup_url,
+          }
+          dp.write_text(json.dumps(detail, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+
+          # Build type catalog for RSS sources. This category intentionally contains repository RSS definitions now;
+          # future RSS sources can be upserted here by the same publication policy.
+          rss_path = ROOT/'subscription/rss.json'
+          rss = {
+              'schemaVersion':1,'type':'rss','name':'订阅源','updatedAt':now,
+              'items':[
+                  {
+                      'id':'reader-repository-stable','name':'🌈 阅读书源仓库','summary':'阅读书源仓库正式订阅入口。',
+                      'icon':'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/assets/reader-repo-icon.png',
+                      'channel':'stable','version':'current','updatedAt':day,'tags':['订阅源','仓库','Stable'],
+                      'sourceUrl':'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository.json',
+                      'importUrl':'legado://import/rssSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository.json',
+                      'detailUrl':'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/rss/repository-stable.json'
+                  },
+                  {
+                      'id':'reader-repository-beta','name':'🌈 阅读书源仓库 · Beta','summary':'阅读书源仓库界面与规则的测试订阅入口。',
+                      'icon':'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/assets/reader-repo-icon.png',
+                      'channel':'beta','version':'current','updatedAt':day,'tags':['订阅源','仓库','Beta'],
+                      'sourceUrl':'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository-beta.json',
+                      'importUrl':'legado://import/rssSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository-beta.json',
+                      'detailUrl':'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/rss/repository-beta.json'
+                  }
+              ]
+          }
+          rss_path.write_text(json.dumps(rss, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+          for key, title, summary, url in [
+              ('repository-stable','🌈 阅读书源仓库','正式订阅入口','https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository.json'),
+              ('repository-beta','🌈 阅读书源仓库 · Beta','测试订阅入口','https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository-beta.json')]:
+              rp = ROOT/f'rss/data/details/rss/{key}.json'
+              rp.parent.mkdir(parents=True, exist_ok=True)
+              rp.write_text(json.dumps({'kind':'rss','title':title,'summary':summary,'badges':['订阅源'],
+                  'sections':[{'title':'用途','text':'用于在阅读中浏览、导入和更新仓库中的书源。'}],
+                  'rssUrl':url}, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+
+          # Add fixed type entries to both Stable and Beta repository definitions without changing their identities.
+          for rel in ['rss/reader-source-repository.json','rss/reader-source-repository-beta.json']:
+              rp = ROOT/rel
+              arr = json.loads(rp.read_text(encoding='utf-8'))
+              o = arr[0]
+              sort = str(o.get('sortUrl') or '')
+              comic_line = '🖼 漫画源::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/comic.json'
+              rss_line = '📰 订阅源::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/rss.json'
+              lines = [x for x in sort.split('\n') if x]
+              lines = [x for x in lines if not x.startswith('🖼 漫画源::') and not x.startswith('📰 订阅源::')]
+              insert_at = 1 if lines else 0
+              lines[insert_at:insert_at] = [comic_line, rss_line]
+              o['sortUrl'] = '\n'.join(lines)
+              o['lastUpdateTime'] = int(now_dt.timestamp()*1000)
+              if rel.endswith('reader-source-repository-beta.json'):
+                  o['sourceComment'] = '仓库 UI Beta：新增漫画源与订阅源固定分类；分类 URL 保持长期稳定。'
+              else:
+                  o['sourceComment'] = 'GitHub 云端阅读源仓库。新增漫画源与订阅源分类；正式版与测试版继续分流。'
+              rp.write_text(json.dumps(arr, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+
+          # Rebuild complete Beta book-source bundle from manifest so existing Beta sources are preserved.
+          beta_sources = []
+          for x in manifest.get('sources', []):
+              if x.get('channel') != 'beta':
+                  continue
+              sp = x.get('sourcePath')
+              if not sp:
+                  continue
+              fp = ROOT/sp
+              if fp.exists():
+                  obj = json.loads(fp.read_text(encoding='utf-8'))
+                  if isinstance(obj, list): beta_sources.extend(obj)
+          (ROOT/'bundles/all-beta.json').write_text(json.dumps(beta_sources, ensure_ascii=False, separators=(',',':')), encoding='utf-8')
+
+          # Persist default publication policy for future conversations/tasks.
+          dr = ROOT/'docs/DEVELOPMENT_RULES.md'
+          dev = dr.read_text(encoding='utf-8')
+          heading = '## 16. Default direct repository publication'
+          if heading not in dev:
+              dev += ('\n'+heading+'\n\n'
+                      'Unless the user explicitly requests local-only delivery, every newly created or modified 阅读 / Legado source is published to `source-core-8d7` in the same task.\n\n'
+                      '- Unconfirmed versions go directly to Beta/Test; do not wait for a separate “publish” instruction.\n'
+                      '- Real-device-confirmed versions may be promoted to Stable only under the existing Stable rules.\n'
+                      '- Keep status catalogs (Stable/Beta) and type catalogs in parallel. Current long-lived type catalogs include `subscription/comic.json` and `subscription/rss.json`.\n'
+                      '- A local downloadable JSON may still be delivered for convenience, but it does not replace repository publication.\n'
+                      '- Publication must upsert existing catalogs and rebuild the relevant bundle without dropping unrelated sources.\n')
+              dr.write_text(dev, encoding='utf-8')
+
+          log = ROOT/'docs/RELEASE_LOG.md'
+          old = log.read_text(encoding='utf-8')
+          marker = f"## {day} — Picacg {meta['version']} Beta + repository type categories"
+          if marker not in old:
+              block = (marker+'\n\nStatus: Beta/Test; awaiting user real-device confirmation.\n\nChanges:\n\n'
+                       '- Published the complete Picacg APP/Web dual-route Legado source to the Beta channel.\n'
+                       '- Added permanent `漫画源` and `订阅源` repository categories while preserving Stable/Beta channels.\n'
+                       '- Added the direct-repository-publication policy for future 阅读 sources.\n'
+                       '- Rebuilt the Beta bundle without dropping existing Beta sources.\n'
+                       f'- Published SHA256: `{sha}`.\n\n')
+              lines = old.splitlines(True)
+              old = (lines[0]+'\n'+block+''.join(lines[1:])) if lines and lines[0].startswith('# RELEASE LOG') else block+old
+              log.write_text(old, encoding='utf-8')
+
+          # Remove staged transport data after successful assembly.
+          for p in stage.iterdir():
+              p.unlink()
+          stage.rmdir()
+          print('published', meta['id'], len(raw), 'bytes', sha)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No repository changes to commit.'
+            exit 0
+          fi
+          git commit -m 'feat: publish Picacg beta and add source type catalogs'
+          git push origin main
