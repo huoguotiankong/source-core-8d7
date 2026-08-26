@@ -1,5 +1,18 @@
 # RELEASE LOG
 
+## 2026-08-26 — Picacg 1.0.0-beta2 SSL + Explore UI hotfix
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Changes:
+
+- 修复 .invalid 书源身份被误用于搜索/发现/章节外层网络请求，统一改用 manhuabika.com 作为可握手的 HTTPS 承载地址
+- 自动模式首次优先网页线路，记住最近成功线路；当前线路网络/SSL失败时继续切换另一线路
+- 发现页渲染阶段不再请求 /categories，避免打开分类页即触发网络异常
+- 发现页重构为快捷入口、热门榜单、官方推荐、内容形态、题材偏好、作品·地区六个分区，采用紧凑四列布局
+- Published SHA256: `bc9b8f1cff680c749c3dd5932097432412b1a6a55505114fe773c685ec72bc78`.
+
+
 ## 2026-08-26 — Picacg 1.0.0-beta1 Beta + repository type categories
 
 Status: Beta/Test; awaiting user real-device confirmation.

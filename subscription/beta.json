@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-26T17:58:44+08:00",
+  "updatedAt": "2026-08-26T18:19:26+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -69,29 +69,31 @@
     {
       "id": "picacg",
       "name": "🍥 哔咔漫画 · APP/网页双线路 Beta",
-      "summary": "哔咔漫画完整生态测试版：APP API + 网页 API 双线路，含登录、账户、签到、收藏、完整漫画阅读与独立评论社区。",
+      "summary": "真机修复 Beta2：移除 .invalid 运行时网络承载，自动线路首次优先网页并保留 APP 兜底；发现页改为分区四列布局。",
       "icon": "",
       "channel": "beta",
-      "version": "1.0.0-beta1",
+      "version": "1.0.0-beta2",
       "updatedAt": "2026-08-26",
       "tags": [
         "哔咔",
         "漫画",
         "APP API",
         "网页线路",
+        "SSL修复",
         "登录",
         "账户",
         "签到",
         "收藏",
         "评论",
         "楼中楼",
-        "双线路"
+        "双线路",
+        "发现页重构"
       ],
       "changelog": [
-        "新增 APP / 网页双线路与自动故障切换",
-        "新增账户中心、每日签到、我的收藏、漫画点赞与收藏",
-        "新增独立评论社区：热门/最新、分页、楼中楼、点赞、发表、回复",
-        "详情页与阅读页右上角定制按钮均可直达评论页"
+        "修复 .invalid 书源身份被误用于搜索/发现/章节外层网络请求，统一改用 manhuabika.com 作为可握手的 HTTPS 承载地址",
+        "自动模式首次优先网页线路，记住最近成功线路；当前线路网络/SSL失败时继续切换另一线路",
+        "发现页渲染阶段不再请求 /categories，避免打开分类页即触发网络异常",
+        "发现页重构为快捷入口、热门榜单、官方推荐、内容形态、题材偏好、作品·地区六个分区，采用紧凑四列布局"
       ],
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json",
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/picacg/picacg-beta.json",

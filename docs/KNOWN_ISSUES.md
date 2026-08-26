@@ -337,3 +337,14 @@ Real-device Beta10 showed `更新` and `首发` as the same stale timestamp on a
 ### 2026-08-26 · qidian-next Beta11 时间/双列兼容问题
 - 更新/首发可能显示相同早期日期；inline-block width 在部分阅读真机无效。
 - Beta12：更新改用最新章节语义+官方搜索，首发与上架分离；双列改用 pre/monospace。
+
+
+## Picacg `.invalid` identity reused as runtime carrier — fixed in 1.0.0-beta2
+
+Real-device symptom: Legado displayed an Android `javax.net.ssl.SSLHandshakeException: connection closed` dialog before the source rule could fall back to the other Pica route. The discovery page also triggered a category request during selector rendering.
+
+Root cause: Beta1 reused the synthetic `bookSourceUrl` identity (`sc8d7.invalid`) as search/explore/chapter outer request URLs. Legado performs the outer HTTP request before rule JavaScript, so failures there are outside `picaRequest()` route fallback.
+
+Permanent rule: synthetic identity hosts are namespace-only. Every operational search/explore/chapter URL must use a real TLS-capable carrier; API switching happens only inside source rules. Discovery selector construction should be offline/static when practical.
+
+Status: fixed in Picacg 1.0.0-beta2; awaiting real-device confirmation.
