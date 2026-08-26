@@ -1,3 +1,18 @@
+## 2026-08-26 — Qidian Next 1.1.0-beta14 fixed metric columns + direct content settings
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Changes:
+
+- 详情作品数据改为固定左右列：月票 / 收藏 / 粉丝固定左列，其余可用指标固定右列。
+- 继续使用真实 HTML 换行和全角空格补位，不使用已在真机失败过的 table / pre / CSS 固定列宽方案。
+- 快捷入口缩短为书友圈 / 角色卡 / 正文设置三枚紧凑按钮，减少不均匀换行。
+- 原“正文源状态”入口改为详情页直达正文设置；新增 jsLib 全局自包含设置页，避免 loginUrl 作用域导致 qfMultiContentV423 未定义。
+- 正文设置页可直接修改正文源类别、各类别 Provider 和 STV API 密钥，并写回原登录信息映射。
+- 搜索、目录、正文 Provider 实际解析、评论、角色卡、书友圈和账号链冻结。
+- Published SHA256: `cc603bafc03e270b4e76ab2b933f06371fbefa6bf5ce732ae5867d8d4ae76b66`.
+
+
 ## 2026-08-26 — Qidian Next 1.1.0-beta13 latest-update + two-column recovery
 
 Status: Beta/Test; awaiting user real-device confirmation.

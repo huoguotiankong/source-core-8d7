@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-26T22:02:01+08:00",
+  "updatedAt": "2026-08-26T22:17:57+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -38,32 +38,32 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "详情 beta13：只保留最近更新时间；作品数据按两项一行恢复双列；修复 Beta12 正文设置入口作用域回归。",
+      "summary": "详情 beta14：作品数据固定左右列；快捷入口紧凑化；正文按钮直达正文设置。",
       "icon": "",
       "channel": "beta",
-      "version": "1.1.0-beta13",
+      "version": "1.1.0-beta14",
       "updatedAt": "2026-08-26",
       "tags": [
         "起点",
         "测试版",
         "详情页",
-        "最近更新",
-        "富数据",
-        "双列",
-        "正文源状态",
-        "缓存"
+        "作品数据",
+        "固定双列",
+        "快捷入口",
+        "正文设置",
+        "直达设置"
       ],
       "changelog": [
-        "作品资料只显示“最近更新”，彻底移除“首发”展示",
-        "取消“连载超过60天即判异常”的更新时间阈值，旧书真实最近更新时间不再被误清空",
-        "更新时间缓存与官方搜索详情缓存升级到 v1113，避免 Beta12 错误缓存继续命中",
-        "作品数据不再使用 pre/monospace/CSS 列宽，改为每两个指标使用真实 HTML 换行；主指标优先总推荐/月票、收藏/粉丝、盟主/首订",
-        "Beta12 会报 qfMultiContentV423 未定义的正文设置入口回退为已验证的正文源状态全局入口",
-        "搜索、目录、正文 Provider 实际取正文逻辑、评论、角色卡、书友圈、账号链冻结"
+        "作品数据固定分栏：月票、收藏、粉丝只进入左列；总推荐、盟主、首订、在看、评分、投资等只进入右列",
+        "双列继续使用真实 HTML 换行与全角空格补位，不回退到真机兼容性较差的 table/pre/CSS 固定列宽",
+        "快捷入口压缩为书友圈、角色卡、正文设置三枚短按钮，减少第三枚按钮单独换行的情况",
+        "正文入口不再只弹“正文源状态”，改为 jsLib 全局自包含正文设置页，直接编辑正文源类别、各 Provider 与 STV API 密钥",
+        "避免再次跨作用域调用 loginUrl 内 qfMultiContentV423；设置保存继续写回阅读登录信息映射",
+        "搜索、目录、正文 Provider 实际取正文逻辑、评论、角色卡、书友圈和账号链冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11013",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11013",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11013",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11014",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11014",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11014",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
     }
   ],
