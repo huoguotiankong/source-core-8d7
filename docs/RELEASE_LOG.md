@@ -1,3 +1,17 @@
+## 2026-08-26 — RSS UI 0.4.1-beta15 native stale-article cleanup
+
+Status: Beta/Test; awaiting real-device confirmation.
+
+Changes:
+
+- Root cause confirmed from Legado source: old RSS rows are deleted by `clearOld` only when `ruleNextPage` is non-blank.
+- Repository `ruleNextPage` changed from empty to `@js:''`: no real second page, but refresh now enters Legado's native old-row cleanup branch.
+- Removed Beta14 `?reset=1` category URL churn; category and detail identities are fixed from this version onward.
+- `subscription/rss.json` continues to expose exactly one repository entry.
+- Rebuilt Picacg Stable RSS detail into the current `kind/title/badges/sections` schema so its detail page shows `◈ 哔咔漫画` instead of the repository fallback title.
+- Picacg Stable book-source JSON and all Qidian book-source business logic are unchanged.
+
+
 ## 2026-08-26 — RSS UI 0.4.0-beta14 single-entry cleanup
 
 Status: Beta/Test; user requested repository/subscription de-duplication after real-device screenshots showed historical RSS entries still visible.

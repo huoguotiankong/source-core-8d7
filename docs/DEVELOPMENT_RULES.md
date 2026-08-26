@@ -237,3 +237,14 @@ The repository itself is one logical RSS source. Do not publish separate Stable/
 - Historical JSON/detail files may remain for compatibility/history, but they are not active catalog entries.
 - RSS item `detailUrl` is a long-lived article identity and must not receive routine version query parameters.
 - When persisted old RSS articles make clean replacement impossible, one deliberate category identity reset is allowed. After that migration, freeze the new category names/URLs; do not repeat the reset per release.
+
+## 19. RSS stale-article cleanup invariant
+
+Legado persists RSS articles and only calls `rssArticleDao.clearOld(origin, sort, order)` after a refresh when the RSS source's `ruleNextPage` field is non-blank.
+
+For repository-style RSS sources whose remote JSON represents the complete current list:
+
+- keep `ruleNextPage` non-blank even when there is no real pagination; use an empty-result rule such as `@js:''`;
+- this enables Legado to delete older rows after inserting the current result while still producing no second-page URL;
+- do not use category-name churn, `?ui=N`, `?reset=N`, or versioned detail URLs as a routine cache-clearing mechanism;
+- category URLs and article detail URLs remain long-lived identities.

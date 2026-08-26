@@ -430,3 +430,15 @@ Beta14 migration:
 - Stable/Beta book-source channels remain separate; only the duplicate repository-RSS entry is collapsed.
 
 Status: published as UI Beta14 for real-device confirmation.
+
+## 30. RSS historical cards persisted despite clean remote catalogs — root cause fixed in Beta15
+
+Real-device result after Beta14: Home, Stable and Beta still contained Beta3/Beta10/Beta11-era cards even though the current remote catalogs contained only the latest items.
+
+Root cause confirmed from Legado source: RSS articles are persisted by `origin + link + sort`; `RssArticlesViewModel` calls `rssArticleDao.clearOld(...)` only when `rssSource.ruleNextPage` is non-blank. The repository RSS source had always used an empty `ruleNextPage`, so refresh inserted/replaced current rows but never deleted older rows.
+
+Beta15 fix: set `ruleNextPage` to the non-blank empty-result rule `@js:''`. It triggers Legado's native `clearOld` branch after current articles are inserted while yielding no actual next-page URL. Beta14 `?reset=1` category parameters are removed and category/detail identities are frozen.
+
+Also fixed the Picacg Stable RSS detail payload, which still used the old manifest-shaped schema and therefore rendered the fallback repository title instead of `◈ 哔咔漫画`.
+
+Status: Beta15 published for real-device confirmation.

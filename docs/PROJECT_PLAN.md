@@ -162,3 +162,7 @@ On 2026-08-26 the user explicitly promoted the Beta6 baseline to the first Stabl
 ## 13. Single current repository RSS entry
 
 From RSS UI Beta14 onward, the repository itself has one active subscription entry. Stable/Beta remain release channels for book sources, not duplicate active RSS repository definitions. The latest already-imported RSS identity is preserved for in-place updates, while legacy repository JSON files may remain only as compatibility artifacts and are not listed in the active RSS catalog.
+
+## 14. RSS current-list replacement model
+
+From UI Beta15 onward the repository RSS source uses Legado's own stale-row cleanup path: `ruleNextPage` stays non-blank but evaluates to an empty result. Current remote catalogs are therefore authoritative complete lists, and refreshing a category can remove older persisted rows instead of accumulating them. Category/detail URLs remain fixed.

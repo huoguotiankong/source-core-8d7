@@ -1,30 +1,26 @@
 {
-  "id": "picacg",
-  "name": "◈ 哔咔漫画",
-  "version": "1.0.0",
-  "channel": "stable",
-  "type": "漫画",
-  "status": "Stable / 正式",
-  "summary": "Beta9 真机确认后晋升正式版；详情顶部定制按钮已恢复，相关推荐保留一次性集合与强去重。",
-  "tags": [
-    "漫画源",
+  "kind": "source",
+  "title": "◈ 哔咔漫画",
+  "summary": "哔咔漫画 1.0.0 正式版。APP/API + 网页双线路，支持登录、账号、评论/楼中楼、点赞收藏、标签、目录和漫画图片正文。",
+  "badges": [
     "Stable",
-    "Picacg",
-    "双线路",
-    "登录",
-    "账号",
-    "评论",
-    "楼中楼",
-    "标签",
-    "定制按钮"
+    "1.0.0",
+    "漫画",
+    "双线路"
   ],
-  "updatedAt": "2026-08-26T21:12:18+08:00",
-  "changelog": [
-    "由 1.0.0-beta9 真机确认基线原样晋升 Stable，不改动业务逻辑。",
-    "详情页顶部定制按钮已确认可直接打开独立哔咔评论中心。",
-    "相关推荐仅返回首批一次，后续页硬终止，并按 ID/标题/封面独立去重。",
-    "保留登录、账户中心、签到、评论/楼中楼、点赞收藏与标签跳转。",
-    "保留 APP/API + 网页双线路以及漫画目录/图片正文。"
+  "sections": [
+    {
+      "title": "互动与账户",
+      "text": "支持登录、账户中心、签到、点赞、收藏、评论、楼中楼、回复与评论点赞。详情页顶部定制按钮已真机确认可进入评论中心。"
+    },
+    {
+      "title": "浏览与阅读",
+      "text": "支持发现分类、标签跳转、相关推荐、分页目录和漫画图片正文；相关推荐采用一次性集合与强去重。"
+    },
+    {
+      "title": "线路",
+      "text": "保留 APP/API 与网页双线路；线路和版本信息不再堆进书源名称。"
+    }
   ],
   "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg.json?v=10000",
   "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/picacg/picacg.json?v=10000"
