@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-26T17:08:00+08:00",
+  "updatedAt": "2026-08-26T17:58:44+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -106,6 +106,44 @@
         "Beta10/11 富数据、简介和冷启动顺序保留；搜索、目录、正文 Provider 实际取正文逻辑、评论、角色卡、书友圈、账号链冻结"
       ],
       "sha256": "01f503ab9913e90595130ee80835bbe32d2926cf2b06589e86adf9a2891ff7f3"
+    },
+    {
+      "id": "picacg",
+      "name": "🍥 哔咔漫画 · APP/网页双线路 Beta",
+      "category": "comic",
+      "artifactType": "bookSource",
+      "channel": "beta",
+      "version": "1.0.0-beta1",
+      "versionCode": 10001,
+      "updatedAt": "2026-08-26T17:58:44+08:00",
+      "sourcePath": "sources/comic/picacg/picacg-beta.json",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json",
+      "bookSourceUrl": "https://sc8d7.invalid/legado/picacg-8d7",
+      "summary": "哔咔漫画完整生态测试版：APP API + 网页 API 双线路，含登录、账户、签到、收藏、完整漫画阅读与独立评论社区。",
+      "tags": [
+        "哔咔",
+        "漫画",
+        "APP API",
+        "网页线路",
+        "登录",
+        "账户",
+        "签到",
+        "收藏",
+        "评论",
+        "楼中楼",
+        "双线路"
+      ],
+      "changelog": [
+        "新增 APP / 网页双线路与自动故障切换",
+        "新增账户中心、每日签到、我的收藏、漫画点赞与收藏",
+        "新增独立评论社区：热门/最新、分页、楼中楼、点赞、发表、回复",
+        "详情页与阅读页右上角定制按钮均可直达评论页"
+      ],
+      "sha256": "30e683ac3ce2cb5069915b9b783e782ea399b7c9ea7f87ed5c22cb99b4320629"
     }
-  ]
+  ],
+  "typeCatalogs": {
+    "comic": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/comic.json",
+    "rss": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/rss.json"
+  }
 }

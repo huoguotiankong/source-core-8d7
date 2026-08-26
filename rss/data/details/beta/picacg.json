@@ -1,0 +1,35 @@
+{
+  "kind": "source",
+  "title": "🍥 哔咔漫画 · APP/网页双线路 Beta",
+  "summary": "哔咔漫画完整生态测试版：APP API + 网页 API 双线路，含登录、账户、签到、收藏、完整漫画阅读与独立评论社区。",
+  "badges": [
+    "BETA",
+    "1.0.0-beta1",
+    "漫画源",
+    "APP / 网页双线路"
+  ],
+  "sections": [
+    {
+      "title": "核心能力",
+      "text": "登录、账户中心、签到、收藏、搜索、分类、排行榜、随机推荐、完整目录与漫画图片。"
+    },
+    {
+      "title": "评论社区",
+      "text": "详情页与阅读页定制按钮双入口；支持评论分页、热门/最新、楼中楼、评论点赞、发表与回复。"
+    },
+    {
+      "title": "线路",
+      "text": "APP API 与网页 API 双线路隔离；自动模式优先最近成功线路，失败时切换另一条。"
+    },
+    {
+      "title": "发布状态",
+      "text": "当前为 Beta / 测试版，等待阅读真机完整回归后再晋升 Stable。"
+    },
+    {
+      "title": "唯一身份",
+      "text": "https://sc8d7.invalid/legado/picacg-8d7"
+    }
+  ],
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/picacg/picacg-beta.json"
+}

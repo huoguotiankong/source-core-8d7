@@ -1,0 +1,15 @@
+{
+  "kind": "rss",
+  "title": "🌈 阅读书源仓库",
+  "summary": "正式订阅入口",
+  "badges": [
+    "订阅源"
+  ],
+  "sections": [
+    {
+      "title": "用途",
+      "text": "用于在阅读中浏览、导入和更新仓库中的书源。"
+    }
+  ],
+  "rssUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository.json"
+}

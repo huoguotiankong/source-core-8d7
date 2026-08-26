@@ -4,7 +4,7 @@
     "sourceName": "🌈 阅读书源仓库 · Beta",
     "sourceIcon": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/assets/reader-repo-icon.png",
     "sourceGroup": "书源仓库",
-    "sourceComment": "UI Beta 13：一次性重置分类缓存模型；以后分类名、分类URL、详情URL保持永久稳定，不再按UI版本换链接，避免旧文章持续叠加。",
+    "sourceComment": "仓库 UI Beta：新增漫画源与订阅源固定分类；分类 URL 保持长期稳定。",
     "enabled": true,
     "enabledCookieJar": true,
     "singleUrl": false,
@@ -23,10 +23,10 @@
     "nextContentUrl": "",
     "enableJs": true,
     "loadWithBaseUrl": true,
-    "sortUrl": "🏠 首页中心::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/home-beta.json\n⭐ 正式通道::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json\n🧪 测试通道::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/beta.json\n📦 批量中心::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/bundle.json\n📖 帮助中心::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/help.json",
+    "sortUrl": "🏠 首页中心::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/home-beta.json\n🖼 漫画源::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/comic.json\n📰 订阅源::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/rss.json\n⭐ 正式通道::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json\n🧪 测试通道::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/beta.json\n📦 批量中心::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/bundle.json\n📖 帮助中心::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/help.json",
     "type": 0,
     "preload": false,
     "cacheFirst": false,
-    "lastUpdateTime": 1787706900000
+    "lastUpdateTime": 1787738324889
   }
 ]

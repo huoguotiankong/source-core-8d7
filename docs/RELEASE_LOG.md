@@ -1,5 +1,18 @@
 # RELEASE LOG
 
+## 2026-08-26 — Picacg 1.0.0-beta1 Beta + repository type categories
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Changes:
+
+- Published the complete Picacg APP/Web dual-route Legado source to the Beta channel.
+- Added permanent `漫画源` and `订阅源` repository categories while preserving Stable/Beta channels.
+- Added the direct-repository-publication policy for future 阅读 sources.
+- Rebuilt the Beta bundle without dropping existing Beta sources.
+- Published SHA256: `30e683ac3ce2cb5069915b9b783e782ea399b7c9ea7f87ed5c22cb99b4320629`.
+
+
 ## 2026-08-26 — Qidian Next 1.1.0-beta9 detail rich fallback
 
 Status: Beta/Test; awaiting user real-device confirmation.

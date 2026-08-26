@@ -4,7 +4,7 @@
     "sourceName": "🌈 阅读书源仓库",
     "sourceIcon": "",
     "sourceGroup": "书源仓库",
-    "sourceComment": "GitHub 云端书源仓库。正式版与测试版分离，点击条目进入对应书源导入入口。",
+    "sourceComment": "GitHub 云端阅读源仓库。新增漫画源与订阅源分类；正式版与测试版继续分流。",
     "enabled": true,
     "enabledCookieJar": true,
     "singleUrl": false,
@@ -20,10 +20,10 @@
     "nextContentUrl": "",
     "enableJs": true,
     "loadWithBaseUrl": true,
-    "sortUrl": "⭐ 正式版::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json\n🧪 测试版::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/beta.json",
+    "sortUrl": "⭐ 正式版::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json\n🖼 漫画源::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/comic.json\n📰 订阅源::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/rss.json\n🧪 测试版::https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/beta.json",
     "type": 0,
     "preload": false,
     "cacheFirst": false,
-    "lastUpdateTime": 1787534040000
+    "lastUpdateTime": 1787738324889
   }
 ]

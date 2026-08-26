@@ -201,3 +201,13 @@ Repository UI rule from Beta13 onward:
 
 If a future incompatible RSS migration truly requires a new identity, do it deliberately once with a documented migration plan rather than once per release.
 
+
+## 16. Default direct repository publication
+
+Unless the user explicitly requests local-only delivery, every newly created or modified 阅读 / Legado source is published to `source-core-8d7` in the same task.
+
+- Unconfirmed versions go directly to Beta/Test; do not wait for a separate “publish” instruction.
+- Real-device-confirmed versions may be promoted to Stable only under the existing Stable rules.
+- Keep status catalogs (Stable/Beta) and type catalogs in parallel. Current long-lived type catalogs include `subscription/comic.json` and `subscription/rss.json`.
+- A local downloadable JSON may still be delivered for convenience, but it does not replace repository publication.
+- Publication must upsert existing catalogs and rebuild the relevant bundle without dropping unrelated sources.

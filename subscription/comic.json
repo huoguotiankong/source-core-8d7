@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "type": "comic",
+  "name": "漫画源",
+  "updatedAt": "2026-08-26T17:58:44+08:00",
+  "items": [
+    {
+      "id": "picacg",
+      "name": "🍥 哔咔漫画 · APP/网页双线路 Beta",
+      "summary": "哔咔漫画完整生态测试版：APP API + 网页 API 双线路，含登录、账户、签到、收藏、完整漫画阅读与独立评论社区。",
+      "icon": "",
+      "channel": "beta",
+      "version": "1.0.0-beta1",
+      "updatedAt": "2026-08-26",
+      "tags": [
+        "哔咔",
+        "漫画",
+        "APP API",
+        "网页线路",
+        "登录",
+        "账户",
+        "签到",
+        "收藏",
+        "评论",
+        "楼中楼",
+        "双线路"
+      ],
+      "changelog": [
+        "新增 APP / 网页双线路与自动故障切换",
+        "新增账户中心、每日签到、我的收藏、漫画点赞与收藏",
+        "新增独立评论社区：热门/最新、分页、楼中楼、点赞、发表、回复",
+        "详情页与阅读页右上角定制按钮均可直达评论页"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/picacg/picacg-beta.json",
+      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/picacg.json",
+      "type": "comic"
+    }
+  ]
+}
