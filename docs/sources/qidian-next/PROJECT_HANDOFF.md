@@ -117,4 +117,11 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - beta2 keeps the zero-extra-request first-paint architecture, but expands parsing/cached display for author metadata, status, update time, recommendation/month-ticket/reading/rating/collection/fans/leader/invest/first-subscribe metrics, tags and honors.
 - The metric strip is replaced by plain HTML rows because Legado detail HTML/CSS support is device/version dependent; simple rows are the preferred compatibility baseline.
 - Missing fields are hidden rather than synchronously fetched. Book circle, role card and smart source remain on-demand.
+## Detail semantic cleanup Beta 1.1.0-beta3 (2026-08-26)
+
+- Real-device beta2 exposed internal Qidian object keys/enums (`sectionCount`, `actionStatus`, `FININSHED`, `honorTypeName`) and numeric ids/timestamps as visible tags/honors.
+- Add parser-side and renderer-side metadata sanitation; cached polluted values are also blocked at render time.
+- Collection/fan metrics use stricter trust rules; an isolated tiny collection count beside a huge fan base is suppressed as likely nested-object noise.
+- Normalize author level to `Lv.x` and common internal finished/serial states to Chinese display values.
+- Keep the zero-extra-request detail first-paint invariant.
 

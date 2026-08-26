@@ -1,30 +1,26 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "详情页 beta2：在不牺牲首屏速度的前提下恢复信息密度，并修复数据卡片真机排版。",
+  "summary": "详情 beta3：修复标签/荣誉脏数据和统计误识别，首屏性能路径不回退。",
   "badges": [
     "Beta",
-    "1.1.0-beta2",
-    "详情增强"
+    "1.1.0-beta3",
+    "详情清洗"
   ],
   "sections": [
     {
-      "title": "本次测试",
-      "text": "详情首屏仍然只解析当前起点响应和已有书籍缓存，不恢复 APP/官网/Atom/第三方同步补全请求。"
+      "title": "本次修复",
+      "text": "过滤 sectionCount、actionStatus、FININSHED、honorTypeName、ID、布尔值、时间戳等起点内部结构字段，避免作为标签/荣誉显示。"
     },
     {
-      "title": "信息恢复",
-      "text": "重新显示作品资料、总推荐/月票/在看/评分/收藏/粉丝/盟主/投资等作品数据，以及标签与荣誉；无值字段自动隐藏。"
+      "title": "统计可信度",
+      "text": "收藏优先只接受页面可见值；粉丝优先使用可见值或明确 BookFansCount 字段，并增加极端比例校验。"
     },
     {
-      "title": "真机 UI 修复",
-      "text": "移除上一版 table 数据卡片，改用普通 HTML 行和自动换行，优先兼容阅读详情页实际渲染。"
-    },
-    {
-      "title": "回归重点",
-      "text": "重点检查详情信息是否足够、排列是否正常、打开速度是否仍明显快于旧版，以及书友圈/角色卡/正文源按钮是否正常。"
+      "title": "性能边界",
+      "text": "继续保持详情首屏零额外同步网络请求，缺失数据宁可隐藏，也不为补一个数字阻塞详情页。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11002",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11002"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11003",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11003"
 }

@@ -1,5 +1,17 @@
 # RELEASE LOG
 
+## 2026-08-26 — 起点增强 1.1.0-beta3
+
+Status: Beta/Test; detail metadata sanitation awaiting real-device confirmation.
+
+Changes:
+
+- Block internal object keys/enums/ids/timestamps from tag and honor rendering.
+- Tighten collection/fan metric trust and normalize author-level/status display.
+- Keep zero extra synchronous detail requests and preserve the QW VIP-content fix.
+- Stable 1.0.0 remains unchanged.
+- Beta SHA256: `d2234efb2d9f62551386c8dbe5056320aab994df6fc34f448d30b68c1d72054c`.
+
 ## 2026-08-26 — 起点增强 1.1.0-beta2
 
 Status: Beta/Test; detail richness/UI compatibility follow-up awaiting real-device confirmation.

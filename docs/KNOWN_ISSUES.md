@@ -289,4 +289,13 @@ Symptom: the first performance-focused detail redesign rendered only a few metri
 Beta fix: restore rich fields from the current response/cache while keeping zero extra first-paint requests; replace table layout with plain HTML rows and hide unavailable fields.
 
 Status: Beta 1.1.0-beta2 published for real-device UI/information-density testing.
+## 23. Detail beta2 exposed internal Qidian object fields as tags/honors — fixed in 1.1.0-beta3
+
+Symptom: real device displayed tokens such as `sectionCount`, `actionStatus`, `FININSHED`, `honorTypeName`, booleans, ids and timestamps under 标签与荣誉; a generic nested counter could also appear as 收藏.
+
+Cause: broad array/string extraction treated object keys and machine values as user-facing labels; ambiguous generic metric fields were accepted without enough context.
+
+Beta fix: parser-side semantic sanitation plus renderer-side defence, stricter collection/fan trust, and status/author-level normalization. No additional first-paint network requests are added.
+
+Status: Beta 1.1.0-beta3 published for real-device confirmation.
 
