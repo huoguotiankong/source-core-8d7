@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "stable",
   "name": "正式版",
-  "updatedAt": "2026-08-26T21:26:24+08:00",
+  "updatedAt": "2026-08-26T21:27:59+08:00",
   "items": [
     {
       "id": "qidian-next",
@@ -63,5 +63,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/picacg.json"
     }
   ],
-  "generatedAt": "2026-08-26T21:26:24+08:00"
+  "generatedAt": "2026-08-26T21:27:59+08:00"
 }
