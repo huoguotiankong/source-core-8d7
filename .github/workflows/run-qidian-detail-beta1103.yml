@@ -14,6 +14,17 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+      - name: Fix publisher replacement escaping
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('scripts/publish_qidian_detail_beta1103.py')
+          s=p.read_text(encoding='utf-8')
+          old="intro2,n=re.subn(r\"function chips\\(v,limit,color\\)\\{[\\s\\S]*?\\}\\nfunction date\",new_chips+'\\nfunction date',intro,count=1)"
+          new="intro2,n=re.subn(r\"function chips\\(v,limit,color\\)\\{[\\s\\S]*?\\}\\nfunction date\",lambda _m:new_chips+'\\nfunction date',intro,count=1)"
+          assert old in s
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
       - name: Publish beta
         run: python scripts/publish_qidian_detail_beta1103.py
       - name: Validate JSON and JS
