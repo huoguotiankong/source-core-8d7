@@ -173,3 +173,13 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - UI: tighter section spacing, separated metric columns, separate tag/author-tag/honor blocks, indented synopsis.
 - Search/catalog/content/review/community/account/QW-VIP domains remain frozen.
 - Status: Beta pending real-device layout/performance confirmation.
+
+
+## Detail time/alignment 1.1.0-beta11 (2026-08-26)
+
+- Beta10 real-device result: rich metrics and synopsis remained correct, but update/publish dates could resolve to the same wrong timestamp.
+- Unscoped full-page `UpdateTime/CreateTime` extraction is removed. Current-book time parsing is anchored to current bookId/title vicinity.
+- Suspect update time may reuse the already-existing exact-book official mobile-search fallback; no new endpoint is introduced.
+- Time book-variable cache keys are versioned to v1111 so old wrong values do not mask the fix.
+- Works-data renderer uses two fixed-width inline-block cells instead of spacing or `<table>`, aligning the right column while preserving the compatibility baseline.
+- Status: Beta, pending real-device confirmation.

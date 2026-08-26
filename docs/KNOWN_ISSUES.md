@@ -328,3 +328,8 @@ Real-device Beta9 confirmed that synopsis and rich metrics are finally present, 
 Beta10 keeps the proven Beta9 data result but changes request priority: QidianTu is attempted only when core metadata is sparse; APP bookDetailInfo is no longer a mandatory first request and runs only if core data remains insufficient. QidianTu/search timeouts are reduced to 3.2s/2.8s. Detail HTML is also compacted without using the table layout that previously broke on-device.
 
 Status: Beta published for real-device confirmation.
+
+
+## Qidian detail time fields could bind to unrelated page objects — addressed in 1.1.0-beta11
+
+Real-device Beta10 showed `更新` and `首发` as the same stale timestamp on a currently updating book. The detail fast parser had fallback scans for generic `UpdateTime/CreateTime` across the whole page, which could bind to unrelated nested/recommended objects; old book-variable caches could then preserve the bad values. Beta11 anchors time extraction to the current bookId/title vicinity, versions time cache keys, and lets the existing exact-book official search repair a suspicious update timestamp. Works-data right column also moved from variable spacing to fixed-width inline-block cells.

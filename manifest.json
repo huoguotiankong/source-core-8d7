@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-26T16:37:00+08:00",
+  "updatedAt": "2026-08-26T16:52:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -80,31 +80,32 @@
       "name": "🌈 起点增强 · Beta",
       "category": "novel",
       "channel": "beta",
-      "version": "1.1.0-beta10",
-      "versionCode": 11010,
-      "updatedAt": "2026-08-26T16:37:00+08:00",
+      "version": "1.1.0-beta11",
+      "versionCode": 11011,
+      "updatedAt": "2026-08-26T16:52:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11010",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11011",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "详情 beta10：Beta9 富数据真机已恢复；本版优化详情排版与冷启动请求顺序，起点图优先、APP 仅核心数据兜底，并收紧补全超时。",
+      "summary": "详情 beta11：修正更新/首发时间串值；按当前 bookId 锚定时间字段并刷新旧时间缓存，同时把作品数据改成固定宽度双列对齐。",
       "tags": [
         "起点",
         "测试版",
         "详情页",
+        "时间修复",
         "富数据",
-        "排版优化",
-        "冷启动优化",
-        "按需补全",
-        "缓存"
+        "双列对齐",
+        "缓存",
+        "按需补全"
       ],
       "changelog": [
-        "Beta9 真机确认作品简介与富数据已恢复，详情数据链作为本版稳定基线",
-        "详情排版收紧段间距，作品数据增加分隔线，作品标签/作者标签/作品荣誉分层展示，简介增加首行缩进",
-        "冷启动先判断核心富数据是否稀疏，仅稀疏时请求起点图；起点图后仍缺核心数据才调用 APP bookDetailInfo",
-        "起点图超时由 4.2 秒收紧至 3.2 秒，官方搜索由 4.2 秒收紧至 2.8 秒；缓存策略保持不变",
-        "不新增接口；搜索、目录、正文 Provider、评论、角色卡、书友圈、账号与情无 VIP 链全部冻结"
+        "修复详情更新时间/首发时间可能抓到同页其他对象时间、或两个字段误显示为同一时间的问题",
+        "当前响应中的时间仅按当前 bookId/书名邻域提取；不再使用未锚定的全页 UpdateTime/CreateTime 扫描结果",
+        "更新时间异常时复用官方移动搜索补全并按当前 bookId 锁定；起点图同时尝试提取明确标注的更新时间/首发时间",
+        "旧 qf_updateTime/qf_publishDate 读取缓存升级到 v1111，避免 Beta10 已缓存的错误时间继续污染显示",
+        "作品数据改为固定宽度双列 span，右列统一起点；不回退到已在真机失败过的 table 布局",
+        "Beta10 富数据、简介、缓存和冷启动顺序保留；搜索、目录、正文 Provider、评论、角色卡、书友圈、账号与情无 VIP 链冻结"
       ],
-      "sha256": "aa21a7378323fa7f28159785747661a505296dbd9398678abfd2a40af1eb6b7e"
+      "sha256": "8ad15ac2e773efb28bfc504f87fb975c8c7988d379527ab6cbd71234d5703d25"
     }
   ]
 }
