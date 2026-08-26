@@ -430,3 +430,10 @@ A generated or statically validated version must not be logged as Stable unless 
 - 作品数据由空格推进改为固定宽度双列 inline-block，右列统一对齐。
 - 非详情域保持冻结。
 - SHA256: `8ad15ac2e773efb28bfc504f87fb975c8c7988d379527ab6cbd71234d5703d25`.
+
+## 2026-08-26 · 🌈 起点增强 · 1.1.0-beta12
+- 更新字段收紧为最新章节/最近更新语义，连载书明显陈旧时复用当前 bookId 官方搜索；支持绝对日期和相对时间。
+- 首发只接受明确 firstPublish/首发时间；上架独立，不再将 createTime/publishTime/VIP 上架冒充首发。
+- 时间缓存切换 v1112。
+- 作品数据改用 pre+monospace 双列；快捷入口“正文设置”直达 qfMultiContentV423。
+- 正式通道未修改。

@@ -1,35 +1,35 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "详情 beta11：修正更新/首发时间串值；按当前 bookId 锚定时间字段并刷新旧时间缓存，同时把作品数据改成固定宽度双列对齐。",
+  "summary": "详情 beta12：重做更新/首发时间可信链，区分首发与上架；作品数据改为等宽预格式双列，正文源快捷入口直达正文设置。",
   "badges": [
     "Beta",
-    "1.1.0-beta11",
-    "时间 / 对齐"
+    "1.1.0-beta12",
+    "时间 / 双列 / 正文设置"
   ],
   "sections": [
     {
-      "title": "真机结论",
-      "text": "Beta10 富数据与简介正常，但更新/首发时间串值，作品数据右列仍因左列文本宽度不同而轻微漂移。"
+      "title": "Beta11 真机结论",
+      "text": "富数据与简介正常，但更新/首发仍可能被早期建书或上架时间污染；inline-block 固定宽度在当前阅读真机未生效。"
     },
     {
-      "title": "时间修复",
-      "text": "详情时间只从当前 bookId/书名邻域读取，不再全页扫 UpdateTime/CreateTime；异常更新时间复用现有官方移动搜索按 bookId 精确修复。"
+      "title": "时间可信链",
+      "text": "更新仅接受最新章节语义，并用当前 bookId 官方搜索校正绝对/相对最近更新时间；首发只接受明确首发字段，上架独立显示。"
     },
     {
-      "title": "缓存修复",
-      "text": "更新时间和首发时间切换到 v1111 缓存键，Beta10 已缓存的错误值不会继续被优先复用。"
+      "title": "作品数据",
+      "text": "双列改为 pre+monospace 预格式布局并按显示宽度补空格；移除指标 emoji，避免不同 emoji 字宽破坏右列起点。"
     },
     {
-      "title": "双列对齐",
-      "text": "作品数据使用两个固定 49% inline-block 单元格，右列每行从同一横向位置开始；不使用真机已证明不兼容的 HTML table。"
+      "title": "快捷入口",
+      "text": "“正文源”改为“正文设置”，直接进入现有正文策略/Provider 设置页。"
     },
     {
       "title": "冻结范围",
-      "text": "Beta10 富数据、简介和冷启动顺序保留；搜索、目录、正文 Provider、评论、角色卡、书友圈、账号与情无 VIP 链不改。"
+      "text": "搜索、目录、正文 Provider 实际解析、评论、角色卡、书友圈、账号和情无 VIP 链不改。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11011",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11011",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11011"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11012",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11012",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11012"
 }

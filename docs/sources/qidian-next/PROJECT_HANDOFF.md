@@ -183,3 +183,9 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - Time book-variable cache keys are versioned to v1111 so old wrong values do not mask the fix.
 - Works-data renderer uses two fixed-width inline-block cells instead of spacing or `<table>`, aligning the right column while preserving the compatibility baseline.
 - Status: Beta, pending real-device confirmation.
+
+### 1.1.0-beta12 真机修复（2026-08-26）
+- 时间按语义分层：更新=latest chapter/当前 bookId 官方搜索；首发=明确 firstPublish；上架=listingDate。
+- usehtml 双列不要依赖 inline-block 百分比宽度；当前改用预格式等宽文本。
+- 详情“正文设置”快捷入口直接调用 qfMultiContentV423。
+- 本版仍为 Beta。

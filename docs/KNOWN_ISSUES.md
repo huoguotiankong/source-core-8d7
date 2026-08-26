@@ -333,3 +333,7 @@ Status: Beta published for real-device confirmation.
 ## Qidian detail time fields could bind to unrelated page objects — addressed in 1.1.0-beta11
 
 Real-device Beta10 showed `更新` and `首发` as the same stale timestamp on a currently updating book. The detail fast parser had fallback scans for generic `UpdateTime/CreateTime` across the whole page, which could bind to unrelated nested/recommended objects; old book-variable caches could then preserve the bad values. Beta11 anchors time extraction to the current bookId/title vicinity, versions time cache keys, and lets the existing exact-book official search repair a suspicious update timestamp. Works-data right column also moved from variable spacing to fixed-width inline-block cells.
+
+### 2026-08-26 · qidian-next Beta11 时间/双列兼容问题
+- 更新/首发可能显示相同早期日期；inline-block width 在部分阅读真机无效。
+- Beta12：更新改用最新章节语义+官方搜索，首发与上架分离；双列改用 pre/monospace。
