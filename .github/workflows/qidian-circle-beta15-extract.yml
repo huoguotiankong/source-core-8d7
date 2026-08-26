@@ -1,0 +1,26 @@
+name: qidian-circle-beta15-extract
+on:
+  push:
+    paths:
+      - '.staging/qidian-circle-beta15/TRIGGER_EXTRACT'
+permissions:
+  contents: write
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Extract circle module
+        run: python .staging/qidian-circle-beta15/extract.py
+      - name: Commit extracted module
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .staging/qidian-circle-beta15/circle.js
+          git diff --cached --check
+          git commit -m "chore: extract qidian circle module for beta15"
+          git push origin HEAD:main
