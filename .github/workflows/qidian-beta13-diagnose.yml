@@ -20,18 +20,15 @@ jobs:
           import json, pathlib
           beta=json.loads(pathlib.Path('sources/novel/qidian-next/qidian-next-beta.json').read_text(encoding='utf-8'))[0]
           stable=json.loads(pathlib.Path('sources/novel/qidian-next/qidian-next.json').read_text(encoding='utf-8'))[0]
-          print('BETA_NAME',beta.get('bookSourceName'))
-          print('BETA_COMMENT',beta.get('bookSourceComment'))
-          def focus(label,text,terms,radius=4500):
-              print('\n========',label,'========')
+          def s(v): return v if isinstance(v,str) else json.dumps(v,ensure_ascii=False)
+          def focus(label,text,terms,radius=3200):
+              text=s(text);print('\n========',label,'========')
               for term in terms:
-                  p=text.find(term)
-                  print('\nTERM',repr(term),'POS',p)
+                  p=text.find(term);print('\nTERM',repr(term),'POS',p)
                   if p>=0: print(text[max(0,p-radius):min(len(text),p+radius)])
-          br=beta.get('ruleBookInfo','')
-          sr=stable.get('ruleBookInfo','')
-          focus('BETA RULE TIME',br,['function qfTimeSuspiciousV1111','function qfCurrentBookTimesV1111','qfTimeSuspiciousV1111()','qfDetailOfficialSearchV1109'])
-          focus('BETA RULE HELPERS',br,['qfBookInfoOpenCircleV373','qfBookInfoOpenRoleV373','快捷入口','正文设置'])
-          focus('STABLE RULE QUICK ENTRY',sr,['快捷入口','正文设置','正文源','qfMultiContent','qfBookInfoOpenCircleV373','qfBookInfoOpenRoleV373'])
+          print('BETA_NAME',beta.get('bookSourceName'))
+          focus('BETA RULE TIME',beta.get('ruleBookInfo',''),['function qfTimeSuspiciousV1111','function qfCurrentBookTimesV1111','qfDetailOfficialSearchV1109'])
+          focus('BETA RULE HELPERS',beta.get('ruleBookInfo',''),['qfBookInfoOpenCircleV373','qfBookInfoOpenRoleV373','快捷入口','正文设置'])
+          focus('STABLE RULE QUICK ENTRY',stable.get('ruleBookInfo',''),['快捷入口','正文设置','正文源','qfMultiContent','qfBookInfoOpenCircleV373','qfBookInfoOpenRoleV373'])
           print('\nSTABLE_COMMENT',stable.get('bookSourceComment'))
           PY
