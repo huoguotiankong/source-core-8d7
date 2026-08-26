@@ -364,3 +364,12 @@ Status: fixed in 1.0.0-beta3; awaiting real-device confirmation of the new reade
 Real-device Beta3 showed `customButton: true` and a valid `clickCustomButton` callback in the source JSON, but the manga reader menu still omitted the custom icon. Source review of Legado/Archive `ReadMenu` confirms visibility is decided before callback execution from the current in-memory `BookSource.customButton` flag; therefore improving callback book-id lookup alone cannot make a hidden button appear.
 
 Beta4 keeps the top-level flag and also calls `picaEnsureReaderFeatures(this)` from detail, catalog and content rules to set `customButton/eventListener` on the active source object before the reader menu is opened. Status: awaiting real-device confirmation.
+
+
+## Image manga reader customButton gap — confirmed upstream limitation in Picacg 1.0.0-beta5
+
+Real-device tests on Picacg beta3/beta4 repeatedly showed the custom button on BookInfoActivity but not in image manga reading. Source audit confirms this is not a BookSource.customButton persistence issue: BookInfoActivity reads the same BookSource.customButton and displays its custom menu item. Image books are launched through ReadMangaActivity and use MangaMenu/ViewMangaMenu; the current MangaMenu implementation has no tv_custom_btn view, no customButton visibility branch, and no SourceCallBack.CLICK_CUSTOM_BUTTON dispatch. Text books such as Qidian use ReadMenu, which does implement all three pieces.
+
+Rule: do not keep mutating customButton/eventListener inside image-source content rules expecting MangaMenu to render a missing control. Preserve bookSourceType=2 for correct manga UX. Source-side customButton remains useful on the detail page. A true manga-reader custom button requires an app-side MangaMenu implementation change.
+
+Status: upstream/app capability gap; not fixable by a standalone Legado source JSON without changing image-book reading mode.

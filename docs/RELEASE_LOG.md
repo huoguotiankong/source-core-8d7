@@ -1,5 +1,20 @@
 # RELEASE LOG
 
+## 2026-08-26 — Picacg 1.0.0-beta5 manga-menu finding and detail UI polish
+
+Status: Beta/Test; core functions retained, detail UI awaits real-device confirmation.
+
+Changes:
+
+- 确认图片漫画正文使用 MangaMenu；当前 MangaMenu 布局/代码没有 customButton 控件与 clickCustomButton 分发，书源侧无法单独补出正文按钮
+- 保留详情页 customButton 与评论回调，不改变 bookSourceType=2，避免退化漫画原生阅读体验
+- 详情互动入口由 3+1 重排为 2×2：查看评论、点赞作品、收藏作品、相关推荐
+- 作品数据改为双列三行：浏览/点赞、评论/章节、页数/状态
+- 清空原生 wordCount 重复统计，顶部摘要仅保留主分类与连载状态
+- 作者、汉化组、分类、标签点击能力及账号/评论/正文/双线路核心链保持不变
+- Published SHA256: `6e7f1144f1d0d1cc3b6a6b884c3cf1ee42f1e36abc1ba3953e9849d097faa172`.
+
+
 ## 2026-08-26 — Picacg 1.0.0-beta4 reader custom-button + Venera-style detail enhancement
 
 Status: Beta/Test; awaiting real-device confirmation.

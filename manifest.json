@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-26T19:12:32+08:00",
+  "updatedAt": "2026-08-26T19:44:05+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -113,36 +113,37 @@
       "category": "comic",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "1.0.0-beta4",
-      "versionCode": 10004,
-      "updatedAt": "2026-08-26T19:12:32+08:00",
+      "version": "1.0.0-beta5",
+      "versionCode": 10005,
+      "updatedAt": "2026-08-26T19:44:05+08:00",
       "sourcePath": "sources/comic/picacg/picacg-beta.json",
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json",
       "bookSourceUrl": "https://sc8d7.invalid/legado/picacg-8d7",
-      "summary": "Beta4：正文阅读菜单定制按钮显示专项自愈；详情页按 Venera 思路扩展为作品数据/描述/信息分区，并增强作者、汉化组、分类、标签跳转。",
+      "summary": "Beta5：确认漫画正文定制按钮受 MangaMenu 上游能力限制；详情互动区改为 2×2，作品数据重排并去除顶部重复统计。",
       "tags": [
         "哔咔",
         "漫画",
         "APP API",
         "网页线路",
-        "正文定制按钮",
         "评论",
         "详情增强",
+        "互动区",
+        "作品数据",
         "作者",
         "汉化组",
         "标签",
-        "上传者",
+        "MangaMenu",
         "双线路"
       ],
       "changelog": [
-        "根据 Legado/Archive ReadMenu 机制，详情/目录/正文执行时再次确保当前 BookSource.customButton 与 eventListener 为 true",
-        "详情页重构为作品数据、描述、信息三个分区，降低顶部信息拥挤",
-        "新增上传者、上传时间、页数、允许下载、允许评论等元数据展示",
-        "作者、汉化组、分类、标签新增点击跳转；分类精确过滤，作者/汉化组走高级搜索",
-        "原生 kind 只保留主要分类与连载状态，完整 tags 下沉到信息区",
-        "评论中心、点赞/收藏、相关推荐、目录、正文图片及 APP/Web 请求核心链冻结"
+        "确认图片漫画正文使用 MangaMenu；当前 MangaMenu 布局/代码没有 customButton 控件与 clickCustomButton 分发，书源侧无法单独补出正文按钮",
+        "保留详情页 customButton 与评论回调，不改变 bookSourceType=2，避免退化漫画原生阅读体验",
+        "详情互动入口由 3+1 重排为 2×2：查看评论、点赞作品、收藏作品、相关推荐",
+        "作品数据改为双列三行：浏览/点赞、评论/章节、页数/状态",
+        "清空原生 wordCount 重复统计，顶部摘要仅保留主分类与连载状态",
+        "作者、汉化组、分类、标签点击能力及账号/评论/正文/双线路核心链保持不变"
       ],
-      "sha256": "1c806cc0181497c7cada9770008176b9d130e2469a482f8da2f95a01335311e1"
+      "sha256": "6e7f1144f1d0d1cc3b6a6b884c3cf1ee42f1e36abc1ba3953e9849d097faa172"
     }
   ],
   "typeCatalogs": {
