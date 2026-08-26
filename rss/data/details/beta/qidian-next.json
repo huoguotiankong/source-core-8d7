@@ -1,26 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "详情 beta3：修复标签/荣誉脏数据和统计误识别，首屏性能路径不回退。",
+  "summary": "详情 beta4：标签严格只认可见文本；资料不足时最多一次起点官方补全。",
   "badges": [
     "Beta",
-    "1.1.0-beta3",
-    "详情清洗"
+    "1.1.0-beta4",
+    "详情平衡"
   ],
   "sections": [
     {
-      "title": "本次修复",
-      "text": "过滤 sectionCount、actionStatus、FININSHED、honorTypeName、ID、布尔值、时间戳等起点内部结构字段，避免作为标签/荣誉显示。"
+      "title": "标签修复",
+      "text": "不再解析泛化数组字符串；标签只接受起点页面可见文本，:true、:50001、状态键、ID 等结构碎片会被直接拒绝。"
     },
     {
-      "title": "统计可信度",
-      "text": "收藏优先只接受页面可见值；粉丝优先使用可见值或明确 BookFansCount 字段，并增加极端比例校验。"
+      "title": "信息补全",
+      "text": "先解析当前响应和缓存；若作品数据仍明显稀疏，最多请求一次起点 PC 官方书页，并复用现有成熟 qdParseBookInfo 解析器补全可靠字段。"
     },
     {
       "title": "性能边界",
-      "text": "继续保持详情首屏零额外同步网络请求，缺失数据宁可隐藏，也不为补一个数字阻塞详情页。"
+      "text": "官方补全单次超时 2.6 秒，30 分钟内不重复探测；不恢复 APP/Atom/第三方多接口串行详情链。"
+    },
+    {
+      "title": "回归范围",
+      "text": "仅修改详情解析/展示。搜索、目录、评论、正文 Provider 与情无 VIP 认证链保持不变。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11003",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11003"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11004",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11004",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11004"
 }

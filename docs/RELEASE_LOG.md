@@ -357,3 +357,8 @@ Future entries should clearly distinguish:
 - Stable published.
 
 A generated or statically validated version must not be logged as Stable unless the user has confirmed it or explicitly requested the stable update.
+
+### 2026-08-26 — 🌈 起点增强 1.1.0-beta4
+- Detail-only Beta: reject structured tag fragments (`:true`, numeric ids, internal keys) and accept only visible human-readable tags.
+- Sparse detail pages may perform one official Qidian PC book-page enrichment request (2.6s timeout) and reuse `qdParseBookInfo`; no secondary fallback.
+- Adds trustworthy missing detail fields when available while keeping Stable 1.0.0 and non-detail domains untouched.

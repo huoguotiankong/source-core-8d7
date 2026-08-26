@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-26T11:31:42+08:00",
+  "updatedAt": "2026-08-26T12:01:47+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -80,28 +80,29 @@
       "name": "🌈 起点增强 · Beta",
       "category": "novel",
       "channel": "beta",
-      "version": "1.1.0-beta3",
-      "versionCode": 11003,
-      "updatedAt": "2026-08-26T11:31:42+08:00",
+      "version": "1.1.0-beta4",
+      "versionCode": 11004,
+      "updatedAt": "2026-08-26T12:01:47+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11003",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11004",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "详情 beta3：修复标签/荣誉脏数据与统计误识别，保持快速首屏。",
+      "summary": "详情 beta4：严格标签清洗 + 稀疏详情最多一次起点官方 PC 书页补全。",
       "tags": [
         "起点",
         "测试版",
         "详情页",
-        "数据清洗",
+        "官方补全",
+        "标签修复",
         "性能优化",
         "情无"
       ],
       "changelog": [
-        "清理内部字段/枚举/ID 泄漏",
-        "收紧统计可信度",
-        "规范作者等级与状态显示",
-        "保留零额外请求快速路径"
+        "修复 :true / :50001 等标签结构碎片",
+        "稀疏详情最多单次官方补全",
+        "复用成熟 qdParseBookInfo",
+        "保留情无 VIP 正文修复"
       ],
-      "sha256": "d2234efb2d9f62551386c8dbe5056320aab994df6fc34f448d30b68c1d72054c"
+      "sha256": "289bf7839a6bef57f701c497cb358a307b4101e124ad6ab0d5ac591f8847f333"
     }
   ]
 }

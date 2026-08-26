@@ -125,3 +125,11 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - Normalize author level to `Lv.x` and common internal finished/serial states to Chinese display values.
 - Keep the zero-extra-request detail first-paint invariant.
 
+
+## Detail balance Beta 1.1.0-beta4 (2026-08-26)
+
+- Real-device beta3 confirmed one title could show correct visible tags, while another still leaked structured fragments such as `:true` and `:50001`; works-data density also remained too low.
+- Generic array-string extraction is no longer used for tags/honors. Tags now require visible human text (Chinese or a short explicit ASCII allowlist) and reject JSON/object punctuation, booleans, ids and internal field names.
+- Current response/cache remains first priority. When reliable detail metrics are sparse, the detail path may issue at most one request to `https://www.qidian.com/book/<bookId>/` with a 2.6s timeout and reuse the existing `qdParseBookInfo(html, baseUrl)` parser.
+- There is no second detail fallback and no APP/Atom/third-party enrichment chain. A per-book 30-minute attempt marker prevents repeated slow probes.
+- Stable 1.0.0 and search/catalog/content/review modules remain unchanged.

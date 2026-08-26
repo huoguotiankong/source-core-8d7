@@ -299,3 +299,9 @@ Beta fix: parser-side semantic sanitation plus renderer-side defence, stricter c
 
 Status: Beta 1.1.0-beta3 published for real-device confirmation.
 
+
+## 24. Detail beta3 still leaked structured tag values and remained sparse — addressed in 1.1.0-beta4
+
+Real-device beta3 showed correct tags on some books, but another book displayed fragments such as `:true`, `:50001`, `:0`, `:50005`; both test books exposed only month-ticket data in the custom works-data block. Root cause: generic array-string extraction could return values from structured objects even after field-name filtering, while the zero-extra-request policy had become too restrictive for information density.
+
+Beta4 removes generic tag/honor array extraction, validates human-visible tag text, and conditionally allows exactly one official Qidian PC book-page request parsed by the mature `qdParseBookInfo` routine. No multi-endpoint fallback is restored. Status: Beta, pending real-device confirmation.
