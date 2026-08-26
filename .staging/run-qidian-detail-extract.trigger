@@ -1,1 +1,1 @@
-run qidian detail extract 3
+run qidian detail extract 4
