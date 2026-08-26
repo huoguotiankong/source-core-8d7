@@ -18,6 +18,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python -c "p='tools/publish_picacg_beta3.py';s=open(p,encoding='utf-8').read();s=s.replace(\"src['ruleBookInfo']['intro'] = '''<js>\",\"src['ruleBookInfo']['intro'] = r'''<js>\");open(p,'w',encoding='utf-8').write(s)"
           python tools/publish_picacg_beta3.py
           node --check /tmp/pica-jslib.js
           node --check /tmp/pica-intro.js
