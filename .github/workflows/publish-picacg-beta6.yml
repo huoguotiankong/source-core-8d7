@@ -17,6 +17,11 @@ jobs:
       - name: Patch and publish Picacg beta6
         run: |
           python tools/publish_picacg_beta6.py
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('docs/DEVELOPMENT_RULES.md')
+          p.write_text(p.read_text(encoding='utf-8').rstrip() + '\n', encoding='utf-8')
+          PY
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add sources/comic/picacg/picacg-beta.json manifest.json subscription/beta.json subscription/comic.json bundles/all-beta.json rss/data/details/beta/picacg.json docs/RELEASE_LOG.md docs/DEVELOPMENT_RULES.md docs/KNOWN_ISSUES.md
