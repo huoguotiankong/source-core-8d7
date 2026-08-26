@@ -1,0 +1,26 @@
+name: qidian-beta14-publish
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/qidian-beta14/RUN'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch Beta14
+        run: python .staging/qidian-beta14/publish.py
+      - name: Commit Beta14
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sources/novel/qidian-next/qidian-next-beta.json bundles/all-beta.json subscription/beta.json manifest.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md
+          git diff --cached --check
+          git commit -m "feat: publish qidian-next beta14 detail layout"
+          git push origin HEAD:main
