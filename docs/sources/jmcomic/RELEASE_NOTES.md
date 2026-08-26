@@ -1,5 +1,18 @@
 # JMComic / 禁漫天堂 Release Notes
 
+## 2026-08-27 — 0.1.0-beta3
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+- Fixed detail-page literal `@onclick` / `@get` output by generating the interaction and metadata HTML dynamically.
+- Normalized JM forum fields `CID`, `UID`, `replys`, `photo`; comment HTML is converted to readable text and relative avatars become `/media/users/` URLs.
+- TOC now returns a Java list consumed through `@json`; APP `series` failure falls back to the original Web `.btn-toolbar / .reading` chain.
+- Forces `book.type = 64` during TOC parsing.
+- Retains Beta2 `this.java` compatibility fix for discovery/login entry points.
+- Repository source now contains complete inline jsLib; Beta1 runtime parts are historical only.
+- Published source SHA256: `fb8332ac2d79ffcf9deb7cb4b9030debbac83ac768c073d493f6fb7d0d23b12f`.
+- Source-specific bundle: `bundles/jmcomic-beta3.json`.
+
 ## 2026-08-26 — 0.1.0-beta1
 
 Status: Beta/Test; awaiting user real-device confirmation.
