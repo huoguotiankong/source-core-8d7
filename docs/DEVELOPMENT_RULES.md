@@ -1,6 +1,6 @@
 # DEVELOPMENT RULES
 
-> Updated: 2026-08-25
+> Updated: 2026-08-26
 
 ## 1. Repository isolation
 
@@ -211,3 +211,16 @@ Unless the user explicitly requests local-only delivery, every newly created or 
 - Keep status catalogs (Stable/Beta) and type catalogs in parallel. Current long-lived type catalogs include `subscription/comic.json` and `subscription/rss.json`.
 - A local downloadable JSON may still be delivered for convenience, but it does not replace repository publication.
 - Publication must upsert existing catalogs and rebuild the relevant bundle without dropping unrelated sources.
+
+## 17. Concise source display naming
+
+`bookSourceName` / RSS source display names should be short and recognizable. Default format:
+
+`<one distinctive icon> <source/platform name>`
+
+Examples: `🍥 哔咔漫画`, `🌈 起点增强`.
+
+- Do not append Beta/Stable, version numbers, APP/Web route descriptions, long capability lists or marketing-style suffixes to the in-app source name.
+- Put channel, version, route architecture and feature descriptions in `bookSourceComment`, Manifest/Subscription metadata, tags and changelog instead.
+- Add a textual suffix only when two independently installable sources would otherwise be genuinely ambiguous, and keep that suffix short.
+- When renaming an existing source, preserve its stable `bookSourceUrl` identity so updates continue in place.

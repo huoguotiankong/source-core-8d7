@@ -1,5 +1,19 @@
 # RELEASE LOG
 
+## 2026-08-26 — Picacg 1.0.0-beta6 interaction order + concise source naming
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Changes:
+
+- 互动区改为第一行「查看评论 / 相关推荐」，第二行「点赞作品 / 收藏作品」
+- `bookSourceName` 精简为「🍥 哔咔漫画」，不再追加 APP/网页双线路、Beta、版本等长后缀
+- 再次核对阅读当前上游：文本 `ReadMenu` 有 `tvCustomBtn`、`customButton` 可见性判断和 `CLICK_CUSTOM_BUTTON` 分发；图片 `MangaMenu` 没有，因此漫画正文无法仅靠书源 JSON 增加定制按钮
+- 详情页定制按钮继续保留并直达评论；作品数据与作品信息布局保持 Beta5 基线
+- 账号、评论、楼中楼、目录、漫画图片正文和 APP/Web 双线路核心链冻结
+- Published SHA256: `7065d8566c3fc1dd7a41b1f6a4e7d1913d9a55632791eff1fc860478a7e0f153`.
+
+
 ## 2026-08-26 — Picacg 1.0.0-beta5 manga-menu finding and detail UI polish
 
 Status: Beta/Test; core functions retained, detail UI awaits real-device confirmation.

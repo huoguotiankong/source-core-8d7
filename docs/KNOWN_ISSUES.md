@@ -1,6 +1,6 @@
 # KNOWN ISSUES
 
-> Updated: 2026-08-25
+> Updated: 2026-08-26
 
 ## 1. RSS import method confusion — understood
 
@@ -369,6 +369,8 @@ Beta4 keeps the top-level flag and also calls `picaEnsureReaderFeatures(this)` f
 ## Image manga reader customButton gap — confirmed upstream limitation in Picacg 1.0.0-beta5
 
 Real-device tests on Picacg beta3/beta4 repeatedly showed the custom button on BookInfoActivity but not in image manga reading. Source audit confirms this is not a BookSource.customButton persistence issue: BookInfoActivity reads the same BookSource.customButton and displays its custom menu item. Image books are launched through ReadMangaActivity and use MangaMenu/ViewMangaMenu; the current MangaMenu implementation has no tv_custom_btn view, no customButton visibility branch, and no SourceCallBack.CLICK_CUSTOM_BUTTON dispatch. Text books such as Qidian use ReadMenu, which does implement all three pieces.
+
+Latest upstream master was rechecked on 2026-08-26: ReadMenu still has tvCustomBtn/customButton/CLICK_CUSTOM_BUTTON, while MangaMenu still has none of those pieces.
 
 Rule: do not keep mutating customButton/eventListener inside image-source content rules expecting MangaMenu to render a missing control. Preserve bookSourceType=2 for correct manga UX. Source-side customButton remains useful on the detail page. A true manga-reader custom button requires an app-side MangaMenu implementation change.
 
