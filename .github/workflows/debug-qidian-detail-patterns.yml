@@ -13,29 +13,29 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Identify rich detail parser
+      - name: Locate outer rich detail parser
         run: |
           python - <<'PY'
           import json,re
           from pathlib import Path
           s=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text(encoding='utf-8'))[0]
           text=str(s.get('jsLib',''))
-          needle='collectionCount:collectionCount'
-          i=text.find(needle)
-          print('needle=',i)
-          assert i>=0
+          i=text.find('collectionCount:collectionCount');assert i>=0
           defs=list(re.finditer(r'function\s+([A-Za-z0-9_$]+)\s*\(',text[:i]))
-          for m in defs[-12:]: print('DEF',m.group(1),'@',m.start())
-          if defs:
-              m=defs[-1];print('\nLAST FUNCTION=',m.group(1));print(text[m.start():min(len(text),i+1800)])
-          # Also locate direct source-page requests near any rich parser call sites.
-          for pat in ['safeMetricCount(', 'JSON.stringify({', 'https://www.qidian.com/book/', 'https://m.qidian.com/book/']:
-              print('\nPAT',pat)
-              pos=0
-              for n in range(15):
-                  j=text.find(pat,pos)
-                  if j<0: break
-                  fn=[x for x in re.finditer(r'function\s+([A-Za-z0-9_$]+)\s*\(',text[:j])]
-                  print(j,'fn=',fn[-1].group(1) if fn else '-')
-                  pos=j+len(pat)
+          print('needle',i,'defs',len(defs))
+          for m in defs[-35:]: print('DEF',m.group(1),'@',m.start())
+          # Print a compact slice before nested helpers where the outer function declaration should live.
+          print('\nSLICE 136000-142200\n',text[136000:142200])
+          # Locate likely call sites by scanning each function name defined in this block after its definition.
+          names=[]
+          for m in defs:
+              if 130000<=m.start()<=142000:names.append((m.group(1),m.start()))
+          for name,pos in names:
+              hits=[];start=pos+8
+              while True:
+                  j=text.find(name+'(',start)
+                  if j<0:break
+                  hits.append(j);start=j+len(name)+1
+                  if len(hits)>=10:break
+              print('CALLS',name,pos,hits)
           PY
