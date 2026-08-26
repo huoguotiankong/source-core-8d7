@@ -1,3 +1,17 @@
+## 2026-08-26 — Picacg 1.0.0 Stable
+
+Status: Stable; user real-device confirmed and explicitly promoted.
+
+Changes:
+
+- Promoted the exact `1.0.0-beta9` functional baseline to Stable; no new business behavior was added during promotion.
+- User confirmed the detail-page custom button is restored and opens the Picacg comment center.
+- Retained one-shot recommendations (`page > 1` returns empty) plus independent ID/title/cover de-duplication.
+- Retained APP/API + Web dual routes, login/account, comments/nested replies, likes/favourites, tags, TOC and manga image content.
+- Stable source / Manifest / Stable subscription / Comic subscription / Stable bundle / Beta channel removal / Stable RSS detail were synchronized.
+- Published source SHA256: `59fbc28ba9d168e95be9dc76a653391b111309009c3ae9d710e7b9aeda61170f`.
+
+
 # RELEASE LOG
 
 ## 2026-08-26 — Picacg 1.0.0-beta9 recommendation hard-stop + startBrowser comment entry

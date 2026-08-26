@@ -98,5 +98,7 @@
       "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json?v=10009",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/picacg.json?v=10005"
     }
-  ]
+  ],
+  "generatedAt": "2026-08-26T21:09:58+08:00",
+  "sources": []
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-26T20:52:06+08:00",
+  "updatedAt": "2026-08-26T21:09:58+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -112,34 +112,32 @@
       "name": "◈ 哔咔漫画",
       "category": "comic",
       "artifactType": "bookSource",
-      "channel": "beta",
-      "version": "1.0.0-beta9",
-      "versionCode": 10009,
-      "updatedAt": "2026-08-26T20:52:06+08:00",
-      "sourcePath": "sources/comic/picacg/picacg-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json",
+      "channel": "stable",
+      "version": "1.0.0",
+      "versionCode": 10000,
+      "updatedAt": "2026-08-26T21:09:58+08:00",
+      "sourcePath": "sources/comic/picacg/picacg.json",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg.json",
       "bookSourceUrl": "https://sc8d7.invalid/legado/picacg-8d7",
-      "summary": "Beta9：相关推荐按真实页码只加载首批并增加标题级强去重；详情顶部定制按钮改走 startBrowser 独立评论页，绕开 BottomWebViewDialog 线程链。",
+      "summary": "正式版：Beta9 真机确认后原样晋升；详情顶部定制按钮恢复，相关推荐保持首批一次性返回与强去重。",
       "tags": [
         "哔咔",
         "漫画",
+        "正式版",
         "APP API",
         "网页线路",
         "评论",
-        "相关推荐",
-        "强去重",
+        "楼中楼",
         "定制按钮",
-        "startBrowser",
         "双线路"
       ],
       "changelog": [
-        "真机确认 Beta8 仍会在推荐超过约 10 部后出现重复；Beta9 不再依赖 session 状态，直接以阅读传入的真实 page 为准，推荐 page>1 硬返回空列表",
-        "推荐首批去重从“ID + 标题/封面/作者组合签名”升级为 ID、规范化标题、规范化封面路径三层独立去重；同标题作品即使 API 返回不同 ID/作者/封面 host 也不会重复显示",
-        "真机确认 Beta8 详情顶部定制按钮仍无法打开评论；Beta9 删除 Rhino function -> Activity.runOnUiThread -> SourceLoginJsExtensions.showBrowser 链",
-        "详情顶部定制按钮直接调用阅读官方 java.startBrowser(url,title,html)，打开独立 WebViewActivity 评论中心；本地 HTML 自动接入 WebViewActivity 注入的 run() 桥，继续复用现有评论/楼中楼/点赞/回复模块",
-        "顶部按钮改为直接从当前 book.bookUrl 提取漫画 ID，不再依赖额外详情请求；详情内原“查看评论”按钮及账号、目录、漫画正文、APP/Web 双线路保持不变"
+        "由 1.0.0-beta9 真机确认基线原样晋升 Stable，不新增业务逻辑",
+        "详情页顶部定制按钮已真机确认恢复，可直接进入独立哔咔评论中心",
+        "相关推荐保留 page>1 硬终止和漫画 ID/标题/封面路径三层独立去重",
+        "保留登录、账户中心、签到、点赞收藏、评论/楼中楼、标签、目录、漫画图片正文及 APP/Web 双线路"
       ],
-      "sha256": "b4d8e6d3fbfd6f0ce78d3cecc28c47ee6d0ddb463350d365474255935dae975e",
+      "sha256": "59fbc28ba9d168e95be9dc76a653391b111309009c3ae9d710e7b9aeda61170f",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],

@@ -37,5 +37,29 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/picacg.json?v=10005",
       "type": "comic"
     }
+  ],
+  "generatedAt": "2026-08-26T21:09:58+08:00",
+  "sources": [
+    {
+      "id": "picacg",
+      "name": "◈ 哔咔漫画",
+      "version": "1.0.0",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg.json?v=100",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/picacg/picacg.json?v=100",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/picacg.json?v=100",
+      "tags": [
+        "漫画源",
+        "Stable",
+        "哔咔",
+        "Picacg",
+        "APP/API",
+        "网页线路",
+        "登录",
+        "账号",
+        "评论"
+      ],
+      "summary": "哔咔漫画 APP/网页双线路正式源，支持登录、账号、评论/楼中楼、点赞收藏、标签与漫画正文。",
+      "channel": "stable"
+    }
   ]
 }
