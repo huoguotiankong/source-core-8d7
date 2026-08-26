@@ -1,0 +1,1 @@
+debug qidian detail patterns
