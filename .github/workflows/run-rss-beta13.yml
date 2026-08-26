@@ -1,0 +1,38 @@
+name: run-rss-beta13
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/run-rss-beta13.trigger'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Apply Beta13 patch
+        run: python scripts/patch_rss_beta13.py
+      - name: Validate RSS JSON
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for p in ['rss/reader-source-repository-beta.json','rss/reader-source-repository-beta13.json','rss/data/home-beta.json','subscription/stable.json','subscription/beta.json']:
+              json.loads(Path(p).read_text(encoding='utf-8'))
+          s=json.loads(Path('rss/reader-source-repository-beta.json').read_text(encoding='utf-8'))[0]
+          assert '?ui=' not in s['sortUrl']
+          assert 'UI Beta 13' in s['ruleContent']
+          assert 'java.startBrowser' not in s['ruleContent']
+          print('validation ok')
+          PY
+      - name: Commit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add rss/reader-source-repository-beta.json rss/reader-source-repository-beta13.json rss/data/home-beta.json rss/data/bundle.json rss/data/help.json rss/data/details/update-beta.json subscription/stable.json subscription/beta.json docs/DEVELOPMENT_RULES.md docs/RELEASE_LOG.md docs/KNOWN_ISSUES.md
+          git commit -m 'fix: stabilize rss article identity in beta13'
+          git push origin main
