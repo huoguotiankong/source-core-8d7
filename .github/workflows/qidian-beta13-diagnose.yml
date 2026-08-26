@@ -14,7 +14,10 @@ jobs:
         with:
           ref: main
       - name: Patch Beta13
-        run: python .staging/qidian-beta13/publish.py
+        shell: bash
+        run: |
+          python .staging/qidian-beta13/fix_publish.py
+          python .staging/qidian-beta13/publish.py
       - name: Commit Beta13
         shell: bash
         run: |
