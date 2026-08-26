@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-26T13:06:30+08:00",
+  "updatedAt": "2026-08-26T14:48:21+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -80,29 +80,29 @@
       "name": "🌈 起点增强 · Beta",
       "category": "novel",
       "channel": "beta",
-      "version": "1.1.0-beta5",
-      "versionCode": 11005,
-      "updatedAt": "2026-08-26T13:06:30+08:00",
+      "version": "1.1.0-beta6",
+      "versionCode": 11006,
+      "updatedAt": "2026-08-26T14:48:21+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11005",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11006",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "详情 beta5：严格标签清洗 + 稀疏详情物理最多一次官方 PC 请求。",
+      "summary": "详情 beta6：补齐起点 bookInfo 简介解析，并让缺简介进入既有单请求补全链。",
       "tags": [
         "起点",
         "测试版",
         "详情页",
+        "书籍简介",
         "单请求",
-        "标签修复",
         "性能优化",
         "情无"
       ],
       "changelog": [
-        "修复 beta4 潜在 ajax→get 双请求",
-        "详情官方补全物理最多一次",
-        "2.6 秒超时与 30 分钟尝试标记不变",
-        "保留情无 VIP 正文修复"
+        "新增 bookInfo/BookInfo 简介字段解析",
+        "缺简介时触发现有一次 PC 补全",
+        "PC HTML 复用提取简介，无第二接口",
+        "保留其它功能与情无 VIP 正文修复"
       ],
-      "sha256": "756f79aa284f31b0c551d4e41ab68af045ad6e9fe0954e005f0ae7a5a2fc0a8b"
+      "sha256": "1d58eb0bb510b6f4dd84c5e1826f892a7681cdbd2f3849f5e6fe43bf8387a850"
     }
   ]
 }

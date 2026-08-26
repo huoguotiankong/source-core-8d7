@@ -143,3 +143,13 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - Beta4 visible-human-text tag sanitation and sparse-enrichment policy remain unchanged.
 - Source-level validation asserts only `bookSourceComment` and `ruleBookInfo.init` changed; `jsLib`, source identity, search/catalog/content/review/Provider and 情无 logic are byte-for-byte preserved in this patch.
 - Status: Beta, pending real-device confirmation.
+
+
+## Detail synopsis repair 1.1.0-beta6 (2026-08-26)
+
+- Real-device beta5: custom 作品资料/月票/快捷入口/标签 render, but 内容简介 is completely absent.
+- Root cause in the detail-local fast parser: `introFromCurrent()` scanned BookIntro/BookDesc/Introduction variants but omitted Qidian's `bookInfo` synopsis field; `qfDetailSparseV1104()` also did not consider a blank synopsis.
+- Beta6 adds `BookInfo/bookInfo`, includes blank `info.intro` in the sparse decision, and fills `info.intro` from `rich.intro || introFromCurrent(pcHtml)` after the existing one official PC request. No additional endpoint/fallback chain is introduced.
+- The attempt-cache key moves from V1104 to V1106 solely to prevent an earlier Beta's 30-minute marker from blocking immediate validation of the new parser. Request limit stays physically at most one with 2.6s timeout and 30-minute suppression thereafter.
+- Source-level guard confirms only `bookSourceComment` and `ruleBookInfo.init` changed; `jsLib`, source identity, search/catalog/content/review/Provider and 情无 logic are preserved.
+- Status: Beta, pending real-device confirmation.

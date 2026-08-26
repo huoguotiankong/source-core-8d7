@@ -368,3 +368,10 @@ A generated or statically validated version must not be logged as Stable unless 
 - Detail-only hardening: eliminate beta4's possible `ajax -> get` double transport attempt.
 - Official PC enrichment is now physically at most one request: prefer `get`, use `ajax` only when `get` is unavailable; no failure fallback.
 - Keep strict visible-tag sanitation, 2.6s timeout, 30-minute attempt marker, Stable 1.0.0, and all non-detail modules unchanged.
+
+
+### 2026-08-26 — 🌈 起点增强 1.1.0-beta6
+- Detail-only synopsis fix from real-device beta5 feedback: add Qidian `bookInfo/BookInfo` synopsis extraction.
+- A blank synopsis now counts as incomplete detail data; the existing PC enrichment may run once and its same HTML response is reused for synopsis extraction.
+- Bump the 30-minute enrichment-attempt marker to V1106 so previous Beta attempts do not mask this parser change during testing.
+- Keep the physical one-request limit, 2.6s timeout, Stable 1.0.0, search/catalog/content/review/Provider modules and 情无 VIP authentication chain unchanged.

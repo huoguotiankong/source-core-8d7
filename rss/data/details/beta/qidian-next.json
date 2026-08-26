@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "详情 beta5：严格标签清洗继续保留；官方补全改为物理最多一次请求。",
+  "summary": "详情 beta6：修复“内容简介”长期不显示；不扩张详情请求链。",
   "badges": [
     "Beta",
-    "1.1.0-beta5",
-    "单请求硬化"
+    "1.1.0-beta6",
+    "简介修复"
   ],
   "sections": [
     {
-      "title": "单请求硬化",
-      "text": "Beta4 使用通用 qfAjaxTextV20，ajax 空结果时可能再走 get。Beta5 改为 get/ajax 二选一，失败后不跨传输层重试，单次详情补全物理最多发出一个请求。"
+      "title": "简介修复",
+      "text": "真机确认作品资料、月票、快捷入口和标签可显示，但内容简介长期为空。Beta6 在详情本地解析中加入起点实际使用的 bookInfo/BookInfo 字段。"
     },
     {
-      "title": "标签与信息量",
-      "text": "Beta4 的严格可见文本标签清洗继续保留；详情稀疏时仍可用起点 PC 官方书页补全评分、推荐、收藏、粉丝、状态、作者等级和标签。"
+      "title": "单请求兜底",
+      "text": "若当前响应仍未得到简介，缺简介会进入原有详情不完整判定；最多请求一次起点 PC 官方书页，并直接从同一份 HTML 中提取简介，不增加第二接口。"
     },
     {
-      "title": "性能边界",
-      "text": "单次超时 2.6 秒；30 分钟内不重复尝试；不恢复 APP/Atom/第三方详情 fallback。"
+      "title": "缓存与性能",
+      "text": "补全标记升级到 V1106，避免旧 Beta 的 30 分钟尝试记录阻断本次新解析；单次超时仍为 2.6 秒，之后 30 分钟内不重复尝试。"
     },
     {
       "title": "回归范围",
-      "text": "仅修改详情补全传输层。Stable 1.0.0、搜索、目录、评论、正文 Provider 与情无 VIP 认证链均不改。"
+      "text": "仅修改 ruleBookInfo.init 的简介解析/补全触发和版本说明；Stable 1.0.0、搜索、目录、正文 Provider、评论、角色卡、书友圈与情无 VIP 认证链不改。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11005",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11005",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11005"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11006",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11006",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11006"
 }

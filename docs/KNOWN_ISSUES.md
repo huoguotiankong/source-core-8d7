@@ -310,3 +310,8 @@ Beta4 removes generic tag/honor array extraction, validates human-visible tag te
 ## 25. Detail beta4 single-enrichment path could physically issue two transport attempts — fixed in 1.1.0-beta5
 
 Code review found `qfAjaxTextV20()` tries `ajax()` first and then `get()` when the first result is empty, so beta4's nominal one enrichment call could become two HTTP attempts and approach 5.2 seconds worst-case. Beta5 makes the detail enrichment transport mutually exclusive: one `get()` when available, otherwise one `ajax()`, with no failure fallback. The 2.6-second timeout and 30-minute per-book attempt marker remain. Status: Beta, pending real-device confirmation.
+
+
+## 26. Qidian detail synopsis stayed blank while other metadata rendered — fixed in 1.1.0-beta6
+
+Real-device beta5 showed title/author/category/latest chapter, works metadata, month-ticket data, shortcuts and tags correctly, but the synopsis block was absent. The detail-local synopsis scanner did not include Qidian's `bookInfo` field, and the sparse-detail decision did not treat a missing synopsis as incomplete. Beta6 adds `bookInfo/BookInfo`, treats a blank synopsis as enrichment-worthy, and reuses the same single Qidian PC HTML response as a fallback source for synopsis text. The enrichment marker is versioned to V1106 so a prior Beta attempt cannot suppress the new parser during immediate testing. No second endpoint is added. Status: Beta, pending real-device confirmation.
