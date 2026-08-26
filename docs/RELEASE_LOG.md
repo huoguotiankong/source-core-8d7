@@ -1,5 +1,25 @@
 # RELEASE LOG
 
+## 2026-08-26 — Picacg 1.0.0-beta9 recommendation hard-stop + startBrowser comment entry
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Real-device finding from Beta8:
+
+- 相关推荐超过约 10 部后仍会出现一部重复作品。
+- 详情页顶部 customButton 仍无法进入评论页。
+
+Changes:
+
+- 推荐接口改为严格单页集合：直接使用阅读实际 page，`page > 1` 返回空，不再依赖 session 状态。
+- 首批推荐按 ID、规范化标题、规范化封面路径三层独立去重；标题相同即视为重复，不再让作者/封面字段差异绕过去重。
+- 顶部 customButton 删除 Rhino `runOnUiThread(function)` + `SourceLoginJsExtensions.showBrowser` 路径。
+- 顶部按钮直接 `java.startBrowser(url,title,html)` 打开独立评论页；利用 WebViewActivity 本地 HTML 的官方 `run()` 注入桥继续运行评论/楼中楼/点赞/回复逻辑。
+- 顶部按钮直接从 `book.bookUrl` 提取漫画 ID，不再为开评论先请求作品详情。
+- 其它核心链冻结。
+- Published SHA256: `b4d8e6d3fbfd6f0ce78d3cecc28c47ee6d0ddb463350d365474255935dae975e`.
+
+
 ## 2026-08-26 — Picacg 1.0.0-beta8 custom-button thread fix + recommendation session de-dup
 
 Status: Beta/Test; awaiting user real-device confirmation.

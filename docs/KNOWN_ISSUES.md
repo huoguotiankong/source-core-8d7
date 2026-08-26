@@ -390,3 +390,19 @@ Root cause from current Legado source:
 Beta8 rule: prepare comment data in the callback background thread, then call the existing BottomWebView opener through the current Activity's `runOnUiThread`. Do not guess alternate event names; the event is confirmed as `clickCustomButton`.
 
 Recommendation note: Picacg `/recommendation` is treated as a one-shot recommendation set, not a Legado-paginated feed. Each opened recommendation session may load that endpoint once, then must return empty on subsequent Explore pages.
+
+
+## Picacg — recommendation duplicate / detail custom button path (Beta8 incomplete)
+
+Real-device result on 2026-08-26:
+
+- Beta8 recommendation session de-dup still allowed a repeated work after roughly ten recommendations.
+- Beta8 detail customButton using `Activity.runOnUiThread(function)` + `SourceLoginJsExtensions.showBrowser` still did not open the comment page.
+
+Engineering conclusion for Beta9:
+
+- Treat `/comics/<id>/recommendation` as a fixed one-page recommendation set in Legado: use the actual `page` parameter and return empty for `page > 1`.
+- De-duplicate the first set by independent semantic keys, especially normalized title, instead of one composite signature.
+- Do not retry the Rhino-function-to-`runOnUiThread` BottomWebViewDialog path for this button. Use `java.startBrowser(url,title,html)` so WebViewActivity owns UI-thread creation and injects the official local-HTML `run()` bridge.
+
+Status: Beta9 published for real-device verification.

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-26T20:28:59+08:00",
+  "updatedAt": "2026-08-26T20:52:06+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -113,13 +113,13 @@
       "category": "comic",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "1.0.0-beta8",
-      "versionCode": 10008,
-      "updatedAt": "2026-08-26T20:28:59+08:00",
+      "version": "1.0.0-beta9",
+      "versionCode": 10009,
+      "updatedAt": "2026-08-26T20:52:06+08:00",
       "sourcePath": "sources/comic/picacg/picacg-beta.json",
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json",
       "bookSourceUrl": "https://sc8d7.invalid/legado/picacg-8d7",
-      "summary": "Beta8：修复详情页顶部定制按钮无法打开评论；相关推荐改为单会话单次加载并按 ID/标题封面双重去重；启用阅读源统一品牌标识。",
+      "summary": "Beta9：相关推荐按真实页码只加载首批并增加标题级强去重；详情顶部定制按钮改走 startBrowser 独立评论页，绕开 BottomWebViewDialog 线程链。",
       "tags": [
         "哔咔",
         "漫画",
@@ -127,19 +127,19 @@
         "网页线路",
         "评论",
         "相关推荐",
-        "去重",
+        "强去重",
         "定制按钮",
-        "品牌图标",
+        "startBrowser",
         "双线路"
       ],
       "changelog": [
-        "修复详情页顶部定制按钮：SourceCallBack 在 IO 线程执行，回调改为显式切回 Activity 主线程后再调用 showBrowser 打开评论中心",
-        "相关推荐每次打开生成独立 session id；同一 session 只允许推荐接口返回一次，阻止 ExploreShowActivity 自动翻页重复追加同一批结果",
-        "推荐结果按漫画 ID 与“标题 + 封面 + 作者”签名双重去重，处理 API 返回不同 ID 但视觉内容相同的重复项",
-        "阅读源统一品牌标识启用：书源名改为「◈ 哔咔漫画」，仓库新增专属 source-core 图标资产",
-        "详情互动区、作品数据、账号、评论、楼中楼、目录、漫画图片正文和 APP/Web 双线路核心链保持不变"
+        "真机确认 Beta8 仍会在推荐超过约 10 部后出现重复；Beta9 不再依赖 session 状态，直接以阅读传入的真实 page 为准，推荐 page>1 硬返回空列表",
+        "推荐首批去重从“ID + 标题/封面/作者组合签名”升级为 ID、规范化标题、规范化封面路径三层独立去重；同标题作品即使 API 返回不同 ID/作者/封面 host 也不会重复显示",
+        "真机确认 Beta8 详情顶部定制按钮仍无法打开评论；Beta9 删除 Rhino function -> Activity.runOnUiThread -> SourceLoginJsExtensions.showBrowser 链",
+        "详情顶部定制按钮直接调用阅读官方 java.startBrowser(url,title,html)，打开独立 WebViewActivity 评论中心；本地 HTML 自动接入 WebViewActivity 注入的 run() 桥，继续复用现有评论/楼中楼/点赞/回复模块",
+        "顶部按钮改为直接从当前 book.bookUrl 提取漫画 ID，不再依赖额外详情请求；详情内原“查看评论”按钮及账号、目录、漫画正文、APP/Web 双线路保持不变"
       ],
-      "sha256": "d0d586c8259910f176ced7e79626b9cb42b1e4421b9a7ac3a1c198446b061c4b",
+      "sha256": "b4d8e6d3fbfd6f0ce78d3cecc28c47ee6d0ddb463350d365474255935dae975e",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],
