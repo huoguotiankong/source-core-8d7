@@ -357,3 +357,10 @@ Beta3 audit after Beta2 real-device testing found one remaining shortcut: `openF
 The manga-reader custom button already had a content callback, but its book-id lookup depended on the reader providing a complete `book` object. Beta3 explicitly parses the current chapter URL first and then falls back to the book context / remembered id.
 
 Status: fixed in 1.0.0-beta3; awaiting real-device confirmation of the new reader-button and detail-tag interactions.
+
+
+## Picacg custom button flag present in JSON but hidden in reader — runtime self-heal in 1.0.0-beta4
+
+Real-device Beta3 showed `customButton: true` and a valid `clickCustomButton` callback in the source JSON, but the manga reader menu still omitted the custom icon. Source review of Legado/Archive `ReadMenu` confirms visibility is decided before callback execution from the current in-memory `BookSource.customButton` flag; therefore improving callback book-id lookup alone cannot make a hidden button appear.
+
+Beta4 keeps the top-level flag and also calls `picaEnsureReaderFeatures(this)` from detail, catalog and content rules to set `customButton/eventListener` on the active source object before the reader menu is opened. Status: awaiting real-device confirmation.

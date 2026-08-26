@@ -1,5 +1,20 @@
 # RELEASE LOG
 
+## 2026-08-26 — Picacg 1.0.0-beta4 reader custom-button + Venera-style detail enhancement
+
+Status: Beta/Test; awaiting real-device confirmation.
+
+Changes:
+
+- 根据 Legado/Archive ReadMenu 机制，详情/目录/正文执行时再次确保当前 BookSource.customButton 与 eventListener 为 true
+- 详情页重构为作品数据、描述、信息三个分区，降低顶部信息拥挤
+- 新增上传者、上传时间、页数、允许下载、允许评论等元数据展示
+- 作者、汉化组、分类、标签新增点击跳转；分类精确过滤，作者/汉化组走高级搜索
+- 原生 kind 只保留主要分类与连载状态，完整 tags 下沉到信息区
+- 评论中心、点赞/收藏、相关推荐、目录、正文图片及 APP/Web 请求核心链冻结
+- Published SHA256: `1c806cc0181497c7cada9770008176b9d130e2469a482f8da2f95a01335311e1`.
+
+
 ## 2026-08-26 — Picacg 1.0.0-beta3 reader/comment tags enhancement
 
 Status: Beta/Test; Beta2 core functions reported basically working on real device, Beta3 enhancements awaiting confirmation.
