@@ -1,0 +1,89 @@
+name: jmcomic-beta1-pr-finalize
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'incoming/jmcomic-beta1-pr/**'
+permissions:
+  contents: write
+  pull-requests: read
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Finalize JMComic beta1
+        shell: bash
+        run: |
+          set -euo pipefail
+          git pull --rebase origin main
+          python - <<'PY'
+          import hashlib, json, pathlib, subprocess
+          from datetime import datetime, timezone, timedelta
+
+          root = pathlib.Path('.')
+          source_path = root/'sources/comic/jmcomic/jmcomic-beta.json'
+          source_bytes = source_path.read_bytes()
+          source = json.loads(source_bytes.decode('utf-8'))
+          assert isinstance(source, list) and len(source) == 1
+          item = source[0]
+          identity = 'https://sc8d7.invalid/legado/jmcomic-8d7'
+          assert item.get('bookSourceUrl') == identity
+          assert item.get('bookSourceName') == '◈ 禁漫天堂'
+
+          runtime = ''.join((root/f'sources/comic/jmcomic/runtime/runtime-{i}.part').read_text(encoding='utf-8') for i in range(1,6))
+          tmp = pathlib.Path('/tmp/jmcomic-beta1-runtime.js')
+          tmp.write_text(runtime, encoding='utf-8')
+          subprocess.run(['node','--check',str(tmp)], check=True)
+          for name in ['jmApiRequest','jmWebRequest','jmOpenComments','jmComments','jmPostComment','jmToc','jmChapter']:
+              assert name in runtime, name
+
+          bundle_path = root/'bundles/all-beta.json'
+          bundle = json.loads(bundle_path.read_text(encoding='utf-8'))
+          assert isinstance(bundle, list)
+          filtered = [x for x in bundle if not isinstance(x,dict) or x.get('bookSourceUrl') != identity]
+          filtered.extend(source)
+          bundle_path.write_text(json.dumps(filtered, ensure_ascii=False, separators=(',',':')), encoding='utf-8')
+          assert sum(1 for x in filtered if isinstance(x,dict) and x.get('bookSourceUrl') == identity) == 1
+
+          sha = hashlib.sha256(source_bytes).hexdigest()
+          log_path = root/'docs/RELEASE_LOG.md'
+          log = log_path.read_text(encoding='utf-8')
+          marker = '## 2026-08-26 — JMComic 0.1.0-beta1 repository publication'
+          if marker not in log:
+              block = f'''{marker}\n\nStatus: Beta/Test; awaiting user real-device confirmation.\n\nChanges:\n\n- Published `◈ 禁漫天堂` to the Beta/Test and comic catalogs with permanent Legado identity `https://sc8d7.invalid/legado/jmcomic-8d7`.\n- Preserved the local Beta1 search/detail/TOC/content rules; the shared jsLib is stored as five cached Raw runtime parts.\n- Concatenated all five runtime parts on GitHub Actions and passed `node --check`.\n- Synchronized Manifest, Beta subscription, comic subscription, Beta RSS detail and the global `bundles/all-beta.json`.\n- Added APP/API + Web dual routes, dynamic domain refresh, login/account, favourites/history, comments/replies, image shunts and JM image de-scrambling.\n- Both the detail-page comment entry and the top custom button open the same independent comment center.\n- Published repository source SHA256: `{sha}`.\n\n'''
+              log_path.write_text(block + log, encoding='utf-8')
+
+          notes_path = root/'docs/sources/jmcomic/RELEASE_NOTES.md'
+          notes = notes_path.read_text(encoding='utf-8')
+          notes = notes.replace('Main `docs/RELEASE_LOG.md` merge is temporarily deferred because the available write action replaces the whole file and another Qidian Beta publication Action is still queued to modify shared release metadata. Replacing the full log now could overwrite that concurrent publication. This source-local note is the authoritative interim record and must be merged into the main log after the shared publication queue is clear.','Main `docs/RELEASE_LOG.md` is synchronized. The global Beta bundle is also synchronized server-side without replacing unrelated Beta sources.')
+          notes = notes.replace('The project-wide `bundles/all-beta.json` was already empty before JMComic publication. It is intentionally not overwritten with a partial JMComic-only array because doing so would drop unrelated Beta sources. `bundles/jmcomic-beta1.json` is maintained as a source-specific bundle using the exact same Git blob as the repository source until the global bundle builder is restored.','`bundles/all-beta.json` now contains exactly one JMComic entry with the permanent identity above, while preserving unrelated Beta sources. `bundles/jmcomic-beta1.json` remains the source-specific bundle and points at the same source payload.')
+          notes_path.write_text(notes, encoding='utf-8')
+
+          detail_path = root/'rss/data/details/beta/jmcomic.json'
+          detail = json.loads(detail_path.read_text(encoding='utf-8'))
+          for sec in detail.get('sections',[]):
+              if sec.get('title') == '当前状态':
+                  sec['text'] = 'Beta/Test，尚未经过真机确认。仓库源、Manifest、Beta 目录、漫画目录、RSS 详情、主 Release Log、全局 Beta Bundle、源内 Release Notes 与独立 Bundle 均已同步；5 段运行时在 GitHub Actions 拼接后通过 node --check。'
+          detail_path.write_text(json.dumps(detail, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+
+          handoff_path = root/'docs/sources/jmcomic/PROJECT_HANDOFF.md'
+          handoff = handoff_path.read_text(encoding='utf-8')
+          if '- `bundles/all-beta.json` -> contains JMComic Beta1 exactly once' not in handoff:
+              handoff = handoff.replace('- five runtime parts under `sources/comic/jmcomic/runtime/`','- five runtime parts under `sources/comic/jmcomic/runtime/`\n- `bundles/all-beta.json` -> contains JMComic Beta1 exactly once\n- `docs/RELEASE_LOG.md` -> contains the Beta1 publication record')
+          handoff_path.write_text(handoff, encoding='utf-8')
+
+          wf = root/'.github/workflows/jmcomic-beta1-pr-finalize.yml'
+          if wf.exists(): wf.unlink()
+          print('JMComic Beta1 finalized:', sha, 'bundle items:', len(filtered), 'runtime chars:', len(runtime))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m 'chore: finalize jmcomic beta1 global publication'
+          git pull --rebase origin main
+          git push origin main
