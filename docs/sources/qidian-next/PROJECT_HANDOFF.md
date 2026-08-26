@@ -1,3 +1,9 @@
+## 2026-08-26 · Current Beta 1.1.0-beta15 — Circle detail multi-image
+
+- Stable remains 1.1.0.
+- Beta15 changes only the lazy `circle` module: preserve all list-card post images into detail and remove confirmed poll metadata leakage.
+- Awaiting real-device confirmation before any Stable promotion.
+
 # Qidian Next PROJECT HANDOFF
 
 > Updated: 2026-08-25

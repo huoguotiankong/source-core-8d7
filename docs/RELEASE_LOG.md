@@ -1,3 +1,16 @@
+## 2026-08-26 — Qidian Next 1.1.0-beta15 circle detail multi-image fix
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Changes:
+
+- 书友圈列表已有的完整正文图片数组随帖子详情入口传递，不再只保留第一张图。
+- 帖子详情将列表预览图与 getpostdetail 返回图按原顺序去重合并，最多 9 张。
+- 详情正文仅过滤尾部明确的 Options / VoteId / VoteType 投票结构元数据。
+- 评论/楼中楼、分类筛选、同人视频、搜索、目录、正文 Provider、角色卡与账号链冻结。
+- Published SHA256: `74432416de1891f939b1e78c3395c9f910b5acc3f6669d3d02c29245b94d8b65`.
+
+
 ## 2026-08-26 — Qidian Next 1.1.0 Stable
 
 Status: Stable; user explicitly requested promotion after Beta14 real-device confirmation.
