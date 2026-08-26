@@ -1,0 +1,43 @@
+name: run-qidian-detail-beta110
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/run-qidian-detail-beta110.trigger'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Publish beta
+        run: python scripts/publish_qidian_detail_beta110.py
+      - name: Validate JSON and JS
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          paths=['sources/novel/qidian-next/qidian-next-beta.json','sources/novel/qidian-next/qidian-next.json','subscription/beta.json','bundles/all-beta.json','manifest.json','rss/data/details/beta/qidian-next.json']
+          for p in paths: json.loads(Path(p).read_text(encoding='utf-8'))
+          s=json.loads(Path(paths[0]).read_text(encoding='utf-8'))[0]
+          assert s['bookSourceUrl']=='https://m.qidian.com/?qf_source=qidian_next_8d7'
+          assert 'v1.1.0-beta1' in s['bookSourceComment']
+          assert 'qfOfficialCallV400' not in s['ruleBookInfo']['init']
+          assert '.ajax(' not in s['ruleBookInfo']['init']
+          print('json gates ok',len(s['ruleBookInfo']['init']),len(s['ruleBookInfo']['intro']))
+          Path('/tmp/init.js').write_text(s['ruleBookInfo']['init'][4:-5],encoding='utf-8')
+          Path('/tmp/intro.js').write_text(s['ruleBookInfo']['intro'][4:-5],encoding='utf-8')
+          PY
+          node --check /tmp/init.js
+          node --check /tmp/intro.js
+      - name: Commit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json subscription/beta.json bundles/all-beta.json manifest.json rss/data/details/beta/qidian-next.json docs/sources/qidian-next/PROJECT_HANDOFF.md docs/RELEASE_LOG.md docs/KNOWN_ISSUES.md
+          git commit -m 'feat: redesign qidian detail ui and fast path beta110'
+          git push origin main
