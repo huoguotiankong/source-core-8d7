@@ -2,7 +2,14 @@ import json, base64, gzip, pathlib
 
 p=pathlib.Path('sources/novel/qidian-next/qidian-next-beta.json')
 doc=json.loads(p.read_text(encoding='utf-8'))
-s=doc[0]['jsLib']
+
+def walk(v,path='root'):
+    if isinstance(v,dict):
+        for k,x in v.items(): yield from walk(x,path+'.'+str(k))
+    elif isinstance(v,list):
+        for i,x in enumerate(v): yield from walk(x,path+f'[{i}]')
+    elif isinstance(v,str):
+        yield path,v
 
 def extract_object_after(text, token):
     pos=text.find(token)
@@ -22,10 +29,13 @@ def extract_object_after(text, token):
         if ch=='{': depth+=1
         elif ch=='}':
             depth-=1
-            if depth==0:
-                return text[start:i+1]
+            if depth==0:return text[start:i+1]
     raise AssertionError('object end not found')
 
+hits=[(path,text) for path,text in walk(doc) if 'QF_MOD38_B64' in text]
+assert len(hits)==1, f'QF_MOD38_B64 hits={[p for p,_ in hits]}'
+path,s=hits[0]
+print('MODULE_FIELD',path)
 obj=extract_object_after(s,'QF_MOD38_B64')
 mods=json.loads(obj)
 raw=mods['circle']
