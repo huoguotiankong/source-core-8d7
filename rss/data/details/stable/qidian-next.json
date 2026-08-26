@@ -1,18 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强",
-  "summary": "起点增强型完整书源：官方搜索、详情、目录、评论体系 + 多正文 Provider。",
-  "badges": ["Stable", "1.0.0", "小说", "增强版"],
+  "summary": "正式版 1.1.0：由 Beta14 真机确认基线晋升；详情富数据、最近更新时间、固定双列与正文设置直达均保留。",
+  "badges": [
+    "Stable",
+    "1.1.0",
+    "Beta14 真机确认"
+  ],
   "sections": [
     {
-      "title": "核心能力",
-      "text": "官方搜索、书籍详情、目录、段评、本章说、作者说等数据链保持起点体系；正文支持多 Provider、STV 与既有切源策略。"
+      "title": "详情页",
+      "text": "保留作品富数据、标签/荣誉与内容简介；作品资料只显示最近更新时间。"
     },
     {
-      "title": "设置与使用",
-      "text": "一级页采用静态双列宫格，二级设置采用卡片化多级页面；后续这里始终只展示当前功能状态，不累计历史版本说明。"
+      "title": "作品数据",
+      "text": "固定双列：月票、收藏、粉丝在左列；总推荐、盟主、首订、在看、评分、投资等可用指标在右列。"
+    },
+    {
+      "title": "快捷入口",
+      "text": "书友圈、角色卡、正文设置保持紧凑布局；正文设置可从详情直接打开。"
+    },
+    {
+      "title": "稳定基线",
+      "text": "本正式版由 1.1.0-beta14 原样晋升；搜索、目录、正文 Provider、评论、角色卡、书友圈和账号链没有新增改动。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=11000",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=11000",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=11000"
 }

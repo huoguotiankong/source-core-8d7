@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-26T22:17:57+08:00",
+  "updatedAt": "2026-08-26T22:28:47+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -49,31 +49,31 @@
       "name": "🌈 起点增强",
       "category": "novel",
       "channel": "stable",
-      "version": "1.0.0",
-      "versionCode": 10000,
-      "updatedAt": "2026-08-26T00:12:17+08:00",
+      "version": "1.1.0",
+      "versionCode": 11000,
+      "updatedAt": "2026-08-26T22:28:47+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=11000",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "起点增强型完整书源：官方搜索/详情/目录/评论体系 + 多正文 Provider；设置采用静态双列首页与卡片化多级页面。",
+      "summary": "正式版 1.1.0：由 Beta14 真机确认基线晋升；详情富数据、最近更新时间、固定双列与正文设置直达均保留。",
       "tags": [
         "起点",
         "正式版",
-        "官方目录",
-        "段评",
-        "本章说",
-        "作者说",
+        "详情富数据",
+        "最近更新",
+        "固定双列",
+        "正文设置",
         "多正文 Provider",
-        "STV",
-        "多级设置"
+        "评论"
       ],
       "changelog": [
-        "第一版正式版，基于已使用的 v0.1.5-beta6 主线晋升",
-        "正式名称改为「🌈 起点增强」，与「起点助手」明确区分",
-        "保留静态双列一级设置页与卡片化多级二级设置架构",
-        "搜索/详情/目录/正文/评论业务逻辑不因正式版晋升而改变"
+        "由 1.1.0-beta14 真机确认基线原样晋升 Stable，不新增业务逻辑",
+        "详情页保留完整富数据与内容简介，只显示最近更新时间，不显示首发时间",
+        "作品数据固定分栏：月票/收藏/粉丝在左列，其余可用指标在右列",
+        "快捷入口保持紧凑三按钮，正文设置可从详情页直接打开",
+        "搜索、目录、正文 Provider、评论、角色卡、书友圈、账号链保持 Beta14 基线"
       ],
-      "sha256": "d64937b9dc4e528795d3818834a6ddab1828df1af84bb483b16961a40d8286ec"
+      "sha256": "c62b0b60dd91f472cac03f16e4853ca0cd1a181d75054e68c5ea29883999c17b"
     },
     {
       "id": "qidian-next-beta",

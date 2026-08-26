@@ -2,34 +2,36 @@
   "schemaVersion": 1,
   "channel": "stable",
   "name": "正式版",
-  "updatedAt": "2026-08-26T21:27:59+08:00",
+  "updatedAt": "2026-08-26T22:28:47+08:00",
   "items": [
     {
       "id": "qidian-next",
       "name": "🌈 起点增强",
-      "summary": "起点增强型完整书源：官方搜索/详情/目录/评论体系 + 多正文 Provider；设置采用静态双列首页与卡片化多级页面。",
+      "summary": "正式版 1.1.0：由 Beta14 真机确认基线晋升；详情富数据、最近更新时间、固定双列与正文设置直达均保留。",
       "icon": "",
       "channel": "stable",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "updatedAt": "2026-08-26",
       "tags": [
         "起点",
         "正式版",
-        "官方目录",
-        "段评",
-        "本章说",
-        "作者说",
+        "详情富数据",
+        "最近更新",
+        "固定双列",
+        "正文设置",
         "多正文 Provider",
-        "STV",
-        "多级设置"
+        "评论"
       ],
       "changelog": [
-        "当前正式版：1.0.0",
-        "完整版本历史请查看 Release Log"
+        "由 1.1.0-beta14 真机确认基线原样晋升 Stable，不新增业务逻辑",
+        "详情页保留完整富数据与内容简介，只显示最近更新时间，不显示首发时间",
+        "作品数据固定分栏：月票/收藏/粉丝在左列，其余可用指标在右列",
+        "快捷入口保持紧凑三按钮，正文设置可从详情页直接打开",
+        "搜索、目录、正文 Provider、评论、角色卡、书友圈、账号链保持 Beta14 基线"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=11000",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=11000",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=11000",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json"
     },
     {
@@ -63,5 +65,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/picacg.json"
     }
   ],
-  "generatedAt": "2026-08-26T21:27:59+08:00"
+  "generatedAt": "2026-08-26T22:28:47+08:00"
 }

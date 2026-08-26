@@ -1,3 +1,17 @@
+## 2026-08-26 — Qidian Next 1.1.0 Stable
+
+Status: Stable; user explicitly requested promotion after Beta14 real-device confirmation.
+
+Changes:
+
+- Promoted the exact `1.1.0-beta14` functional baseline to Stable; no new business behavior added.
+- Retained rich detail metadata and synopsis, with only the latest-update time shown.
+- Retained fixed two-column metrics: month-ticket / collection / fans on the left, remaining available metrics on the right.
+- Retained compact shortcuts and direct detail-page content settings entry.
+- Search, catalog, content Providers, reviews, role card, book circle and account domains remain on the Beta14 baseline.
+- Published Stable SHA256: `c62b0b60dd91f472cac03f16e4853ca0cd1a181d75054e68c5ea29883999c17b`.
+
+
 ## 2026-08-26 — Qidian Next 1.1.0-beta14 fixed metric columns + direct content settings
 
 Status: Beta/Test; awaiting user real-device confirmation.
