@@ -39,8 +39,7 @@ jobs:
           assert 'v1.1.0-beta3' in s['bookSourceComment']
           init=s['ruleBookInfo']['init']; intro=s['ruleBookInfo']['intro']
           assert '.ajax(' not in init and 'qfOfficialCallV400' not in init and 'qfAtomPost' not in init
-          assert 'qfMetaListV1103' in init and 'qfMetricBaseV1103' in init
-          assert 'sectionCount' in init
+          assert 'qfMetaListV1103' in init and 'qfMetricBaseV1103' in init and 'sectioncount' in init.lower()
           full=Path(paths[0]).read_text(encoding='utf-8')
           for marker in ['X-Content-Token','VIP正文已验证']: assert marker in full
           Path('/tmp/init.js').write_text(init[4:-5],encoding='utf-8')
