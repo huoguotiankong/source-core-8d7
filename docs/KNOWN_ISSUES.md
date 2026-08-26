@@ -266,4 +266,13 @@ Cause: Beta11 opened a second browser from inside `ruleContent` with `java.start
 Fix: return the styled HTML directly from `ruleContent` and let the current RSS detail WebView render it; do not launch a second browser. `ruleDescription` remains overridden so old summary rules do not take over. Cache revision bumped to `ui=12`.
 
 Status: published as RSS UI `0.3.2-beta12`, awaiting real-device confirmation.
+## 20. RSS UI releases accumulated old Home/Stable entries — cache model replaced in Beta13
+
+Real-device symptom: after updating Beta11 -> Beta12, Home displayed the three Beta12 items followed by the same three Beta11 items. The channel JSON itself was not duplicated.
+
+Root cause: previous mitigation changed category/detail URLs with `?ui=N`. Legado persists RSS articles, so each new detail URL could be treated as a different stored article; in-list de-duplication cannot remove articles already stored by an older RSS definition.
+
+Beta13 strategy: perform one category-name reset, then freeze category names, category URLs and item detail URLs permanently. Mutable version data is shown only inside detail content. Do not mint new article URLs for routine UI releases.
+
+Status: Beta13 published for real-device confirmation.
 

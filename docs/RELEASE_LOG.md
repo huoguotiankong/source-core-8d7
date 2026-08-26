@@ -1,5 +1,18 @@
 # RELEASE LOG
 
+## 2026-08-26 — RSS repository UI 0.3.3-beta13
+
+Status: Beta/Test; one-time RSS cache-model reset awaiting real-device confirmation.
+
+Changes:
+
+- Replaced the Beta11/Beta12 versioned category/detail identity strategy with permanent RSS article identities.
+- Introduced one new set of top-level category names to escape the already polluted old category cache.
+- Removed `?ui=N` from category and item detail URLs; future UI releases must keep them stable.
+- Removed mutable UI version/date metadata from list identity; version stays in detail content only.
+- Kept Beta12 direct-render detail HTML, list de-duplication and Stable/Beta physical source separation.
+- No book-source business JSON was modified.
+
 ## 2026-08-26 — RSS repository UI 0.3.2-beta12
 
 Status: Beta/Test; blank-detail-page fix awaiting real-device confirmation.

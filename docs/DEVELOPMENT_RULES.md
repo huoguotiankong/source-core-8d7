@@ -186,4 +186,18 @@ For `qidian-next` / `🌈 起点增强`:
 A Beta catalog entry must point only to the Beta source/detail paths. A Stable catalog entry must point only to the Stable paths. Never let an old Beta detail URL start importing the current Stable file after promotion.
 
 When repository channel/detail payloads change in a way that may be cached by Legado/Raw, bump the query revision in the RSS definition (`?v=N`) or move to a new channel-specific detail path.
+## 15. RSS article identity stability
+
+Legado persists RSS articles. Changing an item's detail URL or category identity on every UI release can create a new stored article instead of replacing the old one.
+
+Repository UI rule from Beta13 onward:
+
+- top-level category names are stable release-independent identities;
+- category request URLs remain stable and do not carry `?ui=N` release revisions;
+- item `detailUrl` values remain stable and do not carry UI-version query parameters;
+- mutable UI/source version numbers belong inside detail payload content, not in article identity fields;
+- list title/link identity must remain stable across releases;
+- do not solve cache problems by continuously minting new article URLs.
+
+If a future incompatible RSS migration truly requires a new identity, do it deliberately once with a documented migration plan rather than once per release.
 

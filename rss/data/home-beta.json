@@ -1,29 +1,32 @@
 {
   "type": "home",
-  "name": "仓库",
-  "updatedAt": "2026-08-26T08:59:00+08:00",
+  "name": "首页中心",
+  "updatedAt": "2026-08-26T09:15:00+08:00",
   "items": [
     {
       "id": "repo-overview",
       "name": "🌈 阅读书源仓库",
       "summary": "正式版、测试版和批量导入统一管理；详情页只展示当前状态，不堆积版本历史。",
-      "updatedAt": "UI Beta 12",
+      "updatedAt": "当前仓库",
       "icon": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/assets/reader-repo-icon.png",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/overview.json?ui=12"
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/overview.json",
+      "meta": "仓库入口"
     },
     {
       "id": "repo-policy",
       "name": "⭐ Stable / 🧪 Beta",
       "summary": "Stable 只放真机确认版本；新功能和修复先进入 Beta，两个通道下载文件与详情物理分离。",
       "updatedAt": "严格分流",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/policy.json?ui=12"
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/policy.json",
+      "meta": "通道规则"
     },
     {
       "id": "repo-update",
       "name": "🔄 更新仓库订阅源",
       "summary": "仓库界面或规则升级时，从这里重新导入当前 Beta 定义并覆盖现有订阅源。",
       "updatedAt": "一键更新",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/update-beta.json?ui=12"
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/update-beta.json",
+      "meta": "订阅更新"
     }
   ]
 }
