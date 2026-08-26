@@ -13,22 +13,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Inspect exact app detail time assignments
+      - name: Inspect login script boundary and content handler
         shell: bash
         run: |
           python - <<'PY'
-          import json, pathlib, re, base64, gzip
+          import json, pathlib
           src=json.loads(pathlib.Path('sources/novel/qidian-next/qidian-next-beta.json').read_text(encoding='utf-8'))[0]
-          js=src.get('jsLib','')
-          m=re.search(r'["\']qidian_app["\']\s*:\s*["\']gz:([A-Za-z0-9+/=]+)["\']',js) or re.search(r'QF_MOD38_PACK\s*\[\s*["\']qidian_app["\']\s*\]\s*=\s*["\']gz:([A-Za-z0-9+/=]+)["\']',js)
-          if not m: raise SystemExit('qidian_app pack not found')
-          code=gzip.decompress(base64.b64decode(m.group(1))).decode('utf-8')
-          for pat in [r'out\.updateTime\s*=',r'out\.publishDate\s*=',r'UpdateTime',r'PublishTime',r'CreateTime',r'FirstPublish',r'VipStart']:
-              print('\n### PATTERN',pat)
-              hits=list(re.finditer(pat,code,re.I))
-              print('COUNT',len(hits))
-              for h in hits[:8]:
-                  a=max(0,h.start()-1200);b=min(len(code),h.start()+2400)
-                  print('\n--- AT',h.start(),'---')
-                  print(code[a:b])
+          v=src.get('loginUrl','')
+          print('LOGIN_LEN',len(v))
+          print('LOGIN_HEAD_REPR',repr(v[:700]))
+          print('LOGIN_TAIL_REPR',repr(v[-1200:]))
+          p=v.find('qfMultiContentV423=function')
+          print('MULTI_POS',p)
+          print(v[max(0,p-1500):min(len(v),p+7000)])
           PY
