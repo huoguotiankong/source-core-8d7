@@ -1,3 +1,17 @@
+## 2026-08-27 — JMComic 0.1.0-beta3 detail/comment/TOC hotfix
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Changes:
+
+- 详情页互动区与作品数据改为 JS 动态生成，修复 `@onclick` / `@get` 被当普通文本显示。
+- 评论按 JM APP 实际 `CID / UID / replys / photo` 字段解析，HTML 正文转纯文本并补全用户头像 URL。
+- 目录改为 Java List + `@json`；APP `series` 缺失时回退原始 Web `.btn-toolbar / .reading` 目录链，并强制 `book.type=64`。
+- 保留 Beta2 已恢复的发现/分类与登录页 `this.java` 兼容修复。
+- 仓库源恢复完整内联 jsLib，不再在初始化阶段执行 Beta1 Raw runtime loader。
+- Published SHA256: `fb8332ac2d79ffcf9deb7cb4b9030debbac83ac768c073d493f6fb7d0d23b12f`.
+
+
 ## 2026-08-26 — Qidian Next 1.1.0-beta16 circle detail click hotfix
 
 Status: Beta/Test; awaiting user real-device confirmation.
