@@ -1,20 +1,24 @@
 {
   "kind": "rss",
   "title": "🔄 更新仓库订阅源",
-  "summary": "重新导入当前仓库 Beta 定义；Beta13 起分类与详情链接固定，不再用 UI 版本号制造新的文章身份。",
+  "summary": "重新导入当前唯一仓库定义并覆盖现有订阅；Beta15 起使用阅读原生 clearOld 机制清理历史文章。",
   "badges": [
     "RSS",
-    "UI Beta 13",
-    "缓存模型定型"
+    "UI Beta 15",
+    "原生旧文章清理"
   ],
   "sections": [
     {
-      "title": "为什么这次需要重新导入",
-      "text": "Beta11/Beta12 曾让详情 URL 随 UI 版本变化，阅读会把它们保存成不同文章，因此首页会一版叠一版。Beta13 只做一次分类重置。"
+      "title": "本次为什么需要更新",
+      "text": "此前仓库的 ruleNextPage 为空，阅读刷新时不会执行 rssArticleDao.clearOld，所以 Beta3/Beta10/Beta11 等历史文章会一直残留在本地。"
     },
     {
-      "title": "Beta13 之后",
-      "text": "分类名、分类 URL、详情 URL 和条目标题保持稳定；版本信息只更新详情内容。以后正常刷新同一条目，不再通过换链接绕缓存。"
+      "title": "Beta15 的修复",
+      "text": "ruleNextPage 改为非空但返回空值：不产生真实第二页，却会让阅读在刷新后删除当前分类中更旧的数据库记录。"
+    },
+    {
+      "title": "以后怎么维护",
+      "text": "首页、漫画、仓库订阅、正式版、测试版、批量和帮助的分类 URL 固定，不再添加 ?ui=N、?reset=N 或其它版本参数。"
     }
   ],
   "rssUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository-beta.json"
