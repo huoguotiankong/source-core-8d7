@@ -1,86 +1,84 @@
 # JMComic / 禁漫天堂 Project Handoff
 
-Updated: 2026-08-26
+Updated: 2026-08-27
 
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta1`
+- Version: `0.1.0-beta3`
 - Display name: `◈ 禁漫天堂`
 - Legado identity: `https://sc8d7.invalid/legado/jmcomic-8d7`
 - Repository source: `sources/comic/jmcomic/jmcomic-beta.json`
 - RSS detail: `rss/data/details/beta/jmcomic.json`
-- Runtime: `sources/comic/jmcomic/runtime/runtime-1.part` ... `runtime-5.part`
+- Source-specific bundle: `bundles/jmcomic-beta3.json`
+- Runtime: complete inline `jsLib` in the source JSON. Beta1 runtime parts remain only as history and are not executed.
 
-## Baseline
+## Baseline and confirmed device results
 
-The local complete Beta1 JSON remains the functional baseline. The repository version keeps the same search/detail/TOC/content rules and replaces only the large shared `jsLib` with a five-part Raw loader plus cache.
+Beta1 repository delivery used a five-part Raw loader. Real-device testing showed that during `jsLib` initialization, `java` could resolve to Rhino `JavaPackage java`, making `java.ajax` non-callable and breaking discovery plus every login-page action.
 
-The runtime split points correspond to the original shared jsLib sequence around characters 8000 / 16000 / 24000 / 32000. Boundary inspection confirms that functions and quoted HTML/JS strings continue across parts in their original order.
+Beta2 removed that startup loader and changed network/UI calls to explicitly resolve the Legado Java bridge from `this.java`. Real-device feedback confirmed discovery/category pages and login-page buttons recovered.
 
-## Architecture
+Beta3 keeps the Beta2 compatibility layer and only fixes three isolated areas reported by real-device screenshots:
 
-1. Domain Manager
-   - APP/API dynamic domain servers
-   - Web permanent-link / publication-page discovery
-   - last-success route cache and fallback
-2. APP/API Client
-   - encrypted response handling
-   - login/account/search/detail/chapter/comment endpoints
-3. Web Client
-   - login/search/detail/chapter/comment fallbacks
-4. Account
-   - dual-route login
-   - account center
-   - favourites and watch history
-5. Manga Runtime
-   - TOC / chapter image list
-   - image shunts 1-4
-   - JM image de-scrambling
-6. Comment Center
-   - APP `/forum` read first, Web fallback
-   - Web post/reply first, APP `/comment` fallback
-   - detail entry and custom-button entry share one comment UI
+1. Detail rendering
+   - Literal `@onclick` and nested `@get` text were displayed instead of evaluated.
+   - The interaction block and metadata are now generated dynamically by JS.
+2. Comment center
+   - JM APP forum fields follow `CID / UID / content / photo / replys`.
+   - Comment HTML is converted to readable text.
+   - Relative avatar filenames are expanded to `https://<image-host>/media/users/<photo>`.
+   - Nested `replys` are recursively normalized.
+3. TOC
+   - APP album `series` is parsed as `id / name / sort`.
+   - Chapter objects are returned as Java `ArrayList<HashMap>` and consumed via `@json`.
+   - If APP series is unavailable, the original user-provided Web selectors `.btn-toolbar a[href*=/photo/]` / `a.reading[href*=/photo/]` are used.
+   - TOC parsing forces `book.type = 64` for manga mode.
+
+## Architecture retained
+
+- APP/API + Web dual routes and automatic fallback
+- APP dynamic domain server refresh
+- Web permanent-link / publication-page domain discovery
+- dual-route login and account center
+- favourites and watch history
+- independent comment center with paging, post and reply
+- detail comment entry plus top custom button
+- manga image shunts 1-4
+- JM image de-scrambling
 
 ## Repository publication state
 
-The following active repository entries are synchronized for Beta1:
+Active Beta3 entries are synchronized in:
 
-- `manifest.json` -> `jmcomic`
-- `subscription/beta.json` -> `jmcomic`
-- `subscription/comic.json` -> `jmcomic`
+- `manifest.json`
+- `subscription/beta.json`
+- `subscription/comic.json`
 - `rss/data/details/beta/jmcomic.json`
 - `sources/comic/jmcomic/jmcomic-beta.json`
-- five runtime parts under `sources/comic/jmcomic/runtime/`
+- `bundles/jmcomic-beta3.json`
+- `docs/sources/jmcomic/RELEASE_NOTES.md`
+- `docs/RELEASE_LOG.md`
 
-The repository RSS UI already points its `🖼 漫画` category directly at `subscription/comic.json` and its `🧪 测试版` category at `subscription/beta.json`, so no RSS identity migration is required for JMComic.
+Repository source SHA256: `fb8332ac2d79ffcf9deb7cb4b9030debbac83ac768c073d493f6fb7d0d23b12f`.
 
-## Static validation completed
+## Validation
 
-- Local complete JSON parses successfully.
-- Local complete shared jsLib parses successfully in static JS checks.
-- Repository source JSON parses successfully.
-- Runtime part boundaries were inspected against the local Beta1 baseline and remain continuous.
-- Stable/Beta identity remains `https://sc8d7.invalid/legado/jmcomic-8d7`.
+- Repository JSON parses successfully.
+- Complete inline `jsLib` passes syntax construction with V8 `new Function()`.
+- Login, explore, detail init, detail intro, TOC, content, and custom-button scripts pass syntax construction.
 - No write was made to `asset-core-7f3`.
 
-## Real-device checklist
+## Next real-device checklist
 
-Before Stable promotion, test in Legado:
-
-1. Refresh available domains and run route diagnostics.
-2. Search in Auto mode.
-3. Force APP/API route and test search/detail/TOC/content.
-4. Force Web route and test search/detail/TOC/content.
-5. Test multi-chapter and single-album works.
-6. Test image shunts 1-4 and newer scrambled images.
-7. Login and open account center.
-8. Test favourites and watch history.
-9. Open comments from the detail-page entry.
-10. Open comments from the top custom button.
-11. Test comment paging, posting and replies.
-12. Confirm fallback behavior after deliberately switching to an unavailable route/domain.
+1. Detail page should no longer show literal `@onclick` or stray `}`.
+2. Detail buttons: 查看评论 / 收藏作品 / 账户中心.
+3. Comment body should show plain readable text; avatars should load.
+4. Nested replies should display under the correct parent comment.
+5. Multi-chapter and single-album TOC should both open.
+6. Open one chapter and confirm manga image content and de-scrambling.
+7. Recheck Auto, APP/API and Web routes independently.
 
 ## Promotion rule
 
-Do not promote this source to Stable until the user explicitly confirms the real-device test is normal or directly requests Stable promotion.
+Do not promote to Stable until the user explicitly confirms the real-device test is normal or directly requests Stable promotion.
