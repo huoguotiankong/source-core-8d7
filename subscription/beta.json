@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-26T20:52:06+08:00",
+  "updatedAt": "2026-08-26T21:12:18+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -65,40 +65,7 @@
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11012",
       "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11012",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
-    },
-    {
-      "id": "picacg",
-      "name": "◈ 哔咔漫画",
-      "summary": "Beta9：相关推荐按真实页码只加载首批并增加标题级强去重；详情顶部定制按钮改走 startBrowser 独立评论页，绕开 BottomWebViewDialog 线程链。",
-      "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg",
-      "channel": "beta",
-      "version": "1.0.0-beta9",
-      "updatedAt": "2026-08-26",
-      "tags": [
-        "哔咔",
-        "漫画",
-        "APP API",
-        "网页线路",
-        "评论",
-        "相关推荐",
-        "强去重",
-        "定制按钮",
-        "startBrowser",
-        "双线路"
-      ],
-      "changelog": [
-        "真机确认 Beta8 仍会在推荐超过约 10 部后出现重复；Beta9 不再依赖 session 状态，直接以阅读传入的真实 page 为准，推荐 page>1 硬返回空列表",
-        "推荐首批去重从“ID + 标题/封面/作者组合签名”升级为 ID、规范化标题、规范化封面路径三层独立去重；同标题作品即使 API 返回不同 ID/作者/封面 host 也不会重复显示",
-        "真机确认 Beta8 详情顶部定制按钮仍无法打开评论；Beta9 删除 Rhino function -> Activity.runOnUiThread -> SourceLoginJsExtensions.showBrowser 链",
-        "详情顶部定制按钮直接调用阅读官方 java.startBrowser(url,title,html)，打开独立 WebViewActivity 评论中心；本地 HTML 自动接入 WebViewActivity 注入的 run() 桥，继续复用现有评论/楼中楼/点赞/回复模块",
-        "顶部按钮改为直接从当前 book.bookUrl 提取漫画 ID，不再依赖额外详情请求；详情内原“查看评论”按钮及账号、目录、漫画正文、APP/Web 双线路保持不变"
-      ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json?v=10009",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/picacg/picacg-beta.json?v=10009",
-      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg-beta.json?v=10009",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/picacg.json?v=10005"
     }
   ],
-  "generatedAt": "2026-08-26T21:09:58+08:00",
-  "sources": []
+  "generatedAt": "2026-08-26T21:12:18+08:00"
 }

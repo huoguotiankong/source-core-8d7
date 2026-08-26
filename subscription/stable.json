@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "stable",
   "name": "正式版",
-  "updatedAt": "2026-08-26T00:23:32+08:00",
+  "updatedAt": "2026-08-26T21:12:18+08:00",
   "items": [
     {
       "id": "qidian-next",
@@ -31,29 +31,37 @@
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json",
       "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json"
-    }
-  ],
-  "generatedAt": "2026-08-26T21:09:58+08:00",
-  "sources": [
+    },
     {
       "id": "picacg",
       "name": "◈ 哔咔漫画",
+      "summary": "正式版：Beta9 真机确认后原样晋升；详情顶部定制按钮恢复，相关推荐保持首批一次性返回与强去重。",
+      "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg",
+      "channel": "stable",
       "version": "1.0.0",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg.json?v=100",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/picacg/picacg.json?v=100",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/picacg.json?v=100",
+      "updatedAt": "2026-08-26",
       "tags": [
-        "漫画源",
-        "Stable",
         "哔咔",
-        "Picacg",
-        "APP/API",
+        "漫画",
+        "正式版",
+        "APP API",
         "网页线路",
-        "登录",
-        "账号",
-        "评论"
+        "评论",
+        "楼中楼",
+        "定制按钮",
+        "双线路"
       ],
-      "summary": "哔咔漫画 APP/网页双线路正式源，支持登录、账号、评论/楼中楼、点赞收藏、标签与漫画正文。"
+      "changelog": [
+        "由 1.0.0-beta9 真机确认基线原样晋升 Stable，不新增业务逻辑",
+        "详情页顶部定制按钮已真机确认恢复，可直接进入独立哔咔评论中心",
+        "相关推荐保留 page>1 硬终止和漫画 ID/标题/封面路径三层独立去重",
+        "保留登录、账户中心、签到、点赞收藏、评论/楼中楼、标签、目录、漫画图片正文及 APP/Web 双线路"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg.json?v=10000",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/picacg/picacg.json?v=10000",
+      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg.json?v=10000",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/picacg.json?v=10000"
     }
-  ]
+  ],
+  "generatedAt": "2026-08-26T21:12:18+08:00"
 }

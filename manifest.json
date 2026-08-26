@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-26T21:09:58+08:00",
+  "updatedAt": "2026-08-26T21:12:18+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -115,7 +115,7 @@
       "channel": "stable",
       "version": "1.0.0",
       "versionCode": 10000,
-      "updatedAt": "2026-08-26T21:09:58+08:00",
+      "updatedAt": "2026-08-26T21:12:18+08:00",
       "sourcePath": "sources/comic/picacg/picacg.json",
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg.json",
       "bookSourceUrl": "https://sc8d7.invalid/legado/picacg-8d7",
