@@ -1,0 +1,25 @@
+name: publish-picacg-beta8
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'hotfix/picacg-beta8/READY'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Patch and publish Picacg beta8
+        run: |
+          python tools/publish_picacg_beta8.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/comic/picacg/picacg-beta.json manifest.json subscription/beta.json subscription/comic.json bundles/all-beta.json rss/data/details/beta/picacg.json assets/source-core-source-icon.svg docs/RELEASE_LOG.md docs/DEVELOPMENT_RULES.md docs/KNOWN_ISSUES.md
+          git diff --cached --check
+          git commit -m 'fix: publish Picacg beta8 comments and recommendations'
+          git push origin main
