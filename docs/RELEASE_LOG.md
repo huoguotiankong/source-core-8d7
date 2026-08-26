@@ -1,3 +1,16 @@
+## 2026-08-26 — Qidian Next 1.1.0-beta16 circle detail click hotfix
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Changes:
+
+- 恢复 Beta14 已验证的紧凑帖子详情按钮，不再把完整图片数组塞进 DOM 属性。
+- 初始列表与动态筛选列表的多图均按 postId 保存在当前 WebView 内存，详情打开后继续与官方详情图片去重合并。
+- Beta15 投票尾元数据精确清理保留。
+- 其它书友圈功能及搜索/目录/正文 Provider/角色卡/账号链冻结。
+- Published SHA256: `9928790859b54ca8e2fcc8bea3048a34c21d6643c4bf2af31a302b53e0a97f38`.
+
+
 ## 2026-08-26 — Qidian Next 1.1.0-beta15 circle detail multi-image fix
 
 Status: Beta/Test; awaiting user real-device confirmation.

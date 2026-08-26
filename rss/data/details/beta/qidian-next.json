@@ -1,27 +1,27 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "书友圈 beta15：修复列表多图进入帖子详情后只剩一张，并清理投票结构元数据。",
+  "summary": "书友圈 beta16：恢复帖子“查看详情”点击，并保留列表多图进入详情。",
   "badges": [
     "Beta",
-    "1.1.0-beta15",
-    "书友圈多图"
+    "1.1.0-beta16",
+    "书友圈点击热修"
   ],
   "sections": [
     {
-      "title": "帖子详情多图",
-      "text": "列表卡片已经解析到的全部正文图片会随帖子 ID 一起进入详情页，并与详情接口图片去重合并。"
+      "title": "查看详情恢复",
+      "text": "详情按钮恢复为 Beta14 已验证的紧凑 DOM，仅携带帖子 ID 和首图，不再塞入长图片数组属性。"
     },
     {
-      "title": "投票元数据清理",
-      "text": "移除正文尾部明确的 Options / VoteId / VoteType 结构对象，正常文字和其它 JSON 内容不做宽泛删除。"
+      "title": "多图仍保留",
+      "text": "初始列表与动态筛选列表的完整配图均按 postId 暂存在当前 WebView 内存，点击详情后与详情接口图片去重合并，最多 9 张。"
     },
     {
       "title": "冻结范围",
-      "text": "书友圈回复/楼中楼、分类、同人视频以及搜索、目录、正文 Provider、角色卡和账号链保持不变。"
+      "text": "投票元数据精确清理保留；评论/楼中楼、分类、视频以及其它书源域不变。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11015",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11015",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11015"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11016",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11016",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11016"
 }

@@ -1,3 +1,9 @@
+## 2026-08-26 · Current Beta 1.1.0-beta16 — Circle detail click hotfix
+
+- Stable remains 1.1.0.
+- Beta16 restores the proven compact post-detail button and moves multi-image transfer to an in-memory postId map seeded from initial and dynamic rows.
+- Beta15 poll metadata cleanup is retained. Awaiting real-device confirmation.
+
 ## 2026-08-26 · Current Beta 1.1.0-beta15 — Circle detail multi-image
 
 - Stable remains 1.1.0.

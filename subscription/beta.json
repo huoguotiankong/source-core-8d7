@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-26T23:13:53+08:00",
+  "updatedAt": "2026-08-26T23:59:49+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -38,29 +38,29 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "书友圈 beta15：修复列表多图进入帖子详情后只剩一张，并清理投票结构元数据。",
+      "summary": "书友圈 beta16：恢复帖子“查看详情”点击，并保留列表多图进入详情。",
       "icon": "",
       "channel": "beta",
-      "version": "1.1.0-beta15",
+      "version": "1.1.0-beta16",
       "updatedAt": "2026-08-26",
       "tags": [
         "起点",
         "测试版",
         "书友圈",
         "帖子详情",
+        "点击修复",
         "多图",
-        "投票清理",
         "评论"
       ],
       "changelog": [
-        "书友圈列表卡片的完整图片数组随“查看详情”一起传入详情页，不再只传第一张",
-        "详情页将列表预览图与起点 getpostdetail 图片按原顺序去重合并，最多保留 9 张正文配图",
-        "仅清理正文尾部可确认的 Options/VoteId/VoteType 投票元数据，不做宽泛 JSON 删除",
-        "评论/楼中楼、分类筛选、同人视频、搜索、目录、正文 Provider、角色卡、账号链冻结"
+        "恢复 Beta14 已验证的紧凑“查看详情”按钮 DOM，不再把完整图片数组编码进 data-imgs 属性",
+        "初始列表卡片与动态筛选卡片的完整配图均按 postId 保存在当前书友圈 WebView 内存映射，点击详情时读取并与 getpostdetail 图片去重合并",
+        "保留 Beta15 的 Options/VoteId/VoteType 投票尾元数据精确清理",
+        "评论/楼中楼、分类、视频、详情、正文 Provider、角色卡、账号链冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11015",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11015",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11015",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11016",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11016",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11016",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
     },
     {
