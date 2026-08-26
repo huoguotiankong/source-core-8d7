@@ -1,5 +1,18 @@
 # RELEASE LOG
 
+## 2026-08-26 — RSS repository UI 0.3.1-beta11
+
+Status: Beta/Test; repository cleanup and detail-rendering repair awaiting real-device confirmation.
+
+Changes:
+
+- Renamed top categories and bumped category URLs to `ui=11` to force a clean Legado category cache after old/new list entries were observed together.
+- Simplified the Beta home page to repository overview, Stable/Beta policy and repository self-update only.
+- Added list-level de-duplication by source id / sourceUrl / detailUrl / name.
+- Restored styled detail pages by explicitly opening generated HTML with `java.startBrowser(data:text/html;base64, ...)`.
+- Added a non-empty `ruleDescription` override so stale description rules from older imported RSS definitions cannot keep taking precedence.
+- Stable/Beta source files and channel metadata were not modified by this UI release.
+
 ## 2026-08-26 — 起点增强 1.0.1-beta1
 
 Status: Beta/Test; 情无账号/VIP正文专项修复，等待真机确认。

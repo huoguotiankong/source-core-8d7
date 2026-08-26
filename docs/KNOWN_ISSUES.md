@@ -237,3 +237,23 @@ Beta 修复：恢复情无正文专属 UA/Referer/Accept；只对明确认证错
 
 Status: `🌈 起点增强 1.0.1-beta1` 待真机验证；Stable 1.0.0 未修改。
 
+## 18. RSS old/new list entries mixed and detail page regressed to plain text — fixed in Beta11
+
+Real-device symptoms after Beta10:
+
+- the Home category displayed the new Beta10 cards followed by older Beta3-era cards;
+- the Stable category displayed the same current source more than once even though `subscription/stable.json` contained only one item;
+- opening a source detail showed only a plain summary instead of the styled detail/import page.
+
+Interpretation: Legado retained category/article state across RSS definition updates, and Beta10 had also regressed from the earlier `java.startBrowser(data:text/html;base64, ...)` detail-opening pattern back to returning HTML directly from `ruleContent`.
+
+Beta11 mitigation:
+
+- rename categories and use `ui=11` URLs to create a fresh cache key;
+- de-duplicate list items in `ruleArticles`;
+- explicitly override `ruleDescription` to prevent stale older rules from winning after an in-place RSS update;
+- explicitly open the generated card page through `java.startBrowser`;
+- keep source detail pages current-state only.
+
+Status: published as RSS UI `0.3.1-beta11`, awaiting real-device confirmation.
+
