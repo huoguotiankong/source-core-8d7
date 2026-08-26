@@ -16,6 +16,15 @@ jobs:
           fetch-depth: 0
       - name: Patch and publish Picacg beta8
         run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/publish_picacg_beta8.py')
+          s=p.read_text(encoding='utf-8')
+          old="pat = re.compile(r'function picaBookInfoRecommend\\(\\)\\{.*?return true;\\}', re.S)"
+          new="pat = re.compile(r'function picaBookInfoRecommend\\(\\)\\{.*?catch\\(e\\)\\{.*?\\}return true;\\}', re.S)"
+          assert old in s
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
           python tools/publish_picacg_beta8.py
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
