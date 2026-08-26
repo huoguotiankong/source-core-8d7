@@ -13,17 +13,27 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Inspect login script boundary and content handler
+      - name: Inspect Beta12 detail render and callbacks
         shell: bash
         run: |
           python - <<'PY'
           import json, pathlib
           src=json.loads(pathlib.Path('sources/novel/qidian-next/qidian-next-beta.json').read_text(encoding='utf-8'))[0]
-          v=src.get('loginUrl','')
-          print('LOGIN_LEN',len(v))
-          print('LOGIN_HEAD_REPR',repr(v[:700]))
-          print('LOGIN_TAIL_REPR',repr(v[-1200:]))
-          p=v.find('qfMultiContentV423=function')
-          print('MULTI_POS',p)
-          print(v[max(0,p-1500):min(len(v),p+7000)])
+          print('TOP_KEYS',sorted(src.keys()))
+          terms=['作品数据','<pre','首发','上架','publishDate','60*24','60 * 24','正文设置','qfMultiContentV423','最近更新','updateTime','快捷入口']
+          for field in ['ruleBookInfo','loginUrl','jsLib','bookSourceComment']:
+              v=src.get(field,'')
+              if not isinstance(v,str): v=json.dumps(v,ensure_ascii=False)
+              print('\n===== FIELD',field,'LEN',len(v),'=====')
+              for t in terms:
+                  start=0;hits=[]
+                  while True:
+                      p=v.find(t,start)
+                      if p<0: break
+                      hits.append(p);start=p+1
+                  if hits:
+                      print('\nTERM',repr(t),'HITS',hits[:12])
+                      for p in hits[:4]:
+                          print('---',p,'---')
+                          print(v[max(0,p-1800):min(len(v),p+3500)])
           PY
