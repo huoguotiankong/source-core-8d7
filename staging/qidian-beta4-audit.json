@@ -1,0 +1,81 @@
+{
+  "beta_sha256": "756f79aa284f31b0c551d4e41ab68af045ad6e9fe0954e005f0ae7a5a2fc0a8b",
+  "stable_sha256": "d64937b9dc4e528795d3818834a6ddab1828df1af84bb483b16961a40d8286ec",
+  "expected_stable_sha256": "d64937b9dc4e528795d3818834a6ddab1828df1af84bb483b16961a40d8286ec",
+  "stable_unchanged": true,
+  "display_name": "🌈 起点增强 · Beta",
+  "comment_has_beta4": false,
+  "book_source_url": "https://m.qidian.com/?qf_source=qidian_next_8d7",
+  "detail_init_chars": 18825,
+  "detail_init_ajax_count": 1,
+  "detail_official_pc_url_count": 2,
+  "detail_qdParseBookInfo_count": 3,
+  "detail_2600_count": 2,
+  "detail_30min_literals": {
+    "1800000": 1,
+    "30*60*1000": 0,
+    "30 * 60 * 1000": 0
+  },
+  "detail_forbidden_markers": {
+    "qfOfficialCallV400": 0,
+    "bookDetailInfo": 0,
+    "atom": 1,
+    "qidiantu": 0,
+    "tushujun": 0
+  },
+  "whole_qw_regression_markers": {
+    "X-Content-Token": 5,
+    "VIP正文已验证": 2
+  },
+  "whole_structured_leak_literal_counts": {
+    ":true": 136,
+    ":false": 188,
+    ":50001": 0,
+    ":50005": 0,
+    "sectionCount": 2,
+    "actionStatus": 2,
+    "honorTypeName": 2
+  },
+  "contexts": {
+    "official_pc": [
+      "1.1.0-beta4: strict visible-text metadata + one-request official enrichment.  * Current-response parsing remains first. Only sparse detail pages may make ONE request to  * https://www.qidian.com/book/<bookId>/ and reuse the mature qdParseBookInfo parser.  * No APP/Atom/third-party detail fallback is allowed here. */ function qfHumanMetaV1104(v,kind){   var a=Array.isArray(v)?v:",
+      "1104(){   if(!bid||!qfDetailSparseV1104())return;   var last=Number(bv('qf_detailPcEnrichedAtV1104')||0),now=Date.now();   if(last>0&&now-last<1800000)return;   var pcUrl='https://www.qidian.com/book/'+encodeURIComponent(String(bid))+'/',pcHtml='';   try{     var dj=qfAjaxJavaV20(this),dh={'User-Agent':(typeof QF_UA!=='undefined'?QF_UA:'Mozilla/5.0 (Linux; Android 12) AppleWebK"
+    ],
+    "2600": [
+      ".0 Mobile Safari/537.36'),'Referer':'https://www.qidian.com/','Accept':'text/html,application/xhtml+xml'},dr=null;     if(dj&&typeof dj.get==='function'){       dr=dj.get(pcUrl,dh,2600);       if(dr){         if(typeof dr.body==='function')pcHtml=String(dr.body()||'');         else if(dr.body!==undefined)pcHtml=String(dr.body||'');         else pcHtml=String(dr|",
+      "cHtml=String(dr.body||'');         else pcHtml=String(dr||'');       }     }else if(dj&&typeof dj.ajax==='function'){       pcHtml=String(dj.ajax(pcUrl+','+JSON.stringify({timeout:2600,headers:dh}))||'');     }   }catch(e){pcHtml='';}   try{qfPutBookVarV09.call(this,'qf_detailPcEnrichedAtV1104',String(now));}catch(_ts){}   if(!pcHtml||pcHtml.length<500)return;  "
+    ],
+    "1800000": [
+      "nfo[k]=v;} function qfDetailPcEnrichV1104(){   if(!bid||!qfDetailSparseV1104())return;   var last=Number(bv('qf_detailPcEnrichedAtV1104')||0),now=Date.now();   if(last>0&&now-last<1800000)return;   var pcUrl='https://www.qidian.com/book/'+encodeURIComponent(String(bid))+'/',pcHtml='';   try{     var dj=qfAjaxJavaV20(this),dh={'User-Agent':(typeof QF_UA!=='undefined"
+    ],
+    "qdParseBookInfo": [
+      "<js> var info=qfJson(qdParseBookInfo.call(this,result,baseUrl),{}); var bid=qdBookIdFromUrl(baseUrl); var b=qfBook(this); var searchName=qfQueryV09(baseUrl,\"qfSearchName\"); var searchAuthor=qfQueryV09(baseUrl,\"qfSear",
+      "uest official enrichment.  * Current-response parsing remains first. Only sparse detail pages may make ONE request to  * https://www.qidian.com/book/<bookId>/ and reuse the mature qdParseBookInfo parser.  * No APP/Atom/third-party detail fallback is allowed here. */ function qfHumanMetaV1104(v,kind){   var a=Array.isArray(v)?v:String(v||'').split(/\\s*[·,，|\\/]\\s*/),out=[],s",
+      "ml='';}   try{qfPutBookVarV09.call(this,'qf_detailPcEnrichedAtV1104',String(now));}catch(_ts){}   if(!pcHtml||pcHtml.length<500)return;   var rich={};   try{rich=JSON.parse(String(qdParseBookInfo.call(this,pcHtml,pcUrl)||'{}'));}catch(_rp){rich={};}   qfFillV1104('authorLevel',rich.authorLevel);qfFillV1104('authorWorksCount',rich.authorWorksCount);qfFillV1104('status',rich"
+    ],
+    "tag": [
+      "完结|签约|免费|限免|起点中文网|男生|女生)$/i.test(t))return;     if(!seen[t]){seen[t]=1;out.push(t);}   }   try{     var d=org.jsoup.Jsoup.parse(String(html||''));     var es=d.select('.book-info .tag a, p.tag a, [class*=book-info] [class*=tag] a, [class*=bookInfo] [class*=tag] a');     for(var i=0;i<es.size()&&out.length<8;i++)add(es.get(i).text());   }catch(e){}   return out;",
+      "限免|起点中文网|男生|女生)$/i.test(t))return;     if(!seen[t]){seen[t]=1;out.push(t);}   }   try{     var d=org.jsoup.Jsoup.parse(String(html||''));     var es=d.select('.book-info .tag a, p.tag a, [class*=book-info] [class*=tag] a, [class*=bookInfo] [class*=tag] a');     for(var i=0;i<es.size()&&out.length<8;i++)add(es.get(i).text());   }catch(e){}   return out; }  if(bl",
+      "     if(!seen[t]){seen[t]=1;out.push(t);}   }   try{     var d=org.jsoup.Jsoup.parse(String(html||''));     var es=d.select('.book-info .tag a, p.tag a, [class*=book-info] [class*=tag] a, [class*=bookInfo] [class*=tag] a');     for(var i=0;i<es.size()&&out.length<8;i++)add(es.get(i).text());   }catch(e){}   return out; }  if(blank(info.recommendCount))info.reco",
+      "sh(t);}   }   try{     var d=org.jsoup.Jsoup.parse(String(html||''));     var es=d.select('.book-info .tag a, p.tag a, [class*=book-info] [class*=tag] a, [class*=bookInfo] [class*=tag] a');     for(var i=0;i<es.size()&&out.length<8;i++)add(es.get(i).text());   }catch(e){}   return out; }  if(blank(info.recommendCount))info.recommendCount=visibleMetric(html,'总推荐",
+      "ishDate','CreateTime','createTime'],50); if(blank(info.listingDate))info.listingDate=textScalar(html,['ListingDate','listingDate','VipStartTime','vipStartTime'],50); if(blank(info.tags)){var ts=qfVisibleTagsV1104(html);if(ts.length)info.tags=ts;} if(blank(info.honors))info.honors=[]; if(blank(info.isVip)){var iv=scalar(html,['IsVip','isVip','VIP','VipStatus','v",
+      "stingDate))info.listingDate=textScalar(html,['ListingDate','listingDate','VipStartTime','vipStartTime'],50); if(blank(info.tags)){var ts=qfVisibleTagsV1104(html);if(ts.length)info.tags=ts;} if(blank(info.honors))info.honors=[]; if(blank(info.isVip)){var iv=scalar(html,['IsVip','isVip','VIP','VipStatus','vipStatus']);if(iv)info.isVip=(String(iv)==='1');}  /* Reu"
+    ],
+    "honor": [
+      "ate=textScalar(html,['ListingDate','listingDate','VipStartTime','vipStartTime'],50); if(blank(info.tags)){var ts=qfVisibleTagsV1104(html);if(ts.length)info.tags=ts;} if(blank(info.honors))info.honors=[]; if(blank(info.isVip)){var iv=scalar(html,['IsVip','isVip','VIP','VipStatus','vipStatus']);if(iv)info.isVip=(String(iv)==='1');}  /* Reuse previous successful ric",
+      "r(html,['ListingDate','listingDate','VipStartTime','vipStartTime'],50); if(blank(info.tags)){var ts=qfVisibleTagsV1104(html);if(ts.length)info.tags=ts;} if(blank(info.honors))info.honors=[]; if(blank(info.isVip)){var iv=scalar(html,['IsVip','isVip','VIP','VipStatus','vipStatus']);if(iv)info.isVip=(String(iv)==='1');}  /* Reuse previous successful rich values if p",
+      "dateTime',false);cached('publishDate','qf_publishDate',false);cached('listingDate','qf_listingDate',false); cached('tags','qf_tags',true);cached('rights','qf_rights',true);cached('honors','qf_honors',true);cached('isVip','qf_isVip',false);   /* 1.1.0-beta4: strict visible-text metadata + one-request official enrichment.  * Current-response parsing remains first. ",
+      "lse);cached('publishDate','qf_publishDate',false);cached('listingDate','qf_listingDate',false); cached('tags','qf_tags',true);cached('rights','qf_rights',true);cached('honors','qf_honors',true);cached('isVip','qf_isVip',false);   /* 1.1.0-beta4: strict visible-text metadata + one-request official enrichment.  * Current-response parsing remains first. Only sparse ",
+      "een={};   var ascii={vip:1,'1v1':1,acg:1,bl:1,gl:1,lol:1,nba:1};   var bad={sectioncount:1,actionstatus:1,fininshed:1,finished:1,finish:1,intro:1,true:1,false:1,null:1,undefined:1,honortypename:1,honorname:1,tagname:1,name:1,id:1,type:1,count:1,status:1,code:1,value:1,list:1,bookid:1,sectionid:1,action:1};   for(var i=0;i<a.length;i++){     var t=unesc(String(a[i",
+      "cii={vip:1,'1v1':1,acg:1,bl:1,gl:1,lol:1,nba:1};   var bad={sectioncount:1,actionstatus:1,fininshed:1,finished:1,finish:1,intro:1,true:1,false:1,null:1,undefined:1,honortypename:1,honorname:1,tagname:1,name:1,id:1,type:1,count:1,status:1,code:1,value:1,list:1,bookid:1,sectionid:1,action:1};   for(var i=0;i<a.length;i++){     var t=unesc(String(a[i]||'')).replace("
+    ]
+  },
+  "gates": {
+    "json_ok": true,
+    "stable_unchanged": true,
+    "identity_ok": true,
+    "qw_markers_ok": true,
+    "no_old_multi_endpoint_markers_in_detail_init": false,
+    "no_ajax_in_detail_init": false
+  }
+}
