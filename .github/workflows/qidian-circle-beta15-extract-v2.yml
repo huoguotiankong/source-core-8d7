@@ -3,24 +3,31 @@ on:
   push:
     paths:
       - '.staging/qidian-circle-beta15/TRIGGER_EXTRACT2'
+      - '.staging/qidian-circle-beta15/TRIGGER_PUBLISH'
 permissions:
   contents: write
 jobs:
-  extract:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Extract circle module
-        run: python .staging/qidian-circle-beta15/extract.py
-      - name: Commit extracted module
+      - name: Publish Circle Beta15
+        run: python .staging/qidian-circle-beta15/publish.py
+      - name: Commit Circle Beta15
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .staging/qidian-circle-beta15/circle.js
+          git add sources/novel/qidian-next/qidian-next-beta.json \
+                  bundles/all-beta.json \
+                  subscription/beta.json \
+                  manifest.json \
+                  rss/data/details/beta/qidian-next.json \
+                  docs/RELEASE_LOG.md \
+                  docs/sources/qidian-next/PROJECT_HANDOFF.md
           git diff --cached --check
-          git commit -m "chore: extract qidian circle module for beta15"
+          git commit -m "fix: qidian-next circle multi-image beta15"
           git push origin HEAD:main
