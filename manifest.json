@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-26T15:12:21+08:00",
+  "updatedAt": "2026-08-26T16:04:51+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -80,29 +80,31 @@
       "name": "🌈 起点增强 · Beta",
       "category": "novel",
       "channel": "beta",
-      "version": "1.1.0-beta7",
-      "versionCode": 11007,
-      "updatedAt": "2026-08-26T15:12:21+08:00",
+      "version": "1.1.0-beta8",
+      "versionCode": 11008,
+      "updatedAt": "2026-08-26T16:04:51+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11007",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11008",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "详情 beta7：用同一个官方补全请求槽获取起点 TTS 作品简介，并加入结构化解析/诊断。",
+      "summary": "详情 beta8：恢复官方 APP bookDetailInfo 完整富化，保留当前页面/缓存快速路径；稀疏页最多一次官方请求。",
       "tags": [
         "起点",
         "测试版",
         "详情页",
-        "书籍简介",
-        "官方TTS",
-        "结构化解析",
+        "完整数据",
+        "官方APP",
+        "按需补全",
+        "缓存",
         "单请求"
       ],
       "changelog": [
-        "简介缺失时改用起点官方 TTS 书页补全",
-        "增强 DOM/meta/JSON-LD/脚本 JSON 简介解析",
-        "失败时输出低敏诊断",
-        "其它核心模块保持不变"
+        "恢复官方 APP bookDetailInfo 详情富化，补齐简介、推荐、月票、在看、收藏、粉丝、评分、盟主、作者资料等",
+        "当前响应与书籍缓存优先，资料完整时不产生额外详情补全请求",
+        "资料稀疏时最多一次官方 APP 详情调用，并做 30 分钟防重复",
+        "移除失败的 TTS 唯一补全请求与临时简介诊断",
+        "搜索、目录、正文 Provider、评论、角色卡、书友圈及情无认证链保持不变"
       ],
-      "sha256": "88ffe76e7c150b3c3e4aac901c3558bec9b2644bfa4b5e3feb40d5edb42a80f9"
+      "sha256": "55f9c4371cf2ee7522d330ae80f380b9aaf93d62384a60da01e598f9ac45008b"
     }
   ]
 }

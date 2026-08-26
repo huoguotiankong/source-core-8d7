@@ -1,5 +1,18 @@
 # RELEASE LOG
 
+## 2026-08-26 — Qidian Next 1.1.0-beta8 Beta
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Changes:
+
+- Restored the verified official APP `bookDetailInfo` detail-enrichment chain.
+- Kept current-response parsing and book-variable caches as the zero-request fast path.
+- Sparse detail pages make at most one official APP detail call with 30-minute deduplication.
+- Removed the failed TTS-only enrichment request and temporary synopsis diagnostic UI.
+- Search, catalog, content Providers, reviews, role cards, book circle, and Qingwu VIP auth remain frozen.
+- Published SHA256: `55f9c4371cf2ee7522d330ae80f380b9aaf93d62384a60da01e598f9ac45008b`.
+
 ## 2026-08-26 — 起点增强 1.1.0-beta3
 
 Status: Beta/Test; detail metadata sanitation awaiting real-device confirmation.

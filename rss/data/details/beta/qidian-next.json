@@ -1,31 +1,35 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "详情 beta7：官方 TTS 简介兜底 + 结构化解析 + 失败诊断。",
+  "summary": "详情 beta8：恢复官方 APP bookDetailInfo 完整富化，保留当前页面/缓存快速路径；稀疏页最多一次官方请求。",
   "badges": [
     "Beta",
-    "1.1.0-beta7",
-    "简介修复"
+    "1.1.0-beta8",
+    "详情完整数据回归"
   ],
   "sections": [
     {
-      "title": "Beta6 结论",
-      "text": "真机复测证明 bookInfo/BookInfo 不是可稳定直接读取的简介字符串，继续猜单字段不可取。"
+      "title": "回归原因",
+      "text": "Beta7 把唯一官方补全请求切到 TTS 页面，真机返回极短无效响应，导致原有完整详情富化链被意外裁掉。"
     },
     {
-      "title": "官方 TTS 兜底",
-      "text": "简介为空时不增加第二请求，而是把原有最多一次的官方补全请求改到起点 TTS 书页，从“作品简介”直接提取文本。"
+      "title": "本版修复",
+      "text": "恢复此前验证过的起点官方 APP bookDetailInfo 富化链，补齐简介、推荐/月票/在看、收藏/粉丝、评分/盟主、作者资料、标签/荣誉等。"
     },
     {
-      "title": "结构化解析",
-      "text": "同时解析当前/补全响应中的简介 DOM、meta description、JSON-LD 和当前书籍相关脚本 JSON。"
+      "title": "速度策略",
+      "text": "先解析当前已下载页面并复用书籍缓存；资料已完整时 0 次额外请求，稀疏时最多一次官方 APP 详情调用，30 分钟防重复。"
     },
     {
-      "title": "失败诊断",
-      "text": "若最终仍为空，详情页临时显示低敏简介诊断，只包含响应长度、候选结构、脚本数和命中长度，不输出正文、Cookie 或账号信息。"
+      "title": "冻结范围",
+      "text": "搜索、目录、正文 Provider、段评/本章说、角色卡、书友圈及情无 VIP 认证链均未修改。"
+    },
+    {
+      "title": "发布状态",
+      "text": "Beta / 测试通道，等待阅读真机确认后再考虑晋升 Stable。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11007",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11007",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11007"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11008",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11008",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11008"
 }
