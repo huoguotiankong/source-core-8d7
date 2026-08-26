@@ -21,6 +21,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          sed -i "s/pattern.subn(replacement, init, count=1)/pattern.subn(lambda _m: replacement, init, count=1)/" .github/scripts/patch_qidian_next_detail_beta9.py
           python .github/scripts/patch_qidian_next_detail_beta9.py
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
