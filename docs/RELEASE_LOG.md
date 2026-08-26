@@ -1,5 +1,17 @@
 # RELEASE LOG
 
+## 2026-08-26 — 起点增强 1.1.0-beta1
+
+Status: Beta/Test; detail UI/performance redesign awaiting real-device confirmation.
+
+Changes:
+
+- Replaced blocking multi-provider detail augmentation with a current-response fast path; first render performs no extra synchronous APP/Web/Atom/third-party detail requests.
+- Redesigned custom detail information into compact metrics, on-demand interaction entries, tags and synopsis.
+- Preserved the 1.0.1-beta1 QW VIP-content authentication fix and all search/catalog/content/review Provider logic.
+- Stable 1.0.0 remains unchanged.
+- Beta SHA256: `4c19ccd0358644b93f0bd168f3136f7733ef7fddbe5de130bf7df7dc1b970cca`.
+
 ## 2026-08-26 — RSS repository UI 0.3.3-beta13
 
 Status: Beta/Test; one-time RSS cache-model reset awaiting real-device confirmation.

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-26T07:36:18+08:00",
+  "updatedAt": "2026-08-26T10:32:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -38,26 +38,28 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "起点增强测试版：本版只修情无账号会话与 VIP 正文认证/请求头链路。",
+      "summary": "详情页 UI / 性能专项：首屏只解析当前起点响应，移除同步多接口补全；信息区改为轻量卡片式布局。",
       "icon": "",
       "channel": "beta",
-      "version": "1.0.1-beta1",
+      "version": "1.1.0-beta1",
       "updatedAt": "2026-08-26",
       "tags": [
         "起点",
         "测试版",
+        "详情页",
+        "UI重构",
+        "性能优化",
         "情无",
-        "VIP正文",
-        "认证修复",
         "多正文 Provider"
       ],
       "changelog": [
-        "恢复情无 content.php 专属 User-Agent / Referer / Accept，避免继承起点全局请求环境",
-        "账号登录/检测不再等同于 VIP 正文可用；首次真实 VIP 正文成功后才标记已验证"
+        "详情首屏取消 APP/官网/Atom/第三方同步补全请求，优先快速显示基础信息",
+        "自定义详情重排为核心数据、快捷入口、标签、内容简介四块",
+        "保留 1.0.1-beta1 情无 VIP 正文认证修复"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=10101",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=10101",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=10101",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11001",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11001",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11001",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
     }
   ]

@@ -103,4 +103,12 @@ Stable remains `1.0.0` at `sources/novel/qidian-next/qidian-next.json`. Beta pat
 Real-device trigger: 情无账号登录/检测成功，但固定情无读取 VIP 章节返回 `Service request failed. Reference: ...`. Historical working builds required an explicit 情无 User-Agent + Referer for `/qd/content.php`; the current lazy module had regressed to Accept-only headers. `/auth.php?action=me` validates the account session but does not prove that VIP content is accepted.
 
 Beta changes: restore 情无-specific content headers; retry only authentication-like failures; mark VIP verification only after real paid content succeeds; keep service Reference visible on non-auth failures; keep Stable and all unrelated reading domains unchanged.
+## Detail UI / performance Beta 1.1.0-beta1 (2026-08-26)
+
+- Replaced the 61k-character blocking detail augmentation path with a fast first-paint path based on the already-downloaded Qidian response plus per-book cached values.
+- No APP/Web/Atom/QidianTu/TuShuJun synchronous requests are allowed from the new `ruleBookInfo.init` first-paint path.
+- Native Legado cover/title/author/latest-chapter area remains responsible for primary metadata.
+- Custom detail HTML is reduced to a compact metric strip, on-demand interaction buttons, up to six tags, and synopsis.
+- Book-circle, role-card and smart-source actions remain on-demand buttons and therefore do not block initial detail rendering.
+- The 1.0.1-beta1 QW VIP-content authentication/request-header fix is a hard regression gate for all later Betas.
 

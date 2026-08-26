@@ -1,22 +1,26 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "起点增强测试版：本版只修情无账号会话与 VIP 正文认证/请求头链路。",
+  "summary": "详情页 UI / 性能专项：优先快速显示，再按需进入书友圈、角色卡和正文源功能。",
   "badges": [
     "Beta",
-    "1.0.1-beta1",
-    "情无专项"
+    "1.1.0-beta1",
+    "详情优化"
   ],
   "sections": [
     {
       "title": "本次测试",
-      "text": "恢复情无正文请求的独立 UA/Referer/Accept；登录成功只表示账号会话有效，实际 VIP 正文成功后才视为正文链验证通过。"
+      "text": "详情首屏不再为了总推荐、评分、在看等统计同步串行请求多套接口；只解析当前起点响应和已有书籍缓存。"
     },
     {
-      "title": "测试重点",
-      "text": "固定情无打开同一 VIP 章节；若仍失败，请保留 Service request failed 后面的 Reference。"
+      "title": "UI 调整",
+      "text": "保留阅读原生封面/书名区域，自定义信息区精简为核心数据、快捷入口、作品标签和内容简介，减少重复字段和视觉堆叠。"
+    },
+    {
+      "title": "回归重点",
+      "text": "重点检查详情打开速度、简介/标签/快捷按钮，以及搜索、目录、正文、评论和情无 VIP 正文是否保持正常。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=10101",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=10101"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11001",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11001"
 }

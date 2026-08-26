@@ -275,4 +275,11 @@ Root cause: previous mitigation changed category/detail URLs with `?ui=N`. Legad
 Beta13 strategy: perform one category-name reset, then freeze category names, category URLs and item detail URLs permanently. Mutable version data is shown only inside detail content. Do not mint new article URLs for routine UI releases.
 
 Status: Beta13 published for real-device confirmation.
+## 21. Qidian detail page was visually dense and blocked on multiple enrichment requests — redesigned in 1.1.0-beta1
+
+Symptom: the detail page exposed many useful statistics but duplicated native metadata and could wait on several sequential APP/Web/Atom/third-party fallbacks before rendering.
+
+Beta fix: first paint now parses only the current Qidian response and per-book cache; optional interaction features are opened on demand. The custom area is reduced to metrics, shortcuts, tags and synopsis.
+
+Status: Beta 1.1.0-beta1 published for real-device speed/UI regression testing.
 
