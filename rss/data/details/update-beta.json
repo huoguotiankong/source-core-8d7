@@ -1,16 +1,20 @@
 {
   "kind": "rss",
   "title": "🔄 更新仓库订阅源",
-  "summary": "重新导入最新版仓库 Beta 订阅源定义；内部 sourceUrl 身份保持不变，会更新现有仓库订阅源。",
+  "summary": "重新导入当前仓库 Beta 定义；内部 sourceUrl 身份保持不变，会覆盖更新现有订阅源。",
   "badges": [
     "RSS",
-    "Beta 10",
+    "UI Beta 11",
     "自更新"
   ],
   "sections": [
     {
-      "title": "说明",
-      "text": "Beta9 及更早版本误用了书源在线导入协议。本版已改为 RSS 专用 legado://import/rssSource 导入协议。"
+      "title": "什么时候需要更新",
+      "text": "书源列表数据会自动刷新；只有仓库自身的分类、详情规则或界面发生变化时，才需要重新导入订阅源定义。"
+    },
+    {
+      "title": "本次整理",
+      "text": "清理旧分类缓存造成的重复显示，恢复卡片化详情页，并强化 Stable/Beta 分流。"
     }
   ],
   "rssUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository-beta.json"
