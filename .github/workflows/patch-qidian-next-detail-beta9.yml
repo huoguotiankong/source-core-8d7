@@ -1,0 +1,33 @@
+name: patch-qidian-next-detail-beta9
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/qidian-next-detail-beta9.trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Patch and publish Beta9
+        shell: bash
+        run: |
+          set -euo pipefail
+          python .github/scripts/patch_qidian_next_detail_beta9.py
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No repository changes to commit.'
+            exit 0
+          fi
+          git commit -m 'fix: restore qidian-next rich detail beta9'
+          git push origin main
