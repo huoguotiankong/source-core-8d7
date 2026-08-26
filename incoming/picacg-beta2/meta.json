@@ -1,0 +1,21 @@
+{
+  "id": "picacg",
+  "bookSourceName": "🍥哔咔漫画 · APP/网页双线路 Beta",
+  "displayName": "🍥 哔咔漫画 · APP/网页双线路 Beta",
+  "category": "comic",
+  "channel": "beta",
+  "version": "1.0.0-beta2",
+  "versionCode": 10002,
+  "sourcePath": "sources/comic/picacg/picacg-beta.json",
+  "detailPath": "rss/data/details/beta/picacg.json",
+  "bookSourceUrl": "https://sc8d7.invalid/legado/picacg-8d7",
+  "summary": "真机修复 Beta2：移除 .invalid 运行时网络承载，自动线路首次优先网页并保留 APP 兜底；发现页改为分区四列布局。",
+  "tags": ["哔咔","漫画","APP API","网页线路","SSL修复","登录","账户","签到","收藏","评论","楼中楼","双线路","发现页重构"],
+  "changelog": [
+    "修复 .invalid 书源身份被误用于搜索/发现/章节外层网络请求，统一改用 manhuabika.com 作为可握手的 HTTPS 承载地址",
+    "自动模式首次优先网页线路，记住最近成功线路；当前线路网络/SSL失败时继续切换另一线路",
+    "发现页渲染阶段不再请求 /categories，避免打开分类页即触发网络异常",
+    "发现页重构为快捷入口、热门榜单、官方推荐、内容形态、题材偏好、作品·地区六个分区，采用紧凑四列布局"
+  ],
+  "sha256": "a1590f0845067279c97a8d5a90163e5ae77c0a2cf9305f5c0c729426e32b3db9"
+}
