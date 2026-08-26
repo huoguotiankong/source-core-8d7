@@ -1,3 +1,17 @@
+## 2026-08-26 — RSS UI 0.4.0-beta14 single-entry cleanup
+
+Status: Beta/Test; user requested repository/subscription de-duplication after real-device screenshots showed historical RSS entries still visible.
+
+Changes:
+
+- The repository RSS catalog now exposes one current `🌈 阅读书源仓库` entry instead of separate Stable/Beta duplicates.
+- The already-imported latest RSS `sourceUrl` identity is preserved so Beta13 updates in place rather than creating another subscription source.
+- One deliberate cache migration resets the category identity for 漫画 / 仓库订阅 / 正式版 / 测试版; these identities are frozen after Beta14.
+- `subscription/comic.json` remains one active Picacg entry only: `◈ 哔咔漫画 1.0.0 Stable`.
+- Picacg Stable is confirmed present in `subscription/stable.json`; its RSS detail article identity is now the permanent non-versioned Stable detail URL.
+- Historical Beta/detail/source files remain only for compatibility/history and are not active catalog entries.
+
+
 ## 2026-08-26 — Picacg 1.0.0 Stable
 
 Status: Stable; user real-device confirmed and explicitly promoted.

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-26T21:12:18+08:00",
+  "updatedAt": "2026-08-26T21:26:24+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -12,7 +12,7 @@
       "bundle": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/bundles/all-beta.json"
     }
   },
-  "rssSource": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository.json",
+  "rssSource": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository-beta.json",
   "sources": [
     {
       "id": "qidian-official",

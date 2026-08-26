@@ -226,3 +226,14 @@ Example: `◈ 哔咔漫画`. The matching repository artwork is `assets/source-c
 - When renaming an existing source, preserve its stable `bookSourceUrl` identity so updates continue in place.
 - Do not pick a different decorative emoji for each newly written source. Use the shared `◈` source-core mark unless the user explicitly requests another public identity.
 - Existing mature sources are not bulk-renamed only for branding; adopt the shared mark when they are deliberately renamed or newly rebuilt, so stable user-facing names are not churned unnecessarily.
+
+## 18. Single active RSS repository entry and logical-source de-duplication
+
+The repository itself is one logical RSS source. Do not publish separate Stable/Beta repository RSS entries as simultaneously active choices when they expose the same repository.
+
+- `subscription/rss.json` lists exactly one current repository entry.
+- Preserve the current released RSS `sourceUrl` identity for in-place updates; UI status/version belongs in metadata, not in extra duplicate RSS sources.
+- Type catalogs such as `subscription/comic.json` list only the latest active channel entry for a logical source. A source promoted to Stable is removed from the active Beta/type duplicate listing.
+- Historical JSON/detail files may remain for compatibility/history, but they are not active catalog entries.
+- RSS item `detailUrl` is a long-lived article identity and must not receive routine version query parameters.
+- When persisted old RSS articles make clean replacement impossible, one deliberate category identity reset is allowed. After that migration, freeze the new category names/URLs; do not repeat the reset per release.

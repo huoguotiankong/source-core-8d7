@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "type": "comic",
   "name": "漫画源",
-  "updatedAt": "2026-08-26T21:12:18+08:00",
+  "updatedAt": "2026-08-26T21:26:24+08:00",
   "items": [
     {
       "id": "picacg",
@@ -32,9 +32,9 @@
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg.json?v=10000",
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/picacg/picacg.json?v=10000",
       "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg.json?v=10000",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/picacg.json?v=10000",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/picacg.json",
       "type": "comic"
     }
   ],
-  "generatedAt": "2026-08-26T21:12:18+08:00"
+  "generatedAt": "2026-08-26T21:26:24+08:00"
 }

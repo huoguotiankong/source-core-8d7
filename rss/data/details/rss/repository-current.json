@@ -1,0 +1,21 @@
+{
+  "kind": "rss",
+  "title": "🌈 阅读书源仓库",
+  "summary": "当前唯一仓库订阅入口。更新会覆盖现有最新仓库订阅，不再额外创建 Stable/Beta 重复入口。",
+  "badges": [
+    "订阅源",
+    "唯一入口",
+    "UI Beta14"
+  ],
+  "sections": [
+    {
+      "title": "当前策略",
+      "text": "仓库订阅只保留一个活动入口；书源本身仍按 Stable / Beta 分通道。"
+    },
+    {
+      "title": "缓存迁移",
+      "text": "本版对漫画、仓库订阅、正式版、测试版分类做一次性身份重置，用于摆脱阅读持久化的旧文章。之后这些分类身份固定，不再随 UI 版本变化。"
+    }
+  ],
+  "rssUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository-beta.json"
+}

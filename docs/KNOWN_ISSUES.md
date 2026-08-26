@@ -406,3 +406,27 @@ Engineering conclusion for Beta9:
 - Do not retry the Rhino-function-to-`runOnUiThread` BottomWebViewDialog path for this button. Use `java.startBrowser(url,title,html)` so WebViewActivity owns UI-thread creation and injects the official local-HTML `run()` bridge.
 
 Status: Beta9 published for real-device verification.
+
+## RSS historical duplicate articles and duplicate repository entries — Beta14 migration
+
+Real-device symptom on 2026-08-26:
+
+- 漫画分类同时显示当前 Stable 哔咔、旧 Beta 哔咔和更早的长名称 Beta 条目，尽管当前 `subscription/comic.json` 已只有一个 Stable 项。
+- 仓库订阅分类同时显示 Stable/Beta 两个名称不同但逻辑相同的仓库 RSS 源。
+- 正式版通道未可靠反映刚晋升的 Picacg Stable，表现符合旧分类文章缓存仍在参与展示。
+
+Cause:
+
+- Legado persists RSS articles from older category/article identities; deleting an item from current channel JSON does not delete historical stored articles.
+- Earlier repository design also intentionally advertised two repository RSS definitions, which is unnecessary for a single logical repository source.
+- Picacg Stable detail URL had a version query, which would create future article identities if incremented.
+
+Beta14 migration:
+
+- keep the already-imported latest RSS source identity and update it in place;
+- make `subscription/rss.json` contain exactly one current repository entry;
+- perform one deliberate category identity reset for 漫画 / 仓库订阅 / 正式版 / 测试版, then freeze those identities permanently;
+- keep only Picacg Stable 1.0.0 in the active comic catalog and remove version query from its RSS detail identity;
+- Stable/Beta book-source channels remain separate; only the duplicate repository-RSS entry is collapsed.
+
+Status: published as UI Beta14 for real-device confirmation.

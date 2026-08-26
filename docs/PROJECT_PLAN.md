@@ -158,3 +158,7 @@ A new independent source line `qidian-next` was started on 2026-08-25 at the use
 ## 12. Qidian Next Stable 1.0.0
 
 On 2026-08-26 the user explicitly promoted the Beta6 baseline to the first Stable release. The public display name is `🌈 起点增强`; repository id and permanent Legado identity remain `qidian-next` / `https://m.qidian.com/?qf_source=qidian_next_8d7`. Future unconfirmed test versions must use a separate beta file path so the Stable raw URL never silently serves Beta code.
+
+## 13. Single current repository RSS entry
+
+From RSS UI Beta14 onward, the repository itself has one active subscription entry. Stable/Beta remain release channels for book sources, not duplicate active RSS repository definitions. The latest already-imported RSS identity is preserved for in-place updates, while legacy repository JSON files may remain only as compatibility artifacts and are not listed in the active RSS catalog.
