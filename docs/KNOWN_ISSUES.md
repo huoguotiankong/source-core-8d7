@@ -315,3 +315,8 @@ Code review found `qfAjaxTextV20()` tries `ajax()` first and then `get()` when t
 ## 26. Qidian detail synopsis stayed blank while other metadata rendered — fixed in 1.1.0-beta6
 
 Real-device beta5 showed title/author/category/latest chapter, works metadata, month-ticket data, shortcuts and tags correctly, but the synopsis block was absent. The detail-local synopsis scanner did not include Qidian's `bookInfo` field, and the sparse-detail decision did not treat a missing synopsis as incomplete. Beta6 adds `bookInfo/BookInfo`, treats a blank synopsis as enrichment-worthy, and reuses the same single Qidian PC HTML response as a fallback source for synopsis text. The enrichment marker is versioned to V1106 so a prior Beta attempt cannot suppress the new parser during immediate testing. No second endpoint is added. Status: Beta, pending real-device confirmation.
+
+
+## 27. Beta6 synopsis repair still blank on real device — investigating in 1.1.0-beta7
+
+Real-device retest on `同时穿越：继承万界遗产` still showed no 内容简介 while works metadata, month tickets, shortcuts and tags rendered. This disproves the Beta6 assumption that Qidian `bookInfo/BookInfo` can be treated as a scalar synopsis field. Beta7 uses the existing single enrichment request slot for Qidian's official TTS page when synopsis is missing, because that server-rendered page exposes a visible `作品简介`; it also adds DOM/meta/JSON-LD/book-related-script parsing. If no synopsis is found, a low-sensitivity diagnostic line is rendered. No second network request is added. Status: Beta, pending real-device feedback.

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-26T14:48:21+08:00",
+  "updatedAt": "2026-08-26T15:12:21+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -80,29 +80,29 @@
       "name": "🌈 起点增强 · Beta",
       "category": "novel",
       "channel": "beta",
-      "version": "1.1.0-beta6",
-      "versionCode": 11006,
-      "updatedAt": "2026-08-26T14:48:21+08:00",
+      "version": "1.1.0-beta7",
+      "versionCode": 11007,
+      "updatedAt": "2026-08-26T15:12:21+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11006",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11007",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "详情 beta6：补齐起点 bookInfo 简介解析，并让缺简介进入既有单请求补全链。",
+      "summary": "详情 beta7：用同一个官方补全请求槽获取起点 TTS 作品简介，并加入结构化解析/诊断。",
       "tags": [
         "起点",
         "测试版",
         "详情页",
         "书籍简介",
-        "单请求",
-        "性能优化",
-        "情无"
+        "官方TTS",
+        "结构化解析",
+        "单请求"
       ],
       "changelog": [
-        "新增 bookInfo/BookInfo 简介字段解析",
-        "缺简介时触发现有一次 PC 补全",
-        "PC HTML 复用提取简介，无第二接口",
-        "保留其它功能与情无 VIP 正文修复"
+        "简介缺失时改用起点官方 TTS 书页补全",
+        "增强 DOM/meta/JSON-LD/脚本 JSON 简介解析",
+        "失败时输出低敏诊断",
+        "其它核心模块保持不变"
       ],
-      "sha256": "1d58eb0bb510b6f4dd84c5e1826f892a7681cdbd2f3849f5e6fe43bf8387a850"
+      "sha256": "88ffe76e7c150b3c3e4aac901c3558bec9b2644bfa4b5e3feb40d5edb42a80f9"
     }
   ]
 }

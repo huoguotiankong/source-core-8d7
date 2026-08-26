@@ -153,3 +153,13 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - The attempt-cache key moves from V1104 to V1106 solely to prevent an earlier Beta's 30-minute marker from blocking immediate validation of the new parser. Request limit stays physically at most one with 2.6s timeout and 30-minute suppression thereafter.
 - Source-level guard confirms only `bookSourceComment` and `ruleBookInfo.init` changed; `jsLib`, source identity, search/catalog/content/review/Provider and 情无 logic are preserved.
 - Status: Beta, pending real-device confirmation.
+
+
+## Synopsis official TTS fallback 1.1.0-beta7 (2026-08-26)
+
+- Beta6 real-device result: synopsis still absent on `同时穿越：继承万界遗产`; other detail blocks remained functional.
+- `bookInfo/BookInfo` must not be assumed to be a scalar synopsis field.
+- Beta7 keeps the one-request network ceiling. If synopsis is blank, the sole enrichment request targets Qidian official `https://www.qidian.com/ttsbook/<bookId>/9/`, whose server-rendered page exposes `作品简介`; otherwise the existing PC detail enrichment URL is retained.
+- Parser also checks intro DOM, meta description, JSON-LD and current-book-related script JSON. If all fail, `introDiag` temporarily shows only response length/structure/script count/hit length.
+- Source guard: only `bookSourceComment` and `ruleBookInfo.init/intro` change; `jsLib`, source identity, search/catalog/content/review/Provider and 情无 logic remain unchanged.
+- Status: Beta pending real-device feedback.
