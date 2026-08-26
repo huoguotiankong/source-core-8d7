@@ -1,0 +1,39 @@
+name: qidian-beta13-diagnose
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/qidian-beta13/RUN'
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Inspect qidian beta detail rules
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('sources/novel/qidian-next/qidian-next-beta.json')
+          data=json.loads(p.read_text(encoding='utf-8'))
+          src=data[0]
+          print('BOOK_SOURCE', src.get('bookSourceName'), src.get('bookSourceUrl'))
+          print('TOP_KEYS', sorted(src.keys()))
+          terms=['qfMultiContentV423','⚡ 正文设置','作品数据','qf_updateTime_v1112','qfDateCandidateV1111','qfTimeSuspiciousV1111','qfPublishSuspiciousV1111','safeUpdateTime','safePublishDate','首发','更新']
+          for k,v in src.items():
+              if not isinstance(v,str):
+                  continue
+              hits=[t for t in terms if t in v]
+              if not hits:
+                  continue
+              print('\n=== FIELD',k,'LEN',len(v),'HITS',hits,'===')
+              for t in hits:
+                  pos=v.find(t)
+                  a=max(0,pos-1300); b=min(len(v),pos+2600)
+                  print('\n--- TERM',t,'AT',pos,'---')
+                  print(v[a:b])
+          PY
