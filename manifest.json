@@ -143,13 +143,13 @@
       "category": "comic",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "0.1.0-beta1",
-      "versionCode": 1001,
-      "updatedAt": "2026-08-26T23:10:00+08:00",
+      "version": "0.1.0-beta3",
+      "versionCode": 1003,
+      "updatedAt": "2026-08-27T07:38:00+08:00",
       "sourcePath": "sources/comic/jmcomic/jmcomic-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1001",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1003",
       "bookSourceUrl": "https://sc8d7.invalid/legado/jmcomic-8d7",
-      "summary": "禁漫天堂全功能测试源：APP/API + 网页双线路、动态域名、登录账户、收藏历史、评论/回复与漫画图片正文。",
+      "summary": "禁漫天堂 Beta3：修复详情页按钮/数据模板、评论 HTML/头像/回复字段和目录加载，保留 APP/API + Web 双线路、动态域名、登录账户、收藏历史与漫画正文。",
       "tags": [
         "禁漫天堂",
         "漫画",
@@ -165,14 +165,14 @@
         "双线路"
       ],
       "changelog": [
-        "首个 Beta/Test 仓库版本",
-        "APP/API 与网页双线路自动故障切换，并缓存最近成功线路",
-        "API 动态域名服务器 + jm365 永久跳转页/jmcomicgo 发布页自动更新 Web 域名",
-        "支持登录、账户中心、收藏、观看历史、评论分页、发表评论与回复",
-        "详情页正文入口与顶部定制按钮均可打开独立评论中心",
-        "公共 jsLib 在仓库分段加载并缓存；搜索/详情/目录/正文规则与本地 Beta1 保持一致"
+        "修复详情页 @onclick 与 @get 模板被当普通文字显示，改为 JS 动态生成互动区与作品数据",
+        "评论按 JM APP 实际 CID / UID / replys / photo 字段解析，HTML 正文转纯文本并补全用户头像路径",
+        "目录改为 Java List + @json；APP series 缺失时使用原网页 btn-toolbar / reading 目录链兜底",
+        "目录阶段强制漫画类型 book.type=64",
+        "保留 Beta2 已验证恢复的发现/分类与登录按钮 this.java 兼容修复",
+        "仓库版取消启动阶段远程 runtime loader，恢复完整内联 jsLib"
       ],
-      "sha256": "1c2b8aa76945e10a1ec58cf1efe5acf3c0f3430421baae81d9b4b8e85f9618db",
+      "sha256": "fb8332ac2d79ffcf9deb7cb4b9030debbac83ac768c073d493f6fb7d0d23b12f",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],
