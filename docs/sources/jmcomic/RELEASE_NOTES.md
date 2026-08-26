@@ -15,6 +15,6 @@ Status: Beta/Test; awaiting user real-device confirmation.
 - Manga image shunts 1–4 and JM image de-scrambling retained.
 - Repository source SHA256 recorded in Manifest: `1c2b8aa76945e10a1ec58cf1efe5acf3c0f3430421baae81d9b4b8e85f9618db`.
 
-Main `docs/RELEASE_LOG.md` merge remains pending because the current connector only supports whole-file replacement and the project log is too large to rewrite safely from a truncated response. This source-local note is the authoritative interim release record; merge it into the main log when a safe append/server-side publication path is available.
+Main `docs/RELEASE_LOG.md` merge is temporarily deferred because the available write action replaces the whole file and another Qidian Beta publication Action is still queued to modify shared release metadata. Replacing the full log now could overwrite that concurrent publication. This source-local note is the authoritative interim record and must be merged into the main log after the shared publication queue is clear.
 
-The project-wide `bundles/all-beta.json` was already empty before JMComic publication. It is intentionally not overwritten with a partial JMComic-only array because doing so would drop unrelated Beta sources. A source-specific bundle artifact is maintained separately until the global bundle builder is restored.
+The project-wide `bundles/all-beta.json` was already empty before JMComic publication. It is intentionally not overwritten with a partial JMComic-only array because doing so would drop unrelated Beta sources. `bundles/jmcomic-beta1.json` is maintained as a source-specific bundle using the exact same Git blob as the repository source until the global bundle builder is restored.
