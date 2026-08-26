@@ -1,0 +1,95 @@
+?id="+encodeURIComponent(id),"GET");d._route="app";return d;}
+function jmAlbumWeb(ctx,id){
+ var base=jmWebBase(ctx),raw=jmWebRequest(ctx,"album/"+id,"GET"),doc=Packages.org.jsoup.Jsoup.parse(raw,base),x={id:id,_route:"web"};
+ try{x.name=doc.select("h1").first().text();}catch(e){x.name="JM"+id;}
+ try{var im=doc.select(".thumb-overlay img,img").first();x.image=im?jmAbs(base,im.attr("data-original")||im.attr("src")):"";}catch(e){}
+ var aa=doc.select("a.web-author-tag"),authors=[];for(var i=0;i<aa.size();i++)authors.push(aa.get(i).text());x.author=authors;
+ var tt=doc.select("#intro-block [data-type=tags] a,[data-type=tags] a"),tags=[];for(var j=0;j<tt.size();j++)tags.push(tt.get(j).text());x.tags=tags;
+ try{x.description=doc.select(".intro-collapse-content").first().text();}catch(e){x.description="";}
+ x._html=raw;return x;
+}
+function jmAlbum(ctx,id){
+ var mode=jmRouteMode(ctx),hint=jmQuery(baseUrl,"jm_route"),last=(hint==="app"||hint==="web")?hint:jmGet(ctx,"jm_last_route","app");
+ var seq=mode==="auto"?(last==="web"?["web","app"]:["app","web"]):[mode],err=[];
+ for(var i=0;i<seq.length;i++){try{return seq[i]==="app"?jmAlbumApp(ctx,id):jmAlbumWeb(ctx,id);}catch(e){err.push(jmStr(e&&e.message||e));}}
+ throw new Error(err.join(" | "));
+}
+function jmAuthors(a){if(Array.isArray(a))return a.join(" / ");return jmStr(a);}
+function jmAlbumTags(a){var t=(a&&a.tags)||[];if(typeof t==="string")t=t.split(/\s+/);var c=a&&a.category;if(c&&typeof c==="object"&&c.title)t.unshift(c.title);return jmUniq(t).join(" · ");}
+
+function jmToc(ctx,id){
+ var a=jmAlbum(ctx,id),series=a.series||[],out=[];
+ if(Array.isArray(series)&&series.length){series.sort(function(x,y){return jmNum(x.sort,0)-jmNum(y.sort,0);});for(var i=0;i<series.length;i++){var p=series[i],pid=jmStr(p.id||p.photo_id);if(!pid)continue;out.push({chapterName:jmStr(p.name||("第"+(i+1)+"话")),chapterUrl:jmWebBase(ctx)+"/photo/"+pid+"?jm_album="+id+"&jm_route="+a._route+"&shunt="+jmGet(ctx,"jm_shunt","1"),updateTime:jmStr(p.addtime||p.update_at||"")});}}
+ if(!out.length&&a._route==="web"){
+   try{var doc=Packages.org.jsoup.Jsoup.parse(a._html||jmWebRequest(ctx,"album/"+id,"GET"),jmWebBase(ctx)),els=doc.select(".btn-toolbar a[href*=/photo/],a.reading[href*=/photo/],a[href*=/photo/]"),seen={};
+   for(var k=0;k<els.size();k++){var e=els.get(k),href=e.absUrl("href")||jmAbs(jmWebBase(ctx),e.attr("href")),pid=jmPhotoId(href);if(!pid||seen[pid])continue;out.push({chapterName:e.text()||("章节 "+(out.length+1)),chapterUrl:href+(href.indexOf("?")>=0?"&":"?")+"jm_album="+id+"&jm_route=web&shunt="+jmGet(ctx,"jm_shunt","1"),updateTime:""});seen[pid]=1;}}catch(e){}
+ }
+ if(!out.length)out.push({chapterName:jmStr(a.name||"阅读"),chapterUrl:jmWebBase(ctx)+"/photo/"+id+"?jm_album="+id+"&jm_route="+a._route+"&shunt="+jmGet(ctx,"jm_shunt","1"),updateTime:""});
+ return out;
+}
+function jmChapterApp(ctx,pid){
+ var d=jmApiRequest(ctx,"chapter?id="+encodeURIComponent(pid),"GET"),scr=jmScrambleId(ctx,pid),imgs=d.images||[],host=jmImageHost(ctx),out=[];
+ for(var i=0;i<imgs.length;i++){var f=typeof imgs[i]==="string"?imgs[i]:jmStr(imgs[i].name||imgs[i].filename||imgs[i].url);if(!f)continue;var u=/^https?:\/\//i.test(f)?f:"https://"+host+"/media/photos/"+pid+"/"+f.replace(/^\/+/ ,"");out.push(u);}
+ return {images:out,scramble:scr};
+}
+function jmChapterWeb(ctx,pid){
+ var sh=jmGet(ctx,"jm_shunt","1"),raw=jmWebRequest(ctx,"photo/"+pid+"/?shunt="+encodeURIComponent(sh),"GET"),doc=Packages.org.jsoup.Jsoup.parse(raw,jmWebBase(ctx)),els=doc.select(".thumb-overlay-albums img,.scramble-page img,img[data-original*=/media/photos/]"),out=[],seen={};
+ for(var i=0;i<els.size();i++){var im=els.get(i),u=jmAbs(jmWebBase(ctx),im.attr("data-original")||im.attr("data-src")||im.attr("src"));if(u&&/\/media\/photos\//.test(u)&&!seen[u]){out.push(u);seen[u]=1;}}
+ return {images:out,scramble:""};
+}
+function jmChapter(ctx,pid){
+ var hint=jmQuery(baseUrl,"jm_route"),mode=jmRouteMode(ctx),last=(hint==="app"||hint==="web")?hint:jmGet(ctx,"jm_last_route","app"),seq=mode==="auto"?(last==="web"?["web","app"]:["app","web"]):[mode],err=[];
+ for(var i=0;i<seq.length;i++){try{var x=seq[i]==="app"?jmChapterApp(ctx,pid):jmChapterWeb(ctx,pid);if(x.images.length){jmPut(ctx,"jm_last_route",seq[i]);return x;}}catch(e){err.push(jmStr(e&&e.message||e));}}
+ throw new Error("正文图片获取失败："+err.join(" | "));
+}
+
+function jmCommentsApi(ctx,id,page){
+ var d=jmApiRequest(ctx,"forum?aid="+encodeURIComponent(id)+"&mode=all&page="+page,"GET"),arr=Array.isArray(d)?d:(d.content||d.list||d.comments||d.data||[]),total=jmNum(d.total||d.count||d.total_count,0);
+ return {list:Array.isArray(arr)?arr:[],total:total};
+}
+function jmPickHtmlString(o){
+ if(typeof o==="string")return o;if(!o||typeof o!=="object")return "";
+ var keys=["html","content","data","result","msg"];for(var i=0;i<keys.length;i++){var v=o[keys[i]];if(typeof v==="string"&&v.indexOf("<")>=0)return v;}
+ return "";
+}
+function jmCommentsWeb(ctx,id,page){
+ var raw=jmWebRequest(ctx,"ajax/album_pagination","POST",{video_id:id,page:page,series:1,with_ad_wcm:1}),j=jmJson(raw,{}),html=jmPickHtmlString(j)||raw,doc=Packages.org.jsoup.Jsoup.parse(html,jmWebBase(ctx)),els=doc.select("[id^=comment_],.forum-comment,.comment-list .media,.well"),arr=[];
+ for(var i=0;i<els.size();i++){var e=els.get(i),cid=jmStr(e.attr("data-id")||e.id()).replace(/\D+/g,""),name="",content="",tm="";
+   try{name=e.select(".username,.author,.media-heading,strong").first().text();}catch(_){}
+   try{content=e.select(".comment-content,.content,.forum-content,.media-body p").first().text();}catch(_){}
+   if(!content)content=e.text();if(content&&name)content=content.replace(name,"").trim();
+   if(content)arr.push({id:cid||("w"+page+"_"+i),username:name||"JM用户",content:content,addtime:tm,replies:[]});
+ }
+ return {list:arr,total:arr.length};
+}
+function jmCommentNormalize(c){
+ c=c||{};var u=c.user||c.member||{},rep=c.replies||c.reply||c.children||[];
+ if(rep&&rep.list)rep=rep.list;if(!Array.isArray(rep))rep=[];
+ return {id:jmStr(c.id||c.cid||c.comment_id),name:jmStr(c.nickname||c.username||c.name||u.username||u.name||"JM用户"),avatar:jmStr(c.photo||c.avatar||u.photo||u.avatar),content:jmStr(c.content||c.comment||c.message),time:jmStr(c.addtime||c.created_at||c.createdAt||c.time),likes:jmNum(c.likes||c.like||c.like_count,0),replies:rep.map(jmCommentNormalize)};
+}
+function jmComments(ctx,id,page){
+ try{var x=jmCommentsApi(ctx,id,page);return {list:x.list.map(jmCommentNormalize),total:x.total};}
+ catch(e){try{var w=jmCommentsWeb(ctx,id,page);return {list:w.list.map(jmCommentNormalize),total:w.total};}catch(e2){throw new Error(jmStr(e&&e.message||e)+" | "+jmStr(e2&&e2.message||e2));}}
+}
+function jmPostCommentWeb(ctx,id,text,parent){
+ if(!text)throw new Error("评论内容为空");jmEnsureWebLogin(ctx);
+ var d={video_id:id,comment:text,originator:"",status:"true"};
+ if(parent){delete d.status;d.comment_id=parent;d.is_reply=1;d.forum_subject=1;}
+ var raw=jmWebRequest(ctx,"ajax/album_comment","POST",d),j=jmJson(raw,{});
+ if(j.err===true||j.status===0||j.status==="0")throw new Error(jmStr(j.msg||j.error||"发表评论失败"));
+ return j;
+}
+function jmPostCommentApi(ctx,id,text,parent){
+ var d={aid:id,comment:text,comment_id:parent||"0"};return jmApiRequest(ctx,"comment","POST",d);
+}
+function jmPostComment(ctx,id,text,parent){
+ var err=[];try{return jmPostCommentWeb(ctx,id,text,parent);}catch(e){err.push("Web "+jmStr(e&&e.message||e));}
+ try{return jmPostCommentApi(ctx,id,text,parent);}catch(e2){err.push("APP "+jmStr(e2&&e2.message||e2));}
+ throw new Error(err.join(" | "));
+}
+function jmToggleFavorite(ctx,id){return jmApiRequest(ctx,"favorite","POST",{aid:id});}
+
+function jmCommentHtml(id,title,cover,total){
+ var cfg=JSON.stringify({id:jmStr(id),title:jmStr(title||"禁漫评论"),cover:jmStr(cover),total:jmNum(total,0)}).replace(/</g,"\\u003c");
+ var h=[];
+ h.push('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="color-scheme

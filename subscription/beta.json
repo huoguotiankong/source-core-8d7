@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-26T22:17:57+08:00",
+  "updatedAt": "2026-08-26T23:10:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -12,24 +12,8 @@
       "channel": "beta",
       "version": "4.2.1-alpha2",
       "updatedAt": "2026-08-25",
-      "tags": [
-        "起点",
-        "官方目录",
-        "段评",
-        "本章说",
-        "作者说",
-        "书友圈",
-        "STV",
-        "多正文 Provider"
-      ],
-      "changelog": [
-        "基于 v4.2.0 Stable 的 STV 接入测试主线",
-        "登录页补充 STV API 密钥设置",
-        "正文启动源类别新增 STV·自动 / STV·qidian",
-        "STV 不加入限免/优选/兜底及 9=全源智能",
-        "保持官方搜索、详情、目录、评论等其它域不变",
-        "仓库导入地址临时固定到已校验提交，排除 Raw/CDN/阅读缓存影响"
-      ],
+      "tags": ["起点","官方目录","段评","本章说","作者说","书友圈","STV","多正文 Provider"],
+      "changelog": ["基于 v4.2.0 Stable 的 STV 接入测试主线","登录页补充 STV API 密钥设置","正文启动源类别新增 STV·自动 / STV·qidian","STV 不加入限免/优选/兜底及 9=全源智能","保持官方搜索、详情、目录、评论等其它域不变","仓库导入地址临时固定到已校验提交，排除 Raw/CDN/阅读缓存影响"],
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/111c2fa8b25e8717e78fe9e39944c5177e8c9f63/sources/novel/qidian/qidian-official.json",
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@111c2fa8b25e8717e78fe9e39944c5177e8c9f63/sources/novel/qidian/qidian-official.json",
       "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/111c2fa8b25e8717e78fe9e39944c5177e8c9f63/sources/novel/qidian/qidian-official.json",
@@ -43,29 +27,28 @@
       "channel": "beta",
       "version": "1.1.0-beta14",
       "updatedAt": "2026-08-26",
-      "tags": [
-        "起点",
-        "测试版",
-        "详情页",
-        "作品数据",
-        "固定双列",
-        "快捷入口",
-        "正文设置",
-        "直达设置"
-      ],
-      "changelog": [
-        "作品数据固定分栏：月票、收藏、粉丝只进入左列；总推荐、盟主、首订、在看、评分、投资等只进入右列",
-        "双列继续使用真实 HTML 换行与全角空格补位，不回退到真机兼容性较差的 table/pre/CSS 固定列宽",
-        "快捷入口压缩为书友圈、角色卡、正文设置三枚短按钮，减少第三枚按钮单独换行的情况",
-        "正文入口不再只弹“正文源状态”，改为 jsLib 全局自包含正文设置页，直接编辑正文源类别、各 Provider 与 STV API 密钥",
-        "避免再次跨作用域调用 loginUrl 内 qfMultiContentV423；设置保存继续写回阅读登录信息映射",
-        "搜索、目录、正文 Provider 实际取正文逻辑、评论、角色卡、书友圈和账号链冻结"
-      ],
+      "tags": ["起点","测试版","详情页","作品数据","固定双列","快捷入口","正文设置","直达设置"],
+      "changelog": ["作品数据固定分栏：月票、收藏、粉丝只进入左列；总推荐、盟主、首订、在看、评分、投资等只进入右列","双列继续使用真实 HTML 换行与全角空格补位，不回退到真机兼容性较差的 table/pre/CSS 固定列宽","快捷入口压缩为书友圈、角色卡、正文设置三枚短按钮，减少第三枚按钮单独换行的情况","正文入口不再只弹“正文源状态”，改为 jsLib 全局自包含正文设置页，直接编辑正文源类别、各 Provider 与 STV API 密钥","避免再次跨作用域调用 loginUrl 内 qfMultiContentV423；设置保存继续写回阅读登录信息映射","搜索、目录、正文 Provider 实际取正文逻辑、评论、角色卡、书友圈和账号链冻结"],
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11014",
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11014",
       "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11014",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
+    },
+    {
+      "id": "jmcomic",
+      "name": "◈ 禁漫天堂",
+      "summary": "禁漫天堂全功能测试源：APP/API + 网页双线路、动态域名、登录账户、收藏历史、评论/回复与漫画图片正文。",
+      "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg",
+      "channel": "beta",
+      "version": "0.1.0-beta1",
+      "updatedAt": "2026-08-26",
+      "tags": ["禁漫天堂","漫画","测试版","APP API","网页线路","动态域名","登录","账户","评论","回复","收藏","双线路"],
+      "changelog": ["首个 Beta/Test 仓库版本","APP/API 与网页双线路自动故障切换，并缓存最近成功线路","API 动态域名服务器 + jm365 永久跳转页/jmcomicgo 发布页自动更新 Web 域名","支持登录、账户中心、收藏、观看历史、评论分页、发表评论与回复","详情页正文入口与顶部定制按钮均可打开独立评论中心","公共 jsLib 在仓库分段加载并缓存；搜索/详情/目录/正文规则与本地 Beta1 保持一致"],
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1001",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/jmcomic/jmcomic-beta.json?v=1001",
+      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1001",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/jmcomic.json"
     }
   ],
-  "generatedAt": "2026-08-26T21:12:18+08:00"
+  "generatedAt": "2026-08-26T23:10:00+08:00"
 }

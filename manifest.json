@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-26T22:28:47+08:00",
+  "updatedAt": "2026-08-26T23:10:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -26,23 +26,8 @@
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian/qidian-official.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=v2922_audio_webview_crypto_bridge_fix",
       "summary": "起点官方生态大型书源：官方搜索/目录/评论体系 + 多正文 Provider；本测试版新增 STV 独立正文入口。",
-      "tags": [
-        "起点",
-        "官方目录",
-        "段评",
-        "本章说",
-        "作者说",
-        "书友圈",
-        "STV",
-        "多正文 Provider"
-      ],
-      "changelog": [
-        "基于 v4.2.0 Stable 的 STV 接入测试主线",
-        "登录页补充 STV API 密钥设置",
-        "正文启动源类别新增 STV·自动 / STV·qidian",
-        "STV 不加入限免/优选/兜底及 9=全源智能",
-        "保持官方搜索、详情、目录、评论等其它域不变"
-      ]
+      "tags": ["起点","官方目录","段评","本章说","作者说","书友圈","STV","多正文 Provider"],
+      "changelog": ["基于 v4.2.0 Stable 的 STV 接入测试主线","登录页补充 STV API 密钥设置","正文启动源类别新增 STV·自动 / STV·qidian","STV 不加入限免/优选/兜底及 9=全源智能","保持官方搜索、详情、目录、评论等其它域不变"]
     },
     {
       "id": "qidian-next",
@@ -56,23 +41,8 @@
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=11000",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
       "summary": "正式版 1.1.0：由 Beta14 真机确认基线晋升；详情富数据、最近更新时间、固定双列与正文设置直达均保留。",
-      "tags": [
-        "起点",
-        "正式版",
-        "详情富数据",
-        "最近更新",
-        "固定双列",
-        "正文设置",
-        "多正文 Provider",
-        "评论"
-      ],
-      "changelog": [
-        "由 1.1.0-beta14 真机确认基线原样晋升 Stable，不新增业务逻辑",
-        "详情页保留完整富数据与内容简介，只显示最近更新时间，不显示首发时间",
-        "作品数据固定分栏：月票/收藏/粉丝在左列，其余可用指标在右列",
-        "快捷入口保持紧凑三按钮，正文设置可从详情页直接打开",
-        "搜索、目录、正文 Provider、评论、角色卡、书友圈、账号链保持 Beta14 基线"
-      ],
+      "tags": ["起点","正式版","详情富数据","最近更新","固定双列","正文设置","多正文 Provider","评论"],
+      "changelog": ["由 1.1.0-beta14 真机确认基线原样晋升 Stable，不新增业务逻辑","详情页保留完整富数据与内容简介，只显示最近更新时间，不显示首发时间","作品数据固定分栏：月票/收藏/粉丝在左列，其余可用指标在右列","快捷入口保持紧凑三按钮，正文设置可从详情页直接打开","搜索、目录、正文 Provider、评论、角色卡、书友圈、账号链保持 Beta14 基线"],
       "sha256": "c62b0b60dd91f472cac03f16e4853ca0cd1a181d75054e68c5ea29883999c17b"
     },
     {
@@ -87,24 +57,8 @@
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11014",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
       "summary": "详情 beta14：作品数据固定左右列；快捷入口紧凑化；正文按钮直达正文设置。",
-      "tags": [
-        "起点",
-        "测试版",
-        "详情页",
-        "作品数据",
-        "固定双列",
-        "快捷入口",
-        "正文设置",
-        "直达设置"
-      ],
-      "changelog": [
-        "作品数据固定分栏：月票、收藏、粉丝只进入左列；总推荐、盟主、首订、在看、评分、投资等只进入右列",
-        "双列继续使用真实 HTML 换行与全角空格补位，不回退到真机兼容性较差的 table/pre/CSS 固定列宽",
-        "快捷入口压缩为书友圈、角色卡、正文设置三枚短按钮，减少第三枚按钮单独换行的情况",
-        "正文入口不再只弹“正文源状态”，改为 jsLib 全局自包含正文设置页，直接编辑正文源类别、各 Provider 与 STV API 密钥",
-        "避免再次跨作用域调用 loginUrl 内 qfMultiContentV423；设置保存继续写回阅读登录信息映射",
-        "搜索、目录、正文 Provider 实际取正文逻辑、评论、角色卡、书友圈和账号链冻结"
-      ],
+      "tags": ["起点","测试版","详情页","作品数据","固定双列","快捷入口","正文设置","直达设置"],
+      "changelog": ["作品数据固定分栏：月票、收藏、粉丝只进入左列；总推荐、盟主、首订、在看、评分、投资等只进入右列","双列继续使用真实 HTML 换行与全角空格补位，不回退到真机兼容性较差的 table/pre/CSS 固定列宽","快捷入口压缩为书友圈、角色卡、正文设置三枚短按钮，减少第三枚按钮单独换行的情况","正文入口不再只弹“正文源状态”，改为 jsLib 全局自包含正文设置页，直接编辑正文源类别、各 Provider 与 STV API 密钥","避免再次跨作用域调用 loginUrl 内 qfMultiContentV423；设置保存继续写回阅读登录信息映射","搜索、目录、正文 Provider 实际取正文逻辑、评论、角色卡、书友圈和账号链冻结"],
       "sha256": "cc603bafc03e270b4e76ab2b933f06371fbefa6bf5ce732ae5867d8d4ae76b66"
     },
     {
@@ -120,24 +74,27 @@
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg.json",
       "bookSourceUrl": "https://sc8d7.invalid/legado/picacg-8d7",
       "summary": "正式版：Beta9 真机确认后原样晋升；详情顶部定制按钮恢复，相关推荐保持首批一次性返回与强去重。",
-      "tags": [
-        "哔咔",
-        "漫画",
-        "正式版",
-        "APP API",
-        "网页线路",
-        "评论",
-        "楼中楼",
-        "定制按钮",
-        "双线路"
-      ],
-      "changelog": [
-        "由 1.0.0-beta9 真机确认基线原样晋升 Stable，不新增业务逻辑",
-        "详情页顶部定制按钮已真机确认恢复，可直接进入独立哔咔评论中心",
-        "相关推荐保留 page>1 硬终止和漫画 ID/标题/封面路径三层独立去重",
-        "保留登录、账户中心、签到、点赞收藏、评论/楼中楼、标签、目录、漫画图片正文及 APP/Web 双线路"
-      ],
+      "tags": ["哔咔","漫画","正式版","APP API","网页线路","评论","楼中楼","定制按钮","双线路"],
+      "changelog": ["由 1.0.0-beta9 真机确认基线原样晋升 Stable，不新增业务逻辑","详情页顶部定制按钮已真机确认恢复，可直接进入独立哔咔评论中心","相关推荐保留 page>1 硬终止和漫画 ID/标题/封面路径三层独立去重","保留登录、账户中心、签到、点赞收藏、评论/楼中楼、标签、目录、漫画图片正文及 APP/Web 双线路"],
       "sha256": "59fbc28ba9d168e95be9dc76a653391b111309009c3ae9d710e7b9aeda61170f",
+      "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
+    },
+    {
+      "id": "jmcomic",
+      "name": "◈ 禁漫天堂",
+      "category": "comic",
+      "artifactType": "bookSource",
+      "channel": "beta",
+      "version": "0.1.0-beta1",
+      "versionCode": 1001,
+      "updatedAt": "2026-08-26T23:10:00+08:00",
+      "sourcePath": "sources/comic/jmcomic/jmcomic-beta.json",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1001",
+      "bookSourceUrl": "https://sc8d7.invalid/legado/jmcomic-8d7",
+      "summary": "禁漫天堂全功能测试源：APP/API + 网页双线路、动态域名、登录账户、收藏历史、评论/回复与漫画图片正文。",
+      "tags": ["禁漫天堂","漫画","测试版","APP API","网页线路","动态域名","登录","账户","评论","回复","收藏","双线路"],
+      "changelog": ["首个 Beta/Test 仓库版本","APP/API 与网页双线路自动故障切换，并缓存最近成功线路","API 动态域名服务器 + jm365 永久跳转页/jmcomicgo 发布页自动更新 Web 域名","支持登录、账户中心、收藏、观看历史、评论分页、发表评论与回复","详情页正文入口与顶部定制按钮均可打开独立评论中心","公共 jsLib 在仓库分段加载并缓存；搜索/详情/目录/正文规则与本地 Beta1 保持一致"],
+      "sha256": "1c2b8aa76945e10a1ec58cf1efe5acf3c0f3430421baae81d9b4b8e85f9618db",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],

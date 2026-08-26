@@ -1,0 +1,14 @@
+{
+  "kind": "source",
+  "title": "◈ 禁漫天堂",
+  "summary": "禁漫天堂 0.1.0-beta1 测试版。APP/API + 网页双线路，支持动态域名、账号登录、收藏历史、评论/回复与漫画图片正文。",
+  "badges": ["Beta","0.1.0-beta1","漫画","双线路"],
+  "sections": [
+    {"title":"当前状态","text":"Beta/Test，尚未经过真机确认。仓库版与本地 Beta1 保持相同搜索、详情、目录和正文规则；公共 jsLib 分段加载并缓存。"},
+    {"title":"线路与域名","text":"支持自动、APP/API、网页三种模式。APP API 域名从动态服务器刷新；网页域名通过 jm365 永久跳转页和 jmcomicgo 发布页自动更新，并记忆最近成功线路。"},
+    {"title":"账户与互动","text":"支持双线路登录、账户中心、我的收藏、观看历史。评论中心支持分页、发表评论与回复；读取优先 APP /forum，网页评论接口兜底，写入优先网页端。"},
+    {"title":"阅读","text":"支持漫画详情、分页/多章节目录、图片正文、图片分流 1-4 和 JM 图片反混淆。详情页内“查看评论”和顶部定制按钮均进入独立评论中心。"}
+  ],
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1001",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/jmcomic/jmcomic-beta.json?v=1001"
+}

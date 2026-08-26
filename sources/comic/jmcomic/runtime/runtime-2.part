@@ -1,8 +1,7 @@
 )continue;
    for(var s=0;s<JM_TOKEN_SECRETS.length;s++){
      try{
-       var ts=jmNow(),url="https://"+host+"/"+jmStr(path).replace(/^\/+/ ,"");
-       var headers=jmApiHeaders(ts,JM_TOKEN_SECRETS[s]);
+       var ts=jmNow(),url="https://"+host+"/"+jmStr(path).replace(/^\/+/,""),headers=jmApiHeaders(ts,JM_TOKEN_SECRETS[s]);
        var o={method:(method||"GET").toUpperCase(),headers:headers,timeout:opt.timeout||14000};
        if(o.method!=="GET"){o.body=typeof data==="string"?data:jmForm(data||{});headers["Content-Type"]="application/x-www-form-urlencoded";}
        var raw=java.ajax(url+","+JSON.stringify(o));
@@ -45,7 +44,7 @@ function jmWebRequest(ctx,path,method,data,opt){
  ds=[base].concat(ds.filter(function(x){return x!==base;}));
  var errs=[];
  for(var i=0;i<ds.length;i++){try{
-   var b=ds[i].replace(/\/+$/,""),url=/^https?:\/\//i.test(path)?path:b+"/"+jmStr(path).replace(/^\/+/ ,"");
+   var b=ds[i].replace(/\/+$/,""),url=/^https?:\/\//i.test(path)?path:b+"/"+jmStr(path).replace(/^\/+/,"");
    var hd=jmHtmlHeaders(b),o={method:(method||"GET").toUpperCase(),headers:hd,timeout:opt.timeout||14000};
    if(o.method!=="GET"){o.body=typeof data==="string"?data:jmForm(data||{});hd["Content-Type"]="application/x-www-form-urlencoded";}
    var raw=java.ajax(url+","+JSON.stringify(o));
@@ -86,7 +85,7 @@ function jmEnsureWebLogin(ctx){
 function jmCover(ctx,x,id){
  var u=jmStr((x||{}).image||(x||{}).pic_s||(x||{}).cover||(x||{}).thumb);
  if(/^https?:\/\//i.test(u))return u;
- if(u){if(u.indexOf("/media/")>=0)return "https://"+jmImageHost(ctx)+"/"+u.replace(/^\/+/ ,"");return "https://"+jmImageHost(ctx)+"/media/albums/"+u.replace(/^\/+/ ,"");}
+ if(u){if(u.indexOf("/media/")>=0)return "https://"+jmImageHost(ctx)+"/"+u.replace(/^\/+/,"");return "https://"+jmImageHost(ctx)+"/media/albums/"+u.replace(/^\/+/,"");}
  return id?"https://"+jmImageHost(ctx)+"/media/albums/"+id+"_3x4.jpg":"";
 }
 function jmAlbumId(u){var m=jmStr(u).match(/\/album\/(\d+)/i);if(m)return m[1];m=jmStr(u).match(/[?&](?:id|aid|jm_album)=(\d+)/i);return m?m[1]:"";}
