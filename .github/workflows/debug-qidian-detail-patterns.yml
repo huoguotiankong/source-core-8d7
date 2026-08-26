@@ -1,0 +1,35 @@
+name: debug-qidian-detail-patterns
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/debug-qidian-detail-patterns.trigger'
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Inspect mature detail call patterns
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text(encoding='utf-8'))[0]
+          text='\n'.join([str(s.get('jsLib','')),str(s.get('ruleBookInfo',{}).get('init','')),str(s.get('ruleBookInfo',{}).get('intro',''))])
+          for pat in ['bookdetail/get','bookdetail/lookfor','requestApp(','QF_OfficialClient.request','QF_OfficialClient','safeMetricCount','qfOfficialCallV400']:
+              print('\n===== PATTERN',pat,'=====')
+              start=0;n=0
+              while True:
+                  i=text.find(pat,start)
+                  if i<0: break
+                  n+=1
+                  print(f'--- hit {n} @ {i} ---')
+                  print(text[max(0,i-900):min(len(text),i+1800)])
+                  start=i+len(pat)
+                  if n>=12: break
+              print('hits_shown=',n)
+          PY
