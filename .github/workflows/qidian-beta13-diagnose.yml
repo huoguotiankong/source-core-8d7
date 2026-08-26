@@ -13,21 +13,31 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Inspect intro and official detail adapter
+      - name: Inspect qidian app detail time mapping
         shell: bash
         run: |
           python - <<'PY'
-          import json, pathlib
+          import json, pathlib, re, base64, gzip
           src=json.loads(pathlib.Path('sources/novel/qidian-next/qidian-next-beta.json').read_text(encoding='utf-8'))[0]
-          intro=src.get('ruleBookInfo',{}).get('intro','')
-          print('=== INTRO FULL LEN',len(intro),'===')
-          print(intro)
-          for field in ['jsLib','loginUrl']:
-              v=src.get(field,'')
-              print('\n===',field,'LEN',len(v),'===')
-              for t in ['bookDetailInfo','function qfMultiContentV423','qfMultiContentV423=function','getLoginUrl','reLoginView']:
-                  pos=v.find(t)
+          js=src.get('jsLib','')
+          pats=[
+            r'["\']qidian_app["\']\s*:\s*["\']gz:([A-Za-z0-9+/=]+)["\']',
+            r'QF_MOD38_PACK\s*\[\s*["\']qidian_app["\']\s*\]\s*=\s*["\']gz:([A-Za-z0-9+/=]+)["\']'
+          ]
+          b64=''
+          for p in pats:
+              m=re.search(p,js)
+              if m: b64=m.group(1); break
+          print('PACK_FOUND',bool(b64),'B64_LEN',len(b64))
+          if not b64:
+              for m in list(re.finditer('qidian_app',js))[:8]:
+                  print('\nNEAR',m.start(),js[max(0,m.start()-500):m.start()+1000])
+          else:
+              code=gzip.decompress(base64.b64decode(b64)).decode('utf-8')
+              print('MODULE_LEN',len(code))
+              for t in ['function qfAppBookInfoV530','qfAppBookInfoV530','publishDate','updateTime','firstPublish','listingDate','VipStartTime']:
+                  pos=code.find(t)
                   if pos>=0:
                       print('\n---',t,'AT',pos,'---')
-                      print(v[max(0,pos-2600):min(len(v),pos+6500)])
+                      print(code[max(0,pos-3500):min(len(code),pos+9000)])
           PY
