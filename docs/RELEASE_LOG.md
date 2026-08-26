@@ -1,3 +1,18 @@
+## 2026-08-26 — Qidian Next 1.1.0-beta13 latest-update + two-column recovery
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Changes:
+
+- 详情页作品资料只保留“最近更新”，彻底移除首发时间展示。
+- 删除连载书超过 60 天即清空更新时间的错误阈值；只保留空值与明显未来时间保护。
+- 时间缓存与起点官方搜索详情缓存升级到 v1113，避免 Beta12 错误时间缓存继续命中。
+- 作品数据不再使用 pre/monospace/CSS 列宽；改成每两个指标使用真实 HTML 换行，主指标优先总推荐/月票、收藏/粉丝、盟主/首订。
+- Beta12 跨作用域正文设置回调回退为已验证的正文源状态全局入口，消除 qfMultiContentV423 未定义报错。
+- 搜索、目录、正文 Provider、评论、角色卡、书友圈和账号链冻结。
+- Published SHA256: `6ab1f6c3b40d3e9ece1a29e7c50164eabf6822beec287f68305d0e6f82472286`.
+
+
 ## 2026-08-26 — RSS UI 0.4.1-beta15 native stale-article cleanup
 
 Status: Beta/Test; awaiting real-device confirmation.

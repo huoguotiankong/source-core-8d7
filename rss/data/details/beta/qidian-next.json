@@ -1,35 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "详情 beta12：重做更新/首发时间可信链，区分首发与上架；作品数据改为等宽预格式双列，正文源快捷入口直达正文设置。",
+  "summary": "详情 beta13：只保留最近更新时间；作品数据按两项一行恢复双列；修复 Beta12 正文设置入口作用域回归。",
   "badges": [
     "Beta",
-    "1.1.0-beta12",
-    "时间 / 双列 / 正文设置"
+    "1.1.0-beta13",
+    "最近更新 / 双列 / 正文源"
   ],
   "sections": [
     {
-      "title": "Beta11 真机结论",
-      "text": "富数据与简介正常，但更新/首发仍可能被早期建书或上架时间污染；inline-block 固定宽度在当前阅读真机未生效。"
-    },
-    {
-      "title": "时间可信链",
-      "text": "更新仅接受最新章节语义，并用当前 bookId 官方搜索校正绝对/相对最近更新时间；首发只接受明确首发字段，上架独立显示。"
+      "title": "最近更新时间",
+      "text": "详情页只保留“最近更新”，完全移除首发。取消 60 天陈旧阈值，仅过滤空值和明显未来时间；刷新 v1113 时间缓存。"
     },
     {
       "title": "作品数据",
-      "text": "双列改为 pre+monospace 预格式布局并按显示宽度补空格；移除指标 emoji，避免不同 emoji 字宽破坏右列起点。"
+      "text": "每两个指标一行真实换行：总推荐 / 月票、收藏 / 粉丝、盟主 / 首订优先成对，其余可用指标继续两项一行补位。"
     },
     {
-      "title": "快捷入口",
-      "text": "“正文源”改为“正文设置”，直接进入现有正文策略/Provider 设置页。"
+      "title": "正文源入口",
+      "text": "Beta12 跨作用域正文设置按钮会报 qfMultiContentV423 未定义，本版回退到已验证的“正文源状态”全局入口。"
     },
     {
       "title": "冻结范围",
       "text": "搜索、目录、正文 Provider 实际解析、评论、角色卡、书友圈、账号和情无 VIP 链不改。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11012",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11012",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11012"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11013",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11013",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11013"
 }
