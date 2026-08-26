@@ -1,0 +1,371 @@
+sReadTotal。 */
+    if(bid&&!info.readingCount){
+        var ak='qf_atom_read_v310_'+String(bid),av=qfCGet310(ak),ao={};
+        if(av&&av.charAt(0)==='{'){try{ao=JSON.parse(av)||{};}catch(_a){ao={};}}
+        if(ao.value){info.readingCount=String(ao.value);info.readingMetricLabel='在看';}
+        else if(!ao.checked){
+            var rawA=qfPost310.call(this,'https://mage.if.qidian.com/Atom.axd/Api/Book/GetNonAnony','bookId='+encodeURIComponent(String(bid)),6000),jA={};
+            try{jA=JSON.parse(rawA)||{};}catch(_ja){jA={};}
+            var rvA=qfDeep310(jA,['BssReadTotal','bssReadTotal']);
+            ao={checked:1,value:rvA||''};qfCPut310(ak,JSON.stringify(ao),rvA?3*60*60:30*60);
+            if(rvA){info.readingCount=rvA;info.readingMetricLabel='在看';info.detailSource=(info.detailSource?info.detailSource+'+':'')+'atom-bssread';}
+        }
+    }
+
+    /* APP 新人限免弹窗历史兼容：
+     * alpha10.17：A1(bookId) 累计 10/10 真机样本均 -11205 且 hit=0，
+     * 因此最后一个 OPTIONAL 官方探针退出详情关键路径。
+     * 只读取已有正缓存；不再主动请求、不写新的 checked 负缓存。
+     * 其它限免来源（FreshManSimple/Provider/既有官方字段）继续工作。 */
+    if(bid&&!info.isLimitedFree){
+        var fk='qf_limit_popup_v310_'+String(bid),fv=qfCGet310(fk),fo={};
+        if(fv&&fv.charAt(0)==='{'){try{fo=JSON.parse(fv)||{};}catch(_f){fo={};}}
+        if(fo.hit){
+            info.isLimitedFree=true;
+            info.limitFreeText=info.limitFreeText||'限时免费';
+            info.limitFreeType=info.limitFreeType||'app-limit-popup';
+        }
+    }
+    if(info.isLimitedFree){var r310=Array.isArray(info.rights)?info.rights.slice():[];if(!/限免|限时免费/.test(r310.join(' ')))r310.push('限时免费');info.rights=r310;}
+}catch(_detail310){}
+
+
+/* alpha30.11：修正“限免”语义 + 在读人数 Raw BookDetail 补强。
+ * 起点助手所标记的“限免”并不是某一本书正在参加短期限免专区，而是新人 14 天免费读资格。
+ * 书级判断以 BaseBookInfo.FreshManSimple.IsInBlackList 为准：明确为 0 => 本书可参与新人限免；
+ * 明确非 0 => 本书不参与；字段缺失 => 状态未知，不再用“官网限时免费专区”误判。
+ * 同时直接读取 v3/bookdetail/get 原始响应中的 BssReadTotal，避开标准化层漏字段。 */
+try{
+    function qfAny311(root,key){
+        key=String(key||'').toLowerCase();var q=[{v:root,d:0}],seen=[],steps=0;
+        while(q.length&&steps++<16000){
+            var it=q.shift(),v=it.v,d=it.d;if(v==null||d>10)continue;
+            if(typeof v==='string'){
+                var st=String(v).trim();if((st.charAt(0)==='{'||st.charAt(0)==='[')&&st.length<800000){try{q.push({v:JSON.parse(st),d:d+1});}catch(_sp311){}}
+                continue;
+            }
+            if(typeof v!=='object'||seen.indexOf(v)>=0)continue;seen.push(v);
+            if(Array.isArray(v)){for(var ai=0;ai<v.length&&ai<220;ai++)q.push({v:v[ai],d:d+1});continue;}
+            for(var k in v)if(Object.prototype.hasOwnProperty.call(v,k)&&String(k).toLowerCase()===key){
+                var x=v[k];if(x!==undefined&&x!==null&&typeof x!=='object')return x;
+            }
+            for(var k2 in v)if(Object.prototype.hasOwnProperty.call(v,k2)){var x2=v[k2];if(x2&&typeof x2==='object')q.push({v:x2,d:d+1});}
+        }
+        return undefined;
+    }
+    function qfFreshBlack311(root){
+        var q=[{v:root,d:0}],seen=[],steps=0;
+        while(q.length&&steps++<16000){
+            var it=q.shift(),v=it.v,d=it.d;if(v==null||d>10)continue;
+            if(typeof v==='string'){
+                var st=String(v).trim();if((st.charAt(0)==='{'||st.charAt(0)==='[')&&st.length<800000){try{q.push({v:JSON.parse(st),d:d+1});}catch(_sp311){}}
+                continue;
+            }
+            if(typeof v!=='object'||seen.indexOf(v)>=0)continue;seen.push(v);
+            if(Array.isArray(v)){for(var ai=0;ai<v.length&&ai<220;ai++)q.push({v:v[ai],d:d+1});continue;}
+            for(var k in v)if(Object.prototype.hasOwnProperty.call(v,k)&&/^freshmansimple$/i.test(String(k))){
+                var fm=v[k];if(fm&&typeof fm==='object'){
+                    for(var fk in fm)if(Object.prototype.hasOwnProperty.call(fm,fk)&&/^isinblacklist$/i.test(String(fk))){var fv=fm[fk];if(fv!==undefined&&fv!==null&&String(fv).trim()!=='')return fv;}
+                }
+            }
+            for(var k2 in v)if(Object.prototype.hasOwnProperty.call(v,k2)){var x2=v[k2];if(x2&&typeof x2==='object')q.push({v:x2,d:d+1});}
+        }
+        return undefined;
+    }
+    var qfRaw311=null;
+    if(bid&&(!info.readingCount||info.freshManBlackList===undefined||info.freshManBlackList===null||String(info.freshManBlackList).trim()==='')){
+        var ck311='qf_raw_bookdetail_311_'+String(bid),cv311='';try{cv311=(typeof cache!=='undefined'&&cache.get)?String(cache.get(ck311)||''):'';}catch(_cg311){}
+        if(cv311&&cv311.charAt(0)==='{'){try{qfRaw311=JSON.parse(cv311);}catch(_cj311){qfRaw311=null;}}
+        if(!qfRaw311){
+            try{
+                var ar311=qfOfficialCallV400.call(this,'appRequest',['/argus/api/v3/bookdetail/get',{bookId:String(bid),isOutBook:'0'},{bookId:String(bid),timeout:6000,noCache:true}]);
+                if(ar311){qfRaw311=ar311.json||ar311.root||ar311.data||null;if(!qfRaw311&&ar311.raw){try{qfRaw311=JSON.parse(String(ar311.raw));}catch(_raw311){}}}
+                if(qfRaw311){try{if(typeof cache!=='undefined'&&cache.put)cache.put(ck311,JSON.stringify(qfRaw311),3*60*60);}catch(_cp311){}}
+            }catch(_app311){}
+        }
+    }
+    if(qfRaw311){
+        if(!info.readingCount){var br311=qfAny311(qfRaw311,'BssReadTotal');if(br311!==undefined&&br311!==null&&Number(br311)>0){info.readingCount=String(br311);info.readingMetricLabel='在读';info.detailSource=(info.detailSource?info.detailSource+'+':'')+'raw-bookdetail-bssread';}}
+        var fb311=qfFreshBlack311(qfRaw311);if(fb311!==undefined)info.freshManBlackList=String(fb311);
+    }
+    /* 标准化层如果已经拿到了 FreshManSimple.IsInBlackList，同样沿用；0 不能被当成“空值”。 */
+    var fmv311=info.freshManBlackList,known311=!(fmv311===undefined||fmv311===null||String(fmv311).trim()==='');
+    var eligible311=known311&&Number(fmv311)===0;
+    info.newcomerLimitKnown=known311?1:0;
+    info.newcomerLimitEligible=eligible311?1:0;
+    info.isLimitedFree=eligible311; /* 兼容顶部 kind / 旧渲染字段，但语义从本版起固定为“新人限免资格”。 */
+    info.limitFreeText=eligible311?'新人14天限免':(known311?'不参与新人限免':'新人限免状态未知');
+    info.limitFreeType='freshman-14d';
+    info.limitEnd=''; /* 新人 14 天由账号注册/活动周期决定，不是书籍自身统一结束时间。 */
+    var rr311=Array.isArray(info.rights)?info.rights.slice():[];
+    rr311=rr311.filter(function(v){return !/限时免费|限免/.test(String(v||''));});
+    if(eligible311)rr311.push('限免');
+    info.rights=rr311;
+}catch(_detail311){}
+
+
+/* alpha30.12：在看 / 新人14天权益 / 首订再收口。
+ * 1) 在看：Atom GetNonAnony 是 POST；兼容 String body / Object body，并补 GetNonAnonyEx + gender=0。
+ *    仅接受 BssReadTotal > 0，使用新缓存键，绕开 alpha30.10 的旧负缓存。
+ * 2) 新人14天：这是账号级新人权益，不再把“状态未知”当作书籍属性。
+ *    FreshManSimple.IsInBlackList 只负责本书适用性：0=适用，非0=不适用；缺失时只提示需账号/官方确认。
+ * 3) 首订：只保留严格正整数；未知值直接隐藏，不再输出 0 / --。 */
+try{
+    function qfReadNum312(v){
+        var s=String(v==null?'':v).replace(/,/g,'').trim();if(!s)return '';
+        var m=s.match(/^([0-9]+(?:\.[0-9]+)?)\s*(亿|百万|万|千|w|W|k|K)?$/);if(!m)return '';
+        var n=Number(m[1]);if(!isFinite(n)||n<=0)return '';
+        var u=m[2]||'';if(u==='亿')n*=1e8;else if(u==='百万')n*=1e6;else if(u==='万'||u==='w'||u==='W')n*=1e4;else if(u==='千'||u==='k'||u==='K')n*=1e3;
+        return String(Math.round(n));
+    }
+    function qfFindBssRead312(root){
+        var q=[{v:root,d:0}],seen=[],steps=0;
+        while(q.length&&steps++<16000){
+            var it=q.shift(),v=it.v,d=it.d;if(v==null||d>10)continue;
+            if(typeof v==='string'){
+                var st=String(v).trim();if((st.charAt(0)==='{'||st.charAt(0)==='[')&&st.length<1000000){try{q.push({v:JSON.parse(st),d:d+1});}catch(_sp312){}}
+                continue;
+            }
+            if(typeof v!=='object'||seen.indexOf(v)>=0)continue;seen.push(v);
+            if(Array.isArray(v)){for(var ai=0;ai<v.length&&ai<240;ai++)q.push({v:v[ai],d:d+1});continue;}
+            for(var k in v)if(Object.prototype.hasOwnProperty.call(v,k)&&/^bssreadtotal$/i.test(String(k))){var n=qfReadNum312(v[k]);if(n)return n;}
+            for(var k2 in v)if(Object.prototype.hasOwnProperty.call(v,k2)&&v[k2]&&typeof v[k2]==='object')q.push({v:v[k2],d:d+1});
+        }
+        return '';
+    }
+    function qfCacheGet312(k){try{return (typeof cache!=='undefined'&&cache.get)?String(cache.get(k)||''):'';}catch(_e){return '';}}
+    function qfCachePut312(k,v,sec){try{if(typeof cache!=='undefined'&&cache.put)cache.put(k,String(v||''),sec);}catch(_e){}}
+    function qfAtomPost312(url,body){
+        try{
+            var j=qfJava(this);if(!j||typeof j.ajax!=='function')return '';
+            var op={method:'POST',body:body,timeout:6500,headers:{
+                'User-Agent':'Mozilla/5.0 (Linux; Android 13; zh-CN) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36',
+                'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8',
+                'Accept':'application/json,text/plain,*/*',
+                'Referer':'https://m.qidian.com/'
+            }};
+            return String(j.ajax(String(url)+','+JSON.stringify(op))||'');
+        }catch(_e){return '';}
+    }
+    if(bid&&!qfReadNum312(info.readingCount)){
+        var rk312='qf_atom_read_v312_'+String(bid),rv312=qfCacheGet312(rk312),ro312={};
+        if(rv312&&rv312.charAt(0)==='{'){try{ro312=JSON.parse(rv312)||{};}catch(_r312){ro312={};}}
+        if(ro312.value){info.readingCount=String(ro312.value);info.readingMetricLabel='在看';}
+        else if(!ro312.checked){
+            var base312='https://mage.if.qidian.com/Atom.axd/Api/Book/';
+            var tries312=[
+                ['GetNonAnony','bookId='+encodeURIComponent(String(bid))],
+                ['GetNonAnony',{bookId:String(bid)}],
+                ['GetNonAnonyEx','bookId='+encodeURIComponent(String(bid))+'&gender=0'],
+                ['GetNonAnonyEx',{bookId:String(bid),gender:0}]
+            ],val312='';
+            for(var ti312=0;ti312<tries312.length&&!val312;ti312++){
+                var raw312=qfAtomPost312.call(this,base312+tries312[ti312][0],tries312[ti312][1]),jo312={};
+                try{jo312=JSON.parse(raw312)||{};}catch(_j312){jo312={};}
+                val312=qfFindBssRead312(jo312);
+            }
+            ro312={checked:1,value:val312||''};qfCachePut312(rk312,JSON.stringify(ro312),val312?6*60*60:30*60);
+            if(val312){info.readingCount=val312;info.readingMetricLabel='在看';info.detailSource=(info.detailSource?info.detailSource+'+':'')+'atom-bssread-v312';}
+        }
+    }
+
+    /* 新人权益：强制清理前几版“限时免费专区”语义，只保留 FreshManSimple 的书级适用性。 */
+    var fm312=info.freshManBlackList,known312=!(fm312===undefined||fm312===null||String(fm312).trim()==='');
+    var eligible312=known312&&Number(fm312)===0;
+    info.newcomerLimitKnown=known312?1:0;
+    info.newcomerLimitEligible=eligible312?1:0;
+    info.isLimitedFree=eligible312;
+    info.limitFreeType='freshman-account-benefit';
+    info.limitFreeText=eligible312?'新人14天 · 本书适用':(known312?'新人14天 · 本书不适用':'新人14天 · 需账号/官方确认');
+    info.limitStart='';info.limitEnd='';
+    var rights312=Array.isArray(info.rights)?info.rights.slice():[];
+    rights312=rights312.filter(function(v){return !/限时免费|新人限免|限免/.test(String(v||''));});
+    if(eligible312)rights312.push('限免');
+    info.rights=rights312;
+
+    var fs312=String(info.firstSubscribe==null?'':info.firstSubscribe).replace(/,/g,'').trim();
+    var fmfs312=fs312.match(/^([0-9]+)$/);info.firstSubscribe=(fmfs312&&Number(fmfs312[1])>0)?fmfs312[1]:'';
+}catch(_detail312){}
+
+/* alpha30.13：限免状态完全改走神魔 / 晴天服务器。
+ * - 不再使用本地 FreshManSimple / 官网限时免费专区作为最终判定。
+ * - 优先当前已命中的限免 Provider，其次晴天 -> 神魔。
+ * - 只接受服务器 detail 返回中的明确限免语义；服务器无响应/字段不明确一律“未知”。
+ * - 结果短缓存，避免每次打开详情页重复探测。 */
+try{
+    function qfServerLimitBool313(v){
+        if(v===true||v===1)return true;if(v===false||v===0)return false;
+        var s=String(v==null?'':v).trim().toLowerCase();
+        if(!s)return null;
+        if(/^(?:1|true|yes|y|on|可用|适用|限免|免费|参与)$/.test(s))return true;
+        if(/^(?:0|false|no|n|off|不可用|不适用|非限免|不参与)$/.test(s))return false;
+        return null;
+    }
+    function qfServerLimitAnalyze313(root){
+        var out={known:false,eligible:false,evidence:''},q=[{v:root,p:'',d:0}],seen=[],steps=0;
+        while(q.length&&steps++<14000&&!out.known){
+            var it=q.shift(),v=it.v,p=it.p,d=it.d;if(v==null||d>10)continue;
+            if(typeof v==='string'){
+                var sv=String(v).trim();
+                if((sv.charAt(0)==='{'||sv.charAt(0)==='[')&&sv.length<900000){try{q.push({v:JSON.parse(sv),p:p,d:d+1});}catch(_ps313){}}
+                continue;
+            }
+            if(typeof v!=='object'||seen.indexOf(v)>=0)continue;seen.push(v);
+            if(Array.isArray(v)){for(var ai=0;ai<v.length&&ai<220;ai++)q.push({v:v[ai],p:p+'[]',d:d+1});continue;}
+            for(var k in v){
+                if(!Object.prototype.hasOwnProperty.call(v,k))continue;
+                var vv=v[k],nk=String(k||''),np=p? p+'.'+nk:nk,lk=nk.toLowerCase();
+                /* 起点新人限免最可靠的字段：FreshManSimple.IsInBlackList，0=适用。 */
+                if(lk==='isinblacklist'&&(/fresh|newcomer|limit/i.test(np)||d<=4)){
+                    var nb=Number(vv);if(isFinite(nb)){out.known=true;out.eligible=(nb===0);out.evidence=np+'='+String(vv);break;}
+                }
+                /* 服务器若已经标准化为明确布尔限免字段，直接采用。 */
+                if(/^(?:islimitedfree|islimitfree|isfreelimit|isfreshmanlimitfree|isnewcomerfree|limitfree|limitedfree|newcomereligible|freshmaneligible)$/i.test(nk)){
+                    var bb=qfServerLimitBool313(vv);if(bb!==null){out.known=true;out.eligible=bb;out.evidence=np+'='+String(vv);break;}
+                }
+                /* 明确的状态文本只在字段名本身含 free/limit/fresh 时采用，避免误扫普通简介。 */
+                if(/limit|free|fresh|newcomer/i.test(nk)&&typeof vv==='string'){
+                    var tx=String(vv).trim();
+                    if(/不适用|不可用|不参与|非限免|不在.*(?:限免|免费)/.test(tx)){out.known=true;out.eligible=false;out.evidence=np+'='+tx;break;}
+                    if(/(?:新人|新用户).{0,12}(?:14天|十四天).{0,12}(?:免费|限免)|(?:限免|免费).{0,8}(?:可用|适用|参与)/.test(tx)){out.known=true;out.eligible=true;out.evidence=np+'='+tx;break;}
+                }
+                if(vv&&typeof vv==='object')q.push({v:vv,p:np,d:d+1});
+            }
+        }
+        return out;
+    }
+    function qfServerLimitJson313(raw){try{return JSON.parse(String(raw||''))||{};}catch(_j313){return {};}}
+    function qfServerLimitOne313(name,bid){
+        var raw='',obj={},a={known:false,eligible:false,evidence:'',server:name,responded:false};
+        try{
+            if(name==='晴天'){
+                raw=String(qfQtRequestV328.call(this,'/detail?bookId='+encodeURIComponent(String(bid)),'GET',{},5000)||'');
+            }else if(name==='神魔'){
+                var base='';
+                try{base=qfSmNormBaseV30(this.source.get('qf_sm_base')||'');}catch(_b0){}
+                if(!base)try{base=qfSmAuthBaseV30.call(this);}catch(_b1){}
+                if(!base)base=qfSmBootV30();
+                try{qfSmMirrorV30.call(this,base);}catch(_bm){}
+                raw=String(qfJava(this).ajax(base+'/detail?bookId='+encodeURIComponent(String(bid))+'&format=normalized&min=1, '+JSON.stringify({timeout:5000}))||'');
+                if(!raw){try{raw=String(qfJava(this).ajax(base+'/detail?bookId='+encodeURIComponent(String(bid))+'&format=normalized&min=1',5000)||'');}catch(_s2){}}
+            }
+        }catch(_rq313){raw='';}
+        if(raw){a.responded=true;obj=qfServerLimitJson313(raw);var z=qfServerLimitAnalyze313(obj);a.known=z.known;a.eligible=z.eligible;a.evidence=z.evidence;}
+        return a;
+    }
+    function qfServerLimitCacheGet313(k){try{return (typeof cache!=='undefined'&&cache.get)?String(cache.get(k)||''):'';}catch(_cg313){return '';}}
+    function qfServerLimitCachePut313(k,v,sec){try{if(typeof cache!=='undefined'&&cache.put)cache.put(k,v,sec);}catch(_cp313){}}
+
+    /* alpha10.12.2：限免探测退出详情关键路径。
+     * 详情页只读已有缓存；绝不在 ruleBookInfo.init 内同步访问晴天/神魔。
+     * 这样外部 Provider 异常不会阻塞详情，也不会连带阻断 tocUrl 生成。 */
+    var limit313={state:'未知',source:'',evidence:'',known:false,eligible:false},lk313='qf-server-limit-v314-'+String(bid||'');
+    if(bid){
+        var old313=qfServerLimitCacheGet313(lk313);
+        if(old313){
+            try{
+                var cached313=JSON.parse(old313)||{};
+                if(cached313&&typeof cached313==='object'){
+                    limit313={
+                        state:String(cached313.state||'未知'),
+                        source:String(cached313.source||''),
+                        evidence:String(cached313.evidence||''),
+                        known:!!cached313.known,
+                        eligible:!!cached313.eligible,
+                        ts:Number(cached313.ts||0)
+                    };
+                }
+            }catch(_o313){}
+        }
+    }
+    info.serverLimitState=String(limit313.state||'未知');
+    info.serverLimitSource=String(limit313.source||'');
+    info.serverLimitEvidence=String(limit313.evidence||'');
+    info.isLimitedFree=!!limit313.eligible;
+    info.newcomerLimitKnown=limit313.known?1:0;
+    info.newcomerLimitEligible=limit313.eligible?1:0;
+    info.limitFreeType='server-probe';
+    info.limitFreeText=info.serverLimitState+(info.serverLimitSource?' · '+info.serverLimitSource:'');
+    info.limitStart='';info.limitEnd='';
+    info.freshManBlackList=''; /* 从 alpha30.13 起本地字段不再参与最终限免展示。 */
+    var rs313=Array.isArray(info.rights)?info.rights.slice():[];
+    rs313=rs313.filter(function(v){return !/限时免费|新人限免|限免/.test(String(v||''));});
+    if(limit313.eligible)rs313.push(limit313.source==='神魔'?'限时免费':'限免');info.rights=rs313;
+}catch(_limit313){
+    info.serverLimitState='未知';info.serverLimitSource='神魔/晴天服务器异常';info.isLimitedFree=false;
+}
+
+/* alpha30.13：顶部标签只接受服务器确认后的限免状态。 */
+(function(){
+    var out=[],seen={};
+    function add(v){v=String(v==null?'':v).trim();if(!v||v.length>13||seen[v])return;seen[v]=1;out.push(v);}
+    if(info.status)add(info.status);
+    if(info.isVip)add('VIP');
+    if(info.isLimitedFree)add(String(info.serverLimitSource||'')==='神魔'?'限时免费':'限免');
+    add(info.kind||'');add(info.subKind||'');
+    var rr=Array.isArray(info.rights)?info.rights:[];
+    for(var r=0;r<rr.length&&out.length<6;r++){var rv=String(rr[r]||'');if(/VIP|限时免费|限免/.test(rv))add(rv.indexOf('限时免费')>=0?'限时免费':(/限/.test(rv)?'限免':rv));}
+    info.displayKind=out.slice(0,6).join(',');
+})();
+
+if(bid&&!info.coverUrl)info.coverUrl="https://bookcover.yuewen.com/qdbimg/349573/"+bid+"/180";
+
+qfPutBookVarV09.call(this,"qf_bid",bid);
+qfPutBookVarV09.call(this,"qf_detailBind",String(bid||'')+'|'+qfNorm(info.name||searchName||''));
+qfPutBookVarV09.call(this,"qf_name",info.name||"");
+qfPutBookVarV09.call(this,"qf_author",info.author||"");
+qfPutBookVarV09.call(this,"qf_kind",info.kind||"");
+qfPutBookVarV09.call(this,"qf_subKind",info.subKind||"");
+qfPutBookVarV09.call(this,"qf_authorLevel",info.authorLevel||"");
+qfPutBookVarV09.call(this,"qf_authorWorksCount",info.authorWorksCount||"");
+qfPutBookVarV09.call(this,"qf_introOfficial",info.intro||"");
+qfPutBookVarV09.call(this,"qf_words",info.wordCount||"");
+qfPutBookVarV09.call(this,"qf_wordCount",info.wordCount||"");
+qfPutBookVarV09.call(this,"qf_lastChapter_v70",info.lastChapter||"");
+qfPutBookVarV09.call(this,"qf_status",info.status||"");
+qfPutBookVarV09.call(this,"qf_publishDate",info.publishDate||"");
+qfPutBookVarV09.call(this,"qf_updateTime",info.updateTime||"");
+qfPutBookVarV09.call(this,"qf_recommendCount",info.recommendCount||"");
+qfPutBookVarV09.call(this,"qf_readingCount",info.readingCount||"");
+qfPutBookVarV09.call(this,"qf_readingMetricLabel",info.readingMetricLabel||"在看");
+qfPutBookVarV09.call(this,"qf_collectionCount",info.collectionCount||"");
+qfPutBookVarV09.call(this,"qf_fansCount",info.fansCount||"");
+qfPutBookVarV09.call(this,"qf_monthTicket",info.monthTicket||"");
+qfPutBookVarV09.call(this,"qf_ratingScore",info.ratingScore||"");
+qfPutBookVarV09.call(this,"qf_ratingCount",info.ratingCount||"");
+qfPutBookVarV09.call(this,"qf_leaderCount",info.leaderCount||"");
+qfPutBookVarV09.call(this,"qf_firstSubscribe",info.firstSubscribe||"");
+qfPutBookVarV09.call(this,"qf_qidianTuRefresh",info.qidianTuRefresh||"");
+qfPutBookVarV09.call(this,"qf_serverLimitState",info.serverLimitState||"未知");
+qfPutBookVarV09.call(this,"qf_detailCriticalPath","no-external-limit-probe");
+qfPutBookVarV09.call(this,"qf_serverLimitSource",info.serverLimitSource||"");
+qfPutBookVarV09.call(this,"qf_serverLimitEvidence",info.serverLimitEvidence||"");
+qfPutBookVarV09.call(this,"qf_isLimitedFree",info.isLimitedFree?"1":"");
+qfPutBookVarV09.call(this,"qf_limitStart",info.limitStart||"");
+qfPutBookVarV09.call(this,"qf_limitEnd",info.limitEnd||"");
+qfPutBookVarV09.call(this,"qf_tags",Array.isArray(info.tags)?info.tags.join(' · '):'');
+qfPutBookVarV09.call(this,"qf_rights",Array.isArray(info.rights)?info.rights.join(' · '):'');
+qfPutBookVarV09.call(this,"qf_authorDesc",info.authorDesc||'');
+qfPutBookVarV09.call(this,"qf_authorTags",info.authorTags||'');
+qfPutBookVarV09.call(this,"qf_investCount",info.investCount||'');
+qfPutBookVarV09.call(this,"qf_listingDate",info.listingDate||'');
+qfPutBookVarV09.call(this,"qf_honors",Array.isArray(info.honors)?info.honors.join(' · '):(info.honors||''));
+qfPutBookVarV09.call(this,"qf_isVip",info.isVip?'1':'');
+qfPutBookVarV09.call(this,"qf_limitFreeText",info.limitFreeText||'');
+qfPutBookVarV09.call(this,"qf_limitFreeType",info.limitFreeType||'');
+qfPutBookVarV09.call(this,"qf_newcomerLimitKnown",info.newcomerLimitKnown?"1":"");
+qfPutBookVarV09.call(this,"qf_newcomerLimitEligible",info.newcomerLimitEligible?"1":"");
+qfPutBookVarV09.call(this,"qf_freshManBlackList",info.freshManBlackList===undefined||info.freshManBlackList===null?"":String(info.freshManBlackList));
+
+/* 目录继续使用本地占位；详情增强不增加额外网络请求。 */
+var qfTocLocalV71="";
+try{
+    var qfj71=qfJava(this);
+    if(bid&&qfj71&&qfj71.base64Encode){
+        qfTocLocalV71="data:;base64,"+qfj71.base64Encode("qf-toc-v71:"+bid)+",{\"type\":\"qfTocV71\"}";
+    }
+}catch(_t71){}
+info.tocUrl=bid?(qfTocLocalV71||("https://m.qidian.com/book/"+bid+"/catalog/")):String(baseUrl||"");
+
+JSON.stringify(info);
+</js>
