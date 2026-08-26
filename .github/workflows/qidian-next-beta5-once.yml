@@ -1,0 +1,179 @@
+name: Qidian Next Beta5 One Shot
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qidian-next-beta5-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Patch and validate Beta5
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import copy, datetime, hashlib, json, pathlib, re
+
+          ROOT = pathlib.Path('.')
+          source_path = ROOT/'sources/novel/qidian-next/qidian-next-beta.json'
+          target_url = 'https://m.qidian.com/?qf_source=qidian_next_8d7'
+          version = '1.1.0-beta5'
+          version_code = 11005
+          now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).replace(microsecond=0)
+          now_iso = now.isoformat()
+          date = now.date().isoformat()
+
+          data = json.loads(source_path.read_text('utf-8'))
+          assert isinstance(data, list) and len(data) == 1
+          src = data[0]
+          before = copy.deepcopy(src)
+          assert src.get('bookSourceName') == '🌈 起点增强 · Beta'
+          assert src.get('bookSourceUrl') == target_url
+          assert src.get('bookSourceComment','').startswith('v1.1.0-beta4')
+
+          init = src['ruleBookInfo']['init']
+          old = "    pcHtml=String(qfAjaxTextV20(this,pcUrl,{timeout:2600,headers:{'User-Agent':(typeof QF_UA!=='undefined'?QF_UA:'Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36'),'Referer':'https://www.qidian.com/','Accept':'text/html,application/xhtml+xml'}})||'');\n"
+          assert init.count(old) == 1, 'Beta4 enrichment fetch line not found exactly once'
+          new = """    var dj=qfAjaxJavaV20(this),dh={'User-Agent':(typeof QF_UA!=='undefined'?QF_UA:'Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36'),'Referer':'https://www.qidian.com/','Accept':'text/html,application/xhtml+xml'},dr=null;\n    if(dj&&typeof dj.get==='function'){\n      dr=dj.get(pcUrl,dh,2600);\n      if(dr){\n        if(typeof dr.body==='function')pcHtml=String(dr.body()||'');\n        else if(dr.body!==undefined)pcHtml=String(dr.body||'');\n        else pcHtml=String(dr||'');\n      }\n    }else if(dj&&typeof dj.ajax==='function'){\n      pcHtml=String(dj.ajax(pcUrl+','+JSON.stringify({timeout:2600,headers:dh}))||'');\n    }\n"""
+          init = init.replace(old, new)
+          src['ruleBookInfo']['init'] = init
+          src['bookSourceComment'] = ('v1.1.0-beta5：详情单请求硬化版。基于 beta4 的严格标签清洗与稀疏详情官方补全，'
+                                      '修复通用 qfAjaxTextV20 在 ajax 空结果后继续 get、导致一次详情补全可能实际发出两次请求的问题。'
+                                      '详情补全现在优先单次 get；仅设备不存在 get 能力时才单次 ajax，不做失败后传输层 fallback，'
+                                      '单次超时仍为 2.6 秒，30 分钟尝试标记不变。保留情无 VIP 正文认证修复及其它搜索/目录/评论/Provider 逻辑。')
+
+          changed = {k for k in src if src.get(k) != before.get(k)} | {k for k in before if src.get(k) != before.get(k)}
+          assert changed == {'bookSourceComment','ruleBookInfo'}, changed
+          rb_changed = {k for k in src['ruleBookInfo'] if src['ruleBookInfo'].get(k) != before['ruleBookInfo'].get(k)} | {k for k in before['ruleBookInfo'] if src['ruleBookInfo'].get(k) != before['ruleBookInfo'].get(k)}
+          assert rb_changed == {'init'}, rb_changed
+          assert src['jsLib'] == before['jsLib']
+          assert src['bookSourceUrl'] == before['bookSourceUrl'] == target_url
+          assert 'qfAjaxTextV20(this,pcUrl' not in init
+          assert init.count("dr=dj.get(pcUrl,dh,2600)") == 1
+          assert init.count("dj.ajax(pcUrl+','+JSON.stringify({timeout:2600,headers:dh}))") == 1
+          assert init.count("qfDetailPcEnrichV1104.call(this)") == 1
+          assert "if(last>0&&now-last<1800000)return;" in init
+          assert "!/[\\u4e00-\\u9fff]/.test(t)&&!ascii[low]" in init
+
+          source_text = json.dumps(data, ensure_ascii=False, indent=2) + '\n'
+          source_path.write_text(source_text, 'utf-8')
+          sha = hashlib.sha256(source_text.encode('utf-8')).hexdigest()
+
+          # Keep Beta bundle source object synchronized.
+          bundle_path = ROOT/'bundles/all-beta.json'
+          bundle = json.loads(bundle_path.read_text('utf-8'))
+          replaced = 0
+          def replace_source(node):
+              global replaced
+              if isinstance(node, list):
+                  for i, v in enumerate(node):
+                      if isinstance(v, dict) and v.get('bookSourceUrl') == target_url and v.get('bookSourceName') == '🌈 起点增强 · Beta':
+                          node[i] = copy.deepcopy(src); replaced += 1
+                      else:
+                          replace_source(v)
+              elif isinstance(node, dict):
+                  for k, v in list(node.items()):
+                      if isinstance(v, dict) and v.get('bookSourceUrl') == target_url and v.get('bookSourceName') == '🌈 起点增强 · Beta':
+                          node[k] = copy.deepcopy(src); replaced += 1
+                      else:
+                          replace_source(v)
+          replace_source(bundle)
+          assert replaced >= 1, 'beta bundle source not found'
+          bundle_path.write_text(json.dumps(bundle, ensure_ascii=False, indent=2)+'\n','utf-8')
+
+          # Subscription metadata.
+          sub_path = ROOT/'subscription/beta.json'
+          sub = json.loads(sub_path.read_text('utf-8'))
+          sub['updatedAt'] = now_iso
+          item = next(x for x in sub['items'] if x.get('id') == 'qidian-next-beta')
+          item.update({
+              'summary':'详情 beta5：严格标签清洗保留；稀疏详情官方补全硬化为物理最多一次请求。',
+              'version':version,
+              'updatedAt':date,
+              'tags':['起点','测试版','详情页','单请求','标签修复','性能优化','情无'],
+              'changelog':['修复 beta4 通用请求 helper 可能 ajax→get 双请求的问题','详情补全优先单次 get；仅无 get 能力时单次 ajax','2.6 秒单次超时 + 30 分钟尝试标记保持不变','严格标签清洗与情无 VIP 正文认证修复保持不变'],
+              'sourceUrl':f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={version_code}',
+              'backupUrl':f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v={version_code}',
+              'importUrl':f'legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={version_code}'
+          })
+          sub_path.write_text(json.dumps(sub, ensure_ascii=False, indent=2)+'\n','utf-8')
+
+          # Manifest metadata.
+          man_path = ROOT/'manifest.json'
+          man = json.loads(man_path.read_text('utf-8'))
+          man['updatedAt'] = now_iso
+          found = []
+          def walk(node):
+              if isinstance(node, dict):
+                  if node.get('bookSourceUrl') == target_url and (node.get('id') == 'qidian-next-beta' or node.get('name') == '🌈 起点增强 · Beta'):
+                      found.append(node)
+                  for v in node.values(): walk(v)
+              elif isinstance(node, list):
+                  for v in node: walk(v)
+          walk(man)
+          assert found, 'manifest qidian-next beta entry not found'
+          for m in found:
+              m.update({'version':version,'versionCode':version_code,'updatedAt':now_iso,
+                        'sourceUrl':f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={version_code}',
+                        'summary':'详情 beta5：严格标签清洗 + 稀疏详情物理最多一次官方 PC 请求。',
+                        'tags':['起点','测试版','详情页','单请求','标签修复','性能优化','情无'],
+                        'changelog':['修复 beta4 潜在 ajax→get 双请求','详情官方补全物理最多一次','2.6 秒超时与 30 分钟尝试标记不变','保留情无 VIP 正文修复'],
+                        'sha256':sha})
+          man_path.write_text(json.dumps(man, ensure_ascii=False, indent=2)+'\n','utf-8')
+
+          # RSS detail.
+          rss_path = ROOT/'rss/data/details/beta/qidian-next.json'
+          rss = json.loads(rss_path.read_text('utf-8'))
+          rss.update({'summary':'详情 beta5：严格标签清洗继续保留；官方补全改为物理最多一次请求。',
+                      'badges':['Beta',version,'单请求硬化'],
+                      'sourceUrl':f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={version_code}',
+                      'backupUrl':f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v={version_code}',
+                      'importUrl':f'legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={version_code}'})
+          rss['sections'] = [
+              {'title':'单请求硬化','text':'Beta4 使用通用 qfAjaxTextV20，ajax 空结果时可能再走 get。Beta5 改为 get/ajax 二选一，失败后不跨传输层重试，单次详情补全物理最多发出一个请求。'},
+              {'title':'标签与信息量','text':'Beta4 的严格可见文本标签清洗继续保留；详情稀疏时仍可用起点 PC 官方书页补全评分、推荐、收藏、粉丝、状态、作者等级和标签。'},
+              {'title':'性能边界','text':'单次超时 2.6 秒；30 分钟内不重复尝试；不恢复 APP/Atom/第三方详情 fallback。'},
+              {'title':'回归范围','text':'仅修改详情补全传输层。Stable 1.0.0、搜索、目录、评论、正文 Provider 与情无 VIP 认证链均不改。'}]
+          rss_path.write_text(json.dumps(rss, ensure_ascii=False, indent=2)+'\n','utf-8')
+
+          # Docs.
+          ki = ROOT/'docs/KNOWN_ISSUES.md'
+          kt = ki.read_text('utf-8')
+          kt += f"\n\n## 25. Detail beta4 single-enrichment path could physically issue two transport attempts — fixed in {version}\n\nCode review found `qfAjaxTextV20()` tries `ajax()` first and then `get()` when the first result is empty, so beta4's nominal one enrichment call could become two HTTP attempts and approach 5.2 seconds worst-case. Beta5 makes the detail enrichment transport mutually exclusive: one `get()` when available, otherwise one `ajax()`, with no failure fallback. The 2.6-second timeout and 30-minute per-book attempt marker remain. Status: Beta, pending real-device confirmation.\n"
+          ki.write_text(kt,'utf-8')
+
+          rl = ROOT/'docs/RELEASE_LOG.md'
+          rt = rl.read_text('utf-8')
+          rt += f"\n\n### {date} — 🌈 起点增强 {version}\n- Detail-only hardening: eliminate beta4's possible `ajax -> get` double transport attempt.\n- Official PC enrichment is now physically at most one request: prefer `get`, use `ajax` only when `get` is unavailable; no failure fallback.\n- Keep strict visible-tag sanitation, 2.6s timeout, 30-minute attempt marker, Stable 1.0.0, and all non-detail modules unchanged.\n"
+          rl.write_text(rt,'utf-8')
+
+          ho = ROOT/'docs/sources/qidian-next/PROJECT_HANDOFF.md'
+          ht = ho.read_text('utf-8')
+          ht += f"\n\n## Detail single-request hardening {version} ({date})\n\n- Static code review found beta4 called the generic `qfAjaxTextV20`, which can execute `ajax()` and then `get()` when the first transport returns empty; nominal one enrichment call therefore did not guarantee one physical request.\n- Beta5 uses a detail-local mutually exclusive transport: one `get()` when available; only when the runtime has no `get` function is one `ajax()` used. A thrown/empty request does not trigger a second transport attempt.\n- Single timeout remains 2.6 seconds; the per-book 30-minute attempt marker remains.\n- Beta4 visible-human-text tag sanitation and sparse-enrichment policy remain unchanged.\n- Source-level validation asserts only `bookSourceComment` and `ruleBookInfo.init` changed; `jsLib`, source identity, search/catalog/content/review/Provider and 情无 logic are byte-for-byte preserved in this patch.\n- Status: Beta, pending real-device confirmation.\n"
+          ho.write_text(ht,'utf-8')
+
+          # Final JSON parse / metadata checks.
+          for p in [source_path,bundle_path,sub_path,man_path,rss_path]:
+              json.loads(p.read_text('utf-8'))
+          print('Beta5 source sha256:', sha)
+          print('Bundle replacements:', replaced)
+          print('Manifest matches:', len(found))
+          PY
+      - name: Commit Beta5
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next-beta.json bundles/all-beta.json subscription/beta.json manifest.json rss/data/details/beta/qidian-next.json docs/KNOWN_ISSUES.md docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git diff --cached --quiet && exit 1
+          git commit -m 'fix: harden qidian detail enrichment beta1105'
+          git push origin HEAD:main
