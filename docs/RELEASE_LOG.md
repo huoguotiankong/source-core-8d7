@@ -1,5 +1,21 @@
 # RELEASE LOG
 
+## 2026-08-26 — Picacg 1.0.0-beta3 reader/comment tags enhancement
+
+Status: Beta/Test; Beta2 core functions reported basically working on real device, Beta3 enhancements awaiting confirmation.
+
+Changes:
+
+- 漫画图片阅读页定制按钮强化，章节 URL / 当前书 / 最近书籍 ID 多级识别后直达评论中心
+- 详情页把 API 已返回的 categories/tags 渲染成可点击入口，不增加详情首屏网络请求
+- 新增标签页路由：分类精确过滤，普通标签过滤为空时回退 advanced-search
+- 发现页分类按钮从四列调整为三列，减少真机文字省略
+- 登录页重排 APP通道、登录及功能按钮，改善分组与触控面积
+- 修复登录页“我的收藏”仍以 PICA_SOURCE_ID/.invalid 作为外层地址的残留问题
+- 正文图片、评论接口、楼中楼、账号认证和双线路核心请求逻辑保持不变
+- Published SHA256: `ba414a8394341f5ab9d5f8a190353c458ed7c52aeacf0cfa96134cbad74a088c`.
+
+
 ## 2026-08-26 — Picacg 1.0.0-beta2 SSL + Explore UI hotfix
 
 Status: Beta/Test; awaiting user real-device confirmation.

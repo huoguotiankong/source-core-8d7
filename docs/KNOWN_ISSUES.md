@@ -348,3 +348,12 @@ Root cause: Beta1 reused the synthetic `bookSourceUrl` identity (`sc8d7.invalid`
 Permanent rule: synthetic identity hosts are namespace-only. Every operational search/explore/chapter URL must use a real TLS-capable carrier; API switching happens only inside source rules. Discovery selector construction should be offline/static when practical.
 
 Status: fixed in Picacg 1.0.0-beta2; awaiting real-device confirmation.
+
+
+## Picacg remaining identity shortcut / reader context gap — fixed in 1.0.0-beta3
+
+Beta3 audit after Beta2 real-device testing found one remaining shortcut: `openFavorites()` in the login page still built its outer Explore URL from `PICA_SOURCE_ID`, even though the main discovery/search/catalog paths had already moved to a real HTTPS carrier. Beta3 changes it to `PICA_ROUTE_BASE`.
+
+The manga-reader custom button already had a content callback, but its book-id lookup depended on the reader providing a complete `book` object. Beta3 explicitly parses the current chapter URL first and then falls back to the book context / remembered id.
+
+Status: fixed in 1.0.0-beta3; awaiting real-device confirmation of the new reader-button and detail-tag interactions.

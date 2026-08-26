@@ -50,7 +50,7 @@ new = 'java.put("pica_kind",cats.concat(tags).join(" · ")+(c.finished?" · 完�
 if old not in init:
     raise SystemExit('book-info init baseline not found')
 src['ruleBookInfo']['init'] = init.replace(old, new, 1)
-src['ruleBookInfo']['intro'] = '''<js>
+src['ruleBookInfo']['intro'] = r'''<js>
 var desc=String(java.get("pica_intro")||""),stats=String(java.get("pica_stats")||"");
 var cats=picaJson(java.get("pica_categories"),[]),tags=picaJson(java.get("pica_tags"),[]),team=String(java.get("pica_team")||""),status=String(java.get("pica_status")||"");
 function picaDetailChip(t,k){t=String(t||"").trim();if(!t)return "";var p=k==="category"?"📂 ":"# ";return "<button>"+p+picaEsc(t)+"@onclick:picaBookInfoOpenTag.call(this,"+JSON.stringify(t)+","+JSON.stringify(k)+")</button> ";}
