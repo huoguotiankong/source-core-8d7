@@ -111,4 +111,10 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - Custom detail HTML is reduced to a compact metric strip, on-demand interaction buttons, up to six tags, and synopsis.
 - Book-circle, role-card and smart-source actions remain on-demand buttons and therefore do not block initial detail rendering.
 - The 1.0.1-beta1 QW VIP-content authentication/request-header fix is a hard regression gate for all later Betas.
+## Detail richness Beta 1.1.0-beta2 (2026-08-26)
+
+- Real-device beta1 showed the metric `<table>` rendering vertically/misaligned and the overall detail information becoming too sparse.
+- beta2 keeps the zero-extra-request first-paint architecture, but expands parsing/cached display for author metadata, status, update time, recommendation/month-ticket/reading/rating/collection/fans/leader/invest/first-subscribe metrics, tags and honors.
+- The metric strip is replaced by plain HTML rows because Legado detail HTML/CSS support is device/version dependent; simple rows are the preferred compatibility baseline.
+- Missing fields are hidden rather than synchronously fetched. Book circle, role card and smart source remain on-demand.
 

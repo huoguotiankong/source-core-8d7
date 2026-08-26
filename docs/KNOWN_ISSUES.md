@@ -282,4 +282,11 @@ Symptom: the detail page exposed many useful statistics but duplicated native me
 Beta fix: first paint now parses only the current Qidian response and per-book cache; optional interaction features are opened on demand. The custom area is reduced to metrics, shortcuts, tags and synopsis.
 
 Status: Beta 1.1.0-beta1 published for real-device speed/UI regression testing.
+## 22. Detail beta1 became too sparse and its table metrics rendered incorrectly on real devices — adjusted in 1.1.0-beta2
+
+Symptom: the first performance-focused detail redesign rendered only a few metrics on some books, and the HTML table was flattened into misaligned vertical text on the tested Legado build.
+
+Beta fix: restore rich fields from the current response/cache while keeping zero extra first-paint requests; replace table layout with plain HTML rows and hide unavailable fields.
+
+Status: Beta 1.1.0-beta2 published for real-device UI/information-density testing.
 

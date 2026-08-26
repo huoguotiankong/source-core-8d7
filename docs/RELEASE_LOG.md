@@ -1,5 +1,18 @@
 # RELEASE LOG
 
+## 2026-08-26 — 起点增强 1.1.0-beta2
+
+Status: Beta/Test; detail richness/UI compatibility follow-up awaiting real-device confirmation.
+
+Changes:
+
+- Kept the beta1 zero-extra-request detail fast path.
+- Restored richer work metadata, statistics, tags and honors from the current response or existing per-book cache.
+- Replaced the incompatible metric `<table>` with plain HTML rows for Legado real-device compatibility.
+- Missing metrics remain hidden instead of triggering synchronous enrichment requests.
+- Preserved QW VIP-content authentication fix and Stable 1.0.0 unchanged.
+- Beta SHA256: `98b2b75567eeb2a16e0821c653443241813f5de09f65b2b4f1c0e46c5fb6f4de`.
+
 ## 2026-08-26 — 起点增强 1.1.0-beta1
 
 Status: Beta/Test; detail UI/performance redesign awaiting real-device confirmation.
