@@ -9,6 +9,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 SOURCE_ID = "https://sc8d7.invalid/legado/picacg-8d7"
 VERSION = "1.0.0"
 VERSION_CODE = "100"
+MANIFEST_VERSION_CODE = 10000
 NOW = datetime.now(ZoneInfo("Asia/Shanghai"))
 NOW_ISO = NOW.isoformat(timespec="seconds")
 DATE = NOW.strftime("%Y-%m-%d")
@@ -74,7 +75,6 @@ src["bookSourceComment"] = (
 src["bookSourceGroup"] = "漫画"
 src["lastUpdateTime"] = int(NOW.timestamp() * 1000)
 
-# Syntax gates before publication.
 check_js("jslib", src.get("jsLib", ""))
 rule_explore_js = explore
 if rule_explore_js.startswith("<js>") and rule_explore_js.endswith("</js>"):
@@ -82,26 +82,37 @@ if rule_explore_js.startswith("<js>") and rule_explore_js.endswith("</js>"):
 check_js("explore", rule_explore_js)
 check_js("callback", callback)
 
-STABLE_PATH.parent.mkdir(parents=True, exist_ok=True)
 dump_json(STABLE_PATH, [src])
 sha256 = hashlib.sha256(STABLE_PATH.read_bytes()).hexdigest()
 
 manifest = load_json(MANIFEST_PATH)
-manifest["repository"]["updatedAt"] = NOW_ISO
+manifest["updatedAt"] = NOW_ISO
 found = False
 for entry in manifest.get("sources", []):
     if entry.get("id") == "picacg":
+        entry.clear()
         entry.update({
+            "id": "picacg",
             "name": "◈ 哔咔漫画",
-            "type": "comic",
+            "category": "comic",
+            "artifactType": "bookSource",
             "channel": "stable",
             "version": VERSION,
-            "status": "user-confirmed-stable",
+            "versionCode": MANIFEST_VERSION_CODE,
+            "updatedAt": NOW_ISO,
             "sourcePath": "sources/comic/picacg/picacg.json",
-            "identityUrl": SOURCE_ID,
-            "iconPath": "assets/source-core-icon.svg",
-            "features": ["comic", "app-api", "web-api", "login", "account", "comments", "nested-replies", "like", "favourite", "tags"],
-            "notes": "Picacg APP/Web dual-route source; Beta9 custom-button baseline promoted after user real-device confirmation."
+            "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg.json",
+            "bookSourceUrl": SOURCE_ID,
+            "summary": "正式版：Beta9 真机确认后原样晋升；详情顶部定制按钮恢复，相关推荐保持首批一次性返回与强去重。",
+            "tags": ["哔咔", "漫画", "正式版", "APP API", "网页线路", "评论", "楼中楼", "定制按钮", "双线路"],
+            "changelog": [
+                "由 1.0.0-beta9 真机确认基线原样晋升 Stable，不新增业务逻辑",
+                "详情页顶部定制按钮已真机确认恢复，可直接进入独立哔咔评论中心",
+                "相关推荐保留 page>1 硬终止和漫画 ID/标题/封面路径三层独立去重",
+                "保留登录、账户中心、签到、点赞收藏、评论/楼中楼、标签、目录、漫画图片正文及 APP/Web 双线路"
+            ],
+            "sha256": sha256,
+            "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
         })
         found = True
         break
@@ -138,7 +149,6 @@ comic_sub["sources"] = [x for x in comic_sub.get("sources", []) if x.get("id") !
 comic_sub["sources"].append(comic_entry)
 dump_json(COMIC_SUB_PATH, comic_sub)
 
-# Stable detail page metadata.
 detail = {
     "id": "picacg",
     "name": "◈ 哔咔漫画",
@@ -161,7 +171,6 @@ detail = {
 }
 dump_json(DETAIL_PATH, detail)
 
-# Rebuild bundles from active channel catalog + manifest so unrelated sources are retained.
 manifest_by_id = {x.get("id"): x for x in manifest.get("sources", [])}
 
 def rebuild_bundle(subscription_obj, out_path):
