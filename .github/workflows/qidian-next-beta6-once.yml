@@ -1,0 +1,194 @@
+name: Qidian Next Beta6 One Shot
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/qidian-next-beta6-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Patch and validate Beta6
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import copy, datetime, hashlib, json, pathlib
+
+          ROOT = pathlib.Path('.')
+          source_path = ROOT/'sources/novel/qidian-next/qidian-next-beta.json'
+          target_url = 'https://m.qidian.com/?qf_source=qidian_next_8d7'
+          version = '1.1.0-beta6'
+          version_code = 11006
+          now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).replace(microsecond=0)
+          now_iso = now.isoformat()
+          date = now.date().isoformat()
+
+          data = json.loads(source_path.read_text('utf-8'))
+          assert isinstance(data, list) and len(data) == 1
+          src = data[0]
+          before = copy.deepcopy(src)
+          assert src.get('bookSourceName') == '🌈 起点增强 · Beta'
+          assert src.get('bookSourceUrl') == target_url
+          assert src.get('bookSourceComment','').startswith('v1.1.0-beta5')
+
+          init = src['ruleBookInfo']['init']
+
+          old_keys = "var ks=['BookIntro','bookIntro','BookIntroWords','bookIntroWords','BookDesc','bookDesc','BookDescription','bookDescription','Introduction','introduction'];"
+          new_keys = "var ks=['BookIntro','bookIntro','BookIntroWords','bookIntroWords','BookInfo','bookInfo','BookDesc','bookDesc','BookDescription','bookDescription','Introduction','introduction'];"
+          assert init.count(old_keys) == 1, 'intro key list not found exactly once'
+          init = init.replace(old_keys, new_keys)
+
+          old_sparse = "  return n<3||!info.tags||!info.tags.length||!String(info.status||'').trim();"
+          new_sparse = "  return blank(info.intro)||n<3||!info.tags||!info.tags.length||!String(info.status||'').trim();"
+          assert init.count(old_sparse) == 1, 'detail sparse return not found exactly once'
+          init = init.replace(old_sparse, new_sparse)
+
+          old_fill = "  qfFillV1104('kind',rich.kind);qfFillV1104('subKind',rich.subKind);qfFillV1104('intro',rich.intro);"
+          new_fill = "  qfFillV1104('kind',rich.kind);qfFillV1104('subKind',rich.subKind);qfFillV1104('intro',rich.intro||introFromCurrent(pcHtml));"
+          assert init.count(old_fill) == 1, 'PC intro fill line not found exactly once'
+          init = init.replace(old_fill, new_fill)
+
+          assert init.count("qf_detailPcEnrichedAtV1104") == 2, 'unexpected enrichment marker count'
+          init = init.replace("qf_detailPcEnrichedAtV1104", "qf_detailPcEnrichedAtV1106")
+
+          src['ruleBookInfo']['init'] = init
+          src['bookSourceComment'] = ('v1.1.0-beta6：详情简介修复版。针对真机详情页长期缺失“内容简介”的问题，'
+                                      '详情本地解析新增起点实际使用的 bookInfo/BookInfo 简介字段；简介为空也会被判定为详情资料不完整，'
+                                      '并在原有物理最多一次的起点 PC 官方补全请求中直接复用同一份 HTML 提取简介，不新增第二接口。'
+                                      '补全尝试标记升级为 V1106，避免旧 Beta 的 30 分钟标记阻断本次新解析；仍保持 2.6 秒单次超时与 30 分钟防重复请求。'
+                                      '其它搜索、目录、正文 Provider、段评/本章说、角色卡、书友圈及情无 VIP 认证逻辑不改。')
+
+          changed = {k for k in src if src.get(k) != before.get(k)} | {k for k in before if src.get(k) != before.get(k)}
+          assert changed == {'bookSourceComment','ruleBookInfo'}, changed
+          rb_changed = {k for k in src['ruleBookInfo'] if src['ruleBookInfo'].get(k) != before['ruleBookInfo'].get(k)} | {k for k in before['ruleBookInfo'] if src['ruleBookInfo'].get(k) != before['ruleBookInfo'].get(k)}
+          assert rb_changed == {'init'}, rb_changed
+          assert src['jsLib'] == before['jsLib']
+          assert src['bookSourceUrl'] == before['bookSourceUrl'] == target_url
+          assert "'BookInfo','bookInfo'" in init
+          assert "return blank(info.intro)||n<3" in init
+          assert "qfFillV1104('intro',rich.intro||introFromCurrent(pcHtml))" in init
+          assert init.count("qf_detailPcEnrichedAtV1106") == 2
+          assert "qf_detailPcEnrichedAtV1104" not in init
+          assert init.count("dr=dj.get(pcUrl,dh,2600)") == 1
+          assert init.count("dj.ajax(pcUrl+','+JSON.stringify({timeout:2600,headers:dh}))") == 1
+          assert init.count("qfDetailPcEnrichV1104.call(this)") == 1
+
+          source_text = json.dumps(data, ensure_ascii=False, indent=2) + '\n'
+          source_path.write_text(source_text, 'utf-8')
+          sha = hashlib.sha256(source_text.encode('utf-8')).hexdigest()
+
+          bundle_path = ROOT/'bundles/all-beta.json'
+          bundle = json.loads(bundle_path.read_text('utf-8'))
+          replaced = 0
+          def replace_source(node):
+              global replaced
+              if isinstance(node, list):
+                  for i, v in enumerate(node):
+                      if isinstance(v, dict) and v.get('bookSourceUrl') == target_url and v.get('bookSourceName') == '🌈 起点增强 · Beta':
+                          node[i] = copy.deepcopy(src); replaced += 1
+                      else:
+                          replace_source(v)
+              elif isinstance(node, dict):
+                  for k, v in list(node.items()):
+                      if isinstance(v, dict) and v.get('bookSourceUrl') == target_url and v.get('bookSourceName') == '🌈 起点增强 · Beta':
+                          node[k] = copy.deepcopy(src); replaced += 1
+                      else:
+                          replace_source(v)
+          replace_source(bundle)
+          assert replaced >= 1, 'beta bundle source not found'
+          bundle_path.write_text(json.dumps(bundle, ensure_ascii=False, indent=2)+'\n','utf-8')
+
+          sub_path = ROOT/'subscription/beta.json'
+          sub = json.loads(sub_path.read_text('utf-8'))
+          sub['updatedAt'] = now_iso
+          item = next(x for x in sub['items'] if x.get('id') == 'qidian-next-beta')
+          item.update({
+              'summary':'详情 beta6：修复书籍简介长期为空；复用现有单次官方 PC 补全链，不增加第二接口。',
+              'version':version,
+              'updatedAt':date,
+              'tags':['起点','测试版','详情页','书籍简介','单请求','性能优化','情无'],
+              'changelog':['简介解析新增 bookInfo/BookInfo 官方字段','简介为空时触发现有一次 PC 官方补全','同一份 PC HTML 直接提取简介，不增加第二接口','补全标记升级 V1106，2.6 秒超时与 30 分钟防重复保持不变'],
+              'sourceUrl':f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={version_code}',
+              'backupUrl':f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v={version_code}',
+              'importUrl':f'legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={version_code}'
+          })
+          sub_path.write_text(json.dumps(sub, ensure_ascii=False, indent=2)+'\n','utf-8')
+
+          man_path = ROOT/'manifest.json'
+          man = json.loads(man_path.read_text('utf-8'))
+          man['updatedAt'] = now_iso
+          found = []
+          def walk(node):
+              if isinstance(node, dict):
+                  if node.get('bookSourceUrl') == target_url and (node.get('id') == 'qidian-next-beta' or node.get('name') == '🌈 起点增强 · Beta'):
+                      found.append(node)
+                  for v in node.values(): walk(v)
+              elif isinstance(node, list):
+                  for v in node: walk(v)
+          walk(man)
+          assert found, 'manifest qidian-next beta entry not found'
+          for m in found:
+              m.update({'version':version,'versionCode':version_code,'updatedAt':now_iso,
+                        'sourceUrl':f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={version_code}',
+                        'summary':'详情 beta6：补齐起点 bookInfo 简介解析，并让缺简介进入既有单请求补全链。',
+                        'tags':['起点','测试版','详情页','书籍简介','单请求','性能优化','情无'],
+                        'changelog':['新增 bookInfo/BookInfo 简介字段解析','缺简介时触发现有一次 PC 补全','PC HTML 复用提取简介，无第二接口','保留其它功能与情无 VIP 正文修复'],
+                        'sha256':sha})
+          man_path.write_text(json.dumps(man, ensure_ascii=False, indent=2)+'\n','utf-8')
+
+          rss_path = ROOT/'rss/data/details/beta/qidian-next.json'
+          rss = json.loads(rss_path.read_text('utf-8'))
+          rss.update({'summary':'详情 beta6：修复“内容简介”长期不显示；不扩张详情请求链。',
+                      'badges':['Beta',version,'简介修复'],
+                      'sourceUrl':f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={version_code}',
+                      'backupUrl':f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v={version_code}',
+                      'importUrl':f'legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={version_code}'})
+          rss['sections'] = [
+              {'title':'简介修复','text':'真机确认作品资料、月票、快捷入口和标签可显示，但内容简介长期为空。Beta6 在详情本地解析中加入起点实际使用的 bookInfo/BookInfo 字段。'},
+              {'title':'单请求兜底','text':'若当前响应仍未得到简介，缺简介会进入原有详情不完整判定；最多请求一次起点 PC 官方书页，并直接从同一份 HTML 中提取简介，不增加第二接口。'},
+              {'title':'缓存与性能','text':'补全标记升级到 V1106，避免旧 Beta 的 30 分钟尝试记录阻断本次新解析；单次超时仍为 2.6 秒，之后 30 分钟内不重复尝试。'},
+              {'title':'回归范围','text':'仅修改 ruleBookInfo.init 的简介解析/补全触发和版本说明；Stable 1.0.0、搜索、目录、正文 Provider、评论、角色卡、书友圈与情无 VIP 认证链不改。'}]
+          rss_path.write_text(json.dumps(rss, ensure_ascii=False, indent=2)+'\n','utf-8')
+
+          ki = ROOT/'docs/KNOWN_ISSUES.md'
+          kt = ki.read_text('utf-8')
+          assert '## 26. Qidian detail synopsis stayed blank' not in kt
+          kt += f"\n\n## 26. Qidian detail synopsis stayed blank while other metadata rendered — fixed in {version}\n\nReal-device beta5 showed title/author/category/latest chapter, works metadata, month-ticket data, shortcuts and tags correctly, but the synopsis block was absent. The detail-local synopsis scanner did not include Qidian's `bookInfo` field, and the sparse-detail decision did not treat a missing synopsis as incomplete. Beta6 adds `bookInfo/BookInfo`, treats a blank synopsis as enrichment-worthy, and reuses the same single Qidian PC HTML response as a fallback source for synopsis text. The enrichment marker is versioned to V1106 so a prior Beta attempt cannot suppress the new parser during immediate testing. No second endpoint is added. Status: Beta, pending real-device confirmation.\n"
+          ki.write_text(kt,'utf-8')
+
+          rl = ROOT/'docs/RELEASE_LOG.md'
+          rt = rl.read_text('utf-8')
+          assert f'🌈 起点增强 {version}' not in rt
+          rt += f"\n\n### {date} — 🌈 起点增强 {version}\n- Detail-only synopsis fix from real-device beta5 feedback: add Qidian `bookInfo/BookInfo` synopsis extraction.\n- A blank synopsis now counts as incomplete detail data; the existing PC enrichment may run once and its same HTML response is reused for synopsis extraction.\n- Bump the 30-minute enrichment-attempt marker to V1106 so previous Beta attempts do not mask this parser change during testing.\n- Keep the physical one-request limit, 2.6s timeout, Stable 1.0.0, search/catalog/content/review/Provider modules and 情无 VIP authentication chain unchanged.\n"
+          rl.write_text(rt,'utf-8')
+
+          ho = ROOT/'docs/sources/qidian-next/PROJECT_HANDOFF.md'
+          ht = ho.read_text('utf-8')
+          assert f'## Detail synopsis repair {version}' not in ht
+          ht += f"\n\n## Detail synopsis repair {version} ({date})\n\n- Real-device beta5: custom 作品资料/月票/快捷入口/标签 render, but 内容简介 is completely absent.\n- Root cause in the detail-local fast parser: `introFromCurrent()` scanned BookIntro/BookDesc/Introduction variants but omitted Qidian's `bookInfo` synopsis field; `qfDetailSparseV1104()` also did not consider a blank synopsis.\n- Beta6 adds `BookInfo/bookInfo`, includes blank `info.intro` in the sparse decision, and fills `info.intro` from `rich.intro || introFromCurrent(pcHtml)` after the existing one official PC request. No additional endpoint/fallback chain is introduced.\n- The attempt-cache key moves from V1104 to V1106 solely to prevent an earlier Beta's 30-minute marker from blocking immediate validation of the new parser. Request limit stays physically at most one with 2.6s timeout and 30-minute suppression thereafter.\n- Source-level guard confirms only `bookSourceComment` and `ruleBookInfo.init` changed; `jsLib`, source identity, search/catalog/content/review/Provider and 情无 logic are preserved.\n- Status: Beta, pending real-device confirmation.\n"
+          ho.write_text(ht,'utf-8')
+
+          for p in [source_path,bundle_path,sub_path,man_path,rss_path]:
+              json.loads(p.read_text('utf-8'))
+          print('Beta6 source sha256:', sha)
+          print('Bundle replacements:', replaced)
+          print('Manifest matches:', len(found))
+          PY
+      - name: Commit Beta6
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next-beta.json bundles/all-beta.json subscription/beta.json manifest.json rss/data/details/beta/qidian-next.json docs/KNOWN_ISSUES.md docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git diff --cached --quiet && exit 1
+          git commit -m 'fix: restore qidian detail synopsis beta1106'
+          git push origin HEAD:main
