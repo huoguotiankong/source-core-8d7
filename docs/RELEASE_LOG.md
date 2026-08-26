@@ -1,5 +1,23 @@
 # RELEASE LOG
 
+## 2026-08-26 — Qidian Next 1.1.0-beta9 detail rich fallback
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Real-device finding:
+
+- Beta8 still rendered only a small subset of detail metrics, proving APP `bookDetailInfo` is not a reliable sole enrichment path in the user environment.
+
+Changes:
+
+- Kept current-response/book-cache fast path and APP enrichment as the first layer.
+- Restored cached qidiantu rich-detail fallback only when the detail remains sparse.
+- Added exact-bookId Qidian mobile-search fallback for synopsis / reading / recommendation.
+- Removed the Beta8 30-minute failure suppression behavior; negative caches are short-lived.
+- Kept search/catalog/content/review/account domains frozen.
+- Published SHA256: `d866eb0da45f0c08c8374208e03027f9a1fe0d919c0070bd64288622bd2461a5`.
+
+
 ## 2026-08-26 — Qidian Next 1.1.0-beta8 Beta
 
 Status: Beta/Test; awaiting user real-device confirmation.

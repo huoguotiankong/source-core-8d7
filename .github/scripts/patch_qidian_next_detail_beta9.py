@@ -199,7 +199,7 @@ qfNormalizeDetailV1104();
 qfDetailOfficialSearchV1109.call(this);
 qfNormalizeDetailV1104();'''
 
-    init2, n = pattern.subn(replacement, init, count=1)
+    init2, n = pattern.subn(lambda _m: replacement, init, count=1)
     assert n == 1, f'Beta8 enrichment block match count={n}'
     assert 'qfDetailOfficialEnrichV1108' not in init2
     assert 'qfDetailAppEnrichV1109' in init2
