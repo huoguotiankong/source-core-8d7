@@ -1,1 +1,1 @@
-debug qidian detail patterns 2
+debug qidian detail patterns 3
