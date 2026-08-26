@@ -12,8 +12,23 @@
       "channel": "stable",
       "version": "1.0.0",
       "updatedAt": "2026-08-26",
-      "tags": ["哔咔","漫画","正式版","APP API","网页线路","评论","楼中楼","定制按钮","双线路"],
-      "changelog": ["由 1.0.0-beta9 真机确认基线原样晋升 Stable，不新增业务逻辑","详情页顶部定制按钮已真机确认恢复，可直接进入独立哔咔评论中心","相关推荐保留 page>1 硬终止和漫画 ID/标题/封面路径三层独立去重","保留登录、账户中心、签到、点赞收藏、评论/楼中楼、标签、目录、漫画图片正文及 APP/Web 双线路"],
+      "tags": [
+        "哔咔",
+        "漫画",
+        "正式版",
+        "APP API",
+        "网页线路",
+        "评论",
+        "楼中楼",
+        "定制按钮",
+        "双线路"
+      ],
+      "changelog": [
+        "由 1.0.0-beta9 真机确认基线原样晋升 Stable，不新增业务逻辑",
+        "详情页顶部定制按钮已真机确认恢复，可直接进入独立哔咔评论中心",
+        "相关推荐保留 page>1 硬终止和漫画 ID/标题/封面路径三层独立去重",
+        "保留登录、账户中心、签到、点赞收藏、评论/楼中楼、标签、目录、漫画图片正文及 APP/Web 双线路"
+      ],
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg.json?v=10000",
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/picacg/picacg.json?v=10000",
       "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg.json?v=10000",
@@ -23,19 +38,39 @@
     {
       "id": "jmcomic",
       "name": "◈ 禁漫天堂",
-      "summary": "禁漫天堂全功能测试源：APP/API + 网页双线路、动态域名、登录账户、收藏历史、评论/回复与漫画图片正文。",
+      "summary": "禁漫天堂 Beta3：修复详情页按钮/数据模板、评论 HTML/头像/回复字段和目录加载，保留 APP/API + Web 双线路、动态域名、登录账户、收藏历史与漫画正文。",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg",
       "channel": "beta",
-      "version": "0.1.0-beta1",
-      "updatedAt": "2026-08-26",
-      "tags": ["禁漫天堂","漫画","测试版","APP API","网页线路","动态域名","登录","账户","评论","回复","收藏","双线路"],
-      "changelog": ["首个 Beta/Test 仓库版本","APP/API 与网页双线路自动故障切换，并缓存最近成功线路","API 动态域名服务器 + jm365 永久跳转页/jmcomicgo 发布页自动更新 Web 域名","支持登录、账户中心、收藏、观看历史、评论分页、发表评论与回复","详情页正文入口与顶部定制按钮均可打开独立评论中心","公共 jsLib 在仓库分段加载并缓存；搜索/详情/目录/正文规则与本地 Beta1 保持一致"],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1001",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/jmcomic/jmcomic-beta.json?v=1001",
-      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1001",
+      "version": "0.1.0-beta3",
+      "updatedAt": "2026-08-27",
+      "tags": [
+        "禁漫天堂",
+        "漫画",
+        "测试版",
+        "APP API",
+        "网页线路",
+        "动态域名",
+        "登录",
+        "账户",
+        "评论",
+        "回复",
+        "收藏",
+        "双线路"
+      ],
+      "changelog": [
+        "修复详情页 @onclick 与 @get 模板被当普通文字显示，改为 JS 动态生成互动区与作品数据",
+        "评论按 JM APP 实际 CID / UID / replys / photo 字段解析，HTML 正文转纯文本并补全用户头像路径",
+        "目录改为 Java List + @json；APP series 缺失时使用原网页 btn-toolbar / reading 目录链兜底",
+        "目录阶段强制漫画类型 book.type=64",
+        "保留 Beta2 已验证恢复的发现/分类与登录按钮 this.java 兼容修复",
+        "仓库版取消启动阶段远程 runtime loader，恢复完整内联 jsLib"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1003",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/jmcomic/jmcomic-beta.json?v=1003",
+      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1003",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/jmcomic.json",
       "type": "comic"
     }
   ],
-  "generatedAt": "2026-08-26T23:10:00+08:00"
+  "generatedAt": "2026-08-27T07:38:00+08:00"
 }
