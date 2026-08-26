@@ -13,23 +13,29 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Inspect exact HTML detail parser calls
+      - name: Identify rich detail parser
         run: |
           python - <<'PY'
-          import json
+          import json,re
           from pathlib import Path
           s=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text(encoding='utf-8'))[0]
           text=str(s.get('jsLib',''))
-          for pat in ['qfHtmlBookCoreV08(', 'qfAjaxTextV20(ctx,\'https://www.qidian.com/book/\'', 'qfAjaxTextV20(this,\'https://www.qidian.com/book/\'', 'function qfHtmlBookCoreV08', 'return {name:name', 'collectionCount:collectionCount']:
-              print('\n===== PATTERN',pat,'=====')
-              start=0;n=0
-              while True:
-                  i=text.find(pat,start)
-                  if i<0: break
-                  n+=1
-                  print(f'--- hit {n} @ {i} ---')
-                  print(text[max(0,i-1800):min(len(text),i+4200)])
-                  start=i+len(pat)
-                  if n>=15: break
-              print('hits_shown=',n)
+          needle='collectionCount:collectionCount'
+          i=text.find(needle)
+          print('needle=',i)
+          assert i>=0
+          defs=list(re.finditer(r'function\s+([A-Za-z0-9_$]+)\s*\(',text[:i]))
+          for m in defs[-12:]: print('DEF',m.group(1),'@',m.start())
+          if defs:
+              m=defs[-1];print('\nLAST FUNCTION=',m.group(1));print(text[m.start():min(len(text),i+1800)])
+          # Also locate direct source-page requests near any rich parser call sites.
+          for pat in ['safeMetricCount(', 'JSON.stringify({', 'https://www.qidian.com/book/', 'https://m.qidian.com/book/']:
+              print('\nPAT',pat)
+              pos=0
+              for n in range(15):
+                  j=text.find(pat,pos)
+                  if j<0: break
+                  fn=[x for x in re.finditer(r'function\s+([A-Za-z0-9_$]+)\s*\(',text[:j])]
+                  print(j,'fn=',fn[-1].group(1) if fn else '-')
+                  pos=j+len(pat)
           PY
