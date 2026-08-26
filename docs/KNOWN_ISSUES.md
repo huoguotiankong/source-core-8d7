@@ -257,3 +257,13 @@ Beta11 mitigation:
 
 Status: published as RSS UI `0.3.1-beta11`, awaiting real-device confirmation.
 
+## 19. RSS Beta11 leaves an empty detail page behind — fixed in Beta12
+
+Real-device symptom: opening a repository item launched the styled card page, but after returning an additional blank RSS detail page remained in the navigation stack.
+
+Cause: Beta11 opened a second browser from inside `ruleContent` with `java.startBrowser(...)` and then returned a blank string to the already-open RSS detail page.
+
+Fix: return the styled HTML directly from `ruleContent` and let the current RSS detail WebView render it; do not launch a second browser. `ruleDescription` remains overridden so old summary rules do not take over. Cache revision bumped to `ui=12`.
+
+Status: published as RSS UI `0.3.2-beta12`, awaiting real-device confirmation.
+

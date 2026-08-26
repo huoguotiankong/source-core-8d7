@@ -1,5 +1,17 @@
 # RELEASE LOG
 
+## 2026-08-26 — RSS repository UI 0.3.2-beta12
+
+Status: Beta/Test; blank-detail-page fix awaiting real-device confirmation.
+
+Changes:
+
+- Removed the Beta11 `java.startBrowser(data:text/html...)` second-browser launch from `ruleContent`.
+- Styled detail HTML is now returned directly into the current RSS detail page, matching the mature RSS-source rendering pattern.
+- Kept Beta11 list de-duplication and Stable/Beta physical separation.
+- Bumped repository category/detail cache revision to `ui=12`.
+- Book-source Stable/Beta files and versions were not modified.
+
 ## 2026-08-26 — RSS repository UI 0.3.1-beta11
 
 Status: Beta/Test; repository cleanup and detail-rendering repair awaiting real-device confirmation.
