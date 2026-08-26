@@ -38,9 +38,9 @@ jobs:
           full=Path(paths[0]).read_text(encoding='utf-8')
           for marker in ['X-Content-Token','VIP正文已验证']: assert marker in full
           def unwrap(v):
-              x=v[4:] if v.startswith('@js:') else v
-              # Legado rule strings in this source may have a trailing <js> marker in some versions.
-              if x.endswith('<js>'): x=x[:-4]
+              x=v
+              if x.startswith('<js>') and x.endswith('</js>'): x=x[4:-5]
+              elif x.startswith('@js:'): x=x[4:]
               return x
           Path('/tmp/init.js').write_text(unwrap(init),encoding='utf-8')
           Path('/tmp/intro.js').write_text(unwrap(intro),encoding='utf-8')
