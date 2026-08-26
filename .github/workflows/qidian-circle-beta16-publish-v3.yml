@@ -1,0 +1,32 @@
+name: qidian-circle-beta16-publish-v3
+on:
+  push:
+    paths:
+      - '.github/workflows/qidian-circle-beta16-publish-v3.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch and validate Beta16
+        run: python .staging/qidian-circle-beta16/publish.py
+      - name: Commit Beta16
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sources/novel/qidian-next/qidian-next-beta.json \
+                  bundles/all-beta.json \
+                  subscription/beta.json \
+                  manifest.json \
+                  rss/data/details/beta/qidian-next.json \
+                  docs/RELEASE_LOG.md \
+                  docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git diff --cached --check
+          git commit -m "fix: qidian-next circle detail click beta16"
+          git push origin HEAD:main
