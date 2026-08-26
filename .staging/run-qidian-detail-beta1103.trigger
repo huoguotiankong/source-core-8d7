@@ -1,1 +1,1 @@
-run qidian detail beta1103 2
+run qidian detail beta1103 3
