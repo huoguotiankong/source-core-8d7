@@ -13,6 +13,20 @@ Promotion:
 - Stable SHA256: `e181e0c0dd917687e98441a4208192977f6799f921591405a4c729d9dd46cb69`.
 
 
+## 2026-08-27 — 漫蛙漫画 0.1.0-beta2
+
+Status: Beta/Test; targeted real-device repair, awaiting confirmation.
+
+Changes:
+
+- Beta1 real-device screenshots confirmed discovery/list rendering works, but author parsing bound a large wrapper block, TOC stayed loading, and the comment button lost the current-work URL.
+- Author extraction now only accepts an independent `作者：xxx` line, with conservative HTML fallback; it no longer returns any element merely containing the word “作者”.
+- Detail parsing now runs once in `init`; cached fields feed the display renderer.
+- Added explicit WebView-backed `tocUrl`; TOC scans and de-duplicates all `/chapter/` anchors.
+- Current work URLs now strip Legado request-option suffixes and persist through source/book/java contexts for comment/custom-button use.
+- Discovery, login/Cookie, dynamic-domain, anti-bot WebView and AES image logic remain unchanged.
+- Repository source SHA256: `68a7d847739fea6b5f3544a3fb854dcdf194d7eae28f546518b4b830bd798e32`.
+
 ## 2026-08-27 — 漫蛙漫画 0.1.0-beta1
 
 Status: Beta/Test; new reconstructed source awaiting user real-device confirmation.
