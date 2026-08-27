@@ -1,3 +1,18 @@
+## 2026-08-27 — JMComic 0.1.0-beta5 detail/content/comment hotfix
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Changes:
+
+- 详情“查看评论 / 收藏作品”直接绑定当前漫画 ID，不再依赖点击上下文重新识别。
+- 详情名称、封面、作者、简介和标签回归原始禁漫网页源已验证选择器，APP/API 仅作为附加数据。
+- 正文优先读取当前网页章节 `data-original` 图片链。
+- APP `/chapter` 图片对象补齐 `image` 字段解析，修复“正文没有图片”。
+- Web 主动请求保留为第三兜底，图片分流与 JM 反混淆保持。
+- 评论中心继续优化卡片、楼中楼、页码、回复目标和暗色模式；已恢复的评论数据模型不改。
+- Published SHA256: `3266fae2495344cf8efbee76a2bef692f0530671d81a794336a485fcdc7e791b`.
+
+
 ## 2026-08-27 — JMComic 0.1.0-beta4 detail HTML + TOC fallback fix
 
 Status: Beta/Test; awaiting user real-device confirmation.
