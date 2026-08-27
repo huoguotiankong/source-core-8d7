@@ -1,3 +1,18 @@
+## 2026-08-27 — JMComic 1.0.0 Stable
+
+Status: Stable. User explicitly requested formal release.
+
+Promotion:
+
+- `0.1.0-beta8` is promoted to Stable 1.0.0 without new business logic.
+- Stable source path: `sources/comic/jmcomic/jmcomic.json`.
+- Stable detail path: `rss/data/details/stable/jmcomic.json`.
+- Stable and Beta preserve the same `bookSourceUrl`: `https://sc8d7.invalid/legado/jmcomic-8d7`.
+- Active Beta JMComic entry is removed from Beta/type duplicate listings; historical Beta files remain.
+- Stable retains dual routes, login/AVS auth, account/favourites/history, comments/replies, detail tags, verified TOC/content and image de-scrambling.
+- Stable SHA256: `e181e0c0dd917687e98441a4208192977f6799f921591405a4c729d9dd46cb69`.
+
+
 ## 2026-08-27 — JMComic 0.1.0-beta8 login credentials + AVS auth
 
 Status: Beta/Test; awaiting user real-device confirmation.
