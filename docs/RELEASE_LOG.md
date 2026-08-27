@@ -1,3 +1,24 @@
+## 2026-08-27 — JMComic 0.1.0-beta6 robust comment identity + comment UI
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Real-device finding:
+
+- Beta5 manga content is confirmed working and is frozen.
+- Detail “查看评论” and the top custom button both reached the callback but failed with “无法识别漫画 ID”, proving the remaining failure is identity recovery rather than the comment API.
+
+Changes:
+
+- 搜索/发现阶段持久保存规范化标题、封面路径到 JM ID 的映射。
+- 详情/定制按钮统一使用显式 ID、bookUrl/ruleUrl/baseUrl、canonical/og:url、标题/封面映射多级解析。
+- 详情“查看评论 / 收藏作品”直接携带 JM ID + 标题 + 封面三重上下文。
+- 顶部 customButton 使用同一个 resolver，不再只依赖当前 book/baseUrl。
+- 详情作品数据新增 JM 编号、评论数与当前线路。
+- 评论页优化页面 title、卡片、楼中楼时间、页码和回复目标；评论数据模型不改。
+- Beta5 目录/正文、APP `/chapter image` 字段兼容、图片分流与反混淆冻结。
+- Published SHA256: `c36f64b73b3865a6ac0b1d07de2ae1a85b27407b04f54fe5b47ba189ecf65b69`.
+
+
 ## 2026-08-27 — JMComic 0.1.0-beta5 detail/content/comment hotfix
 
 Status: Beta/Test; awaiting user real-device confirmation.
