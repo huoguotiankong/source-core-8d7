@@ -5,91 +5,77 @@ Updated: 2026-08-27
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta4`
+- Version: `0.1.0-beta5`
 - Display name: `◈ 禁漫天堂`
 - Legado identity: `https://sc8d7.invalid/legado/jmcomic-8d7`
 - Repository source: `sources/comic/jmcomic/jmcomic-beta.json`
 - RSS detail: `rss/data/details/beta/jmcomic.json`
-- Source-specific bundle: `bundles/jmcomic-beta4.json`
-- Runtime: complete inline `jsLib`; Beta1 runtime parts are historical only.
+- Source-specific bundle: `bundles/jmcomic-beta5.json`
+- Runtime: complete inline `jsLib`.
 
-## Real-device history
+## Confirmed real-device progression
 
-### Beta1
+- Beta1: repository Raw runtime loader failed because `java` resolved to Rhino `JavaPackage`.
+- Beta2: discovery/categories and login-page buttons recovered after explicit `this.java` compatibility handling.
+- Beta3: comment HTML text and nested replies recovered; TOC direction improved.
+- Beta4: detail HTML buttons render correctly and Web TOC opens.
+- Beta5: targets the remaining issues from the latest screenshots:
+  1. Detail comment/favourite buttons bind the album ID directly.
+  2. Detail visual data falls back to the original Web source selectors.
+  3. Content uses the original verified chapter-image selector first.
+  4. APP `/chapter` image objects now accept the actual `image` field.
+  5. Comment UI is refined without changing the recovered comment data model.
 
-Repository delivery used a five-part Raw loader. Legado resolved `java` as Rhino `JavaPackage java` during jsLib initialization, so `java.ajax` failed. Discovery and all login-page actions were unusable.
-
-### Beta2
-
-Removed startup Raw loading and resolved the Legado bridge through `this.java`. User real-device feedback confirmed discovery/category pages and login-page buttons recovered.
-
-### Beta3
-
-Fixed JM forum comment normalization:
-
-- API fields `CID / UID / content / photo / replys`
-- HTML comment body -> readable text
-- relative avatars -> `/media/users/`
-- nested `replys` recursively normalized
-
-Real-device feedback confirmed comment bodies and nested replies are now readable.
-
-Beta3 remaining failures:
-
-- detail JS-returned buttons were still rendered as literal `@onclick` text
-- detail showed `baseUrl 未定义`
-- catalog stayed loading
-
-### Beta4
+## Current architecture
 
 1. Detail
-   - Adds the same `<usehtml>...</usehtml>` wrapper used by the verified Picacg detail page.
-   - Removes direct jsLib dependence on the rule-local `baseUrl`.
-   - Adds safe ID resolution from book variable, bookUrl, ruleUrl, then safe baseUrl.
-2. Catalog
-   - Detail precomputes a real Web album URL in `jm_toc`.
-   - TOC returns to the original user-provided source selector: `class.btn-toolbar.0@tag.a||.reading`.
-   - Chapter body still uses Auto / APP/API / Web routes.
-3. Comments
-   - Beta3 comment behavior is frozen in Beta4; no UI rewrite.
+   - Album ID is captured during init and inserted directly into button callbacks.
+   - Name/cover/author/description/tags use the original Web selectors as the visual baseline.
+   - API detail data is supplemental only.
+2. TOC
+   - Original Web selectors `class.btn-toolbar.0@tag.a||.reading`.
+   - Manga mode `book.type=64`.
+   - Selected image shunt is appended to chapter URLs.
+3. Content
+   - First: current Web chapter `.row.thumb-overlay-albums img[data-original]`.
+   - Second: APP `/chapter?id=<photoId>`; supports string items and object `image/name/filename/url`.
+   - Third: active Web request and Jsoup image extraction.
+   - Existing image de-scrambling retained.
+4. Comments
+   - APP `/forum` read first, Web fallback.
+   - `CID/UID/content/photo/replys` normalization retained.
+   - Independent comment center supports paging, posting, replying and nested replies.
+5. Account/routes
+   - Auto / APP/API / Web route switching.
+   - Dynamic API and Web domain refresh.
+   - Login, account center, favourites and history.
 
-## Architecture retained
+## Repository publication state
 
-- APP/API + Web dual routes and fallback
-- APP dynamic domain refresh
-- Web permanent-link/publication-page domain discovery
-- dual-route login and account center
-- favourites and watch history
-- independent comment center with paging/post/reply
-- detail comment entry and top custom button
-- manga image shunts 1-4
-- JM image de-scrambling
-
-## Repository publication
-
-Beta4 is synchronized to:
+Beta5 is synchronized in:
 
 - `manifest.json`
 - `subscription/beta.json`
 - `subscription/comic.json`
 - `rss/data/details/beta/jmcomic.json`
 - `sources/comic/jmcomic/jmcomic-beta.json`
-- `bundles/jmcomic-beta4.json`
+- `bundles/jmcomic-beta5.json`
 - `bundles/all-beta.json`
 - `docs/sources/jmcomic/RELEASE_NOTES.md`
 - `docs/RELEASE_LOG.md`
 
-Repository source SHA256: `df81fa4a10ab178454c0a59c52dd3ee0bf5ed9ef1da06704c04df4a5fb352598`.
+Repository Beta5 source SHA256: `3266fae2495344cf8efbee76a2bef692f0530671d81a794336a485fcdc7e791b`.
 
 ## Next real-device checklist
 
-1. Detail interaction buttons should render as buttons, not literal `@onclick` text.
-2. Detail should no longer show `baseUrl 未定义`.
-3. Open catalog for single-album and multi-chapter works.
-4. Open one chapter and verify image body.
-5. Recheck comment center; Beta3 behavior should remain unchanged.
-6. Test Auto, APP/API and Web content routes.
+1. Detail cover, single author, synopsis and tags.
+2. Detail “查看评论” should open the same comment center as the top custom button.
+3. Detail “收藏作品” should submit against the correct album ID.
+4. Open a Web TOC chapter and verify images appear.
+5. Test the same chapter with Auto, APP/API and Web route modes.
+6. Verify scrambled newer chapters.
+7. Comment paging, replies and posting after the UI refinement.
 
 ## Promotion rule
 
-Do not promote to Stable until the user explicitly confirms the real-device test is normal or directly requests Stable promotion.
+Do not promote to Stable until the user explicitly confirms the source is normal on device or directly requests Stable promotion.
