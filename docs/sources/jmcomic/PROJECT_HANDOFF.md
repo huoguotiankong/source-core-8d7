@@ -4,68 +4,66 @@ Updated: 2026-08-27
 
 ## Current release
 
-- Channel: Beta/Test
-- Version: `0.1.0-beta8`
+- Channel: Stable
+- Version: `1.0.0`
+- Promoted baseline: `0.1.0-beta8`
 - Display name: `◈ 禁漫天堂`
 - Legado identity: `https://sc8d7.invalid/legado/jmcomic-8d7`
-- Repository source: `sources/comic/jmcomic/jmcomic-beta.json`
-- RSS detail: `rss/data/details/beta/jmcomic.json`
-- Source-specific bundle: `bundles/jmcomic-beta8.json`
-- Runtime: complete inline `jsLib`.
+- Stable source: `sources/comic/jmcomic/jmcomic.json`
+- Historical Beta source: `sources/comic/jmcomic/jmcomic-beta.json`
+- Stable RSS detail: `rss/data/details/stable/jmcomic.json`
+- Stable bundle: `bundles/jmcomic-stable.json`
 
-## Confirmed real-device progression
+## Stable promotion
 
-- Beta1: Raw runtime loader failed because `java` resolved to Rhino `JavaPackage`.
-- Beta2: discovery/categories and login-page buttons recovered.
-- Beta3: comment text/nested replies recovered.
-- Beta4: detail HTML and Web TOC recovered.
-- Beta5: manga content confirmed working; TOC/content frozen.
-- Beta6: JM ID recovery restored detail/custom comment entry.
-- Beta7: comment bridge protocol fixed; detail authors/tags enriched.
-- Beta8: login-specific repair.
+On 2026-08-27 the user explicitly requested promotion of the Beta8 baseline to Stable.
 
-## Beta8 login architecture
+Stable 1.0.0 is a release-channel promotion, not a new feature version. No new business logic was added during promotion. Only release/version metadata and distribution paths were changed.
 
-1. Credentials
-   - primary: `source.getLoginInfoMap()`;
-   - fallback: legacy `source.getLoginInfo()`.
-2. APP login
-   - token secret prefers `18comicAPP`;
-   - tries APP versions `2.1.2` and `2.0.20`;
-   - successful response field `s` is stored as AVS.
-3. Auth persistence
-   - AVS is written through `ctx.cookie` when available;
-   - all later APP/API requests also explicitly send `Cookie: AVS=<value>`.
-4. Web login
-   - official form fields: username/password/id_remember/login_remember/submit_login;
-   - manual Web login button retained as fallback.
-5. Diagnostics
-   - login status button shows username, UID, AVS state, Web state, API host/version;
-   - clear-login button removes local auth state.
+## Stable 1.0.0 capabilities
 
-## Frozen modules
+- APP/API + Web dual routes.
+- Dynamic APP/Web domain refresh.
+- Login credentials read through `source.getLoginInfoMap()` with legacy fallback.
+- APP login compatibility for `18comicAPP` and app versions `2.1.2 / 2.0.20`.
+- AVS persistence and explicit API authentication.
+- Manual Web login fallback and login-state diagnostics.
+- Account center, favourites and watch history.
+- Independent comment center, nested replies, post/reply and detail/custom-button entry.
+- Clickable authors/original works/tags and enriched detail metrics.
+- Verified Web TOC and manga content.
+- APP `/chapter image` compatibility.
+- Image shunts 1-4 and JM image de-scrambling.
 
-- Web TOC and manga mode.
-- Current-page Web content.
-- APP `/chapter image` field compatibility.
-- Image shunts / de-scrambling.
-- Beta7 detail tag UI.
-- Beta7 comment bridge and comment UI.
+## Distribution separation
 
-## Repository publication
+Stable and Beta share the same permanent Legado `bookSourceUrl` identity so imports update the same logical source.
 
-Beta8 synchronized in source, Manifest, Beta subscription, Comic subscription, RSS detail, source-specific bundle, all-beta bundle, Release Notes and Release Log.
+Physical distribution is separate:
 
-Repository Beta8 source SHA256: `b6e5efbe29ea2018f1d3246e0e1ce0d9e0347efb4818afd4e9496f69734d7514`.
+- Stable: `sources/comic/jmcomic/jmcomic.json`
+- Historical/Future Beta: `sources/comic/jmcomic/jmcomic-beta.json`
 
-## Next real-device checklist
+After promotion, the active Beta catalog entry is removed. Historical Beta files remain for compatibility/history only. Future unconfirmed changes must return to the Beta file path and Beta channel.
 
-1. Fill account/password, tap “账号登录”.
-2. Tap “登录状态”; verify username and APP/API AVS state.
-3. Open account center.
-4. Try favourite or post/reply comment to verify authenticated request.
-5. If APP succeeds but Web fails, use “网页登录” and re-check status.
+## Repository publication state
 
-## Promotion rule
+Stable 1.0.0 is synchronized in:
 
-Do not promote to Stable until the user explicitly confirms normal operation or requests promotion.
+- `manifest.json`
+- `subscription/stable.json`
+- `subscription/comic.json`
+- `rss/data/details/stable/jmcomic.json`
+- `sources/comic/jmcomic/jmcomic.json`
+- `bundles/jmcomic-stable.json`
+- `bundles/all-stable.json`
+- `docs/sources/jmcomic/RELEASE_NOTES.md`
+- `docs/RELEASE_LOG.md`
+
+The active JMComic entry is removed from `subscription/beta.json` and `bundles/all-beta.json`.
+
+Stable source SHA256: `e181e0c0dd917687e98441a4208192977f6799f921591405a4c729d9dd46cb69`.
+
+## Future development rule
+
+Do not modify the Stable file with unconfirmed changes. New work starts from Stable 1.0.0 into the separate Beta path, and returns to Stable only after user real-device confirmation or an explicit Stable-release request.
