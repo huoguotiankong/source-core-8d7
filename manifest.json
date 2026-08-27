@@ -143,13 +143,13 @@
       "category": "comic",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "0.1.0-beta4",
-      "versionCode": 1004,
-      "updatedAt": "2026-08-27T07:55:00+08:00",
+      "version": "0.1.0-beta5",
+      "versionCode": 1005,
+      "updatedAt": "2026-08-27T08:46:00+08:00",
       "sourcePath": "sources/comic/jmcomic/jmcomic-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1004",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1005",
       "bookSourceUrl": "https://sc8d7.invalid/legado/jmcomic-8d7",
-      "summary": "禁漫天堂 Beta4：修复详情按钮纯文本与 baseUrl 未定义，目录回归原始 Web 选择器；保留评论、双线路、动态域名、登录账户和漫画正文。",
+      "summary": "禁漫天堂 Beta5：修复详情评论入口 ID、恢复原始网页详情选择器、正文网页优先与 APP image 字段，并优化评论中心 UI。",
       "tags": [
         "禁漫天堂",
         "漫画",
@@ -165,15 +165,15 @@
         "双线路"
       ],
       "changelog": [
-        "详情互动区加入 <usehtml> 包装，使 @onclick 按钮按阅读 HTML 规则执行",
-        "清除 jsLib 对规则局部 baseUrl 的直接依赖，详情/正文通过安全上下文解析 ID",
-        "详情提前写入真实 Web album 目录地址",
-        "目录回归原始禁漫源已验证的 class.btn-toolbar.0@tag.a||.reading 选择器",
-        "章节正文继续支持自动 / APP/API / Web 路线，不把目录强制绑定到单一正文线路",
-        "保留 Beta3 评论 HTML 清洗、头像补全和楼中楼 replys",
-        "保留 Beta2 发现分类和登录入口 this.java 兼容修复"
+        "详情评论/收藏按钮直接绑定当前漫画 ID，不再依赖点击上下文重新识别",
+        "详情名称、封面、作者、简介和标签回归原始禁漫网页源已验证选择器",
+        "正文优先使用原始网页章节 data-original 图片链",
+        "APP /chapter 图片对象补齐 image 字段解析，修复正文没有图片",
+        "Web 主动请求继续作为第三兜底，保留图片分流和 JM 反混淆",
+        "评论中心优化卡片、楼中楼、页码、回复状态和暗色模式",
+        "发现、登录、目录等已恢复功能冻结不动"
       ],
-      "sha256": "df81fa4a10ab178454c0a59c52dd3ee0bf5ed9ef1da06704c04df4a5fb352598",
+      "sha256": "3266fae2495344cf8efbee76a2bef692f0530671d81a794336a485fcdc7e791b",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],
