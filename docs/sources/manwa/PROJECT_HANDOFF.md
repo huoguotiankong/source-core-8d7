@@ -5,7 +5,7 @@ Updated: 2026-08-27
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta1`
+- Version: `0.1.0-beta2`
 - Display name: `◈ 漫蛙漫画`
 - Legado identity: `https://sc8d7.invalid/legado/manwa-8d7`
 - Beta source: `sources/comic/manwa/manwa-beta.json`
@@ -15,6 +15,23 @@ Updated: 2026-08-27
 ## Baseline
 
 This is a new reconstruction. The user-provided Manwa source was used only to confirm working HTML selectors, query parameters and the current image-decryption chain. Its selector-combination discovery UI is not retained.
+
+## Beta2 current state
+
+Beta1 real-device feedback:
+
+- Discovery/list works and returns manga cards.
+- Author extraction can bind a large wrapper block, producing synopsis/page text as the author.
+- TOC can remain loading because no explicit detail tocUrl is supplied.
+- Comment entry can lose the current work URL across WebView/request contexts.
+
+Beta2 repairs:
+
+- Author extraction now accepts only an independent line beginning with `作者：` and uses a conservative HTML fallback.
+- Detail parsing runs once in `init`; `intro` only renders cached fields.
+- `tocUrl` is explicit and keeps the WebView carrier.
+- TOC scans all `/chapter/` anchors and de-duplicates by chapter id.
+- Book URL helpers strip Legado request-option suffixes and persist the current work URL through source/book/java contexts.
 
 ## Beta1 architecture
 
