@@ -5,7 +5,7 @@ Updated: 2026-08-27
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta5`
+- Version: `0.1.0-beta6`
 - Display name: `◈ 漫蛙漫画`
 - Legado identity: `https://sc8d7.invalid/legado/manwa-8d7`
 - Beta source: `sources/comic/manwa/manwa-beta.json`
@@ -15,6 +15,22 @@ Updated: 2026-08-27
 ## Baseline
 
 This is a new reconstruction. The user-provided Manwa source was used only to confirm working HTML selectors, query parameters and the current image-decryption chain. Its selector-combination discovery UI is not retained.
+
+## Beta6 official callback API fix
+
+Beta5 real-device result:
+
+- Detail/TOC remain working.
+- Custom comment button still reports that the manga id is unresolved.
+
+Repository investigation of Legado itself found the actual callback contract:
+
+- `SourceCallBack.callBackBtn()` injects `event`, `java`, `result`, `book`, and `chapter`.
+- `Book` exposes Kotlin/JVM getters including `getBookUrl()`, `getTocUrl()`, and `getName()`.
+
+Beta6 removes the manga-id gate entirely. The custom button reads the current URL through the explicit JVM getters, strips only the Legado request suffix, and calls `java.startBrowser()` directly. It falls back from book URL to TOC URL only when necessary.
+
+Detail/TOC and Beta5 image-source work are frozen.
 
 ## Beta5 comment and image-route fix
 
