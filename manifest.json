@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-27T10:00:00+08:00",
+  "updatedAt": "2026-08-27T11:49:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -172,6 +172,39 @@
         "保留已验证的网页目录、漫画正文、APP /chapter image 兼容、图片分流 1-4 与 JM 反混淆"
       ],
       "sha256": "e181e0c0dd917687e98441a4208192977f6799f921591405a4c729d9dd46cb69",
+      "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
+    },
+    {
+      "id": "manwa",
+      "name": "◈ 漫蛙漫画",
+      "category": "comic",
+      "artifactType": "bookSource",
+      "channel": "beta",
+      "version": "0.1.0-beta1",
+      "versionCode": 1001,
+      "updatedAt": "2026-08-27T11:49:00+08:00",
+      "sourcePath": "sources/comic/manwa/manwa-beta.json",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1001",
+      "bookSourceUrl": "https://sc8d7.invalid/legado/manwa-8d7",
+      "summary": "Beta1：发现页重写为分区直达；加入官方网页登录/Cookie、官方评论入口和自动更新域名。",
+      "tags": [
+        "漫蛙",
+        "漫画",
+        "测试版",
+        "动态域名",
+        "网页登录",
+        "评论",
+        "收藏",
+        "WebView"
+      ],
+      "changelog": [
+        "发现页完全重写为快捷入口、主分类、地区、连载状态、常用标签分区直达，不沿用参考源的排列组合筛选",
+        "启用 CookieJar，账号使用官方网页登录，提供会员中心、我的收藏、主页与公告入口",
+        "详情页互动按钮与 BookInfo 顶部定制按钮均可进入当前作品官方评论页，复用官网评论/回复/举报能力",
+        "加入 12 小时域名缓存、官方走失/跳转入口解析、备用域名探测、手动刷新和线路诊断",
+        "保留本地搜索/详情/目录/正文规则、WebView 反爬兼容及当前 AES/CBC 图片解密链"
+      ],
+      "sha256": "0708de51154c534846e05a8905b2a408adc95a665b3fa245c133e14880f3e247",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],
