@@ -1,35 +1,35 @@
 {
   "kind": "source",
   "title": "◈ 漫蛙漫画",
-  "summary": "漫蛙漫画 0.1.0-beta9：清理旧线路登录状态、保持稳定正文链，并修复评论页过早搬 DOM 导致的空白。",
+  "summary": "漫蛙漫画 0.1.0-beta10：评论页按真实 DOM/CSS 重做布局 reset，修复楼中楼挤压和等级徽章过大；登录设置改为紧凑双列。",
   "badges": [
     "Beta",
-    "0.1.0-beta9",
+    "0.1.0-beta10",
     "漫画",
-    "评论懒加载修复"
+    "UI优化"
   ],
   "sections": [
     {
-      "title": "登录迁移",
-      "text": "Beta9 登录页已移除旧“图片线路”表单；login() 前置定义，并在确认时清理 Beta5/Beta7 遗留的表单/线路状态。"
+      "title": "评论布局",
+      "text": "原站 .detail-list-comment-cover 使用 absolute、.detail-list-comment-info 自带 padding-left；与 Beta9 的 flex 叠加后会在有楼中楼时压缩主评论宽度。Beta10 显式重置定位、padding、float 和宽度。"
     },
     {
-      "title": "正文",
-      "text": "继续使用 Beta3/Beta4 已真机确认能显示图片的章节请求、逐图 User-Agent/Referer 请求头和 AES 解密链；不恢复 Beta5 导致黑屏的原始图片 URL 模式。"
+      "title": "楼中楼",
+      "text": "顶层评论、普通回复、楼中楼列表与带头像完整子回复分别处理；所有回复容器固定 100% 宽并清除 float，避免正文出现单字竖排。"
     },
     {
-      "title": "评论",
-      "text": "定制评论页先唤醒官网评论标签并触发懒加载，只有 #comment 内真实评论列表渲染后才隔离为 94% 半屏，避免过早隐藏原网页导致列表永远不加载。"
+      "title": "头像与徽章",
+      "text": "只把第一个图片作为 44px 圆形头像；后续等级/钻石图片缩小并贴在头像右下角，不再作为第二个大头像占位。"
     },
     {
-      "title": "诊断",
-      "text": "若 15 秒仍未获得评论列表，页面会保留 #comment 并显示 items/children/text 三项诊断，不再是纯空白页。"
+      "title": "登录设置",
+      "text": "8 个入口改为 4 行双列：网页登录/会员中心、我的收藏/漫蛙主页、刷新域名/线路诊断、最新公告/使用说明。"
     },
     {
       "title": "冻结范围",
-      "text": "详情、目录和动态域名保持现有稳定基线，本轮不做其它功能改动。"
+      "text": "正文、详情、目录和动态域名逻辑本轮不改。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1009",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1009"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1010",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1010"
 }
