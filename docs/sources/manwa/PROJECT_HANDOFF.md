@@ -5,7 +5,7 @@ Updated: 2026-08-27
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta7`
+- Version: `0.1.0-beta8`
 - Display name: `◈ 漫蛙漫画`
 - Legado identity: `https://sc8d7.invalid/legado/manwa-8d7`
 - Beta source: `sources/comic/manwa/manwa-beta.json`
@@ -15,6 +15,28 @@ Updated: 2026-08-27
 ## Baseline
 
 This is a new reconstruction. The user-provided Manwa source was used only to confirm working HTML selectors, query parameters and the current image-decryption chain. Its selector-combination discovery UI is not retained.
+
+## Beta8 stability rollback
+
+Beta7 real-device result:
+
+- Login form confirm throws `Function login not implements!!!`.
+- Manga chapter opens but images fail to load.
+- Custom comment sheet opens and shows title/count, but the comment body is blank.
+
+Root causes:
+
+1. Legado `SourceLoginDialog.login()` always calls a JavaScript `login()` function when the stored login form is non-empty. The source did not implement it.
+2. The Beta5 image-route experiment changed both chapter URL parameters and per-image request options; this regressed a previously working image chain.
+3. The Manwa comment DOM is the real `#comment` node and is intentionally rendered with `display:none` until the website's tab switcher shows it. Beta7 moved the node but never explicitly removed that hidden state.
+
+Beta8 repairs:
+
+- implement a no-op/success `login()` for the form-save contract;
+- remove the Beta5 image-route UI/runtime and restore the Beta3/Beta4 chapter + image request chain;
+- use `#comment` directly and force `display:block`;
+- move `#win-comment`, `#book_id`, and `#session_uid` into the custom comment sheet so the original posting/session logic remains available;
+- freeze the working detail/TOC baseline.
 
 ## Beta7 custom comment view
 
