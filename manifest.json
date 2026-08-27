@@ -143,13 +143,13 @@
       "category": "comic",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "0.1.0-beta3",
-      "versionCode": 1003,
-      "updatedAt": "2026-08-27T07:38:00+08:00",
+      "version": "0.1.0-beta4",
+      "versionCode": 1004,
+      "updatedAt": "2026-08-27T07:55:00+08:00",
       "sourcePath": "sources/comic/jmcomic/jmcomic-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1003",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1004",
       "bookSourceUrl": "https://sc8d7.invalid/legado/jmcomic-8d7",
-      "summary": "禁漫天堂 Beta3：修复详情页按钮/数据模板、评论 HTML/头像/回复字段和目录加载，保留 APP/API + Web 双线路、动态域名、登录账户、收藏历史与漫画正文。",
+      "summary": "禁漫天堂 Beta4：修复详情按钮纯文本与 baseUrl 未定义，目录回归原始 Web 选择器；保留评论、双线路、动态域名、登录账户和漫画正文。",
       "tags": [
         "禁漫天堂",
         "漫画",
@@ -165,14 +165,15 @@
         "双线路"
       ],
       "changelog": [
-        "修复详情页 @onclick 与 @get 模板被当普通文字显示，改为 JS 动态生成互动区与作品数据",
-        "评论按 JM APP 实际 CID / UID / replys / photo 字段解析，HTML 正文转纯文本并补全用户头像路径",
-        "目录改为 Java List + @json；APP series 缺失时使用原网页 btn-toolbar / reading 目录链兜底",
-        "目录阶段强制漫画类型 book.type=64",
-        "保留 Beta2 已验证恢复的发现/分类与登录按钮 this.java 兼容修复",
-        "仓库版取消启动阶段远程 runtime loader，恢复完整内联 jsLib"
+        "详情互动区加入 <usehtml> 包装，使 @onclick 按钮按阅读 HTML 规则执行",
+        "清除 jsLib 对规则局部 baseUrl 的直接依赖，详情/正文通过安全上下文解析 ID",
+        "详情提前写入真实 Web album 目录地址",
+        "目录回归原始禁漫源已验证的 class.btn-toolbar.0@tag.a||.reading 选择器",
+        "章节正文继续支持自动 / APP/API / Web 路线，不把目录强制绑定到单一正文线路",
+        "保留 Beta3 评论 HTML 清洗、头像补全和楼中楼 replys",
+        "保留 Beta2 发现分类和登录入口 this.java 兼容修复"
       ],
-      "sha256": "fb8332ac2d79ffcf9deb7cb4b9030debbac83ac768c073d493f6fb7d0d23b12f",
+      "sha256": "df81fa4a10ab178454c0a59c52dd3ee0bf5ed9ef1da06704c04df4a5fb352598",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],
