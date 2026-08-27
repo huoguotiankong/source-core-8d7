@@ -5,7 +5,7 @@ Updated: 2026-08-27
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta9`
+- Version: `0.1.0-beta10`
 - Display name: `◈ 漫蛙漫画`
 - Legado identity: `https://sc8d7.invalid/legado/manwa-8d7`
 - Beta source: `sources/comic/manwa/manwa-beta.json`
@@ -15,6 +15,37 @@ Updated: 2026-08-27
 ## Baseline
 
 This is a new reconstruction. The user-provided Manwa source was used only to confirm working HTML selectors, query parameters and the current image-decryption chain. Its selector-combination discovery UI is not retained.
+
+## Beta10 comment layout + compact login
+
+Beta9 real-device confirmation:
+
+- comments now load into the custom page;
+- the header/count and ordinary top-level comments are usable;
+- a comment containing nested replies can collapse the parent content into a very narrow vertical strip;
+- level/diamond art can appear as a second large image below the avatar;
+- the native login page is functional but visually inefficient because every action occupies a large full-width pill.
+
+Confirmed CSS cause:
+
+The Manwa-compatible mobile stylesheet defines:
+
+- `.detail-list-comment-cover { position:absolute; ... }`
+- `.detail-list-comment-info { padding-left:55px; }`
+- `.detail-list-comment-sublist` and reply elements with their own margins/float-era layout.
+
+Beta9's custom CSS added flex but did not fully reset those legacy declarations. The result was a mixed absolute + padded + flex layout, which only becomes obvious when nested reply DOM consumes additional width.
+
+Beta10 rules:
+
+1. Reset the original absolute positioning, left padding, floats, width and margins before applying the card layout.
+2. Tag only the first-level `ul.detail-list-comment > li` as top-level comment cards.
+3. Tag `.detail-list-comment-sublist > li` separately; if a child contains its own cover/info block, treat it as a full nested comment card.
+4. Force reply/sublist containers to 100% width and clear floats.
+5. Treat the first cover image as the avatar and any later images as level/badge art.
+6. Keep the comment-ready gate from Beta9 unchanged.
+7. Login UI uses 0.40 flex-basis for two-column pairing, providing enough space for the app's divider/margins; all eight actions remain.
+8. Content/detail/TOC/dynamic-domain logic remains frozen.
 
 ## Beta9 upgrade migration + comment ready gate
 
