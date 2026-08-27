@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-27T13:40:00+08:00",
+  "updatedAt": "2026-08-27T14:20:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -180,30 +180,32 @@
       "category": "comic",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "0.1.0-beta4",
-      "versionCode": 1004,
-      "updatedAt": "2026-08-27T13:40:00+08:00",
+      "version": "0.1.0-beta5",
+      "versionCode": 1005,
+      "updatedAt": "2026-08-27T14:20:00+08:00",
       "sourcePath": "sources/comic/manwa/manwa-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1004",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1005",
       "bookSourceUrl": "https://sc8d7.invalid/legado/manwa-8d7",
-      "summary": "Beta4：单独修复顶部评论按钮和登录页线路诊断；评论直接从当前 book.bookUrl 提取作品 ID 后打开官方作品页。",
+      "summary": "Beta5：评论ID改为 book变量/tocUrl/bookUrl/source 多路识别；新增官方图源切换与正文图片加载优化。",
       "tags": [
         "漫蛙",
         "漫画",
         "测试版",
         "评论修复",
-        "登录诊断",
+        "图源切换",
+        "加载优化",
         "动态域名",
         "Mihon适配"
       ],
       "changelog": [
-        "登录页线路诊断不再调用 getElements，只检查域名、镜像候选和基础连通性",
-        "顶部定制按钮优先直接读取 BookInfoActivity 当前 book.bookUrl，不再依赖详情页 source 缓存 URL",
-        "清理 bookUrl 尾部 WebView 请求配置并从 /book/<id> 重建真实作品地址",
-        "评论入口不再猜 #comment 锚点，直接打开当前作品官方页面；评论/发表评论/楼中楼都在同一页面",
-        "Beta3 详情、目录、正文、发现页和动态域名逻辑保持冻结"
+        "详情 init 把当前漫画 ID/URL 写入 book.putVariable，评论按钮优先读取持久化 book 变量",
+        "评论 ID 回退链新增 book.tocUrl；目录已正常时可直接复用当前作品 tocUrl",
+        "登录设置新增图片线路与刷新图源列表，从首页 img-host-modal 提取官方图片线路参数",
+        "章节请求按自动/默认/线路1-6附加选中图源参数，自动模式优先第一条官方备用图源",
+        "正文图片移除每张图片重复的 Referer/User-Agent 请求 JSON，交给阅读原生图片加载器并发/缓存，AES 解密保持不变",
+        "Beta3 已恢复正常的详情和目录解析保持冻结"
       ],
-      "sha256": "446ce8225b61b1f98e2923123321b474422a75987c0238e2fecdea1eb4ba3ed1",
+      "sha256": "c72c4431a53f2d0bee055fbd442aeaa9d38cb206a2b4d3c1c0e68a9bb5fd11b9",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],
