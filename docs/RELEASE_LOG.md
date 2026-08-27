@@ -13,6 +13,21 @@ Promotion:
 - Stable SHA256: `e181e0c0dd917687e98441a4208192977f6799f921591405a4c729d9dd46cb69`.
 
 
+## 2026-08-27 — 漫蛙漫画 0.1.0-beta7
+
+Status: Beta/Test; custom comment-view upgrade awaiting real-device confirmation.
+
+Changes:
+
+- Beta6 real-device test confirmed the custom button resolves and opens the correct current work, but still showed the raw Manwa webpage.
+- Kept the verified `Book.getBookUrl()/getTocUrl()/getName()` callback path.
+- Replaced `java.startBrowser()` with Legado `java.showBrowser(url, html, preloadJs, config)`.
+- Added a 94% height rounded comment-only bottom WebView.
+- The injected preload script locates the active comment container from comment-form/list signals, moves the original Manwa comment DOM into a clean shell, hides the rest of the website, and applies custom card/reply/dark-mode styling.
+- Because the original DOM is preserved, website Cookie state, posting, reply and report interactions remain available.
+- Beta3 detail/TOC and Beta5 image-source/performance modules remain unchanged.
+- Source SHA256: `b42e14f6da67289151816b76dcb96417ea8bf0e248d51d5d41077971e05a282d`.
+
 ## 2026-08-27 — 漫蛙漫画 0.1.0-beta5
 
 Status: Beta/Test; comment-id and image-performance repair awaiting real-device confirmation.
