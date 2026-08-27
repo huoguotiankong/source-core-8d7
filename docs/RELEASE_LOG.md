@@ -1,3 +1,18 @@
+## 2026-08-27 — JMComic 0.1.0-beta4 detail HTML + TOC fallback fix
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Changes:
+
+- 详情 JS 返回内容加入 `<usehtml>` 包装，修复 `@onclick` 按钮被直接显示为文字。
+- 公共 jsLib 移除对规则局部 `baseUrl` 的直接访问，详情/正文通过安全上下文解析 ID。
+- 详情预先生成真实 Web album 目录地址。
+- 目录回归原始禁漫源已验证的 `class.btn-toolbar.0@tag.a||.reading` 选择器。
+- 章节正文继续支持 Auto / APP/API / Web 路线，目录与正文 Provider 解耦。
+- Beta3 评论 HTML、头像和楼中楼修复冻结保留。
+- Published SHA256: `df81fa4a10ab178454c0a59c52dd3ee0bf5ed9ef1da06704c04df4a5fb352598`.
+
+
 ## 2026-08-27 — JMComic 0.1.0-beta3 detail/comment/TOC hotfix
 
 Status: Beta/Test; awaiting user real-device confirmation.
