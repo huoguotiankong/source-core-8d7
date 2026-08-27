@@ -1,0 +1,31 @@
+{
+  "kind": "source",
+  "title": "◈ 禁漫天堂",
+  "summary": "禁漫天堂 1.0.0 正式版。APP/API + Web 双线路，支持登录账户、AVS 鉴权、评论/楼中楼、收藏历史、标签、目录和漫画图片正文。",
+  "badges": [
+    "Stable",
+    "1.0.0",
+    "漫画",
+    "双线路"
+  ],
+  "sections": [
+    {
+      "title": "账户与互动",
+      "text": "支持账号登录、手动网页登录、登录状态、账户中心、收藏、观看历史、评论、楼中楼、发表与回复；APP 登录成功后保存 AVS 用于后续鉴权。"
+    },
+    {
+      "title": "详情与浏览",
+      "text": "详情页支持评论入口、顶部定制按钮、可点击作者/原作/标签，以及浏览、点赞、评论、章节、JM编号和当前线路等作品数据。"
+    },
+    {
+      "title": "目录与正文",
+      "text": "保留 Beta5 已确认的网页目录与漫画正文链，兼容 APP /chapter 的 image 字段，支持图片分流 1-4 与 JM 图片反混淆。"
+    },
+    {
+      "title": "线路",
+      "text": "保留 APP/API 与 Web 双线路、动态 API 域名和 Web 域名更新；Stable/Beta 共用同一 bookSourceUrl identity，但下载路径物理分离。"
+    }
+  ],
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic.json?v=10000",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/jmcomic/jmcomic.json?v=10000"
+}
