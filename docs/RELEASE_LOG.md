@@ -13,6 +13,21 @@ Promotion:
 - Stable SHA256: `e181e0c0dd917687e98441a4208192977f6799f921591405a4c729d9dd46cb69`.
 
 
+## 2026-08-27 — 漫蛙漫画 0.1.0-beta1
+
+Status: Beta/Test; new reconstructed source awaiting user real-device confirmation.
+
+Changes:
+
+- Added new `◈ 漫蛙漫画` source with permanent identity `https://sc8d7.invalid/legado/manwa-8d7`.
+- Rebuilt discovery as direct sectioned entries for quick access, main categories, regions, status and common tags; the reference source's stored selector-combination UI is not retained.
+- Enabled CookieJar and official web-login/member/favourites flows.
+- Added official comment-page entry from the detail UI and BookInfo custom button, preserving the website's own comment/reply/report interactions.
+- Added cached dynamic-domain discovery using current official lost/redirect routes and announced backup domains, plus manual refresh/diagnostics.
+- Preserved local search/detail/TOC/content parsing, WebView anti-bot compatibility and the current AES/CBC image-decryption chain.
+- Published complete Beta source, dedicated/all-beta bundles, Manifest, Beta/Comic subscriptions, RSS detail metadata and source handoff.
+- SHA256: `0708de51154c534846e05a8905b2a408adc95a665b3fa245c133e14880f3e247`.
+
 ## 2026-08-27 — JMComic 0.1.0-beta8 login credentials + AVS auth
 
 Status: Beta/Test; awaiting user real-device confirmation.
