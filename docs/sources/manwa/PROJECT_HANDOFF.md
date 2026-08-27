@@ -5,7 +5,7 @@ Updated: 2026-08-27
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta3`
+- Version: `0.1.0-beta4`
 - Display name: `◈ 漫蛙漫画`
 - Legado identity: `https://sc8d7.invalid/legado/manwa-8d7`
 - Beta source: `sources/comic/manwa/manwa-beta.json`
@@ -15,6 +15,20 @@ Updated: 2026-08-27
 ## Baseline
 
 This is a new reconstruction. The user-provided Manwa source was used only to confirm working HTML selectors, query parameters and the current image-decryption chain. Its selector-combination discovery UI is not retained.
+
+## Beta4 comment fix
+
+Beta3 real-device feedback:
+
+- Source login diagnostics crashed because `SourceLoginJsExtensions` does not expose DOM helpers such as `getElements`.
+- The custom comment button still failed to resolve/open the current manga.
+
+Beta4 is intentionally a narrow repair:
+
+- Login diagnostics are network-only.
+- The BookInfo custom button reads the current `book.bookUrl` first, strips the Legado WebView request suffix, extracts `/book/<id>`, and opens that official work page.
+- The unverified `#comment` anchor is removed. Manwa's comments, post form and nested replies are server-rendered on the same work page.
+- Beta3 detail/TOC/content/domain logic remains frozen.
 
 ## Beta3 current state
 
