@@ -1,5 +1,18 @@
 # JMComic / 禁漫天堂 Release Notes
 
+## 2026-08-27 — 0.1.0-beta6
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+- User confirmed Beta5 manga content loads; TOC/content rules are frozen in Beta6.
+- Added persistent normalized title/cover -> JM ID mapping during search/discovery.
+- Added canonical / og:url / ruleUrl / bookUrl / page-title-cover multi-stage album ID resolution.
+- Detail comment/favourite buttons carry ID + title + cover; top custom button uses the same resolver.
+- Detail data area now exposes JM ID, comment count and current route.
+- Comment UI refined without changing the recovered forum data model.
+- Published repository source SHA256: `c36f64b73b3865a6ac0b1d07de2ae1a85b27407b04f54fe5b47ba189ecf65b69`.
+- Source-specific bundle: `bundles/jmcomic-beta6.json`.
+
 ## 2026-08-27 — 0.1.0-beta5
 
 Status: Beta/Test; awaiting user real-device confirmation.
