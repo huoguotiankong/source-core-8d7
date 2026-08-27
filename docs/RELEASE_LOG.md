@@ -1,3 +1,23 @@
+## 2026-08-27 — JMComic 0.1.0-beta8 login credentials + AVS auth
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Real-device finding:
+
+- Core browsing, TOC/content and current detail/comment work had already progressed, but account login still failed.
+- Root compatibility issue: the source read login fields only through legacy `getLoginInfo()`; the current reader path used by the proven Picacg source is `getLoginInfoMap()`.
+
+Changes:
+
+- 登录页优先使用 `source.getLoginInfoMap()` 读取账号/密码，兼容旧 `getLoginInfo()`。
+- APP 登录优先 `18comicAPP`，并兼容 `2.1.2 / 2.0.20` 两个 APP 版本。
+- 登录返回 `s` 保存为 AVS，并在后续 API 请求显式携带 `Cookie: AVS=...`。
+- Cookie 写入改用当前阅读上下文 `ctx.cookie`，显式请求头作为兜底。
+- 新增手动网页登录、登录状态和清除登录按钮。
+- Beta5 已确认的正文/目录与 Beta7 详情/评论模块冻结。
+- Published SHA256: `b6e5efbe29ea2018f1d3246e0e1ce0d9e0347efb4818afd4e9496f69734d7514`.
+
+
 ## 2026-08-27 — JMComic 0.1.0-beta7 comment bridge + detail tags
 
 Status: Beta/Test; awaiting user real-device confirmation.
