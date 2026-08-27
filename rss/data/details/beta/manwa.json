@@ -1,0 +1,35 @@
+{
+  "kind": "source",
+  "title": "◈ 漫蛙漫画",
+  "summary": "漫蛙漫画 0.1.0-beta1 测试版：发现页重构为分区直达，加入官方网页登录/Cookie、官方评论入口和动态域名更新。",
+  "badges": [
+    "Beta",
+    "0.1.0-beta1",
+    "漫画",
+    "动态域名"
+  ],
+  "sections": [
+    {
+      "title": "发现页",
+      "text": "完全重写为快捷入口、主分类、地区、连载状态、常用标签分区直达；不使用参考源的多选变量与“漫画列表”二次确认结构。"
+    },
+    {
+      "title": "账号与收藏",
+      "text": "启用 CookieJar，账号走漫蛙官方网页登录；提供会员中心、我的收藏、主页与最新公告入口，避免在首版猜测未确认的私有登录 API。"
+    },
+    {
+      "title": "评论",
+      "text": "作品详情内置“官方评论”按钮，BookInfo 顶部定制按钮也可进入当前作品官方评论页；复用网页登录状态，保留官网评论、回复、举报等现有交互。图片漫画正文使用 MangaMenu，正文菜单是否有 customButton 取决于阅读 App 本身。"
+    },
+    {
+      "title": "动态域名",
+      "text": "缓存最近成功域名 12 小时；自动参考官方走失页/跳转页和官方公布备用域名探测当前入口，并提供手动刷新与线路诊断。"
+    },
+    {
+      "title": "目录与正文",
+      "text": "搜索、分类、详情、目录与漫画图片正文均保留本地规则；列表/章节使用 WebView 兼容反爬，图片继续使用当前 AES/CBC 解密链。"
+    }
+  ],
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1001",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1001"
+}
