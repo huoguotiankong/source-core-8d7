@@ -1,3 +1,17 @@
+## 2026-08-27 — 漫蛙漫画 0.1.0-beta9
+
+Status: Beta/Test; legacy-login migration and comment lazy-load repair awaiting real-device confirmation.
+
+Changes:
+
+- Real-device screenshots came from the Beta5-Beta7 generation: the login page still exposed the image-route selector, form confirmation threw `Function login not implements!!!`, chapter pages had parsed page counts but image requests failed, and the custom comment sheet showed only its header/count.
+- Login UI no longer exposes the old image-route selector. `login()` is defined first and removes legacy stored form state after confirmation, so an in-place upgrade cannot keep calling an obsolete Beta5/Beta7 setting.
+- Manga content stays on the Beta3/Beta4 request chain that was already confirmed to render images: per-image User-Agent/Referer request options plus the existing AES decryptor.
+- The comment preload no longer moves `#comment` as soon as the empty container exists. It first reveals the native comment section, clicks a matching native comment tab when present, scrolls it into view to trigger lazy loading, and waits up to 15 seconds for actual comment-list content.
+- If the list still does not render, the custom sheet preserves `#comment` and shows `items/children/text` diagnostics instead of a blank body.
+- Detail/TOC and dynamic-domain modules remain frozen.
+- SHA256: `46b8b09dcf3dcef9b3f54360ce626797ccfc4ce5325647ab0fa2807723d5300a`.
+
 ## 2026-08-27 — JMComic 1.0.0 Stable
 
 Status: Stable. User explicitly requested formal release.
