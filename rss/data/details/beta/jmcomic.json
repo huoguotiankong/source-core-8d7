@@ -1,35 +1,35 @@
 {
   "kind": "source",
   "title": "◈ 禁漫天堂",
-  "summary": "禁漫天堂 0.1.0-beta5 测试版。修复详情评论入口、详情网页数据和正文图片链，并继续优化评论中心。",
+  "summary": "禁漫天堂 0.1.0-beta6 测试版。Beta5 正文已真机确认恢复；Beta6 冻结正文/目录，只修复详情评论入口、顶部定制按钮 ID 识别并优化评论页。",
   "badges": [
     "Beta",
-    "0.1.0-beta5",
+    "0.1.0-beta6",
     "漫画",
-    "双线路"
+    "正文已恢复"
   ],
   "sections": [
     {
       "title": "当前状态",
-      "text": "Beta/Test。Beta4 已确认详情按钮能显示、目录能打开、评论主体恢复；Beta5 继续修复详情评论入口 ID、详情网页数据和正文图片链。"
+      "text": "Beta/Test。用户已真机确认 Beta5 正文恢复；Beta6 不再改动目录/正文，只验证详情与顶部定制按钮能否稳定打开同一个评论中心。"
     },
     {
       "title": "本轮修复",
-      "text": "详情按钮直接绑定当前漫画 ID；名称/封面/作者/简介/标签回归原始网页源已验证选择器；正文优先读取当前章节 data-original 图片，APP /chapter 补齐 image 字段，Web 主动请求继续兜底。"
+      "text": "搜索/发现阶段持久保存“标题、封面 → JM ID”映射；详情再结合 canonical、og:url、ruleUrl、bookUrl 和页面标题/封面多级反查。详情按钮直接携带 JM ID + 标题 + 封面，顶部定制按钮统一使用同一解析器。"
     },
     {
-      "title": "评论中心",
-      "text": "保留 APP /forum + Web fallback 和发表评论/回复能力；优化评论卡片、楼中楼层级、页码、回复状态、暗色模式与头部信息。"
+      "title": "详情与评论",
+      "text": "详情作品数据增加 JM 编号、评论数和当前线路；评论页继续保留 APP /forum 优先、Web 兜底的数据模型，并优化顶部标题、评论卡片、楼中楼时间、页码和回复状态。"
     },
     {
-      "title": "保留能力",
-      "text": "保留自动 / APP/API / 网页线路、动态域名、登录账户、收藏历史、网页目录、图片分流 1-4 与 JM 图片反混淆。"
+      "title": "冻结模块",
+      "text": "Beta5 已恢复的 Web 目录、漫画正文、APP /chapter image 字段兼容、图片分流 1-4 与 JM 反混淆在 Beta6 全部冻结。"
     },
     {
       "title": "仓库文件",
-      "text": "源：sources/comic/jmcomic/jmcomic-beta.json\nBundle：bundles/jmcomic-beta5.json\n交接：docs/sources/jmcomic/PROJECT_HANDOFF.md\n版本记录：docs/sources/jmcomic/RELEASE_NOTES.md"
+      "text": "源：sources/comic/jmcomic/jmcomic-beta.json\nBundle：bundles/jmcomic-beta6.json\n交接：docs/sources/jmcomic/PROJECT_HANDOFF.md\n版本记录：docs/sources/jmcomic/RELEASE_NOTES.md"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1005",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/jmcomic/jmcomic-beta.json?v=1005"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1006",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/jmcomic/jmcomic-beta.json?v=1006"
 }
