@@ -1,31 +1,35 @@
 {
   "kind": "source",
   "title": "◈ 漫蛙漫画",
-  "summary": "漫蛙漫画 0.1.0-beta6：按阅读官方 SourceCallBack/Book JVM API 重写评论按钮，移除漫画 ID 识别链。",
+  "summary": "漫蛙漫画 0.1.0-beta7：评论按钮升级为独立定制半屏，只保留漫蛙原生评论 DOM 并重新排版。",
   "badges": [
     "Beta",
-    "0.1.0-beta6",
+    "0.1.0-beta7",
     "漫画",
-    "评论JVM API修复"
+    "定制评论页"
   ],
   "sections": [
     {
-      "title": "根因",
-      "text": "阅读官方源码确认 clickCustomButton 会注入 Book 实体，但 Beta5 使用 book.bookUrl/book.tocUrl 的 Rhino 属性映射不可靠。"
+      "title": "评论入口",
+      "text": "继续使用 Beta6 已真机确认的 Book JVM getter 获取当前作品地址，打开动作改为 java.showBrowser() 94% 高度圆角半屏。"
     },
     {
-      "title": "评论",
-      "text": "Beta6 直接调用 Book JVM getter：getBookUrl()/getTocUrl()/getName()。优先打开当前 bookUrl，仅清理 Legado WebView 请求参数；不再识别漫画 ID。"
+      "title": "定制界面",
+      "text": "注入 comment-only 皮肤，自动寻找包含发表评论/排序/举报/查看更多回复数的评论容器，隐藏站点导航、详情、目录和广告，只保留评论区并重新排版。"
     },
     {
-      "title": "失败诊断",
-      "text": "若仍不能打开，提示会直接显示 getter 的实际返回值与异常，不再只有“ID未识别”。"
+      "title": "原生交互保留",
+      "text": "没有复制评论为静态文本，而是移动原站评论 DOM，所以 Cookie、发表评论、回复、举报等官网交互继续保留。"
+    },
+    {
+      "title": "样式",
+      "text": "增加作品名、评论数、刷新顶部栏，统一评论卡片、头像、等级、时间、楼中楼样式，并兼容深色模式。"
     },
     {
       "title": "冻结范围",
-      "text": "Beta3 已恢复的详情/目录和 Beta5 的图片线路/加载优化保持不变。"
+      "text": "Beta3 详情/目录与 Beta5 图源切换/图片加载优化保持不变。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1006",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1006"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1007",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1007"
 }
