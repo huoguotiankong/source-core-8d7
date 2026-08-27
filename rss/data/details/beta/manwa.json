@@ -1,35 +1,31 @@
 {
   "kind": "source",
   "title": "◈ 漫蛙漫画",
-  "summary": "漫蛙漫画 0.1.0-beta3：按当前维护中的 Manwa/Mihon 实现重做详情/目录/图片选择器，并采用 lks 镜像列表自动更新域名。",
+  "summary": "漫蛙漫画 0.1.0-beta4：单独修复顶部评论按钮和登录页线路诊断上下文。",
   "badges": [
     "Beta",
-    "0.1.0-beta3",
+    "0.1.0-beta4",
     "漫画",
-    "真实选择器重构"
+    "评论修复"
   ],
   "sections": [
     {
-      "title": "本次根因",
-      "text": "Beta2 真机仍显示简介被当作者、目录持续加载、评论无法识别当前作品，说明继续依赖自定义详情字段缓存不可行。Beta3 改为当前维护中的 Manwa 扩展真实 DOM 选择器。"
-    },
-    {
-      "title": "详情与目录",
-      "text": "作者：p.detail-main-info-author > span.detail-main-info-value > a；简介：#detail > p.detail-desc；标签：div.detail-main-info-class > a.info-tag；目录：ul#detail-list-select > li > a。tocUrl 直接由当前详情 baseUrl 生成并使用 WebView。"
-    },
-    {
-      "title": "正文",
-      "text": "图片优先解析 #cp_img > div.img-content > img[data-r-src]，继续保留 AES/CBC 解密及旧 .content-img 兼容。"
+      "title": "真机反馈",
+      "text": "Beta3 在书源登录页点线路诊断时报 SourceLoginJsExtensions 没有 getElements；同时顶部评论按钮仍无法正常进入评论。"
     },
     {
       "title": "评论",
-      "text": "详情 init 从当前 baseUrl 或页面 /book/<id> 提取作品 URL 并保存；顶部定制按钮打开同一本官方详情评论锚点。"
+      "text": "顶部定制按钮现在直接读取当前 BookInfoActivity 的 book.bookUrl，剥离阅读附加的 WebView 请求配置，提取 /book/<id> 并重建真实漫蛙作品地址。评论、发表评论和楼中楼就在该作品页。"
     },
     {
-      "title": "动态域名",
-      "text": "跟随当前 Manwa 扩展实现：请求 https://fuwt.cc/mw666，解析脚本中的 var lks = JSON.parse(atob(...)) 得到镜像列表，再检测并缓存可用域名。"
+      "title": "诊断",
+      "text": "登录页线路诊断只检查当前域名、fuwt.cc/mw666 镜像候选数量和基础连通性，不再尝试读取详情 DOM。"
+    },
+    {
+      "title": "冻结范围",
+      "text": "Beta3 已重构的详情、目录、正文、发现页与动态域名全部不动，避免为评论修复再次影响其它模块。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1003",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1003"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1004",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1004"
 }
