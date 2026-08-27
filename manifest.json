@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-27T14:20:00+08:00",
+  "updatedAt": "2026-08-27T14:52:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -180,32 +180,30 @@
       "category": "comic",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "0.1.0-beta5",
-      "versionCode": 1005,
-      "updatedAt": "2026-08-27T14:20:00+08:00",
+      "version": "0.1.0-beta6",
+      "versionCode": 1006,
+      "updatedAt": "2026-08-27T14:52:00+08:00",
       "sourcePath": "sources/comic/manwa/manwa-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1005",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1006",
       "bookSourceUrl": "https://sc8d7.invalid/legado/manwa-8d7",
-      "summary": "Beta5：评论ID改为 book变量/tocUrl/bookUrl/source 多路识别；新增官方图源切换与正文图片加载优化。",
+      "summary": "Beta6：按阅读官方 SourceCallBack/Book JVM API 重写顶部评论按钮，直接用 getBookUrl()/getTocUrl() 打开当前作品，不再识别漫画ID。",
       "tags": [
         "漫蛙",
         "漫画",
         "测试版",
         "评论修复",
+        "Legado源码适配",
         "图源切换",
-        "加载优化",
-        "动态域名",
-        "Mihon适配"
+        "动态域名"
       ],
       "changelog": [
-        "详情 init 把当前漫画 ID/URL 写入 book.putVariable，评论按钮优先读取持久化 book 变量",
-        "评论 ID 回退链新增 book.tocUrl；目录已正常时可直接复用当前作品 tocUrl",
-        "登录设置新增图片线路与刷新图源列表，从首页 img-host-modal 提取官方图片线路参数",
-        "章节请求按自动/默认/线路1-6附加选中图源参数，自动模式优先第一条官方备用图源",
-        "正文图片移除每张图片重复的 Referer/User-Agent 请求 JSON，交给阅读原生图片加载器并发/缓存，AES 解密保持不变",
-        "Beta3 已恢复正常的详情和目录解析保持冻结"
+        "核对阅读官方 SourceCallBack.callBackBtn：clickCustomButton 明确注入 event/java/result/book/chapter",
+        "核对 Book 实体：改用 JVM getter book.getBookUrl()/getTocUrl()/getName()，不再使用 Rhino 属性映射",
+        "评论按钮删除漫画ID识别链，直接清理当前 bookUrl 的 WebView 参数后 java.startBrowser()",
+        "bookUrl 为空时才回退 tocUrl；失败提示会直接展示 getter 返回值与异常",
+        "Beta3 详情/目录与 Beta5 图片线路/加载优化保持冻结"
       ],
-      "sha256": "c72c4431a53f2d0bee055fbd442aeaa9d38cb206a2b4d3c1c0e68a9bb5fd11b9",
+      "sha256": "55495533c4be01f008b8126d402fe5eafb1ac2740e30572f91c32097bcad51d3",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],
