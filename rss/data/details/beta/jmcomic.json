@@ -1,35 +1,35 @@
 {
   "kind": "source",
   "title": "◈ 禁漫天堂",
-  "summary": "禁漫天堂 0.1.0-beta7 测试版。正文/目录冻结；本版修复评论桥“未知操作”，并增强详情作者、标签和作品数据。",
+  "summary": "禁漫天堂 0.1.0-beta8 测试版。登录专项修复：getLoginInfoMap、双 APP 版本登录、AVS 持久鉴权；正文/目录/详情/评论冻结。",
   "badges": [
     "Beta",
-    "0.1.0-beta7",
+    "0.1.0-beta8",
     "漫画",
-    "评论桥修复"
+    "登录修复"
   ],
   "sections": [
     {
       "title": "当前状态",
-      "text": "Beta/Test。Beta5 正文已真机确认恢复，Beta7 继续冻结目录和正文；当前重点验证评论页与详情作者/标签交互。"
+      "text": "Beta/Test。Beta5 正文已真机确认恢复，Beta7 详情/评论桥保持；Beta8 只处理登录与后续鉴权。"
     },
     {
-      "title": "评论修复",
-      "text": "WebView 发送 action/op 双兼容；列表响应同时返回 list、total 和 data，修复“未知操作”以及 UI 无法读取评论列表的问题。APP /forum、Web 兜底、发表和回复数据链保持不变。"
+      "title": "登录修复",
+      "text": "优先使用 source.getLoginInfoMap() 读取账号密码；APP 登录优先 18comicAPP，并兼容 2.1.2 / 2.0.20；成功后保存 AVS 并显式用于后续 API 请求。"
     },
     {
-      "title": "详情增强",
-      "text": "参考哔咔成熟详情结构与 Venera 信息布局，新增可点击作者、原作、分类/标签；作品数据展示浏览、点赞、评论、章节、JM 编号与当前线路，并补充更新时间。"
+      "title": "网页登录",
+      "text": "继续保留官方 Web 表单登录，并增加手动网页登录入口、登录状态和清除登录按钮，便于区分账号读取、APP 登录、Web Cookie 三类问题。"
     },
     {
       "title": "冻结模块",
-      "text": "Web 目录、漫画正文、APP /chapter image 字段兼容、图片分流 1-4 和 JM 图片反混淆全部保持 Beta5 基线。"
+      "text": "目录/正文、详情标签、评论桥和评论 UI 均保持当前工作基线，不在 Beta8 改动。"
     },
     {
       "title": "仓库文件",
-      "text": "源：sources/comic/jmcomic/jmcomic-beta.json\nBundle：bundles/jmcomic-beta7.json\n交接：docs/sources/jmcomic/PROJECT_HANDOFF.md\n版本记录：docs/sources/jmcomic/RELEASE_NOTES.md"
+      "text": "源：sources/comic/jmcomic/jmcomic-beta.json\nBundle：bundles/jmcomic-beta8.json\n交接：docs/sources/jmcomic/PROJECT_HANDOFF.md\n版本记录：docs/sources/jmcomic/RELEASE_NOTES.md"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1007",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/jmcomic/jmcomic-beta.json?v=1007"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1008",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/jmcomic/jmcomic-beta.json?v=1008"
 }
