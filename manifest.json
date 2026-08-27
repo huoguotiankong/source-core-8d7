@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-27T11:49:00+08:00",
+  "updatedAt": "2026-08-27T12:20:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -180,31 +180,31 @@
       "category": "comic",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "0.1.0-beta1",
-      "versionCode": 1001,
-      "updatedAt": "2026-08-27T11:49:00+08:00",
+      "version": "0.1.0-beta2",
+      "versionCode": 1002,
+      "updatedAt": "2026-08-27T12:20:00+08:00",
       "sourcePath": "sources/comic/manwa/manwa-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1001",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1002",
       "bookSourceUrl": "https://sc8d7.invalid/legado/manwa-8d7",
-      "summary": "Beta1：发现页重写为分区直达；加入官方网页登录/Cookie、官方评论入口和自动更新域名。",
+      "summary": "Beta2：修复详情作者误抓、目录持续加载和评论入口丢失当前作品 URL；发现页/登录/动态域名保持 Beta1。",
       "tags": [
         "漫蛙",
         "漫画",
         "测试版",
-        "动态域名",
-        "网页登录",
+        "详情修复",
+        "目录修复",
         "评论",
-        "收藏",
-        "WebView"
+        "动态域名",
+        "网页登录"
       ],
       "changelog": [
-        "发现页完全重写为快捷入口、主分类、地区、连载状态、常用标签分区直达，不沿用参考源的排列组合筛选",
-        "启用 CookieJar，账号使用官方网页登录，提供会员中心、我的收藏、主页与公告入口",
-        "详情页互动按钮与 BookInfo 顶部定制按钮均可进入当前作品官方评论页，复用官网评论/回复/举报能力",
-        "加入 12 小时域名缓存、官方走失/跳转入口解析、备用域名探测、手动刷新和线路诊断",
-        "保留本地搜索/详情/目录/正文规则、WebView 反爬兼容及当前 AES/CBC 图片解密链"
+        "作者字段改为只接受独立“作者：xxx”信息行，避免简介/整页文本误识别",
+        "详情初始化只解析一次，并显式生成当前作品 URL 与 tocUrl",
+        "目录改为扫描作品页 /chapter/ 链接并按章节 ID 去重，不再依赖单一 DOM 容器",
+        "评论入口统一清理 WebView 请求参数，并通过 source/book/java 多路保存当前作品地址",
+        "分区发现页、Cookie 登录、动态域名、WebView 反爬和 AES 图片正文链保持不变"
       ],
-      "sha256": "0708de51154c534846e05a8905b2a408adc95a665b3fa245c133e14880f3e247",
+      "sha256": "68a7d847739fea6b5f3544a3fb854dcdf194d7eae28f546518b4b830bd798e32",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],
