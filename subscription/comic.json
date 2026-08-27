@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "type": "comic",
   "name": "漫画源",
-  "updatedAt": "2026-08-27T12:53:00+08:00",
+  "updatedAt": "2026-08-27T13:40:00+08:00",
   "items": [
     {
       "id": "picacg",
@@ -73,34 +73,33 @@
     {
       "id": "manwa",
       "name": "◈ 漫蛙漫画",
-      "summary": "Beta3：按当前 Manwa/Mihon 真实适配选择器重构详情/目录/正文，并切换到 fuwt.cc/mw666 的 lks 镜像列表动态域名机制。",
+      "summary": "Beta4：单独修复顶部评论按钮和登录页线路诊断；评论直接从当前 book.bookUrl 提取作品 ID 后打开官方作品页。",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg",
       "channel": "beta",
-      "version": "0.1.0-beta3",
+      "version": "0.1.0-beta4",
       "updatedAt": "2026-08-27",
       "tags": [
         "漫蛙",
         "漫画",
         "测试版",
-        "详情修复",
-        "目录修复",
+        "评论修复",
+        "登录诊断",
         "动态域名",
-        "Mihon适配",
-        "评论"
+        "Mihon适配"
       ],
       "changelog": [
-        "详情改用当前维护中的 Manwa 扩展真实选择器：作者/简介/标签不再走 Beta1/2 猜测逻辑",
-        "目录改回 ul#detail-list-select > li > a，并由当前详情 baseUrl 直接生成 WebView tocUrl",
-        "正文优先使用 #cp_img > div.img-content > img[data-r-src]，保留旧选择器兼容",
-        "当前作品 URL 从 baseUrl 或页面 /book/<id> 提取并持久化，供评论和顶部定制按钮使用",
-        "动态域名切换到 https://fuwt.cc/mw666 的 lks/Base64 镜像列表机制，普通运行时也统一使用新逻辑"
+        "登录页线路诊断不再调用 getElements，只检查域名、镜像候选和基础连通性",
+        "顶部定制按钮优先直接读取 BookInfoActivity 当前 book.bookUrl，不再依赖详情页 source 缓存 URL",
+        "清理 bookUrl 尾部 WebView 请求配置并从 /book/<id> 重建真实作品地址",
+        "评论入口不再猜 #comment 锚点，直接打开当前作品官方页面；评论/发表评论/楼中楼都在同一页面",
+        "Beta3 详情、目录、正文、发现页和动态域名逻辑保持冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1003",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1003",
-      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1003",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1004",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1004",
+      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1004",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json",
       "type": "comic"
     }
   ],
-  "generatedAt": "2026-08-27T12:53:00+08:00"
+  "generatedAt": "2026-08-27T13:40:00+08:00"
 }
