@@ -13,6 +13,21 @@ Promotion:
 - Stable SHA256: `e181e0c0dd917687e98441a4208192977f6799f921591405a4c729d9dd46cb69`.
 
 
+## 2026-08-27 — 漫蛙漫画 0.1.0-beta3
+
+Status: Beta/Test; verified-selector rebuild awaiting user real-device confirmation.
+
+Changes:
+
+- Beta2 real-device test still showed synopsis text as author, a continuously loading TOC, and unresolved current-work URL for the comment button.
+- Rebased detail/TOC/image selectors on the current maintained Keiyoushi/Mihon Manwa implementation rather than continuing heuristic parsing.
+- Canonical selectors: author `p.detail-main-info-author > span.detail-main-info-value > a`; description `#detail > p.detail-desc`; genres `div.detail-main-info-class > a.info-tag`; chapters `ul#detail-list-select > li > a`; images `#cp_img > div.img-content > img[data-r-src]`.
+- `tocUrl` is generated directly from the current detail `baseUrl` and forced through WebView; the Beta2 JS chapter-scanning fallback was removed.
+- Current-work URL is extracted from `baseUrl` or a page `/book/<id>` link and persisted for the comment/custom-button path.
+- Dynamic-domain discovery now follows the maintained extension's `https://fuwt.cc/mw666` + Base64 `lks` mirror-list mechanism; normal automatic refresh uses the same new path.
+- Removed the obsolete Beta2 detail/TOC hotfix block; no Stable files changed.
+- SHA256: `4fed2aba67b0a89e5894598c6125bb3f3086f234fb36368625004909aa9e3c6c`.
+
 ## 2026-08-27 — 漫蛙漫画 0.1.0-beta2
 
 Status: Beta/Test; targeted real-device repair, awaiting confirmation.
