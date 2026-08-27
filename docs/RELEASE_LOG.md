@@ -13,6 +13,33 @@ Promotion:
 - Stable SHA256: `e181e0c0dd917687e98441a4208192977f6799f921591405a4c729d9dd46cb69`.
 
 
+## 2026-08-27 — 漫蛙漫画 0.1.0-beta5
+
+Status: Beta/Test; comment-id and image-performance repair awaiting real-device confirmation.
+
+Changes:
+
+- Beta4 real-device result confirmed detail/TOC were usable, but the custom comment button still could not identify the manga ID; image content rendered but loaded slowly.
+- BookInfo init now persists the current manga ID/URL into book variables.
+- Custom-button ID resolution order is now book variable -> book.tocUrl -> book.bookUrl -> source cache.
+- Added dynamic Manwa image-route discovery from the homepage image-source modal, with Auto/Default/Route1-6 selection in login settings.
+- Chapter requests append the selected official image-source parameter.
+- Removed repeated per-image Referer/User-Agent request JSON so Legado's native manga image loader handles concurrency/cache directly.
+- AES image decryption and the Beta3 detail/TOC parsing chain remain unchanged.
+- SHA256: `c72c4431a53f2d0bee055fbd442aeaa9d38cb206a2b4d3c1c0e68a9bb5fd11b9`.
+
+## 2026-08-27 — 漫蛙漫画 0.1.0-beta4
+
+Status: Beta/Test; targeted comment/diagnostic repair after Beta3 real-device feedback.
+
+Changes:
+
+- Fixed login-page diagnostics: SourceLoginJsExtensions does not provide DOM methods such as `getElements`, so diagnostics became network-only.
+- Custom-button comment path was changed to inspect current book context directly and strip Legado WebView request options.
+- Removed the unverified `#comment` anchor and opened the official work page instead.
+- Beta3 detail/TOC/content/discovery/domain modules stayed frozen.
+- SHA256: `446ce8225b61b1f98e2923123321b474422a75987c0238e2fecdea1eb4ba3ed1`.
+
 ## 2026-08-27 — 漫蛙漫画 0.1.0-beta3
 
 Status: Beta/Test; verified-selector rebuild awaiting user real-device confirmation.
