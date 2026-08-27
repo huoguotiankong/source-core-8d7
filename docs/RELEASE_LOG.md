@@ -13,6 +13,21 @@ Promotion:
 - Stable SHA256: `e181e0c0dd917687e98441a4208192977f6799f921591405a4c729d9dd46cb69`.
 
 
+## 2026-08-27 — 漫蛙漫画 0.1.0-beta8
+
+Status: Beta/Test; stability rollback and exact comment-DOM repair awaiting real-device confirmation.
+
+Changes:
+
+- Fixed login form confirmation by implementing the required JavaScript `login()` function.
+- Removed the Beta5 image-route selection UI/runtime after real-device regression.
+- Restored the Beta3/Beta4 chapter request and per-image User-Agent/Referer request chain; AES image decryption is unchanged.
+- Replaced heuristic comment-container detection with the actual Manwa `#comment` node.
+- Forced `#comment` visible because the site renders it with `display:none` until the native tab switcher activates it.
+- Moved `#win-comment`, `#book_id`, and `#session_uid` into the custom 94% comment sheet to preserve original posting/session behavior.
+- Detail/TOC remain frozen at the Beta3 real-device working baseline.
+- SHA256: `42922c48498505584fe1e25c21c6aa461b6cc2bf35d4cd20991de1ffb6e3e20d`.
+
 ## 2026-08-27 — 漫蛙漫画 0.1.0-beta7
 
 Status: Beta/Test; custom comment-view upgrade awaiting real-device confirmation.
