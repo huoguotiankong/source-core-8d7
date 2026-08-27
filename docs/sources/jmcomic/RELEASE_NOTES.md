@@ -1,5 +1,18 @@
 # JMComic / 禁漫天堂 Release Notes
 
+## 2026-08-27 — 0.1.0-beta5
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+- Detail comment/favourite buttons now embed the current album ID directly.
+- Detail visual fields return to the original Web selectors for name, cover, author, synopsis and tags.
+- Chapter content first reads the original verified Web `data-original` image list.
+- APP `/chapter` objects now parse `image` in addition to `name / filename / url`.
+- Web active fetch remains the third content fallback; image shunts and JM de-scrambling remain intact.
+- Comment center UI refined: denser cards, nested-reply hierarchy, page indicator, reply-target state and dark mode.
+- Published source SHA256: `3266fae2495344cf8efbee76a2bef692f0530671d81a794336a485fcdc7e791b`.
+- Source-specific bundle: `bundles/jmcomic-beta5.json`.
+
 ## 2026-08-27 — 0.1.0-beta4
 
 Status: Beta/Test; awaiting user real-device confirmation.
