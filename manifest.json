@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-27T14:52:00+08:00",
+  "updatedAt": "2026-08-27T14:55:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -180,30 +180,32 @@
       "category": "comic",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "0.1.0-beta6",
-      "versionCode": 1006,
-      "updatedAt": "2026-08-27T14:52:00+08:00",
+      "version": "0.1.0-beta7",
+      "versionCode": 1007,
+      "updatedAt": "2026-08-27T14:55:00+08:00",
       "sourcePath": "sources/comic/manwa/manwa-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1006",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1007",
       "bookSourceUrl": "https://sc8d7.invalid/legado/manwa-8d7",
-      "summary": "Beta6：按阅读官方 SourceCallBack/Book JVM API 重写顶部评论按钮，直接用 getBookUrl()/getTocUrl() 打开当前作品，不再识别漫画ID。",
+      "summary": "Beta7：评论按钮升级为 94% 高度定制半屏，仅保留漫蛙原生评论 DOM 并重新排版，继续复用官网登录态/发表/回复/举报。",
       "tags": [
         "漫蛙",
         "漫画",
         "测试版",
-        "评论修复",
-        "Legado源码适配",
+        "定制评论页",
+        "半屏WebView",
+        "评论",
         "图源切换",
         "动态域名"
       ],
       "changelog": [
-        "核对阅读官方 SourceCallBack.callBackBtn：clickCustomButton 明确注入 event/java/result/book/chapter",
-        "核对 Book 实体：改用 JVM getter book.getBookUrl()/getTocUrl()/getName()，不再使用 Rhino 属性映射",
-        "评论按钮删除漫画ID识别链，直接清理当前 bookUrl 的 WebView 参数后 java.startBrowser()",
-        "bookUrl 为空时才回退 tocUrl；失败提示会直接展示 getter 返回值与异常",
+        "保留 Beta6 已验证的 Book JVM getter 当前作品定位",
+        "评论打开方式从 startBrowser 改为 showBrowser 94% 高度圆角半屏",
+        "注入 comment-only 皮肤，自动提取评论容器并隐藏详情/目录/站点导航/广告",
+        "保留漫蛙原生评论 DOM 和 Cookie，因此发表评论、回复、举报继续使用官网逻辑",
+        "新增作品名/评论数/刷新顶部栏、评论卡片/头像/等级/楼中楼样式和深色模式",
         "Beta3 详情/目录与 Beta5 图片线路/加载优化保持冻结"
       ],
-      "sha256": "55495533c4be01f008b8126d402fe5eafb1ac2740e30572f91c32097bcad51d3",
+      "sha256": "b42e14f6da67289151816b76dcb96417ea8bf0e248d51d5d41077971e05a282d",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],
