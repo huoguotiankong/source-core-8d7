@@ -1,31 +1,35 @@
 {
   "kind": "source",
   "title": "◈ 漫蛙漫画",
-  "summary": "漫蛙漫画 0.1.0-beta8：修复登录保存报错、恢复稳定正文链，并按真实 #comment 节点修复定制评论空白。",
+  "summary": "漫蛙漫画 0.1.0-beta9：清理旧线路登录状态、保持稳定正文链，并修复评论页过早搬 DOM 导致的空白。",
   "badges": [
     "Beta",
-    "0.1.0-beta8",
+    "0.1.0-beta9",
     "漫画",
-    "稳定性修复"
+    "评论懒加载修复"
   ],
   "sections": [
     {
-      "title": "登录",
-      "text": "阅读登录表单右上角确认会强制调用 login()；Beta8 已实现该函数，保存设置不再报 Function login not implements。"
+      "title": "登录迁移",
+      "text": "Beta9 登录页已移除旧“图片线路”表单；login() 前置定义，并在确认时清理 Beta5/Beta7 遗留的表单/线路状态。"
     },
     {
       "title": "正文",
-      "text": "移除 Beta5 图片线路选择与附加图源参数，恢复 Beta3/Beta4 已真机确认能显示图片的章节请求和逐图 User-Agent/Referer 请求头模式；AES 解密不变。"
+      "text": "继续使用 Beta3/Beta4 已真机确认能显示图片的章节请求、逐图 User-Agent/Referer 请求头和 AES 解密链；不恢复 Beta5 导致黑屏的原始图片 URL 模式。"
     },
     {
       "title": "评论",
-      "text": "不再猜评论容器，直接使用漫蛙真实 #comment 节点并强制 display:block；同时保留 #win-comment/#book_id/#session_uid 以继续支持官网发表评论和登录态。"
+      "text": "定制评论页先唤醒官网评论标签并触发懒加载，只有 #comment 内真实评论列表渲染后才隔离为 94% 半屏，避免过早隐藏原网页导致列表永远不加载。"
+    },
+    {
+      "title": "诊断",
+      "text": "若 15 秒仍未获得评论列表，页面会保留 #comment 并显示 items/children/text 三项诊断，不再是纯空白页。"
     },
     {
       "title": "冻结范围",
-      "text": "Beta3 已恢复的详情与目录保持不变，后续图片性能优化将在稳定基线上单独进行。"
+      "text": "详情、目录和动态域名保持现有稳定基线，本轮不做其它功能改动。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1008",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1008"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1009",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1009"
 }
