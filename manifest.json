@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-27T15:30:00+08:00",
+  "updatedAt": "2026-08-27T17:30:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -180,32 +180,31 @@
       "category": "comic",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "0.1.0-beta8",
-      "versionCode": 1008,
-      "updatedAt": "2026-08-27T15:30:00+08:00",
+      "version": "0.1.0-beta9",
+      "versionCode": 1009,
+      "updatedAt": "2026-08-27T17:30:00+08:00",
       "sourcePath": "sources/comic/manwa/manwa-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1008",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1009",
       "bookSourceUrl": "https://sc8d7.invalid/legado/manwa-8d7",
-      "summary": "Beta8：修复登录页缺少 login()、回退图片线路导致的正文回归，并按真实 #comment DOM 修复定制评论空白。",
+      "summary": "Beta9：清理旧图片线路/登录表单状态，正文继续使用已验证稳定链；评论改为等待官网列表真实渲染后再进入定制半屏。",
       "tags": [
         "漫蛙",
         "漫画",
         "测试版",
-        "登录修复",
-        "正文恢复",
+        "登录迁移",
+        "正文稳定链",
+        "评论懒加载",
         "定制评论",
-        "稳定性回退",
         "动态域名"
       ],
       "changelog": [
-        "实现登录表单必须的 login()，右上角确认保存不再报 Function login not implements",
-        "移除造成正文回归的 Beta5 图片线路选择 UI 和运行时模块",
-        "章节请求与漫画正文恢复 Beta3/Beta4 已真机确认能显示图片的稳定链，保留 AES 解密",
-        "评论页直接锁定真实 #comment 节点并强制 display:block，不再模糊猜容器",
-        "把 #win-comment/#book_id/#session_uid 一起移入定制半屏，保留官网 Cookie 与发表评论逻辑",
-        "Beta3 详情/目录保持冻结"
+        "login() 前置定义并清理 Beta5/Beta7 遗留的登录表单与图片线路状态；登录页不再显示旧图片线路选择",
+        "正文继续冻结 Beta3/Beta4 已真机显示成功的逐图 User-Agent/Referer + AES 解密链",
+        "评论页先唤醒官网评论标签并滚动触发懒加载，等待 #comment 内真实评论列表出现后再构建定制半屏",
+        "15 秒仍未就绪时保留 #comment 并显示 items/children/text 诊断，不再只出现空白页",
+        "详情、目录和动态域名保持现有稳定基线"
       ],
-      "sha256": "42922c48498505584fe1e25c21c6aa461b6cc2bf35d4cd20991de1ffb6e3e20d",
+      "sha256": "46b8b09dcf3dcef9b3f54360ce626797ccfc4ce5325647ab0fa2807723d5300a",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],
