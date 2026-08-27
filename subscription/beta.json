@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-27T17:30:00+08:00",
+  "updatedAt": "2026-08-27T18:10:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -66,33 +66,34 @@
     {
       "id": "manwa",
       "name": "◈ 漫蛙漫画",
-      "summary": "Beta9：清理旧图片线路/登录表单状态，正文继续使用已验证稳定链；评论改为等待官网列表真实渲染后再进入定制半屏。",
+      "summary": "Beta10：评论卡片/楼中楼按真实漫蛙 CSS 做彻底布局重置，修复竖排与大徽章；登录设置改为双列紧凑布局。",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg",
       "channel": "beta",
-      "version": "0.1.0-beta9",
+      "version": "0.1.0-beta10",
       "updatedAt": "2026-08-27",
       "tags": [
         "漫蛙",
         "漫画",
         "测试版",
-        "登录迁移",
-        "正文稳定链",
-        "评论懒加载",
-        "定制评论",
+        "评论UI",
+        "楼中楼",
+        "登录设置",
+        "双列布局",
         "动态域名"
       ],
       "changelog": [
-        "login() 前置定义并清理 Beta5/Beta7 遗留的登录表单与图片线路状态；登录页不再显示旧图片线路选择",
-        "正文继续冻结 Beta3/Beta4 已真机显示成功的逐图 User-Agent/Referer + AES 解密链",
-        "评论页先唤醒官网评论标签并滚动触发懒加载，等待 #comment 内真实评论列表出现后再构建定制半屏",
-        "15 秒仍未就绪时保留 #comment 并显示 items/children/text 诊断，不再只出现空白页",
-        "详情、目录和动态域名保持现有稳定基线"
+        "重置漫蛙原站评论头像 absolute 定位和 info padding-left，避免自定义 flex 与原站 CSS 叠加",
+        "顶层评论、普通回复、楼中楼和带头像子回复分开布局，回复容器固定 100% 宽并清除 float",
+        "头像与等级/钻石图标拆分：头像圆形固定，额外徽章缩小至头像右下角",
+        "评论正文换行、时间/点赞、发表评论区域和移动端间距统一收紧",
+        "登录页 8 个常用入口改为 4 行双列，保留网页登录、会员中心、收藏、主页、刷新域名、诊断、公告和说明",
+        "正文、详情、目录、动态域名逻辑冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1009",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1009",
-      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1009",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1010",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1010",
+      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1010",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-08-27T17:30:00+08:00"
+  "generatedAt": "2026-08-27T18:10:00+08:00"
 }
