@@ -5,7 +5,7 @@ Updated: 2026-08-27
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta2`
+- Version: `0.1.0-beta3`
 - Display name: `◈ 漫蛙漫画`
 - Legado identity: `https://sc8d7.invalid/legado/manwa-8d7`
 - Beta source: `sources/comic/manwa/manwa-beta.json`
@@ -15,6 +15,29 @@ Updated: 2026-08-27
 ## Baseline
 
 This is a new reconstruction. The user-provided Manwa source was used only to confirm working HTML selectors, query parameters and the current image-decryption chain. Its selector-combination discovery UI is not retained.
+
+## Beta3 current state
+
+Beta2 real-device result:
+
+- Cover loads.
+- Author is still polluted by synopsis text.
+- Custom detail HTML does not render as expected.
+- TOC remains loading.
+- customButton cannot resolve the current manga URL.
+
+Beta3 investigation found the maintained Keiyoushi/Mihon Manwa implementation. Its confirmed selectors are now the canonical parsing baseline:
+
+- author: `p.detail-main-info-author > span.detail-main-info-value > a`
+- status: `p.detail-main-info-author:contains(更新状态) > span.detail-main-info-value`
+- genres: `div.detail-main-info-class > a.info-tag`
+- description: `#detail > p.detail-desc`
+- chapters: `ul#detail-list-select > li > a`
+- images: `#cp_img > div.img-content > img[data-r-src]`
+
+Domain discovery also follows the maintained extension's current redirect method: `https://fuwt.cc/mw666` exposes a Base64-encoded `lks` mirror list.
+
+Beta3 removes the Beta2 hotfix runtime block instead of stacking another compatibility implementation.
 
 ## Beta2 current state
 
