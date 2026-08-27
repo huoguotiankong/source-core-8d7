@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-27T10:00:00+08:00",
+  "updatedAt": "2026-08-27T11:49:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -62,7 +62,37 @@
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11016",
       "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11016",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
+    },
+    {
+      "id": "manwa",
+      "name": "◈ 漫蛙漫画",
+      "summary": "Beta1：发现页重写为分区直达；加入官方网页登录/Cookie、官方评论入口和自动更新域名。",
+      "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg",
+      "channel": "beta",
+      "version": "0.1.0-beta1",
+      "updatedAt": "2026-08-27",
+      "tags": [
+        "漫蛙",
+        "漫画",
+        "测试版",
+        "动态域名",
+        "网页登录",
+        "评论",
+        "收藏",
+        "WebView"
+      ],
+      "changelog": [
+        "发现页完全重写为快捷入口、主分类、地区、连载状态、常用标签分区直达，不沿用参考源的排列组合筛选",
+        "启用 CookieJar，账号使用官方网页登录，提供会员中心、我的收藏、主页与公告入口",
+        "详情页互动按钮与 BookInfo 顶部定制按钮均可进入当前作品官方评论页，复用官网评论/回复/举报能力",
+        "加入 12 小时域名缓存、官方走失/跳转入口解析、备用域名探测、手动刷新和线路诊断",
+        "保留本地搜索/详情/目录/正文规则、WebView 反爬兼容及当前 AES/CBC 图片解密链"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1001",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1001",
+      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1001",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-08-27T10:00:00+08:00"
+  "generatedAt": "2026-08-27T11:49:00+08:00"
 }
