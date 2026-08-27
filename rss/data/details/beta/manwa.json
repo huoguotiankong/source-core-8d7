@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "◈ 漫蛙漫画",
-  "summary": "漫蛙漫画 0.1.0-beta5：评论改用 book变量/tocUrl 多路定位；新增官网图源切换与正文图片加载优化。",
+  "summary": "漫蛙漫画 0.1.0-beta6：按阅读官方 SourceCallBack/Book JVM API 重写评论按钮，移除漫画 ID 识别链。",
   "badges": [
     "Beta",
-    "0.1.0-beta5",
+    "0.1.0-beta6",
     "漫画",
-    "评论+图源"
+    "评论JVM API修复"
   ],
   "sections": [
     {
-      "title": "当前状态",
-      "text": "Beta3/4 真机已经确认封面、简介、最新章与目录恢复；Beta5 冻结这条已恢复的数据链，只处理评论定位与图片速度。"
+      "title": "根因",
+      "text": "阅读官方源码确认 clickCustomButton 会注入 Book 实体，但 Beta5 使用 book.bookUrl/book.tocUrl 的 Rhino 属性映射不可靠。"
     },
     {
       "title": "评论",
-      "text": "详情 init 持久化漫画 ID 到 book variable；顶部定制按钮按 book变量 → tocUrl → bookUrl → source缓存识别作品 ID。由于 tocUrl 已真机正常，评论不再依赖单一 bookUrl。"
+      "text": "Beta6 直接调用 Book JVM getter：getBookUrl()/getTocUrl()/getName()。优先打开当前 bookUrl，仅清理 Legado WebView 请求参数；不再识别漫画 ID。"
     },
     {
-      "title": "图片线路",
-      "text": "登录设置新增自动/默认/线路1-6与“刷新图源列表”。线路参数从官网首页 img-host-modal 动态提取并缓存，章节页按选择附加相应图源参数。"
+      "title": "失败诊断",
+      "text": "若仍不能打开，提示会直接显示 getter 的实际返回值与异常，不再只有“ID未识别”。"
     },
     {
-      "title": "加载优化",
-      "text": "正文图片移除逐图重复请求头 JSON，让阅读原生图片加载器直接处理并发和缓存；AES/CBC 解密链保持不变。"
+      "title": "冻结范围",
+      "text": "Beta3 已恢复的详情/目录和 Beta5 的图片线路/加载优化保持不变。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1005",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1005"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1006",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1006"
 }
