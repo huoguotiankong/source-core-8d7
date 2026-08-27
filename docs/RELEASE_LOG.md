@@ -1,3 +1,18 @@
+## 2026-08-27 — 漫蛙漫画 0.1.0-beta10
+
+Status: Beta/Test; comment-layout and login-UI refinement awaiting real-device confirmation.
+
+Changes:
+
+- Beta9 real-device test confirmed the custom comment page now loads real comments, but nested replies exposed a severe layout collision: the parent comment body could collapse into a one-character-wide vertical column.
+- Root cause confirmed against the Manwa-compatible mobile stylesheet: the original page uses absolute positioning for `.detail-list-comment-cover` and a fixed left padding on `.detail-list-comment-info`. Beta9 added flex without resetting those original rules, so both layout systems were active at once.
+- Beta10 explicitly resets position/padding/float/width before applying the custom card layout.
+- Top-level comments, simple reply blocks, sublists and full avatar-bearing replies are styled separately. Reply containers are forced to full width and cleared from floats.
+- The first image in the cover block is treated as the avatar; extra level/diamond images are rendered as small bottom-right badges instead of full-size avatars.
+- Login settings are compressed from eight full-width rows into four two-column rows while preserving all existing actions.
+- Content/detail/TOC/domain behavior is frozen.
+- SHA256: `5e85dac3eae1dc828304d29fccb87f3fae22a1cb2c94aedf7769e1c4d5330f92`.
+
 ## 2026-08-27 — 漫蛙漫画 0.1.0-beta9
 
 Status: Beta/Test; legacy-login migration and comment lazy-load repair awaiting real-device confirmation.
