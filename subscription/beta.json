@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-26T23:59:49+08:00",
+  "updatedAt": "2026-08-27T10:00:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -62,42 +62,7 @@
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11016",
       "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11016",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
-    },
-    {
-      "id": "jmcomic",
-      "name": "◈ 禁漫天堂",
-      "summary": "禁漫天堂 Beta8：登录专项修复。优先读取 getLoginInfoMap，APP 登录兼容 18comicAPP + 2.1.2/2.0.20，保存 AVS 并用于后续鉴权；正文/目录/详情/评论链冻结。",
-      "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg",
-      "channel": "beta",
-      "version": "0.1.0-beta8",
-      "updatedAt": "2026-08-27",
-      "tags": [
-        "禁漫天堂",
-        "漫画",
-        "测试版",
-        "APP API",
-        "网页线路",
-        "动态域名",
-        "登录",
-        "账户",
-        "评论",
-        "回复",
-        "收藏",
-        "双线路"
-      ],
-      "changelog": [
-        "登录页优先使用 source.getLoginInfoMap() 读取账号密码，兼容旧 getLoginInfo()",
-        "APP 登录优先 18comicAPP，并兼容 2.1.2 / 2.0.20 两个 APP 版本",
-        "登录成功后保存 s 为 AVS，后续 API 收藏/评论等请求显式携带 AVS Cookie",
-        "Cookie 写入使用当前阅读上下文 ctx.cookie，并保留显式请求头兜底",
-        "新增手动网页登录、登录状态和清除登录按钮",
-        "Beta5 正文/目录与 Beta7 详情/评论桥冻结"
-      ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1008",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/jmcomic/jmcomic-beta.json?v=1008",
-      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1008",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/jmcomic.json"
     }
   ],
-  "generatedAt": "2026-08-27T09:20:00+08:00"
+  "generatedAt": "2026-08-27T10:00:00+08:00"
 }
