@@ -1,5 +1,18 @@
 # JMComic / 禁漫天堂 Release Notes
 
+## 2026-08-27 — 0.1.0-beta4
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+- Added `<usehtml>...</usehtml>` around JS-generated detail HTML so `@onclick` buttons are parsed as interactive Legado HTML.
+- Removed jsLib's direct dependency on rule-local `baseUrl`; book/chapter IDs resolve through safe context helpers.
+- Detail now precomputes a real Web album TOC URL.
+- TOC returned to the original proven selector `class.btn-toolbar.0@tag.a||.reading`.
+- Chapter body still uses Auto / APP/API / Web routes independently from TOC.
+- Beta3 comment HTML/avatar/reply normalization is retained unchanged.
+- Published source SHA256: `df81fa4a10ab178454c0a59c52dd3ee0bf5ed9ef1da06704c04df4a5fb352598`.
+- Source-specific bundle: `bundles/jmcomic-beta4.json`.
+
 ## 2026-08-27 — 0.1.0-beta3
 
 Status: Beta/Test; awaiting user real-device confirmation.
