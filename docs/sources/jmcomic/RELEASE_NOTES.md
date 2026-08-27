@@ -1,5 +1,18 @@
 # JMComic / 禁漫天堂 Release Notes
 
+## 2026-08-27 — 0.1.0-beta8
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+- Login page now reads credentials from `source.getLoginInfoMap()` first, with legacy `getLoginInfo()` fallback.
+- APP login prefers `18comicAPP` and tries app versions `2.1.2` and `2.0.20`.
+- Successful login response field `s` is persisted as AVS and explicitly attached to subsequent API requests.
+- Cookie persistence now uses the current reader context `ctx.cookie`, with explicit AVS header fallback.
+- Added manual Web login, login-status and clear-login controls.
+- Beta5 content/TOC and Beta7 detail/comment modules remain frozen.
+- Published SHA256: `b6e5efbe29ea2018f1d3246e0e1ce0d9e0347efb4818afd4e9496f69734d7514`.
+- Source-specific bundle: `bundles/jmcomic-beta8.json`.
+
 ## 2026-08-27 — 0.1.0-beta7
 
 Status: Beta/Test; awaiting user real-device confirmation.
