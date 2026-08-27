@@ -143,13 +143,13 @@
       "category": "comic",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "0.1.0-beta7",
-      "versionCode": 1007,
-      "updatedAt": "2026-08-27T09:13:00+08:00",
+      "version": "0.1.0-beta8",
+      "versionCode": 1008,
+      "updatedAt": "2026-08-27T09:20:00+08:00",
       "sourcePath": "sources/comic/jmcomic/jmcomic-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1007",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic-beta.json?v=1008",
       "bookSourceUrl": "https://sc8d7.invalid/legado/jmcomic-8d7",
-      "summary": "禁漫天堂 Beta7：正文/目录继续冻结；修复评论页“未知操作”桥接协议，并按哔咔/Venera思路增强详情作者、标签与作品数据。",
+      "summary": "禁漫天堂 Beta8：登录专项修复。优先读取 getLoginInfoMap，APP 登录兼容 18comicAPP + 2.1.2/2.0.20，保存 AVS 并用于后续鉴权；正文/目录/详情/评论链冻结。",
       "tags": [
         "禁漫天堂",
         "漫画",
@@ -165,14 +165,14 @@
         "双线路"
       ],
       "changelog": [
-        "修复评论 WebView 与阅读侧桥接协议错位：action/op 双兼容",
-        "评论列表响应同时提供 list / total / data，修复“未知操作”与列表读取失败",
-        "详情新增可点击作者、原作、分类/标签按钮",
-        "作品数据调整为浏览/点赞、评论/章节、JM编号/线路三行双列",
-        "补充更新时间，作者/标签点击进入对应作品列表",
-        "Beta5 已确认正常的目录/正文、图片分流与反混淆继续冻结"
+        "登录页优先使用 source.getLoginInfoMap() 读取账号密码，兼容旧 getLoginInfo()",
+        "APP 登录优先 18comicAPP，并兼容 2.1.2 / 2.0.20 两个 APP 版本",
+        "登录成功后保存 s 为 AVS，后续 API 收藏/评论等请求显式携带 AVS Cookie",
+        "Cookie 写入使用当前阅读上下文 ctx.cookie，并保留显式请求头兜底",
+        "新增手动网页登录、登录状态和清除登录按钮",
+        "Beta5 正文/目录与 Beta7 详情/评论桥冻结"
       ],
-      "sha256": "6423393d9dfcf10845400fe2916a922cd7cf013a359314175e4155e393a2b6f1",
+      "sha256": "b6e5efbe29ea2018f1d3246e0e1ce0d9e0347efb4818afd4e9496f69734d7514",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],
