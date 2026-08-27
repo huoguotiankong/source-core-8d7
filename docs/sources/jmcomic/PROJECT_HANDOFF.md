@@ -5,76 +5,79 @@ Updated: 2026-08-27
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta5`
+- Version: `0.1.0-beta6`
 - Display name: `◈ 禁漫天堂`
 - Legado identity: `https://sc8d7.invalid/legado/jmcomic-8d7`
 - Repository source: `sources/comic/jmcomic/jmcomic-beta.json`
 - RSS detail: `rss/data/details/beta/jmcomic.json`
-- Source-specific bundle: `bundles/jmcomic-beta5.json`
+- Source-specific bundle: `bundles/jmcomic-beta6.json`
 - Runtime: complete inline `jsLib`.
 
 ## Confirmed real-device progression
 
 - Beta1: repository Raw runtime loader failed because `java` resolved to Rhino `JavaPackage`.
 - Beta2: discovery/categories and login-page buttons recovered after explicit `this.java` compatibility handling.
-- Beta3: comment HTML text and nested replies recovered; TOC direction improved.
+- Beta3: comment HTML text and nested replies recovered.
 - Beta4: detail HTML buttons render correctly and Web TOC opens.
-- Beta5: targets the remaining issues from the latest screenshots:
-  1. Detail comment/favourite buttons bind the album ID directly.
-  2. Detail visual data falls back to the original Web source selectors.
-  3. Content uses the original verified chapter-image selector first.
-  4. APP `/chapter` image objects now accept the actual `image` field.
-  5. Comment UI is refined without changing the recovered comment data model.
+- Beta5: user confirmed manga content now loads. The TOC/content chain is frozen from Beta6 onward unless a new regression is demonstrated.
+- Beta6: focuses only on detail/comment entry identity resolution and comment UI refinement.
 
-## Current architecture
+## Beta6 identity strategy
 
-1. Detail
-   - Album ID is captured during init and inserted directly into button callbacks.
-   - Name/cover/author/description/tags use the original Web selectors as the visual baseline.
-   - API detail data is supplemental only.
-2. TOC
-   - Original Web selectors `class.btn-toolbar.0@tag.a||.reading`.
-   - Manga mode `book.type=64`.
-   - Selected image shunt is appended to chapter URLs.
-3. Content
-   - First: current Web chapter `.row.thumb-overlay-albums img[data-original]`.
-   - Second: APP `/chapter?id=<photoId>`; supports string items and object `image/name/filename/url`.
-   - Third: active Web request and Jsoup image extraction.
-   - Existing image de-scrambling retained.
-4. Comments
-   - APP `/forum` read first, Web fallback.
-   - `CID/UID/content/photo/replys` normalization retained.
-   - Independent comment center supports paging, posting, replying and nested replies.
-5. Account/routes
-   - Auto / APP/API / Web route switching.
-   - Dynamic API and Web domain refresh.
-   - Login, account center, favourites and history.
+The previous failure was not the comment API. Both the detail entry and top custom button reached the callback but could not recover the JM album ID from their runtime context.
+
+Beta6 resolves album identity in this order:
+
+1. explicit ID passed by the detail button;
+2. current book variable / bookUrl / ruleUrl / safe base URL;
+3. page canonical / og:url;
+4. a persistent mapping written during search/discovery: normalized title -> JM ID and normalized cover path -> JM ID;
+5. detail-page title/cover lookup against the same mapping.
+
+The detail button now carries ID + title + cover. The top custom button uses the same resolver and the current book title/cover.
+
+## Frozen working modules
+
+The following Beta5 behavior is frozen in Beta6:
+
+- Web TOC using the original verified JM selectors.
+- Manga type `book.type=64`.
+- Current-page Web image extraction.
+- APP `/chapter` compatibility including object `image` field.
+- Active-Web fallback image extraction.
+- Image shunts 1-4.
+- JM image de-scrambling.
+
+## Comment center
+
+- APP `/forum` read first, Web fallback.
+- `CID / UID / content / photo / replys` normalization retained.
+- Posting/replying path retained.
+- Beta6 UI refinement: real HTML title, larger cards, nested-reply timestamps, clearer page state and reply target.
 
 ## Repository publication state
 
-Beta5 is synchronized in:
+Beta6 is synchronized in:
 
 - `manifest.json`
 - `subscription/beta.json`
 - `subscription/comic.json`
 - `rss/data/details/beta/jmcomic.json`
 - `sources/comic/jmcomic/jmcomic-beta.json`
-- `bundles/jmcomic-beta5.json`
+- `bundles/jmcomic-beta6.json`
 - `bundles/all-beta.json`
 - `docs/sources/jmcomic/RELEASE_NOTES.md`
 - `docs/RELEASE_LOG.md`
 
-Repository Beta5 source SHA256: `3266fae2495344cf8efbee76a2bef692f0530671d81a794336a485fcdc7e791b`.
+Repository Beta6 source SHA256: `c36f64b73b3865a6ac0b1d07de2ae1a85b27407b04f54fe5b47ba189ecf65b69`.
 
 ## Next real-device checklist
 
-1. Detail cover, single author, synopsis and tags.
-2. Detail “查看评论” should open the same comment center as the top custom button.
-3. Detail “收藏作品” should submit against the correct album ID.
-4. Open a Web TOC chapter and verify images appear.
-5. Test the same chapter with Auto, APP/API and Web route modes.
-6. Verify scrambled newer chapters.
-7. Comment paging, replies and posting after the UI refinement.
+1. Open a result from search/discovery and verify the detail page shows a numeric JM ID.
+2. Tap detail “查看评论”; it should open the comment center without the “无法识别漫画 ID” toast.
+3. Tap the top custom button; it should open the same comment center.
+4. Confirm Beta5 content remains normal.
+5. Confirm comment paging / replies / posting remain normal after UI changes.
 
 ## Promotion rule
 
