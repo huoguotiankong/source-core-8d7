@@ -1,3 +1,23 @@
+## 2026-08-27 — JMComic 0.1.0-beta7 comment bridge + detail tags
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+Real-device finding:
+
+- Beta6 can resolve the numeric JM ID and open the independent comment page.
+- The page then fails with “未知操作”, proving the remaining failure is the WebView/reader bridge protocol, not album identity or the comment API.
+
+Changes:
+
+- 评论桥同时接受 `action` 与 `op`；修复 Beta6 页面发送 `op:list/post` 而桥只判断 `action` 的协议错位。
+- 列表响应同时返回 `list / total / data`，修复页面从错误层级读取评论数据。
+- APP /forum、Web 评论兜底、发表评论和回复链保持不变。
+- 详情参考哔咔成熟交互和 Venera 信息层级，新增可点击作者、原作、分类/标签。
+- 作品数据调整为浏览/点赞、评论/章节、JM编号/线路三行，并补充更新时间。
+- Beta5 已确认正常的目录/正文、图片分流和反混淆继续冻结。
+- Published SHA256: `6423393d9dfcf10845400fe2916a922cd7cf013a359314175e4155e393a2b6f1`.
+
+
 ## 2026-08-27 — JMComic 0.1.0-beta6 robust comment identity + comment UI
 
 Status: Beta/Test; awaiting user real-device confirmation.
