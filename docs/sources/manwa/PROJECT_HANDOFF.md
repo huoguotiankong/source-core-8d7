@@ -5,7 +5,7 @@ Updated: 2026-08-27
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta4`
+- Version: `0.1.0-beta5`
 - Display name: `◈ 漫蛙漫画`
 - Legado identity: `https://sc8d7.invalid/legado/manwa-8d7`
 - Beta source: `sources/comic/manwa/manwa-beta.json`
@@ -15,6 +15,41 @@ Updated: 2026-08-27
 ## Baseline
 
 This is a new reconstruction. The user-provided Manwa source was used only to confirm working HTML selectors, query parameters and the current image-decryption chain. Its selector-combination discovery UI is not retained.
+
+## Beta5 comment and image-route fix
+
+Beta4 real-device result:
+
+- Cover/detail/TOC are now materially working: latest chapter and first TOC item display correctly.
+- Custom-button comment path still cannot identify the manga id.
+- Manga images render, but load very slowly.
+
+Beta5 therefore freezes detail/TOC and changes only two domains.
+
+### Comment id persistence
+
+During BookInfo parsing, the current `/book/<id>` is stored in:
+
+- `book.putVariable("mw_book_id_v5", id)`
+- `book.putVariable("mw_book_url_v5", url)`
+- source KV as a fallback.
+
+Custom-button resolution order is:
+
+`book variable -> book.tocUrl -> book.bookUrl -> source KV`.
+
+The `tocUrl` fallback is important because Beta4 real-device results prove that the current work's TOC route is already correctly resolved.
+
+### Image routes / performance
+
+The maintained Manwa extension exposes image-source switching from the site's `#img-host-modal`. Beta5 implements the same concept:
+
+- fetch and cache the official image-route href parameters;
+- login UI selection: Auto / Default / Route 1-6;
+- append the selected route parameter to chapter-page requests;
+- Auto uses the first discovered alternate route when available;
+- remove per-image duplicate request-option JSON so Legado's native manga image loader can cache/concurrently fetch the original image URLs;
+- keep the existing AES image decryption unchanged.
 
 ## Beta4 comment fix
 
