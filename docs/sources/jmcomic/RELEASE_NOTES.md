@@ -1,5 +1,17 @@
 # JMComic / 禁漫天堂 Release Notes
 
+## 2026-08-27 — 1.0.0 Stable
+
+Status: Stable. Promoted explicitly by the user from `0.1.0-beta8`.
+
+- Beta8 business logic promoted unchanged; no new runtime feature was added during promotion.
+- Stable source moved to `sources/comic/jmcomic/jmcomic.json`.
+- Stable RSS detail moved to `rss/data/details/stable/jmcomic.json`.
+- Active Beta catalog/bundle entry removed; Beta file remains historical/future-test storage.
+- Stable and Beta keep the same permanent `bookSourceUrl` identity.
+- Stable source SHA256: `e181e0c0dd917687e98441a4208192977f6799f921591405a4c729d9dd46cb69`.
+- Stable source-specific bundle: `bundles/jmcomic-stable.json`.
+
 ## 2026-08-27 — 0.1.0-beta8
 
 Status: Beta/Test; awaiting user real-device confirmation.
