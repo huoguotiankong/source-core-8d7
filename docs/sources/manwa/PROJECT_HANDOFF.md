@@ -5,7 +5,7 @@ Updated: 2026-08-27
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta8`
+- Version: `0.1.0-beta9`
 - Display name: `◈ 漫蛙漫画`
 - Legado identity: `https://sc8d7.invalid/legado/manwa-8d7`
 - Beta source: `sources/comic/manwa/manwa-beta.json`
@@ -15,6 +15,25 @@ Updated: 2026-08-27
 ## Baseline
 
 This is a new reconstruction. The user-provided Manwa source was used only to confirm working HTML selectors, query parameters and the current image-decryption chain. Its selector-combination discovery UI is not retained.
+
+## Beta9 upgrade migration + comment ready gate
+
+Latest real-device screenshots are from the Beta5-Beta7 generation, not the Beta8 repository payload: the login page still contains the image-route selector. They confirm three practical failures that must be protected against during in-place upgrades:
+
+- old login-form state can survive because the source keeps the same permanent `bookSourceUrl`;
+- Beta5/Beta7 raw image URLs can produce a chapter with a valid page count but failed image loads;
+- the custom comment shell can be created before Manwa has actually populated `#comment`, leaving a correct title/count over a blank body.
+
+Beta9 policy:
+
+1. The login page contains buttons only; the obsolete image-route selector is removed.
+2. `login()` is defined first and clears legacy stored login-form state after confirmation. The old source KV `mw_img_choice_v5` is reset to Default.
+3. Content remains exactly on the Beta3/Beta4 proven request model: chapter WebView request + per-image User-Agent/Referer options + existing AES decryptor.
+4. Comment presentation uses a ready gate. The preload reveals `#comment`, attempts the native comment-tab activation, scrolls the section into view to trigger lazy rendering, and waits for real `.detail-list-comment > li` content before moving the DOM.
+5. A 15-second timeout no longer leaves a blank page. It preserves the comment container and prints `items / children / text` counts for the next diagnostic iteration.
+6. Detail/TOC and dynamic-domain code remain frozen.
+
+External verification during Beta9 also confirmed the maintained Manwa crawler reads comments from `#comment .detail-list-comment > li`, while the current Keiyoushi/Mihon extension still uses `#cp_img > div.img-content > img[data-r-src]` for manga images. These reinforce the existing selector baseline without introducing a new private API.
 
 ## Beta8 stability rollback
 
