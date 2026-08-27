@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "◈ 漫蛙漫画",
-  "summary": "漫蛙漫画 0.1.0-beta4：单独修复顶部评论按钮和登录页线路诊断上下文。",
+  "summary": "漫蛙漫画 0.1.0-beta5：评论改用 book变量/tocUrl 多路定位；新增官网图源切换与正文图片加载优化。",
   "badges": [
     "Beta",
-    "0.1.0-beta4",
+    "0.1.0-beta5",
     "漫画",
-    "评论修复"
+    "评论+图源"
   ],
   "sections": [
     {
-      "title": "真机反馈",
-      "text": "Beta3 在书源登录页点线路诊断时报 SourceLoginJsExtensions 没有 getElements；同时顶部评论按钮仍无法正常进入评论。"
+      "title": "当前状态",
+      "text": "Beta3/4 真机已经确认封面、简介、最新章与目录恢复；Beta5 冻结这条已恢复的数据链，只处理评论定位与图片速度。"
     },
     {
       "title": "评论",
-      "text": "顶部定制按钮现在直接读取当前 BookInfoActivity 的 book.bookUrl，剥离阅读附加的 WebView 请求配置，提取 /book/<id> 并重建真实漫蛙作品地址。评论、发表评论和楼中楼就在该作品页。"
+      "text": "详情 init 持久化漫画 ID 到 book variable；顶部定制按钮按 book变量 → tocUrl → bookUrl → source缓存识别作品 ID。由于 tocUrl 已真机正常，评论不再依赖单一 bookUrl。"
     },
     {
-      "title": "诊断",
-      "text": "登录页线路诊断只检查当前域名、fuwt.cc/mw666 镜像候选数量和基础连通性，不再尝试读取详情 DOM。"
+      "title": "图片线路",
+      "text": "登录设置新增自动/默认/线路1-6与“刷新图源列表”。线路参数从官网首页 img-host-modal 动态提取并缓存，章节页按选择附加相应图源参数。"
     },
     {
-      "title": "冻结范围",
-      "text": "Beta3 已重构的详情、目录、正文、发现页与动态域名全部不动，避免为评论修复再次影响其它模块。"
+      "title": "加载优化",
+      "text": "正文图片移除逐图重复请求头 JSON，让阅读原生图片加载器直接处理并发和缓存；AES/CBC 解密链保持不变。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1004",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1004"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1005",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1005"
 }
