@@ -1,5 +1,18 @@
 # JMComic / 禁漫天堂 Release Notes
 
+## 2026-08-27 — 0.1.0-beta7
+
+Status: Beta/Test; awaiting user real-device confirmation.
+
+- Fixed comment WebView bridge mismatch: accepts both `action` and `op`.
+- Comment list response exposes `list`, `total` and `data`, fixing the Beta6 “未知操作” failure.
+- APP/Web comment data model, nested replies, post and reply paths remain unchanged.
+- Detail now includes clickable authors, original works and tags.
+- Metrics show views/likes, comments/chapters, JM id/route plus update time.
+- Beta5 TOC/content and manga image pipeline remain frozen.
+- Published SHA256: `6423393d9dfcf10845400fe2916a922cd7cf013a359314175e4155e393a2b6f1`.
+- Source-specific bundle: `bundles/jmcomic-beta7.json`.
+
 ## 2026-08-27 — 0.1.0-beta6
 
 Status: Beta/Test; awaiting user real-device confirmation.
