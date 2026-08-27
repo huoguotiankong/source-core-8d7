@@ -5,7 +5,7 @@ Updated: 2026-08-27
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta6`
+- Version: `0.1.0-beta7`
 - Display name: `◈ 漫蛙漫画`
 - Legado identity: `https://sc8d7.invalid/legado/manwa-8d7`
 - Beta source: `sources/comic/manwa/manwa-beta.json`
@@ -15,6 +15,24 @@ Updated: 2026-08-27
 ## Baseline
 
 This is a new reconstruction. The user-provided Manwa source was used only to confirm working HTML selectors, query parameters and the current image-decryption chain. Its selector-combination discovery UI is not retained.
+
+## Beta7 custom comment view
+
+Beta6 real-device result:
+
+- The custom button finally opens the correct current work.
+- The result is still the raw Manwa webpage rather than a custom comment UI.
+
+Beta7 keeps the verified `Book.getBookUrl()/getTocUrl()` path and only changes presentation:
+
+- use Legado `java.showBrowser(url, html, preloadJs, config)`;
+- open a 94% height rounded bottom WebView;
+- keep the original Manwa comment DOM and website event handlers/Cookie state;
+- inject a comment-only skin that identifies the smallest comment container by the presence of comment-form/list signals such as 发表评论, 排序, 举报 and 查看更多回复数;
+- move that container into a clean shell, hide the rest of the website, and restyle comment cards/replies;
+- preserve official posting/reply/report functionality instead of guessing private write APIs.
+
+The preload script is syntax-checked separately after generation.
 
 ## Beta6 official callback API fix
 
