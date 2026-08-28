@@ -1,0 +1,96 @@
+name: patch-qidian-beta21b
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta21b.trigger']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch beta21 robustly
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,re,base64,gzip,hashlib
+          from pathlib import Path
+          sp=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          doc=json.loads(sp.read_text(encoding='utf-8'))
+          src=doc[0] if isinstance(doc,list) else doc
+          assert 'beta20' in str(src.get('bookSourceComment','')).lower()
+          js=src['jsLib'];m=re.search(r'"circle":"gz:([A-Za-z0-9+/=]+)"',js);assert m
+          circle=gzip.decompress(base64.b64decode(m.group(1))).decode('utf-8')
+          assert 'state.previewImgs=pims;' in circle and circle.count('bindPostOpens(root)')==1
+          assert 'qfOpenPostDirect' not in circle and 'qfEnsureFeedMoreButton' not in circle
+
+          # Paging: only replace the source of top-level all-page params.
+          needle="var vs=(label==='全部')?[baseParams(tab,page)]:paramVariants(tab,c||{},page);"
+          assert circle.count(needle)==1, circle.count(needle)
+          helper="function qfVerifiedAllPageParams(tab,page){var top=TOP_META[tab]||TOP_META.dongtai;return {pageIndex:String(page||1),subCategoryId:'0',circleId:CIRCLE_ID,sortType:String(currentSort),categoryId:String(top.id||'0'),bookId:BOOK_ID,bookType:'1'};}"
+          pos=circle.index('function qfPageRows(')
+          circle=circle[:pos]+helper+circle[pos:]
+          circle=circle.replace(needle,"var vs=(label==='全部')?[qfVerifiedAllPageParams(tab,page)]:paramVariants(tab,c||{},page);",1)
+
+          # Body: locate qfStripMetaJson itself, then insert immediately before its own return s.
+          fs=circle.index('function qfStripMetaJson(s)')
+          ret=circle.index('return s;',fs)
+          poll="try{var qvp=s.lastIndexOf('{'),qvs=qvp>=0?s.slice(qvp).trim():'';if(qvs&&qvs.charAt(qvs.length-1)==='}'){var qvo=JSON.parse(qvs);if(qvo&&typeof qvo==='object'&&!Array.isArray(qvo)&&Object.prototype.hasOwnProperty.call(qvo,'Options')&&Object.prototype.hasOwnProperty.call(qvo,'VoteId')&&Object.prototype.hasOwnProperty.call(qvo,'VoteType'))s=s.slice(0,qvp).trim();}}catch(_qv){}"
+          circle=circle[:ret]+poll+circle[ret:]
+
+          assert circle.count('function qfVerifiedAllPageParams(')==1
+          assert circle.count('function qfPageRows(')==1
+          assert "qfVerifiedAllPageParams(tab,page)" in circle
+          assert circle.count("hasOwnProperty.call(qvo,'Options')")==1
+          assert circle.count('bindPostOpens(root)')==1 and 'state.previewImgs=pims;' in circle
+          assert 'qfOpenPostDirect' not in circle and 'qfEnsureFeedMoreButton' not in circle
+
+          nb64=base64.b64encode(gzip.compress(circle.encode('utf-8'),compresslevel=9,mtime=0)).decode('ascii')
+          js=js[:m.start(1)]+nb64+js[m.end(1):];src['jsLib']=js
+          src['bookSourceComment']='v1.1.0-beta21：基于 beta20 恢复版，仅修书友圈下一页与正文投票尾注。动态/精华/同人“全部”分页恢复历史真机验证成功的 pageIndex+subCategoryId+circleId+sortType+categoryId+bookId+bookType 参数；正文仅在尾部 JSON 可解析且同时包含 Options/VoteId/VoteType 时删除该投票元数据。查看详情、多图、评论/楼中楼及其它域保持 beta20 原样。'
+          sp.write_text(json.dumps(doc,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
+          d2=json.loads(sp.read_text(encoding='utf-8'));s2=d2[0] if isinstance(d2,list) else d2
+          mm=re.search(r'"circle":"gz:([A-Za-z0-9+/=]+)"',s2['jsLib']);assert mm
+          cc=gzip.decompress(base64.b64decode(mm.group(1))).decode('utf-8')
+          assert 'qfVerifiedAllPageParams' in cc and "hasOwnProperty.call(qvo,'VoteType')" in cc
+          assert cc.count('bindPostOpens(root)')==1 and 'state.previewImgs=pims;' in cc
+          sha=hashlib.sha256(sp.read_bytes()).hexdigest()
+
+          mp=Path('manifest.json');man=json.loads(mp.read_text(encoding='utf-8'));hit=False
+          for it in man.get('sources',[]):
+              if it.get('id')=='qidian-next-beta':
+                  it.update({'version':'1.1.0-beta21','versionCode':11021,'updatedAt':'2026-08-28T23:53:00+08:00','sourceUrl':'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11021','summary':'书友圈 beta21：恢复历史真机验证分页参数，并清理帖子正文尾部投票元数据。','tags':['起点','测试版','书友圈','连续分页','帖子正文','投票清理','Beta20基线'],'changelog':['“全部”下一页恢复 v2.9.72 真机验证过的 pageIndex/subCategoryId/sortType/categoryId/bookId 参数组合','不修改滚动触发、详情打开、多图传递、评论与楼中楼','正文仅删除尾部可解析且同时含 Options/VoteId/VoteType 的投票元数据对象','其它域冻结'],'sha256':sha});hit=True;break
+          assert hit;man['updatedAt']='2026-08-28T23:53:00+08:00';mp.write_text(json.dumps(man,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          bp=Path('subscription/beta.json');sub=json.loads(bp.read_text(encoding='utf-8'));hit=False
+          for it in sub.get('items',[]):
+              if it.get('id')=='qidian-next-beta':
+                  it.update({'summary':'书友圈 beta21：下一页恢复已验证参数；帖子正文清理尾部投票 JSON。','version':'1.1.0-beta21','updatedAt':'2026-08-28','tags':['起点','测试版','书友圈','连续分页','帖子正文','投票清理','Beta20基线'],'changelog':['“全部”分页恢复历史真机成功参数，不再用错误 postCategoryId 组合','正文尾部 Options/VoteId/VoteType 投票对象精确清理','查看详情、多图、评论/楼中楼保持 beta20 原样','其它域冻结'],'sourceUrl':'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11021','backupUrl':'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11021','importUrl':'legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11021'});hit=True;break
+          assert hit;sub['updatedAt']='2026-08-28T23:53:00+08:00';sub['generatedAt']='2026-08-28T23:53:00+08:00';bp.write_text(json.dumps(sub,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          bunp=Path('bundles/all-beta.json');bun=json.loads(bunp.read_text(encoding='utf-8'));cnt=[0]
+          def rb(o):
+              if isinstance(o,list):
+                  for i,v in enumerate(o):
+                      if isinstance(v,dict) and v.get('bookSourceUrl')==src.get('bookSourceUrl') and '起点增强' in str(v.get('bookSourceName','')):o[i]=src;cnt[0]+=1
+                      else:rb(v)
+              elif isinstance(o,dict):
+                  for k,v in list(o.items()):
+                      if isinstance(v,dict) and v.get('bookSourceUrl')==src.get('bookSourceUrl') and '起点增强' in str(v.get('bookSourceName','')):o[k]=src;cnt[0]+=1
+                      else:rb(v)
+          rb(bun);assert cnt[0]>=1;bunp.write_text(json.dumps(bun,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
+
+          rp=Path('docs/RELEASE_LOG.md');oldlog=rp.read_text(encoding='utf-8')
+          rp.write_text(f'''## 2026-08-28 — 起点增强 1.1.0-beta21\n\nStatus: Beta/Test; narrow follow-up on Beta20.\n\n- Beta20 real-device feedback confirms detail opening and multi-image display are restored; those paths are untouched.\n- Top-level feed paging restores the v2.9.72 on-device verified query spelling: `pageIndex + subCategoryId + circleId + sortType + categoryId + bookId + bookType`.\n- Post text strips only a trailing valid JSON poll metadata object containing `Options`, `VoteId`, and `VoteType`.\n- Existing scroll trigger, comments, nested replies and non-community domains remain unchanged.\n- SHA256: `{sha}`.\n\n'''+oldlog,encoding='utf-8')
+          print('BETA21_OK',sha,'bundle',cnt[0])
+          PY
+          git diff --check
+      - name: Commit beta21
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
+          git commit -m 'fix(qidian): verified circle paging and poll suffix beta21'
+          git push origin main
