@@ -1,31 +1,35 @@
 {
   "kind": "source",
   "title": "◈ 漫蛙漫画",
-  "summary": "漫蛙漫画 0.1.0-beta11：在 Beta10 布局基础上补齐动态楼中楼和图片/表情评论的兼容。",
+  "summary": "漫蛙漫画 0.1.0-beta12：评论卡片切换到 Grid 布局，并补上评论列表自动/手动连续加载。",
   "badges": [
     "Beta",
-    "0.1.0-beta11",
+    "0.1.0-beta12",
     "漫画",
-    "动态回复"
+    "评论连续加载"
   ],
   "sections": [
     {
-      "title": "动态楼中楼",
-      "text": "点击“查看更多回复数”后，站点脚本新插入的回复会被 MutationObserver 自动捕获并重新标记，不再只对首屏 DOM 生效。"
+      "title": "评论排版",
+      "text": "Beta11 顶层 li 使用 flex；当楼中楼/回复容器作为直接子节点出现时会成为第三列并挤压正文。Beta12 改为 44px + 剩余宽度的两列 Grid。"
     },
     {
-      "title": "图片/表情评论",
-      "text": "评论正文中的图片统一限制在 180px 和手机可用宽度以内；纯图片/表情评论减少额外留白。"
+      "title": "楼中楼",
+      "text": "顶层直接挂载的回复容器强制进入下一行正文列；带头像的完整子回复也使用独立 Grid，不再与父评论争抢横向宽度。"
     },
     {
-      "title": "评论细节",
-      "text": "章节来源链接采用轻量胶囊样式，“查看更多回复数”改为整行可点击区域；Beta10 顶层评论/楼中楼布局 reset 保留。"
+      "title": "连续加载",
+      "text": "接近底部、触摸结束或底部哨兵进入视口时自动尝试加载更多评论；同时保留手动“加载更多”按钮。"
+    },
+    {
+      "title": "下一页处理",
+      "text": "优先识别站点加载更多/更多评论/下一页控件；若存在下一页 URL，则同源 fetch 后去重追加当前列表，并排除“查看更多回复数”。"
     },
     {
       "title": "冻结范围",
-      "text": "登录页继续使用 Beta10 双列布局；正文、详情、目录和动态域名本轮不改。"
+      "text": "正文、详情、目录、登录设置和动态域名本轮不改。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1011",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1011"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1012",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1012"
 }
