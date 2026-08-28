@@ -1,3 +1,17 @@
+## 2026-08-28 — 漫蛙漫画 0.1.0-beta11
+
+Status: Beta/Test; dynamic-reply and media-comment UI hardening awaiting real-device confirmation.
+
+Changes:
+
+- Continued from Beta10 without touching content/detail/TOC/domain logic.
+- The custom comment sheet now observes mutations inside `#comment`; replies loaded after clicking “查看更多回复数” are automatically reclassified as top-level/sub-level/full nested comment nodes and receive the same layout reset.
+- Dynamic comment-list replacement by the site's own scripts is handled by the same observer, avoiding the “first screen looks correct, newly loaded replies regress” class of bugs.
+- Comment/sticker images are constrained to 180px and mobile viewport width; image-only comments use reduced spacing.
+- Chapter-source links are restyled as compact chips and “查看更多回复数” becomes a full-width action row.
+- Current Manwa pages still expose server-rendered comments, chapter attribution, image/sticker comments and expandable reply counts; Beta11 only adapts presentation, not the site's data/write APIs.
+- SHA256: `3b1c7029c21adae4a3bb85624b9a273ac992f0406921bff6ee349df846ced996`.
+
 ## 2026-08-28 — 起点增强 1.1.0-beta17
 
 Status: Beta/Test; circle detail-tap and continuous-pagination repair awaiting real-device confirmation.
