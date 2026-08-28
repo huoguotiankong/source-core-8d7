@@ -1,0 +1,144 @@
+name: patch-qidian-beta19c
+on:
+  push:
+    paths:
+      - '.staging/patch-qidian-beta19c.trigger'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch qidian beta19 via parsed registries
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,re,base64,gzip,hashlib
+          from pathlib import Path
+          sp=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          doc=json.loads(sp.read_text(encoding='utf-8'))
+          def fs(o):
+              if isinstance(o,dict):
+                  if o.get('bookSourceName')=='🌈 起点增强 · Beta': return o
+                  for v in o.values():
+                      r=fs(v)
+                      if r:return r
+              elif isinstance(o,list):
+                  for v in o:
+                      r=fs(v)
+                      if r:return r
+          src=fs(doc); assert src and 'beta18' in str(src.get('bookSourceComment','')).lower()
+          js=src['jsLib']
+
+          def extract_obj(text,varname):
+              st=text.index('var '+varname+'='); b=text.index('{',st)
+              dep=0; ins=False; esc=False
+              for i in range(b,len(text)):
+                  c=text[i]
+                  if ins:
+                      if esc:esc=False
+                      elif c=='\\':esc=True
+                      elif c=='"':ins=False
+                  else:
+                      if c=='"':ins=True
+                      elif c=='{':dep+=1
+                      elif c=='}':
+                          dep-=1
+                          if dep==0:return b,i+1,text[b:i+1]
+              raise RuntimeError('unclosed '+varname)
+          def replace_registry(text,varname,mut):
+              b,e,raw=extract_obj(text,varname)
+              obj=json.loads(raw)
+              mut(obj)
+              out=json.dumps(obj,ensure_ascii=False,separators=(',',':'))
+              return text[:b]+out+text[e:]
+
+          # Obtain exact Beta18 module from actual PACK registry.
+          _,_,praw=extract_obj(js,'QF_MOD38_PACK'); pack=json.loads(praw)
+          assert 'circle' in pack and 'circle_b19' not in pack
+          packed=pack['circle']; assert packed.startswith('gz:')
+          circle=gzip.decompress(base64.b64decode(packed[3:])).decode('utf-8')
+          assert 'qfEnsureFeedMoreButton' in circle and 'qfOpenPostDirect' in circle
+
+          # Visible B19 marker: title + fixed CSS pseudo-element in generated page.
+          circle19=circle.replace('<title>起点书友圈</title><style>','<title>起点书友圈 · B19</title><style>',1)
+          assert circle19!=circle
+          # Insert CSS rule immediately after first generated html/body CSS rule string occurrence.
+          mcss=re.search(r'(html,body\{[^}]+\})',circle19)
+          assert mcss
+          badge="body:after{content:'B19';position:fixed;right:7px;bottom:7px;z-index:99;background:rgba(20,22,28,.72);color:#fff;font-size:9px;padding:2px 5px;border-radius:7px;pointer-events:none}"
+          circle19=circle19[:mcss.end()]+badge+circle19[mcss.end():]
+          assert 'B19' in circle19
+          packed19='gz:'+base64.b64encode(gzip.compress(circle19.encode('utf-8'),compresslevel=9,mtime=0)).decode('ascii')
+
+          js=replace_registry(js,'QF_MOD38_PACK',lambda o:o.__setitem__('circle_b19',packed19))
+          def mex(o):
+              assert 'circle' in o and 'circle_b19' not in o
+              o['circle_b19']=list(o['circle'])
+          js=replace_registry(js,'QF_MOD38_EXPORTS',mex)
+          def mdeps(o):
+              assert 'circle' in o and 'circle_b19' not in o
+              o['circle_b19']=list(o['circle'])
+          js=replace_registry(js,'QF_MOD38_DEPS',mdeps)
+
+          pairs=[
+            ('circleOpen:{module:"circle",entry:"qfOpenQidianCircleV2961",sideEffect:true}','circleOpen:{module:"circle_b19",entry:"qfOpenQidianCircleV2961",sideEffect:true}'),
+            ('circleData:{module:"circle",entry:"qfCircleData",model:"circleSet"}','circleData:{module:"circle_b19",entry:"qfCircleData",model:"circleSet"}'),
+            ('circleView:{module:"circle",entry:"qfCircleView"}','circleView:{module:"circle_b19",entry:"qfCircleView"}'),
+            ('circle:{data:"circleData",view:"circleView",model:"circleSet",module:"circle",schema:"qf.circle-set/1"}','circle:{data:"circleData",view:"circleView",model:"circleSet",module:"circle_b19",schema:"qf.circle-set/1"}')]
+          for old,new in pairs:
+              n=js.count(old); print('route',old[:30],n); assert n>=1
+              js=js.replace(old,new,1)
+          # verify parsed final registries and routes
+          _,_,pr=extract_obj(js,'QF_MOD38_PACK');pf=json.loads(pr)
+          _,_,er=extract_obj(js,'QF_MOD38_EXPORTS');ef=json.loads(er)
+          _,_,dr=extract_obj(js,'QF_MOD38_DEPS');df=json.loads(dr)
+          assert pf['circle']==packed and 'circle_b19' in pf
+          assert ef['circle_b19']==ef['circle'] and df['circle_b19']==df['circle']
+          assert 'B19' in gzip.decompress(base64.b64decode(pf['circle_b19'][3:])).decode('utf-8')
+          for _,new in pairs: assert new in js
+
+          src['jsLib']=js
+          src['bookSourceComment']='v1.1.0-beta19：书友圈运行链强制换键版。保留旧 circle 模块，复制 beta18 实现为 circle_b19，并将 circleOpen/circleData/circleView 与 OfficialDomainService 全部切换到新模块键，以绕过可能存活的旧模块内存实例；新页面右下角带极小 B19 标记。详情/分页业务仍为 beta18，其他域冻结。'
+          sp.write_text(json.dumps(doc,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
+          d2=json.loads(sp.read_text(encoding='utf-8'));s2=fs(d2);assert s2 and 'beta19' in s2['bookSourceComment'].lower()
+          sha=hashlib.sha256(sp.read_bytes()).hexdigest()
+
+          mp=Path('manifest.json');man=json.loads(mp.read_text(encoding='utf-8'));hit=False
+          for it in man.get('sources',[]):
+              if it.get('id')=='qidian-next-beta':
+                  it.update({'version':'1.1.0-beta19','versionCode':11019,'updatedAt':'2026-08-28T23:30:00+08:00','summary':'书友圈 beta19：切换至全新 circle_b19 模块键并加入 B19 真机运行标记。','tags':['起点','测试版','书友圈','模块换键','运行链诊断','帖子详情','连续分页'],'changelog':['保留旧 circle，复制 beta18 当前实现为 circle_b19','circleOpen/circleData/circleView 与 OfficialDomainService 全部改走 circle_b19','新页面右下角显示极小 B19，作为真机运行链硬证据','详情和分页逻辑沿用 beta18，其它域冻结'],'sha256':sha});hit=True;break
+          assert hit;man['updatedAt']='2026-08-28T23:30:00+08:00';mp.write_text(json.dumps(man,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          bp=Path('subscription/beta.json');sub=json.loads(bp.read_text(encoding='utf-8'));hit=False
+          for it in sub.get('items',[]):
+              if it.get('id')=='qidian-next-beta':
+                  it.update({'summary':'书友圈 beta19：切换 circle_b19 新模块键，并加入 B19 真机运行标记。','version':'1.1.0-beta19','updatedAt':'2026-08-28','tags':['起点','测试版','书友圈','模块换键','运行链诊断','帖子详情','连续分页'],'changelog':['书友圈正常入口整体切换至 circle_b19','旧 circle 保留用于回滚兼容','右下角 B19 用来确认真机是否实际命中新模块','详情/分页沿用 beta18，其它域冻结'],'sourceUrl':'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11019','backupUrl':'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11019','importUrl':'legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11019'});hit=True;break
+          assert hit;sub['updatedAt']='2026-08-28T23:30:00+08:00';sub['generatedAt']='2026-08-28T23:30:00+08:00';bp.write_text(json.dumps(sub,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          bunp=Path('bundles/all-beta.json');bun=json.loads(bunp.read_text(encoding='utf-8'));cnt=[0]
+          def rb(o):
+              if isinstance(o,list):
+                  for i,v in enumerate(o):
+                      if isinstance(v,dict) and v.get('bookSourceUrl')==s2.get('bookSourceUrl') and '起点增强' in str(v.get('bookSourceName','')):o[i]=s2;cnt[0]+=1
+                      else:rb(v)
+              elif isinstance(o,dict):
+                  for k,v in list(o.items()):
+                      if isinstance(v,dict) and v.get('bookSourceUrl')==s2.get('bookSourceUrl') and '起点增强' in str(v.get('bookSourceName','')):o[k]=s2;cnt[0]+=1
+                      else:rb(v)
+          rb(bun);assert cnt[0]>=1;bunp.write_text(json.dumps(bun,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
+          rp=Path('docs/RELEASE_LOG.md');old=rp.read_text(encoding='utf-8')
+          rp.write_text(f'''## 2026-08-28 — 起点增强 1.1.0-beta19\n\nStatus: Beta/Test; fresh lazy-module key diagnostic after Beta18 still had no observable real-device effect.\n\nChanges:\n\n- Preserve old `circle`; duplicate Beta18 implementation as `circle_b19`.\n- Route `circleOpen`, `circleData`, `circleView`, and OfficialDomainService circle spec to `circle_b19`.\n- New page carries a tiny `B19` badge. If absent on device, the active page is not executing Beta19 circle code and further detail/paging patching must stop until the active source path is identified.\n- Stable and all non-community domains remain unchanged.\n- SHA256: `{sha}`.\n\n'''+old,encoding='utf-8')
+          print('BETA19_OK',sha,'bundle',cnt[0],len(circle),len(circle19))
+          PY
+          git diff --check
+      - name: Commit beta19
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
+          git commit -m "fix(qidian): force fresh circle module key in beta19"
+          git push origin main
