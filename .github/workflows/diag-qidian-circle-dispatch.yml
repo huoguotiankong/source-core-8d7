@@ -1,0 +1,40 @@
+name: diag-qidian-circle-dispatch
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-circle-dispatch.trigger'
+permissions:
+  contents: read
+jobs:
+  diag:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Inspect circle dispatch references
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          d=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text(encoding='utf-8'))
+          def find(o):
+              if isinstance(o,dict) and o.get('bookSourceName')=='🌈 起点增强 · Beta': return o
+              if isinstance(o,dict):
+                  for v in o.values():
+                      r=find(v)
+                      if r:return r
+              if isinstance(o,list):
+                  for v in o:
+                      r=find(v)
+                      if r:return r
+          js=find(d)['jsLib']
+          for pat in ['"circle"','circle,','circle)',"'circle'",'qfCircleFn','qfModuleFnV38.call(this,"circle"','qfModuleEnsureV38.call(this,"circle"']:
+              print('\n###',pat)
+              st=0;c=0
+              while c<20:
+                  i=js.find(pat,st)
+                  if i<0:break
+                  print('POS',i,js[max(0,i-550):min(len(js),i+1000)].replace('\n','\\n'))
+                  st=i+len(pat);c+=1
+          PY
