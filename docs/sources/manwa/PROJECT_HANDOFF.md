@@ -5,7 +5,7 @@ Updated: 2026-08-27
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta12`
+- Version: `0.1.0-beta13`
 - Display name: `◈ 漫蛙漫画`
 - Legado identity: `https://sc8d7.invalid/legado/manwa-8d7`
 - Beta source: `sources/comic/manwa/manwa-beta.json`
@@ -15,6 +15,33 @@ Updated: 2026-08-27
 ## Baseline
 
 This is a new reconstruction. The user-provided Manwa source was used only to confirm working HTML selectors, query parameters and the current image-decryption chain. Its selector-combination discovery UI is not retained.
+
+## Beta13 native DOM + load watchdog
+
+Beta12 real-device result:
+
+- layout improved, but the bottom state can stay forever at “正在加载更多评论 / 加载中”;
+- no new comments are appended.
+
+Root issue:
+
+- Beta12 introduced a guessed generic `fetch` path for next-page loading;
+- Manwa's current comment transport is not proven to expose a stable next-page URL suitable for direct fetch in the embedded browser;
+- a pending request leaves the custom `loading=true` state uncleared.
+
+Beta13 strategy:
+
+1. Remove custom next-page fetch.
+2. Keep `#comment` in the site's original DOM rather than moving it.
+3. Preserve the full ancestor chain for comments, login/comment modal and hidden book/session fields.
+4. Isolate presentation by hiding unrelated siblings only.
+5. Trigger native scroll paths: `window`, `document`, and jQuery window scroll if present.
+6. Prefer real comment-area “更多评论 / 下一页” controls and continue excluding reply-more controls.
+7. Add an 8-second watchdog so every loading attempt resolves.
+8. Keep MutationObserver to detect any native comment append immediately.
+9. Preserve Beta12 Grid layout and freeze content/detail/TOC/login/domain.
+
+If Beta13 still reports “原站本次未返回更多评论”, the next diagnostic step should capture the site's actual XHR/fetch request produced by its sort/comment controls instead of guessing endpoint parameters.
 
 ## Beta12 grid comments + continuous loading
 
