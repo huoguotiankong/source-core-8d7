@@ -1,3 +1,18 @@
+## 2026-08-28 — 漫蛙漫画 0.1.0-beta12
+
+Status: Beta/Test; grid-layout and continuous comment loading repair awaiting real-device confirmation.
+
+Changes:
+
+- Beta11 real-device screenshot confirmed two remaining defects: nested replies could render as a separate right-side column, and only the initially rendered comment batch was visible with no further loading on downward scroll.
+- Root layout fix: top-level comments now use CSS Grid (`44px + minmax(0,1fr)`) instead of flex. A direct-child reply/sublist therefore drops to the next grid row rather than becoming a third horizontal flex item.
+- Full nested comments use the same grid model with a 34px avatar column.
+- Added an infinite-comment loader driven by near-bottom scroll, touch-end and IntersectionObserver.
+- The loader searches for site-native “加载更多 / 更多评论 / 下一页” controls and explicitly ignores “查看更多回复数”.
+- When a next-page URL is available, same-origin fetch + DOMParser is used to de-duplicate and append comments without replacing the current page. A manual “加载更多” button and visible loaded-count status remain as fallback/diagnostics.
+- Content/detail/TOC/login/domain modules are frozen.
+- SHA256: `0284fd6d63cb92025737e6c97916bdf99c2dd475e3db737a08cde80abf7ff45f`.
+
 ## 2026-08-28 — 漫蛙漫画 0.1.0-beta11
 
 Status: Beta/Test; dynamic-reply and media-comment UI hardening awaiting real-device confirmation.
