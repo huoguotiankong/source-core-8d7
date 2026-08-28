@@ -1,0 +1,170 @@
+name: patch-qidian-beta18
+
+on:
+  push:
+    paths:
+      - '.staging/patch-qidian-beta18.trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch source and release metadata
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,re,base64,gzip,hashlib,datetime
+          from pathlib import Path
+
+          repo=Path('.')
+          sp=repo/'sources/novel/qidian-next/qidian-next-beta.json'
+          doc=json.loads(sp.read_text(encoding='utf-8'))
+          def find_source(o):
+              if isinstance(o,dict):
+                  if o.get('bookSourceName')=='🌈 起点增强 · Beta': return o
+                  for v in o.values():
+                      r=find_source(v)
+                      if r:return r
+              elif isinstance(o,list):
+                  for v in o:
+                      r=find_source(v)
+                      if r:return r
+          src=find_source(doc); assert src
+          assert 'beta17' in str(src.get('bookSourceComment','')).lower()
+          js=src['jsLib']
+          m=re.search(r'"circle"\s*:\s*"gz:([A-Za-z0-9+/=]+)"',js); assert m
+          code=gzip.decompress(base64.b64decode(m.group(1))).decode('utf-8')
+          before=hashlib.sha256(code.encode()).hexdigest()
+
+          def rep(old,new,label,count=1):
+              global code
+              n=code.count(old)
+              assert n>=count, f'{label}: expected >= {count}, got {n}'
+              code=code.replace(old,new,count)
+              print(label,n)
+
+          # Detail: make the visible control a native anchor. Native href opens the overlay via :target
+          # even if Android WebView drops JS click listeners; inline handler and delegated listener remain.
+          rep("#detail{display:none;position:fixed;", "#detail{display:none;position:fixed;", 'detail css anchor')
+          rep(".dHead{position:sticky;", "#detail:target{display:block}.dHead{position:sticky;", 'detail target fallback')
+          old="if(pid)r+='<span class=\\\"go qfPostOpen\\\" role=\\\"button\\\" tabindex=\\\"0\\\" data-cid=\\\"'+esc(cid)+'\\\" data-pid=\\\"'+esc(pid)+'\\\" data-img=\\\"'+esc(ims.length?ims[0]:'')+'\\\">查看详情 ›</span>';"
+          new="if(pid)r+='<a class=\\\"go qfPostOpen\\\" href=\\\"#detail\\\" role=\\\"button\\\" data-cid=\\\"'+esc(cid)+'\\\" data-pid=\\\"'+esc(pid)+'\\\" data-img=\\\"'+esc(ims.length?ims[0]:'')+'\\\" onclick=\\\"qfOpenPostDirect(this,event);return false;\\\">查看详情 ›</a>';"
+          rep(old,new,'native detail anchor')
+          # Lazy DOM/state resolution removes dependence on earlier assignment order.
+          marker="var qfPostTouchAt=0;function qfPostOpenNode(t)"
+          replacement="function qfEnsureDetailState(){if(!detail)detail=document.getElementById('detail');if(!body)body=document.getElementById('detailBody');if(!state)state={cid:'',pid:'',pg:1,total:0,loading:false,previewImgs:[],detailRoot:null};return !!(detail&&body);}function qfOpenPostDirect(el,ev){try{if(!qfEnsureDetailState())return false;qfOpenPost(el,ev);}catch(e){try{var d=document.getElementById('detail'),b=document.getElementById('detailBody');if(d)d.style.display='block';if(b)b.innerHTML='<div class=\\\"err\\\">详情入口异常：'+String(e&&e.message?e.message:e)+'</div>';}catch(_e){}}return false;}var qfPostTouchAt=0;function qfPostOpenNode(t)"
+          rep(marker,replacement,'lazy detail resolver')
+          # qfOpenPost itself also resolves DOM lazily and changes hash first, so there is immediate visual feedback.
+          rep("function qfOpenPost(el,ev){if(!el)return;", "function qfOpenPost(el,ev){if(!el)return;if(!qfEnsureDetailState())return;try{location.hash='detail';}catch(_hash){}", 'open post guard')
+          # Back button clears hash too.
+          rep("document.getElementById('dBack').onclick=function(){detail.style.display='none';document.body.style.overflow='';};", "document.getElementById('dBack').onclick=function(){detail.style.display='none';document.body.style.overflow='';try{history.replaceState(null,'',location.href.replace(/#detail$/,''));}catch(_h){try{location.hash='';}catch(_h2){}}};", 'detail back hash')
+
+          # Pagination: page rows now tests multiple official-compatible paging parameter shapes and
+          # prefers a page containing at least one row not already rendered.
+          ps=code.index('function qfPageRows(')
+          pe=code.index('function qfNextFeed(',ps)
+          old_page_rows=code[ps:pe]
+          new_page_rows="function qfPageRows(tab,label,c,page,baseRows){page=Math.max(2,Number(page)||2);baseRows=Array.isArray(baseRows)?baseRows:[];var seen={};for(var bi=0;bi<baseRows.length;bi++){var bk=rowKey(baseRows[bi]);if(bk)seen[bk]=1;}var baseVs=(label==='全部')?[baseParams(tab,page)]:paramVariants(tab,c||{},page),vs=[];function addv(p){p=cloneObj(p||{});var sig=qfParamKey(p);for(var z=0;z<vs.length;z++)if(qfParamKey(vs[z])===sig)return;vs.push(p);}for(var vi0=0;vi0<baseVs.length;vi0++){var p0=baseVs[vi0]||{};addv(p0);var p1=cloneObj(p0);p1.pageIndex=String(page);p1.pageNum=String(page);p1.page=String(page);addv(p1);var p2=cloneObj(p0);delete p2.pageIndex;p2.pageNum=String(page);p2.pageSize='10';addv(p2);var p3=cloneObj(p0);delete p3.pageIndex;p3.page=String(page);p3.pageSize='10';addv(p3);}var fallback=[];for(var vi=0;vi<vs.length;vi++){var rows=[];try{rows=topRequest(tab,page,vs[vi])||[];}catch(_e){rows=[];}if(!rows.length)continue;if(label!=='全部'){if(tab==='tongren')rows=fanAccept(rows,c,label);else if(tab==='jinghua')rows=qfEssenceAccept(rows,c,label);else if(tab==='dongtai')rows=qfDynamicAccept(rows,c,label);else{var local=localCategoryFilter(rows,c,true);if(local.length)rows=local;else if(qfCandidateTrust(c)<2)rows=[];}}if(!rows.length)continue;if(!fallback.length)fallback=rows.slice(0);for(var ri=0;ri<rows.length;ri++){var rk=rowKey(rows[ri]);if(!rk||!seen[rk])return rows;}}return fallback;}"
+          code=code[:ps]+new_page_rows+code[pe:]
+          # Pass existing rows into qfPageRows so repeat-first-page responses can be rejected.
+          oldcall="pg=st.page+1,rows=qfPageRows(currentTab,label,c,pg),base=feedCache[key];"
+          newcall="pg=st.page+1,base=feedCache[key];if(!base||!base.length){if(label==='全部'&&INITIAL_ROWS[currentTab]&&INITIAL_ROWS[currentTab].length)base=INITIAL_ROWS[currentTab].slice(0);else base=[];}var rows=qfPageRows(currentTab,label,c,pg,base);"
+          rep(oldcall,newcall,'pagination novel-page selection')
+          # Remove duplicated base-init immediately following the replaced call.
+          dup="if(!base||!base.length){if(label==='全部'&&INITIAL_ROWS[currentTab]&&INITIAL_ROWS[currentTab].length)base=INITIAL_ROWS[currentTab].slice(0);else base=[];}var merged=mergeFeedRows(base,rows);"
+          rep(dup,"var merged=mergeFeedRows(base,rows);",'dedupe base init')
+
+          # Explicit manual fallback button. Auto loading remains; button lets real-device testing
+          # bypass scroll/IntersectionObserver completely.
+          rep(".feedAuto{font-size:12px;color:var(--sub);text-align:center;padding:12px 8px}", ".feedAuto{font-size:12px;color:var(--sub);text-align:center;padding:12px 8px}.qfFeedMore{display:block;width:calc(100% - 24px);margin:10px 12px 18px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--accent);font-weight:750;font-size:13px}", 'manual load css')
+          insert_at=code.index("var qfFeedPageState=")
+          # Add helper before pagination state declaration.
+          helper="function qfEnsureFeedMoreButton(){var pane=document.getElementById('pane_'+currentTab);if(!pane)return;var old=document.getElementById('qfFeedMoreBtn');if(old&&old.parentNode!==pane){old.parentNode.removeChild(old);old=null;}if(!old){old=document.createElement('button');old.type='button';old.id='qfFeedMoreBtn';old.className='qfFeedMore';old.textContent='加载更多帖子';old.onclick=function(){qfNextFeed(true);};pane.appendChild(old);}}"
+          code=code[:insert_at]+helper+code[insert_at:]
+          # qfNextFeed accepts force and reports state on the button.
+          rep("function qfNextFeed(){if(detail&&detail.style.display==='block')return;", "function qfNextFeed(force){if(detail&&detail.style.display==='block')return;qfEnsureFeedMoreButton();", 'next feed force arg')
+          rep("if(st.loading||st.done)return;", "if(st.loading)return;if(st.done&&force){st.done=false;st.empty=0;}else if(st.done)return;", 'manual retry done')
+          rep("hint.textContent='正在加载下一页…';if(list)list.appendChild(hint);", "hint.textContent='正在加载下一页…';if(list)list.appendChild(hint);var mb=document.getElementById('qfFeedMoreBtn');if(mb){mb.disabled=true;mb.textContent='正在加载下一页…';}", 'manual loading feedback')
+          rep("st.loading=false;qfFeedPageState[key]=st;if(!st.done)setTimeout(qfArmFeedObserver,40);", "st.loading=false;qfFeedPageState[key]=st;var mb2=document.getElementById('qfFeedMoreBtn');if(mb2){mb2.disabled=false;mb2.textContent=st.done?'继续尝试加载':'加载更多帖子';}if(!st.done)setTimeout(qfArmFeedObserver,40);", 'manual button final state')
+          # Keep manual button attached after rerenders and tab switches.
+          rep("bindPostOpens(list);bindVideoLazy(list);bindVideoFallback(list);qfArmFeedObserver();", "bindPostOpens(list);bindVideoLazy(list);bindVideoFallback(list);qfArmFeedObserver();qfEnsureFeedMoreButton();", 'render manual button')
+          rep("applyChipSet('dongtai');", "applyChipSet('dongtai');qfEnsureFeedMoreButton();", 'initial manual button')
+          rep("if(first)loadCategory(first);};}applyChipSet('dongtai');", "if(first)loadCategory(first);setTimeout(qfEnsureFeedMoreButton,20);};}applyChipSet('dongtai');", 'tab manual button')
+
+          # Sanity checks on the decompressed generator.
+          assert '<a class=\\\"go qfPostOpen\\\" href=\\\"#detail\\\"' in code
+          assert 'qfOpenPostDirect(this,event)' in code
+          assert '#detail:target{display:block}' in code
+          assert 'qfEnsureFeedMoreButton' in code
+          assert "p1.pageNum=String(page)" in code
+          assert "qfPageRows(currentTab,label,c,pg,base)" in code
+          after=hashlib.sha256(code.encode()).hexdigest()
+          print('circle',before,'->',after)
+
+          nb64=base64.b64encode(gzip.compress(code.encode('utf-8'),compresslevel=9,mtime=0)).decode('ascii')
+          src['jsLib']=js[:m.start(1)]+nb64+js[m.end(1):]
+          src['bookSourceComment']='v1.1.0-beta18：书友圈详情与分页改为硬兜底架构。详情入口使用原生 #detail 锚点 + inline handler + 委托三重通道，并延迟解析详情 DOM；列表保留自动触底，同时新增“加载更多帖子”显式按钮，下一页若重复第一页会自动尝试 pageIndex/pageNum/page 多套参数。其它域冻结。'
+          sp.write_text(json.dumps(doc,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
+          # Validate roundtrip.
+          d2=json.loads(sp.read_text(encoding='utf-8')); s2=find_source(d2); assert s2
+          mm=re.search(r'"circle"\s*:\s*"gz:([A-Za-z0-9+/=]+)"',s2['jsLib']); assert mm
+          assert gzip.decompress(base64.b64decode(mm.group(1))).decode()==code
+          sha=hashlib.sha256(sp.read_bytes()).hexdigest()
+
+          # Manifest.
+          mp=Path('manifest.json'); man=json.loads(mp.read_text(encoding='utf-8'))
+          for it in man.get('sources',[]):
+              if it.get('id')=='qidian-next-beta':
+                  it.update({'version':'1.1.0-beta18','versionCode':11018,'updatedAt':'2026-08-28T23:08:00+08:00','summary':'书友圈 beta18：详情改原生锚点三重入口，分页加入显式加载按钮与多参数翻页兜底。','tags':['起点','测试版','书友圈','帖子详情','连续分页','原生锚点','手动加载','评论'],'changelog':['查看详情改为原生 #detail 锚点 + inline handler + 捕获委托三重通道，降低 Android WebView 事件链失效风险','详情 DOM/状态改为点击时延迟解析，即使初始化顺序异常仍可尝试打开','保留自动触底，并新增“加载更多帖子”显式按钮，完全绕开 scroll/IntersectionObserver 也可请求下一页','下一页返回重复首屏时自动轮询 pageIndex/pageNum/page 多种官方兼容分页参数并优先采用含新帖子的一组','其它评论/楼中楼、分类、视频、正文 Provider、角色卡和账号链冻结'],'sha256':sha})
+                  break
+          else: raise AssertionError('manifest beta item missing')
+          man['updatedAt']='2026-08-28T23:08:00+08:00'
+          mp.write_text(json.dumps(man,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          # Beta subscription.
+          bp=Path('subscription/beta.json'); sub=json.loads(bp.read_text(encoding='utf-8'))
+          for it in sub.get('items',[]):
+              if it.get('id')=='qidian-next-beta':
+                  it.update({'summary':'书友圈 beta18：详情改原生锚点三重入口，分页加入显式加载按钮与多参数翻页兜底。','version':'1.1.0-beta18','updatedAt':'2026-08-28','tags':['起点','测试版','书友圈','帖子详情','连续分页','原生锚点','手动加载','评论'],'changelog':['查看详情改为原生 #detail 锚点 + inline handler + 捕获委托三重通道','详情 DOM/状态在点击时延迟解析，避免初始化顺序影响','新增显式“加载更多帖子”按钮作为自动触底之外的硬兜底','重复首屏时自动尝试 pageIndex/pageNum/page 多套分页参数并选择含新帖的数据','其它功能冻结'],'sourceUrl':'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11018','backupUrl':'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11018','importUrl':'legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11018'})
+                  break
+          else: raise AssertionError('subscription beta item missing')
+          sub['updatedAt']='2026-08-28T23:08:00+08:00'; sub['generatedAt']='2026-08-28T23:08:00+08:00'
+          bp.write_text(json.dumps(sub,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          # Bundle: replace beta source object recursively if bundle is JSON.
+          bunp=Path('bundles/all-beta.json'); bun=json.loads(bunp.read_text(encoding='utf-8'))
+          replaced=[0]
+          def replace_bundle(o):
+              if isinstance(o,list):
+                  for i,v in enumerate(o):
+                      if isinstance(v,dict) and v.get('bookSourceName')=='🌈 起点增强 · Beta': o[i]=s2; replaced[0]+=1
+                      else: replace_bundle(v)
+              elif isinstance(o,dict):
+                  for k,v in list(o.items()):
+                      if isinstance(v,dict) and v.get('bookSourceName')=='🌈 起点增强 · Beta': o[k]=s2; replaced[0]+=1
+                      else: replace_bundle(v)
+          replace_bundle(bun); assert replaced[0]>=1, 'bundle beta source missing'
+          bunp.write_text(json.dumps(bun,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
+
+          # Release log prepend.
+          rp=Path('docs/RELEASE_LOG.md'); old=rp.read_text(encoding='utf-8')
+          entry='''## 2026-08-28 — 起点增强 1.1.0-beta18\n\nStatus: Beta/Test; persistent circle detail/pagination failures reworked with hard fallbacks, awaiting real-device confirmation.\n\nChanges:\n\n- Real-device Beta17 confirmed both “查看详情” and continuous paging still failed; event-delegation/scroll-only fixes were insufficient.\n- Detail entry is now a native `#detail` anchor plus inline handler plus delegated handler; detail DOM/state is resolved lazily at tap time.\n- Feed keeps automatic near-bottom loading but now also exposes an explicit “加载更多帖子” button to bypass WebView scroll/IntersectionObserver behavior entirely.\n- Page fetching detects repeated first-page data and probes `pageIndex`, `pageNum`, and `page` compatible variants, preferring a result that adds unseen posts.\n- Stable remains untouched; other Beta domains are frozen.\n- SHA256: `'''+sha+'''`.\n\n'''
+          rp.write_text(entry+old,encoding='utf-8')
+          print('source sha256',sha,'bundle replacements',replaced[0])
+          PY
+          git diff --check
+          git status --short
+      - name: Commit beta18
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
+          git commit -m 'fix(qidian): harden circle detail and paging beta18'
+          git push origin main
