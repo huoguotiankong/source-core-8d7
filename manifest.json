@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-28T22:36:00+08:00",
+  "updatedAt": "2026-08-28T23:05:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -181,32 +181,33 @@
       "category": "comic",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "0.1.0-beta11",
-      "versionCode": 1011,
-      "updatedAt": "2026-08-28T22:36:00+08:00",
+      "version": "0.1.0-beta12",
+      "versionCode": 1012,
+      "updatedAt": "2026-08-28T23:05:00+08:00",
       "sourcePath": "sources/comic/manwa/manwa-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1011",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1012",
       "bookSourceUrl": "https://sc8d7.invalid/legado/manwa-8d7",
-      "summary": "Beta11：动态展开楼中楼后自动重新套用布局；图片/表情评论、章节来源与“查看更多回复数”进一步优化。",
+      "summary": "Beta12：评论卡片改为 Grid 修复楼中楼挤到右侧；新增自动/手动连续加载更多评论。",
       "tags": [
         "漫蛙",
         "漫画",
         "测试版",
         "评论UI",
-        "动态楼中楼",
-        "表情评论",
-        "MutationObserver",
+        "CSS Grid",
+        "连续加载",
+        "评论翻页",
         "动态域名"
       ],
       "changelog": [
-        "保留 Beta10 评论布局 reset，并为动态插入的更多回复增加 MutationObserver 自动归一化",
-        "点击“查看更多回复数”后新加载的楼中楼无需刷新即可应用同一套布局",
-        "评论列表若被站点脚本动态替换，也会重新标记顶层/子回复节点",
-        "图片/表情评论限制最大 180px，纯图片评论减少无效留白",
-        "章节来源链接与“查看更多回复数”按钮重新收口",
-        "登录页保持 Beta10 四行双列；正文、详情、目录和域名逻辑冻结"
+        "顶层评论由 Flex 改为两列 Grid，头像固定左列、正文固定右列",
+        "顶层直接挂载的楼中楼/回复节点强制进入下一行，修复右侧第三列挤压",
+        "带头像子回复同样改为 Grid，保留头像角标/等级徽章处理",
+        "接近底部自动识别并触发站点加载更多/下一页控件",
+        "下一页有 URL 时同源 fetch 后去重追加，避免整页跳转",
+        "新增手动加载更多与已显示 X / 总数状态；排除查看更多回复数误触发",
+        "正文、详情、目录、登录页和域名模块冻结"
       ],
-      "sha256": "3b1c7029c21adae4a3bb85624b9a273ac992f0406921bff6ee349df846ced996",
+      "sha256": "0284fd6d63cb92025737e6c97916bdf99c2dd475e3db737a08cde80abf7ff45f",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],
