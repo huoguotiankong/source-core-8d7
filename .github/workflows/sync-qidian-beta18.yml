@@ -1,0 +1,74 @@
+name: sync-qidian-beta18
+on:
+  push:
+    paths:
+      - '.staging/sync-qidian-beta18.trigger'
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Sync beta18 metadata
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          sp=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          doc=json.loads(sp.read_text(encoding='utf-8'))
+          def fs(o):
+              if isinstance(o,dict):
+                  if o.get('bookSourceName')=='🌈 起点增强 · Beta': return o
+                  for v in o.values():
+                      r=fs(v)
+                      if r:return r
+              elif isinstance(o,list):
+                  for v in o:
+                      r=fs(v)
+                      if r:return r
+          src=fs(doc); assert src and 'beta18' in str(src.get('bookSourceComment','')).lower()
+          sha=hashlib.sha256(sp.read_bytes()).hexdigest()
+          summary='书友圈 beta18：详情使用原生锚点三重入口；分页增加显式加载按钮和多参数翻页兜底。'
+          tags=['起点','测试版','书友圈','帖子详情','连续分页','原生锚点','手动加载','评论']
+          changes=['查看详情改为原生 #detail 锚点 + inline handler + 捕获委托三重通道','详情 DOM/状态在点击时延迟解析，降低 WebView 初始化顺序影响','保留自动触底并新增“加载更多帖子”显式按钮，可完全绕过 scroll/IntersectionObserver','重复首屏时自动尝试 pageIndex/pageNum/page 多套分页参数并优先采用含新帖的数据','其它评论/楼中楼、分类、视频、正文 Provider、角色卡和账号链冻结']
+          mp=Path('manifest.json'); man=json.loads(mp.read_text(encoding='utf-8'))
+          hit=False
+          for it in man.get('sources',[]):
+              if it.get('id')=='qidian-next-beta':
+                  it.update(version='1.1.0-beta18',versionCode=11018,updatedAt='2026-08-28T23:15:00+08:00',summary=summary,tags=tags,changelog=changes,sha256=sha); hit=True
+          assert hit; man['updatedAt']='2026-08-28T23:15:00+08:00'; mp.write_text(json.dumps(man,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          bp=Path('subscription/beta.json'); sub=json.loads(bp.read_text(encoding='utf-8')); hit=False
+          for it in sub.get('items',[]):
+              if it.get('id')=='qidian-next-beta':
+                  it.update(summary=summary,version='1.1.0-beta18',updatedAt='2026-08-28',tags=tags,changelog=changes,sourceUrl='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11018',backupUrl='https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11018',importUrl='legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11018'); hit=True
+          assert hit; sub['updatedAt']='2026-08-28T23:15:00+08:00'; sub['generatedAt']='2026-08-28T23:15:00+08:00'; bp.write_text(json.dumps(sub,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          bunp=Path('bundles/all-beta.json'); bun=json.loads(bunp.read_text(encoding='utf-8')); n=[0]
+          def repl(o):
+              if isinstance(o,list):
+                  for i,v in enumerate(o):
+                      if isinstance(v,dict) and v.get('bookSourceName')=='🌈 起点增强 · Beta': o[i]=src; n[0]+=1
+                      else: repl(v)
+              elif isinstance(o,dict):
+                  for k,v in list(o.items()):
+                      if isinstance(v,dict) and v.get('bookSourceName')=='🌈 起点增强 · Beta': o[k]=src; n[0]+=1
+                      else: repl(v)
+          repl(bun); assert n[0]>=1; bunp.write_text(json.dumps(bun,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
+          rp=Path('docs/RELEASE_LOG.md'); old=rp.read_text(encoding='utf-8')
+          if '起点增强 1.1.0-beta18' not in old:
+              entry=f'''## 2026-08-28 — 起点增强 1.1.0-beta18\n\nStatus: Beta/Test; persistent circle detail/pagination failures reworked with hard fallbacks, awaiting real-device confirmation.\n\nChanges:\n\n- Beta17 real-device testing confirmed both “查看详情” and continuous paging still failed.\n- Detail entry now uses a native `#detail` anchor, inline callback, and delegated callback; DOM/state is resolved lazily.\n- Feed keeps automatic paging and adds an explicit “加载更多帖子” button to bypass WebView scroll/observer failures.\n- Duplicate first-page responses trigger `pageIndex`, `pageNum`, and `page` parameter probes, preferring results with unseen posts.\n- Stable and unrelated Beta modules remain unchanged.\n- SHA256: `{sha}`.\n\n'''
+              rp.write_text(entry+old,encoding='utf-8')
+          print('sha',sha,'bundle',n[0])
+          PY
+          git diff --check
+      - name: Commit metadata
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
+          git commit -m 'chore: sync qidian beta18 release metadata'
+          git push origin main
