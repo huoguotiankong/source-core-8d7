@@ -1,0 +1,98 @@
+name: patch-qidian-beta18b
+
+on:
+  push:
+    paths:
+      - '.staging/patch-qidian-beta18b.trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch beta18 source
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,re,base64,gzip,hashlib
+          from pathlib import Path
+          sp=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          doc=json.loads(sp.read_text(encoding='utf-8'))
+          def fs(o):
+              if isinstance(o,dict):
+                  if o.get('bookSourceName')=='🌈 起点增强 · Beta': return o
+                  for v in o.values():
+                      r=fs(v)
+                      if r:return r
+              elif isinstance(o,list):
+                  for v in o:
+                      r=fs(v)
+                      if r:return r
+          src=fs(doc); assert src and 'beta17' in str(src.get('bookSourceComment','')).lower()
+          js=src['jsLib']; m=re.search(r'"circle"\s*:\s*"gz:([A-Za-z0-9+/=]+)"',js); assert m
+          code=gzip.decompress(base64.b64decode(m.group(1))).decode()
+          before=hashlib.sha256(code.encode()).hexdigest()
+          def rep(a,b,name):
+              global code
+              n=code.count(a); assert n>=1,f'{name}: {n}'; code=code.replace(a,b,1); print(name,n)
+
+          # Detail: native anchor + :target + inline callback + delegated callback.
+          rep('.dHead{position:sticky;','#detail:target{display:block}.dHead{position:sticky;','detail target css')
+          a="if(pid)r+='<span class=\\\"go qfPostOpen\\\" role=\\\"button\\\" tabindex=\\\"0\\\" data-cid=\\\"'+esc(cid)+'\\\" data-pid=\\\"'+esc(pid)+'\\\" data-img=\\\"'+esc(ims.length?ims[0]:'')+'\\\">查看详情 ›</span>';"
+          b="if(pid)r+='<a class=\\\"go qfPostOpen\\\" href=\\\"#detail\\\" role=\\\"button\\\" data-cid=\\\"'+esc(cid)+'\\\" data-pid=\\\"'+esc(pid)+'\\\" data-img=\\\"'+esc(ims.length?ims[0]:'')+'\\\" onclick=\\\"qfOpenPostDirect(this,event);return false;\\\">查看详情 ›</a>';"
+          rep(a,b,'detail native anchor')
+          rep('var qfPostTouchAt=0;function qfPostOpenNode(t)',"function qfEnsureDetailState(){if(!detail)detail=document.getElementById('detail');if(!body)body=document.getElementById('detailBody');if(!state)state={cid:'',pid:'',pg:1,total:0,loading:false,previewImgs:[],detailRoot:null};return !!(detail&&body);}function qfOpenPostDirect(el,ev){try{if(!qfEnsureDetailState())return false;qfOpenPost(el,ev);}catch(e){try{location.hash='detail';var d=document.getElementById('detail'),b=document.getElementById('detailBody');if(d)d.style.display='block';if(b)b.innerHTML='<div class=\\\"err\\\">详情入口异常：'+String(e&&e.message?e.message:e)+'</div>';}catch(_e){}}return false;}var qfPostTouchAt=0;function qfPostOpenNode(t)",'detail lazy resolver')
+          rep('function qfOpenPost(el,ev){if(!el)return;',"function qfOpenPost(el,ev){if(!el)return;if(!qfEnsureDetailState())return;try{location.hash='detail';}catch(_hash){}",'detail open guard')
+          rep("document.getElementById('dBack').onclick=function(){detail.style.display='none';document.body.style.overflow='';};","document.getElementById('dBack').onclick=function(){detail.style.display='none';document.body.style.overflow='';try{history.replaceState(null,'',location.href.replace(/#detail$/,''));}catch(_h){try{location.hash='';}catch(_h2){}}};",'detail back')
+
+          # Pagination chooses parameter variant that actually adds unseen rows.
+          ps=code.index('function qfPageRows('); pe=code.index('function qfNextFeed(',ps)
+          npr="function qfPageRows(tab,label,c,page,baseRows){page=Math.max(2,Number(page)||2);baseRows=Array.isArray(baseRows)?baseRows:[];var seen={};for(var bi=0;bi<baseRows.length;bi++){var bk=rowKey(baseRows[bi]);if(bk)seen[bk]=1;}var baseVs=(label==='全部')?[baseParams(tab,page)]:paramVariants(tab,c||{},page),vs=[];function addv(p){p=cloneObj(p||{});var sig=qfParamKey(p);for(var z=0;z<vs.length;z++)if(qfParamKey(vs[z])===sig)return;vs.push(p);}for(var vi0=0;vi0<baseVs.length;vi0++){var p0=baseVs[vi0]||{};addv(p0);var p1=cloneObj(p0);p1.pageIndex=String(page);p1.pageNum=String(page);p1.page=String(page);addv(p1);var p2=cloneObj(p0);delete p2.pageIndex;p2.pageNum=String(page);p2.pageSize='10';addv(p2);var p3=cloneObj(p0);delete p3.pageIndex;p3.page=String(page);p3.pageSize='10';addv(p3);}var fallback=[];for(var vi=0;vi<vs.length;vi++){var rows=[];try{rows=topRequest(tab,page,vs[vi])||[];}catch(_e){rows=[];}if(!rows.length)continue;if(label!=='全部'){if(tab==='tongren')rows=fanAccept(rows,c,label);else if(tab==='jinghua')rows=qfEssenceAccept(rows,c,label);else if(tab==='dongtai')rows=qfDynamicAccept(rows,c,label);else{var local=localCategoryFilter(rows,c,true);if(local.length)rows=local;else if(qfCandidateTrust(c)<2)rows=[];}}if(!rows.length)continue;if(!fallback.length)fallback=rows.slice(0);for(var ri=0;ri<rows.length;ri++){var rk=rowKey(rows[ri]);if(!rk||!seen[rk])return rows;}}return fallback;}"
+          code=code[:ps]+npr+code[pe:]
+          rep('pg=st.page+1,rows=qfPageRows(currentTab,label,c,pg),base=feedCache[key];',"pg=st.page+1,base=feedCache[key];if(!base||!base.length){if(label==='全部'&&INITIAL_ROWS[currentTab]&&INITIAL_ROWS[currentTab].length)base=INITIAL_ROWS[currentTab].slice(0);else base=[];}var rows=qfPageRows(currentTab,label,c,pg,base);",'page base before request')
+          rep("if(!base||!base.length){if(label==='全部'&&INITIAL_ROWS[currentTab]&&INITIAL_ROWS[currentTab].length)base=INITIAL_ROWS[currentTab].slice(0);else base=[];}var merged=mergeFeedRows(base,rows);",'var merged=mergeFeedRows(base,rows);','remove duplicate base init')
+
+          # Manual fallback button CSS uses a marker confirmed in Beta17.
+          css='.go{display:inline-flex;border:0;background:transparent;-webkit-appearance:none;appearance:none;touch-action:manipulation;align-items:center;gap:3px;color:#df5360;font-size:11.5px;font-weight:750;cursor:pointer;flex:none}'
+          rep(css,css+'.qfFeedMore{display:block;width:calc(100% - 24px);margin:10px 12px 18px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--accent);font-weight:750;font-size:13px}','manual button css')
+          ia=code.index('var qfFeedPageState=')
+          helper="function qfEnsureFeedMoreButton(){var pane=document.getElementById('pane_'+currentTab);if(!pane)return;var old=document.getElementById('qfFeedMoreBtn');if(old&&old.parentNode!==pane){old.parentNode.removeChild(old);old=null;}if(!old){old=document.createElement('button');old.type='button';old.id='qfFeedMoreBtn';old.className='qfFeedMore';old.textContent='加载更多帖子';old.onclick=function(){qfNextFeed(true);};pane.appendChild(old);}}"
+          code=code[:ia]+helper+code[ia:]
+          rep("function qfNextFeed(){if(detail&&detail.style.display==='block')return;","function qfNextFeed(force){if(detail&&detail.style.display==='block')return;qfEnsureFeedMoreButton();",'next feed force')
+          rep('if(st.loading||st.done)return;',"if(st.loading)return;if(st.done&&force){st.done=false;st.empty=0;}else if(st.done)return;",'manual retry')
+          rep("hint.textContent='正在加载下一页…';if(list)list.appendChild(hint);","hint.textContent='正在加载下一页…';if(list)list.appendChild(hint);var mb=document.getElementById('qfFeedMoreBtn');if(mb){mb.disabled=true;mb.textContent='正在加载下一页…';}",'loading button state')
+          rep("st.loading=false;qfFeedPageState[key]=st;if(!st.done)setTimeout(qfArmFeedObserver,40);","st.loading=false;qfFeedPageState[key]=st;var mb2=document.getElementById('qfFeedMoreBtn');if(mb2){mb2.disabled=false;mb2.textContent=st.done?'继续尝试加载':'加载更多帖子';}if(!st.done)setTimeout(qfArmFeedObserver,40);",'done button state')
+          rep('bindPostOpens(list);bindVideoLazy(list);bindVideoFallback(list);qfArmFeedObserver();','bindPostOpens(list);bindVideoLazy(list);bindVideoFallback(list);qfArmFeedObserver();qfEnsureFeedMoreButton();','render button')
+          # Add once after final initial apply. We avoid replacing every occurrence.
+          last=code.rfind("applyChipSet('dongtai');")
+          assert last>=0
+          end=last+len("applyChipSet('dongtai');")
+          code=code[:end]+"qfEnsureFeedMoreButton();"+code[end:]
+
+          assert '#detail:target{display:block}' in code
+          assert 'qfOpenPostDirect(this,event)' in code
+          assert 'qfEnsureFeedMoreButton' in code
+          assert 'p1.pageNum=String(page)' in code
+          assert 'qfPageRows(currentTab,label,c,pg,base)' in code
+          after=hashlib.sha256(code.encode()).hexdigest(); print('circle',before,'->',after)
+          nb=base64.b64encode(gzip.compress(code.encode(),9,mtime=0)).decode()
+          src['jsLib']=js[:m.start(1)]+nb+js[m.end(1):]
+          src['bookSourceComment']='v1.1.0-beta18：书友圈详情/分页硬兜底。详情入口改为原生 #detail 锚点 + inline handler + 捕获委托三通道，DOM 状态点击时延迟解析；分页保留自动触底并增加“加载更多帖子”按钮，重复首屏时轮询 pageIndex/pageNum/page 参数变体。其它域冻结。'
+          sp.write_text(json.dumps(doc,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
+          chk=json.loads(sp.read_text(encoding='utf-8')); s2=fs(chk); mm=re.search(r'"circle"\s*:\s*"gz:([A-Za-z0-9+/=]+)"',s2['jsLib']); assert gzip.decompress(base64.b64decode(mm.group(1))).decode()==code
+          print('source_sha256',hashlib.sha256(sp.read_bytes()).hexdigest())
+          PY
+          git diff --check
+      - name: Commit beta18 source
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json
+          git commit -m 'fix(qidian): harden circle interaction beta18'
+          git push origin main
