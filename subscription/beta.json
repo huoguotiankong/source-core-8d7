@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-28T23:14:00+08:00",
+  "updatedAt": "2026-08-28T23:34:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -38,31 +38,29 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "书友圈 beta18：详情使用原生锚点三重入口；分页增加显式加载按钮和多参数翻页兜底。",
+      "summary": "书友圈 beta19：切换 circle_b19 新模块键，并加入 B19 真机运行标记。",
       "icon": "",
       "channel": "beta",
-      "version": "1.1.0-beta18",
+      "version": "1.1.0-beta19",
       "updatedAt": "2026-08-28",
       "tags": [
         "起点",
         "测试版",
         "书友圈",
+        "模块换键",
+        "运行链诊断",
         "帖子详情",
-        "连续分页",
-        "原生锚点",
-        "手动加载",
-        "评论"
+        "连续分页"
       ],
       "changelog": [
-        "查看详情改为原生 #detail 锚点 + inline handler + 捕获委托三重通道",
-        "详情 DOM/状态在点击时延迟解析，降低 WebView 初始化顺序影响",
-        "保留自动触底并新增“加载更多帖子”显式按钮，可完全绕过 scroll/IntersectionObserver",
-        "重复首屏时自动尝试 pageIndex/pageNum/page 多套分页参数并优先采用含新帖的数据",
-        "其它评论/楼中楼、分类、视频、正文 Provider、角色卡和账号链冻结"
+        "正常书友圈入口整体切换至 circle_b19",
+        "旧 circle 保留用于回滚兼容",
+        "B19 标记用于判定真机是否命中新模块",
+        "详情/分页沿用 beta18，其它域冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11018",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11018",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11018",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11019",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11019",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11019",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
     },
     {
@@ -97,5 +95,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-08-28T23:14:00+08:00"
+  "generatedAt": "2026-08-28T23:34:00+08:00"
 }

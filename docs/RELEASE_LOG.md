@@ -1,3 +1,16 @@
+## 2026-08-28 — 起点增强 1.1.0-beta19
+
+Status: Beta/Test; fresh lazy-module key diagnostic after Beta18 still had no observable real-device effect.
+
+Changes:
+
+- Preserve old `circle`; duplicate Beta18 implementation as `circle_b19`.
+- Route `circleOpen`, `circleData`, `circleView`, and OfficialDomainService circle spec to `circle_b19`.
+- `circle` has no explicit `QF_MOD38_DEPS` entry; `circle_b19` intentionally follows the same loader-default empty dependency path.
+- New page carries a tiny `B19` badge. If absent on device, the active page is not executing Beta19 circle code and further detail/paging patching must stop until the active source path is identified.
+- Stable and all non-community domains remain unchanged.
+- SHA256: `e2e878406ddc65222e6e1f13802a149e846e5eb1d77280ace60112c881f837b6`.
+
 ## 2026-08-28 — 漫蛙漫画 0.1.0-beta13
 
 Status: Beta/Test; native-comment-DOM loading repair awaiting real-device confirmation.
