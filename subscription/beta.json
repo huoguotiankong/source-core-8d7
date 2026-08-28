@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-27T18:10:00+08:00",
+  "updatedAt": "2026-08-28T22:23:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -38,29 +38,30 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "书友圈 beta16：恢复帖子“查看详情”点击，并保留列表多图进入详情。",
+      "summary": "书友圈 beta17：修复帖子详情点击事件链，并重做连续分页触发与空页判定。",
       "icon": "",
       "channel": "beta",
-      "version": "1.1.0-beta16",
-      "updatedAt": "2026-08-26",
+      "version": "1.1.0-beta17",
+      "updatedAt": "2026-08-28",
       "tags": [
         "起点",
         "测试版",
         "书友圈",
         "帖子详情",
-        "点击修复",
-        "多图",
+        "连续分页",
+        "触底加载",
         "评论"
       ],
       "changelog": [
-        "恢复 Beta14 已验证的紧凑“查看详情”按钮 DOM，不再把完整图片数组编码进 data-imgs 属性",
-        "初始列表卡片与动态筛选卡片的完整配图均按 postId 保存在当前书友圈 WebView 内存映射，点击详情时读取并与 getpostdetail 图片去重合并",
-        "保留 Beta15 的 Options/VoteId/VoteType 投票尾元数据精确清理",
-        "评论/楼中楼、分类、视频、详情、正文 Provider、角色卡、账号链冻结"
+        "帖子详情由单节点 onclick 改为 WebView 捕获级 touchend/click 事件委托，并补 TopicId/topicId 帖子标识兼容",
+        "分页空结果不再缓存 45 秒，避免瞬时空页被固化为“没有更多”",
+        "单次空页不再直接结束；连续 3 次无新增才判定到底，重复页会推进页码继续探测",
+        "新增 scrollingElement、IntersectionObserver 与近底 watchdog 三重触底触发，降低 Android WebView 漏掉 window scroll 的概率",
+        "移除书友圈合并列表 200 条硬渲染上限；其它评论/楼中楼、分类、视频、正文 Provider、角色卡和账号链冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11016",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11016",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11016",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11017",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11017",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11017",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
     },
     {
@@ -95,5 +96,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-08-27T18:10:00+08:00"
+  "generatedAt": "2026-08-28T22:23:00+08:00"
 }

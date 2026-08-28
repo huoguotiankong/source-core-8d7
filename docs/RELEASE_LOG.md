@@ -1,3 +1,16 @@
+## 2026-08-28 — 起点增强 1.1.0-beta17
+
+Status: Beta/Test; circle detail-tap and continuous-pagination repair awaiting real-device confirmation.
+
+Changes:
+
+- 帖子详情由单节点 onclick 改为 WebView 捕获级 touchend/click 事件委托，并补 TopicId/topicId 帖子标识兼容
+- 分页空结果不再缓存 45 秒，避免瞬时空页被固化为“没有更多”
+- 单次空页不再直接结束；连续 3 次无新增才判定到底，重复页会推进页码继续探测
+- 新增 scrollingElement、IntersectionObserver 与近底 watchdog 三重触底触发，降低 Android WebView 漏掉 window scroll 的概率
+- 移除书友圈合并列表 200 条硬渲染上限；其它评论/楼中楼、分类、视频、正文 Provider、角色卡和账号链冻结
+- SHA256: `1eb3b1a62d7e3651b4c2909a38c73a06cc010acdd6f38a43fe9e4a909be6dc6c`.
+
 ## 2026-08-27 — 漫蛙漫画 0.1.0-beta10
 
 Status: Beta/Test; comment-layout and login-UI refinement awaiting real-device confirmation.
