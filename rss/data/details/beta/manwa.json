@@ -1,35 +1,35 @@
 {
   "kind": "source",
   "title": "◈ 漫蛙漫画",
-  "summary": "漫蛙漫画 0.1.0-beta12：评论卡片切换到 Grid 布局，并补上评论列表自动/手动连续加载。",
+  "summary": "漫蛙漫画 0.1.0-beta13：评论加载回到官网原生 DOM/滚动机制，并增加超时恢复，修复永久加载中。",
   "badges": [
     "Beta",
-    "0.1.0-beta12",
+    "0.1.0-beta13",
     "漫画",
-    "评论连续加载"
+    "评论原生加载"
   ],
   "sections": [
     {
-      "title": "评论排版",
-      "text": "Beta11 顶层 li 使用 flex；当楼中楼/回复容器作为直接子节点出现时会成为第三列并挤压正文。Beta12 改为 44px + 剩余宽度的两列 Grid。"
+      "title": "为什么 Beta12 卡住",
+      "text": "Beta12 会自己猜测下一页入口并直接 fetch；在漫蛙当前线路/Cloudflare 环境下，该请求可能长期 pending，因此界面一直停在“正在加载更多评论 / 加载中”。"
     },
     {
-      "title": "楼中楼",
-      "text": "顶层直接挂载的回复容器强制进入下一行正文列；带头像的完整子回复也使用独立 Grid，不再与父评论争抢横向宽度。"
+      "title": "原生 DOM",
+      "text": "#comment 不再搬出漫蛙原父级结构；定制页只隐藏无关节点并覆盖 CSS，尽量保留官网事件委托、滚动监听、IntersectionObserver 和动态追加环境。"
     },
     {
-      "title": "连续加载",
-      "text": "接近底部、触摸结束或底部哨兵进入视口时自动尝试加载更多评论；同时保留手动“加载更多”按钮。"
+      "title": "加载桥",
+      "text": "接近底部时触发真实 window/document/jQuery scroll，并优先点击评论区内官网自己的“更多评论/下一页”控件。"
     },
     {
-      "title": "下一页处理",
-      "text": "优先识别站点加载更多/更多评论/下一页控件；若存在下一页 URL，则同源 fetch 后去重追加当前列表，并排除“查看更多回复数”。"
+      "title": "Watchdog",
+      "text": "每次加载最长等待 8 秒；没有新增评论会自动退出加载状态并允许重试，不再永久卡死。"
     },
     {
       "title": "冻结范围",
-      "text": "正文、详情、目录、登录设置和动态域名本轮不改。"
+      "text": "Beta12 Grid 评论排版保留；正文、详情、目录、登录设置和动态域名不改。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1012",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1012"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1013",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1013"
 }
