@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-28T23:05:00+08:00",
+  "updatedAt": "2026-08-28T23:15:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -80,30 +80,31 @@
       "name": "🌈 起点增强 · Beta",
       "category": "novel",
       "channel": "beta",
-      "version": "1.1.0-beta17",
-      "versionCode": 11017,
-      "updatedAt": "2026-08-28T22:23:00+08:00",
+      "version": "1.1.0-beta18",
+      "versionCode": 11018,
+      "updatedAt": "2026-08-28T23:15:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11017",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "书友圈 beta17：修复帖子详情点击事件链，并重做连续分页触发与空页判定。",
+      "summary": "书友圈 beta18：详情使用原生锚点三重入口；分页增加显式加载按钮和多参数翻页兜底。",
       "tags": [
         "起点",
         "测试版",
         "书友圈",
         "帖子详情",
         "连续分页",
-        "触底加载",
+        "原生锚点",
+        "手动加载",
         "评论"
       ],
       "changelog": [
-        "帖子详情由单节点 onclick 改为 WebView 捕获级 touchend/click 事件委托，并补 TopicId/topicId 帖子标识兼容",
-        "分页空结果不再缓存 45 秒，避免瞬时空页被固化为“没有更多”",
-        "单次空页不再直接结束；连续 3 次无新增才判定到底，重复页会推进页码继续探测",
-        "新增 scrollingElement、IntersectionObserver 与近底 watchdog 三重触底触发，降低 Android WebView 漏掉 window scroll 的概率",
-        "移除书友圈合并列表 200 条硬渲染上限；其它评论/楼中楼、分类、视频、正文 Provider、角色卡和账号链冻结"
+        "查看详情改为原生 #detail 锚点 + inline handler + 捕获委托三重通道",
+        "详情 DOM/状态在点击时延迟解析，降低 WebView 初始化顺序影响",
+        "保留自动触底并新增“加载更多帖子”显式按钮，可完全绕过 scroll/IntersectionObserver",
+        "重复首屏时自动尝试 pageIndex/pageNum/page 多套分页参数并优先采用含新帖的数据",
+        "其它评论/楼中楼、分类、视频、正文 Provider、角色卡和账号链冻结"
       ],
-      "sha256": "1eb3b1a62d7e3651b4c2909a38c73a06cc010acdd6f38a43fe9e4a909be6dc6c"
+      "sha256": "253aba0ea6ca7d2e1838be699483bb7aaf3684a68396a78cc7014030b5579bfa"
     },
     {
       "id": "picacg",

@@ -1,3 +1,16 @@
+## 2026-08-28 — 起点增强 1.1.0-beta18
+
+Status: Beta/Test; persistent circle detail/pagination failures reworked with hard fallbacks, awaiting real-device confirmation.
+
+Changes:
+
+- Beta17 real-device testing confirmed both “查看详情” and continuous paging still failed.
+- Detail entry now uses a native `#detail` anchor, inline callback, and delegated callback; DOM/state is resolved lazily.
+- Feed keeps automatic paging and adds an explicit “加载更多帖子” button to bypass WebView scroll/observer failures.
+- Duplicate first-page responses trigger `pageIndex`, `pageNum`, and `page` parameter probes, preferring results with unseen posts.
+- Stable and unrelated Beta modules remain unchanged.
+- SHA256: `253aba0ea6ca7d2e1838be699483bb7aaf3684a68396a78cc7014030b5579bfa`.
+
 ## 2026-08-28 — 漫蛙漫画 0.1.0-beta12
 
 Status: Beta/Test; grid-layout and continuous comment loading repair awaiting real-device confirmation.
