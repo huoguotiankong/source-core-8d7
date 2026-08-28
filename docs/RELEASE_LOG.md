@@ -1,3 +1,16 @@
+## 2026-08-28 — 起点增强 1.1.0-beta20
+
+Status: Beta/Test; rollback-first recovery after Beta15+ community regressions.
+
+Changes:
+
+- User confirmed the community module was healthy before the multi-image change; repository history identifies Beta14 as the real-device-confirmed baseline and Beta15 as the first multi-image patch.
+- Rebuilt Beta from current Stable (the Beta14-confirmed baseline), discarding Beta15-beta19 circle interaction/pagination rewrites.
+- Preserved the original Beta14 `bindPostOpens` onclick, `getpostdetail`, detail scroll pagination, feed pagination, comments and nested replies.
+- Only changed the image handoff: existing list `images` are percent-encoded as JSON in `data-img`, then decoded into the already-existing `state.previewImgs`; legacy single-image values still fall back correctly.
+- Stable remains unchanged. Other domains remain frozen.
+- SHA256: `84722b17d96cb6c4382a379d17daf3efa484283a22b3037747d3905130cd652b`.
+
 ## 2026-08-28 — 起点增强 1.1.0-beta19
 
 Status: Beta/Test; fresh lazy-module key diagnostic after Beta18 still had no observable real-device effect.

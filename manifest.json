@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-28T23:34:00+08:00",
+  "updatedAt": "2026-08-28T23:43:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -80,30 +80,29 @@
       "name": "🌈 起点增强 · Beta",
       "category": "novel",
       "channel": "beta",
-      "version": "1.1.0-beta19",
-      "versionCode": 11019,
-      "updatedAt": "2026-08-28T23:34:00+08:00",
+      "version": "1.1.0-beta20",
+      "versionCode": 11020,
+      "updatedAt": "2026-08-28T23:43:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11017",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11020",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "书友圈 beta19：使用全新 circle_b19 模块键强制绕过旧 lazy-module 实例，并加入 B19 真机运行标记。",
+      "summary": "书友圈 beta20：整体回退 Beta14 真机稳定基线，仅最小修复帖子详情多图传递。",
       "tags": [
         "起点",
         "测试版",
         "书友圈",
-        "模块换键",
-        "运行链诊断",
+        "Beta14回退",
         "帖子详情",
-        "连续分页"
+        "多图",
+        "最小修复"
       ],
       "changelog": [
-        "保留旧 circle，复制 beta18 当前实现为 circle_b19",
-        "circleOpen/circleData/circleView 与 OfficialDomainService 全部改走 circle_b19",
-        "circle/circle_b19 均沿用加载器默认空依赖，不新增 DEPS 条目",
-        "新页面右下角显示极小 B19 作为真机运行链硬证据",
-        "其它域冻结"
+        "书友圈整体恢复到 Beta14/Stable 真机确认代码，不继承 Beta15-beta19 的详情/分页补丁",
+        "保持原 bindPostOpens onclick、getpostdetail、详情滚动与列表分页逻辑原样",
+        "仅把列表已有 images 数组编码后传给既有 state.previewImgs，详情仍使用原 topicHtml 多图渲染",
+        "旧单图 data-img 仍可回退解析；其它域冻结"
       ],
-      "sha256": "e2e878406ddc65222e6e1f13802a149e846e5eb1d77280ace60112c881f837b6"
+      "sha256": "84722b17d96cb6c4382a379d17daf3efa484283a22b3037747d3905130cd652b"
     },
     {
       "id": "picacg",
