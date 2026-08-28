@@ -5,7 +5,7 @@ Updated: 2026-08-27
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta10`
+- Version: `0.1.0-beta11`
 - Display name: `◈ 漫蛙漫画`
 - Legado identity: `https://sc8d7.invalid/legado/manwa-8d7`
 - Beta source: `sources/comic/manwa/manwa-beta.json`
@@ -15,6 +15,31 @@ Updated: 2026-08-27
 ## Baseline
 
 This is a new reconstruction. The user-provided Manwa source was used only to confirm working HTML selectors, query parameters and the current image-decryption chain. Its selector-combination discovery UI is not retained.
+
+## Beta11 dynamic reply + media comment UI
+
+Beta11 is a narrow continuation of the Beta10 comment rewrite.
+
+Observed current Manwa behavior from the live site:
+
+- work pages expose server-rendered comments and chapter attribution;
+- comment bodies can be plain text or image/sticker content;
+- some comments expose “查看更多回复数 (N)” and insert/reveal nested replies after interaction.
+
+Risk found in Beta10:
+
+- `mark(c)` ran only during initial construction of the custom comment shell;
+- replies inserted later by the site's own JavaScript would not receive `mw-sub-comment / mw-sub-full` classes and could fall back to the original site's legacy layout.
+
+Beta11 fix:
+
+1. Observe `#comment` with `MutationObserver({childList:true, subtree:true})`.
+2. Re-run the idempotent normalizer after every dynamic child update.
+3. Keep top-level and nested class assignment separate.
+4. Detect image-heavy comment bodies and mark them as media comments.
+5. Constrain comment/sticker images to 180px and viewport-safe width.
+6. Style chapter links and “查看更多回复数” for the custom sheet.
+7. Do not change login, content, detail, TOC or domain modules.
 
 ## Beta10 comment layout + compact login
 
