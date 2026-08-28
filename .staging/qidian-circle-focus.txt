@@ -1,0 +1,685 @@
+COMMENT=v1.1.0-beta17：书友圈详情与连续分页双修。详情打开改为 WebView 捕获级 touchend/click 委托，避免嵌套 BottomSheet 中直接 onclick 丢失，并补 TopicId 兼容；连续分页不再缓存空页或单次空页即判到底，改为连续 3 次无新增才结束，并增加 scrollingElement、IntersectionObserver 与近底 watchdog 三重触发。其余域冻结。
+
+===== LIST REQUEST =====
+POS=116481
+function listRequest(params){var req=signed('v1/circle/getcirclepostlist',params),root=parse(ajax(req));return {root:root,rows:feedRows(root)};}");
+    h.push("var qfPageRequestCache={};function 
+
+===== BASE PARAMS =====
+POS=118608
+function baseParams(tab,page){var top=TOP_META[tab]||TOP_META.dongtai;return {pageIndex:String(page||1),subCategory:'0',circleId:CIRCLE_ID,sortType:String(currentSort),postCategoryId:String(top.id||'0'),bookId:BOOK_ID,bookType:'1'};}");
+    h.push("function 
+
+===== TOP REQUEST =====
+POS=118857
+function topRequest(tab,page,params){var p=params||baseParams(tab,page),rows=qfCachedList(p);if(rows.length)return rows.slice(0);var q={pageIndex:String(page||1),subCategory:String(p.subCategory!=null?p.subCategory:(p.subCategoryId!=null?p.subCategoryId:'0')),circleId:CIRCLE_ID,postSortType:String(currentSort),postCategoryId:String(p.postCategoryId||'0'),qdBookId:BOOK_ID,qdBookType:'1'};if(p.categoryId!=null)q.categoryId=String(p.categoryId);if(p.subCategoryId!=null)q.subCategoryId=String(p.subCategoryId);if(p.isJinghua!=null)q.isJinghua=String(p.isJinghua);if(p.isGodReview!=null)q.isGodReview=String(p.isGodReview);return qfCachedList(q).slice(0);}");
+    h.push("function 
+
+===== PARAM VARIANTS =====
+POS=124995
+function paramVariants(tab,c,page){var b=baseParams(tab,page),p=applyCandidate(b,c||{mode:'all',id:b.postCategoryId}),out=[p];if(tab==='tongren'&&String((TOP_META.tongren||{}).parentId||'')&&String(p.postCategoryId||'')==='316'){var q=cloneObj(p);q.postCategoryId=String(TOP_META.tongren.parentId);out.push(q);}return out;}");
+    h.push("function 
+
+===== FEED CARD =====
+POS=110778
+function feedCard(o,label){o=o||{};label=String(label||'');var cid=String(o.CircleId||o.circleId||CIRCLE_ID),pid=String(o.PostId||o.postId||o.Id||o.id||o.TopicId||o.topicId||''),nm=String(o.user||user(o)||'书友'),av=qfNormUrl(o.avatar||avatar(o)||''),title=String(o.title||titleOf(o)||''),rr=richOf(o),rich=rr.raw,bd=qfCleanPollText(String(o.body||rr.text||'')),ims=imageUrls(o,rich),tm=String(o.time||time(o)||''),rp=o.reply!=null?o.reply:(o.PostCount!=null?o.PostCount:(o.CommentCount!=null?o.CommentCount:(o.commentCount!=null?o.commentCount:''))),lk=o.like!=null?o.like:(o.StarCount!=null?o.StarCount:(o.LikeCount!=null?o.LikeCount:o.likeCount));var directImgs=Array.isArray(o.images)?o.images:[];for(var dix=directImgs.length-1;dix>=0;dix--){var diu=qfNormUrl(directImgs[dix]);if(diu&&ims.indexOf(diu)<0)ims.unshift(diu);}var directImg=qfNormUrl(o.image||'');if(directImg&&ims.indexOf(directImg)<0)ims.unshift(directImg);if(pid)qfPostPreviewImgs[String(pid)]=ims.slice(0,9);var vd={url:qfNormUrl(o.video||''),poster:qfNormUrl(o.videoPoster||'')};if(!vd.url)vd=videoInfo(o,rich);if(!vd.poster&&ims.length)vd.poster=ims[0];var fb=(nm||'书').slice(0,1);var r='<article class=\"post\"><div class=\"user\">'+(av?imgTag(av,'avatar',''):'<span class=\"avatarFb\">'+esc(fb)+'</span>')+'<span class=\"u\">'+esc(nm)+'</span>'+(label&&label!=='全部'?'<span class=\"kindTag\">'+esc(label)+'</span>':'')+'</div>';if(title)r+='<div class=\"t\">'+esc(title)+'</div>';if(bd&&bd!==title)r+='<div class=\"b\">'+esc(bd)+'</div>';if((vd&&vd.url)||(label==='同人视频'&&pid)){if(!vd)vd={url:'',poster:''};if(!vd.poster&&ims.length)vd.poster=ims[0];r+=videoTag(vd,'postVideo',cid,pid);}else if(ims.length)r+=imageGridTag(ims);var ms=[];if(tm)ms.push(tm);if(rp!==''&&rp!=null)ms.push('💬 '+rp);if(lk!==''&&lk!=null)ms.push('♡ '+lk);r+='<div class=\"postFoot\"><div class=\"meta\">'+esc(ms.join('　'))+'</div>';if(pid)r+='<span class=\"go qfPostOpen\" role=\"button\" tabindex=\"0\" data-cid=\"'+esc(cid)+'\" data-pid=\"'+esc(pid)+'\" data-img=\"'+esc(ims.length?ims[0]:'')+'\">查看详情 ›</span>';return r+'</div></article>';}");
+    h.push("var INITIAL_ROWS=
+
+===== PANE LIST =====
+POS=121181
+function paneList(tab){var pane=document.getElementById('pane_'+tab);return pane&&pane.querySelector('.feedList');}function 
+
+===== RENDER FILTERED =====
+POS=121363
+function renderFiltered(tab,rows,label){var list=paneList(tab);if(!list)return;var hh='';for(var i=0;i<rows.length;i++)hh+=feedCard(rows[i],String(label||''));list.innerHTML=hh||'<div class=\"empty\">当前分类暂无帖子</div>';bindPostOpens(list);bindVideoLazy(list);bindVideoFallback(list);qfArmFeedObserver();}function 
+
+===== PAGINATION =====
+POS=142108
+var qfFeedPageState={},qfFeedScrollTimer=0,qfFeedObserver=null;function qfActiveChip(){for(var i=0;i<chips.length;i++)if(chips[i].classList.contains('active')&&chipVisibleFor(chips[i],currentTab))return chips[i];return null;}function qfPageRows(tab,label,c,page){page=Math.max(2,Number(page)||2);var vs=(label==='全部')?[baseParams(tab,page)]:paramVariants(tab,c||{},page);for(var vi=0;vi<vs.length;vi++){var rows=[];try{rows=topRequest(tab,page,vs[vi])||[];}catch(_e){rows=[];}if(!rows.length)continue;if(label==='全部')return rows;if(tab==='tongren'){var fa=fanAccept(rows,c,label);if(fa.length)return fa;continue;}if(tab==='jinghua'){var ea=qfEssenceAccept(rows,c,label);if(ea.length)return ea;continue;}if(tab==='dongtai'){var da=qfDynamicAccept(rows,c,label);if(da.length)return da;continue;}var local=localCategoryFilter(rows,c,true);if(local.length)return local;if(qfCandidateTrust(c)>=2)return rows;}return [];}function qfNextFeed(){if(detail&&detail.style.display==='block')return;var chip=qfActiveChip();if(!chip)return;var label=String(chip.getAttribute('data-name')||'全部'),key=cacheKey(currentTab,label),st=qfFeedPageState[key]||{page:1,loading:false,done:false,empty:0};if(st.loading||st.done)return;var ds=fanDirectState[key],fs=fanScanState[key];if(currentTab==='tongren'&&label!=='全部'){st.page=Math.max(st.page,Number(ds&&ds.page||0),Number(fs&&fs.page||0));if((ds&&!ds.done)||(fs&&!fs.done)){qfFeedPageState[key]=st;return;}}st.loading=true;qfFeedPageState[key]=st;var list=paneList(currentTab),hint=document.createElement('div');hint.className='feedAuto loading';hint.textContent='正在加载下一页…';if(list)list.appendChild(hint);setTimeout(function(){try{var cands=parseCandidateAttr(chip),c=cands.length?cands[0]:{mode:'all',id:String((TOP_META[currentTab]||{}).id||'0')},pg=st.page+1,rows=qfPageRows(currentTab,label,c,pg),base=feedCache[key];if(!base||!base.length){if(label==='全部'&&INITIAL_ROWS[currentTab]&&INITIAL_ROWS[currentTab].length)base=INITIAL_ROWS[currentTab].slice(0);else base=[];}var merged=mergeFeedRows(base,rows);if(rows.length&&merged.length>base.length){st.page=pg;st.empty=0;feedCache[key]=merged.slice(0);renderFiltered(currentTab,merged,label);}else if(rows.length){st.page=pg;st.empty++;if(st.empty>=3)st.done=true;}else{st.empty++;if(st.empty>=3)st.done=true;}try{if(hint&&hint.parentNode)hint.parentNode.removeChild(hint);}catch(_rm){}if(st.done&&list){var d=document.createElement('div');d.className='feedAuto done';d.textContent='已经到底了';list.appendChild(d);}}catch(_e){st.empty++;if(st.empty>=3)st.done=true;try{if(hint&&hint.parentNode)hint.parentNode.removeChild(hint);}catch(_rm2){}}st.loading=false;qfFeedPageState[key]=st;if(!st.done)setTimeout(qfArmFeedObserver,40);},30);}function qfNearBottom(){var se=document.scrollingElement||document.documentElement,b=document.body,top=Number((se&&se.scrollTop)||window.pageYOffset||0),h=window.innerHeight||document.documentElement.clientHeight||0,sh=Math.max((se&&se.scrollHeight)||0,document.documentElement.scrollHeight||0,b.scrollHeight||0);return top+h>=sh-520;}function qfArmFeedObserver(){try{if(qfFeedObserver){qfFeedObserver.disconnect();qfFeedObserver=null;}if(typeof IntersectionObserver!=='function')return;var list=paneList(currentTab),posts=list?list.querySelectorAll('.post'):null,last=posts&&posts.length?posts[posts.length-1]:null;if(!last)return;qfFeedObserver=new IntersectionObserver(function(es){for(var i=0;i<es.length;i++){if(es[i].isIntersecting){qfNextFeed();break;}}},{root:null,rootMargin:'0px 0px 520px 0px',threshold:0.01});qfFeedObserver.observe(last);}catch(_o){}}function qfHeadCompact(){try{var hd=document.querySelector('.head'),se=document.scrollingElement||document.documentElement,y=Number((se&&se.scrollTop)||window.pageYOffset||0);if(hd){if(y>86)hd.classList.add('compact');else hd.classList.remove('compact');}}catch(_h){}}window.addEventListener('scroll',function(){qfHeadCompact();
+
+===== POST OPEN =====
+POS=101489
+var qfPostTouchAt=0;function qfPostOpenNode(t){while(t&&t!==document){if(t.classList&&t.classList.contains('qfPostOpen'))return t;t=t.parentNode;}return null;}function qfOpenPost(el,ev){if(!el)return;try{if(ev&&ev.preventDefault)ev.preventDefault();if(ev&&ev.stopPropagation)ev.stopPropagation();}catch(_ev){}state.cid=String(el.getAttribute('data-cid')||CIRCLE_ID);state.pid=String(el.getAttribute('data-pid')||'');if(!state.pid){try{window.java.toast('帖子ID为空，无法打开详情');}catch(_id){}return;}var pim=qfNormUrl(el.getAttribute('data-img')||''),pims=[];try{pims=(qfPostPreviewImgs&&qfPostPreviewImgs[state.pid])?qfPostPreviewImgs[state.pid].slice(0,9):[];}catch(_pm){}if(!Array.isArray(pims))pims=[];var pic=[],pis={};for(var px=0;px<pims.length&&pic.length<9;px++){var pu=qfNormUrl(pims[px]);if(/^https?:\\/\\//i.test(pu)&&!pis[pu]){pis[pu]=1;pic.push(pu);}}if(!pic.length&&pim)pic=[pim];state.previewImgs=pic;state.detailRoot=null;state.loading=false;state.pg=1;state.total=0;detail.style.display='block';detail.scrollTop=0;document.body.style.overflow='hidden';body.innerHTML='<div class=\\\"loading\\\"><div class=\\\"spin\\\"></div>正在加载帖子详情…</div>';setTimeout(function(){fetchDetail(true);},20);}function qfPostOpenEvent(ev){var el=qfPostOpenNode(ev&&ev.target);if(!el)return;var now=Date.now();if(ev.type==='click'&&now-qfPostTouchAt<700){try{ev.preventDefault();ev.stopPropagation();}catch(_d){}return;}if(ev.type==='touchend')qfPostTouchAt=now;qfOpenPost(el,ev);}function bindPostOpens(root){root=root||document;var opens=root.querySelectorAll('.qfPostOpen');for(var oi=0;oi<opens.length;oi++){opens[oi].setAttribute('role','button');opens[oi].setAttribute('tabindex','0');}}document.addEventListener('touchend',qfPostOpenEvent,true);document.addEventListener('click',qfPostOpenEvent,true);document.addEventListener('keydown',function(ev){var el=qfPostOpenNode(ev&&ev.target),k=String(ev&&ev.key||'');if(el&&(k==='Enter'||k===' '))qfOpenPost(el,ev);},true);bindPostOpens(document);
+
+===== DETAIL FETCH =====
+POS=98670
+function fetchDetail(reset){if(state.loading)return;state.loading=true;if(reset){state.pg=1;body.innerHTML='<div class=\\\"loading\\\">正在加载起点官方帖子详情…</div>';}try{var dk=state.cid+'|'+state.pid+'|'+state.pg,dc=qfDetailPageCache[dk],root=null;if(dc&&Date.now()-Number(dc.ts||0)<120000){root=dc.root;}else{var req=signed('v1/circle/getpostdetail',{circleId:state.cid,postId:state.pid,pg:String(state.pg),pz:'20',sort:'0'});root=parse(ajax(req));qfDetailPageCache[dk]={ts:Date.now(),root:root};var dks=Object.keys(qfDetailPageCache);if(dks.length>24){dks.sort(function(a,b){return Number((qfDetailPageCache[a]||{}).ts||0)-Number((qfDetailPageCache[b]||{}).ts||0);});while(dks.length>24)delete qfDetailPageCache[dks.shift()];}}state.detailRoot=root;var d=dataOf(root),topic=d.TopicData||d.topicData||{},rows=arrays(d),total=Number(d.TotalCount||d.totalCount||rows.length)||rows.length;state.total=total;if(reset){body.innerHTML=topicHtml(topic,root)+'<div class=\\\"reviewTitle\\\">全部回复'+(total?'（'+total+'）':'')+'</div><div id=\\\"reviewList\\\"></div><button class=\\\"moreBtn\\\" id=\\\"moreBtn\\\">加载更多评论</button>';}bindVideoFallback(body);var list=document.getElementById('reviewList');for(var i=0;i<rows.length;i++)list.insertAdjacentHTML('beforeend',reviewHtml(rows[i]));var arts=list.querySelectorAll('.review');for(var ai=0;ai<arts.length&&ai<rows.length;ai++){var rid=qfReviewId(rows[ai]);if(!rid)continue;var linked=qfLinkedReplies(root,rid);if(linked.length&&!arts[ai].querySelector('.subReplies')){var box=document.createElement('div');box.className='subReplies';var hh='';for(var li=0;li<linked.length&&li<5;li++)hh+=subReplyHtml(linked[li]);box.innerHTML=hh;var meta=arts[ai].querySelector('.reviewMeta');arts[ai].insertBefore(box,meta||null);}}var rms=list.querySelectorAll('.qfReplyMore');for(var ri=0;ri<rms.length;ri++){if(!rms[ri].getAttribute('data-bound')){rms[ri].setAttribute('data-bound','1');rms[ri].onclick=function(){var el=this;el.style.display='inline-block';el.textContent='正在加载回复…';setTimeout(function(){loadReviewReplies(el,false);},30);};}}var btn=document.getElementById('moreBtn');if(btn){if(!rows.length||list.children.length>=total){btn.style.display='none';}else{btn.style.display='block';btn.onclick=function(){state.pg++;fetchDetail(false);};}}}catch(e){body.innerHTML='<div class=\\\"err\\\">帖子详情加载失败：'+esc(e&&e.message?e.message:e)+'</div>';}state.loading=false;}");
+    h.push("var qfDetailScrollTimer=0;detail.addEventListener('scroll',function(){if(qfDetailScrollTimer||state.loading)return;qfDetailScrollTimer=setTimeout(function(){qfDetailScrollTimer=0;var btn=document.getElementById('moreBtn');if(!btn||btn.style.display==='none')return;if(detail.scrollTop+detail.clientHeight>=detail.scrollHeight-420){state.pg++;fetchDetail(false);}},100);},{passive:true});");
+    h.push("var qfPostTouchAt=0;function 
+
+===== OCCURRENCES getpostlist =====
+COUNT=0
+
+===== OCCURRENCES GetPostList =====
+COUNT=0
+
+===== OCCURRENCES PageIndex =====
+COUNT=7
+
+-- 1 @97299 --
+cument.body.style.overflow='';};");
+    h.push("function loadReviewReplies(el,auto){if(!el||el.getAttribute('data-loading')==='1')return;var rid=String(el.getAttribute('data-rid')||'');if(!rid)return;el.setAttribute('data-loading','1');if(!auto){el.style.display='inline-block';el.textContent='正在加载回复…';}var attempts=[{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pageIndex:'1',pageSize:'50',sortType:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,pg:'1',pz:'50',type:'1',sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,pg:'1',pz:'50',sort:'0'}}],rows=[],lastErr='';if(state.detailRoot)rows=qfLinkedReplies(state.detailRoot,rid);for(var i=0;i<attempts.length&&!rows.length;i++){try{var req=signed(attempts[i].path,attempts[i].p),root=parse(ajax(req));rows=qfLinkedReplies(root,rid);if(!rows.length)rows=qfReviewDetailRows(root);if(!rows.length)rows=qfLooseReplyRows(root,rid);}catch(e){lastErr=String(e&&e.message?e.message:e);}}if(rows.length){var old=el.parentNode.querySelector('.subReplies');if(old)old.parentNode.removeChild(old);var box=document.createElement('div');box.className='subReplies';var hh='';for(var j=0;j<rows.length&&j<50;j++)hh+=subReplyHtml(rows[j]);box.innerHTML=hh;el.parentNode.insertBefore(box,el);el.style.display='none';}else{if(!auto){el.style.display='inline-block';el.textContent='暂未获取到回复'+(lastErr?' · '+lastErr:'');}else{el.style.display='none';}el.setAttribute('data-loading','0');}}");
+    h.push("function fetchDetail(reset){if(state.loading)return;state.loading=true;if(reset){state.pg=1;body.innerHTML='<div class=\\\"loading\\\">正在加载起点官方帖子详情…</div>';}try{var dk=state.cid+'|'+state.pid+'|'+state.pg,dc=qfDetailPageCache[dk],root=null;if(dc&&Date.now()-Number(dc.ts||0)<120000){root=dc.root;}else{var req=signed('v1/circle/getpostdetail',{circleId:state.cid,postId:state.pid,pg:String(state.pg),pz:'20',sort:'0'});root=parse
+
+-- 2 @118686 --
+fSeedPreviewRows(INITIAL_ROWS.tongren);qfSeedPreviewRows(INITIAL_ROWS.discussion);qfSeedPreviewRows(INITIAL_ROWS.discussionPreview);");
+    h.push("function rowPostId(o){o=o||{};return String(o.PostId||o.postId||o.Id||o.id||o.TopicId||o.topicId||'');}function mergeFeedRows(a,b){a=Array.isArray(a)?a:[];b=Array.isArray(b)?b:[];var out=[],seen={};function add(o){var id=rowPostId(o),k=id||String(o.title||o.Title||'')+'|'+String(o.body||o.Body||o.Content||'').slice(0,80);if(k&&seen[k])return;if(k)seen[k]=1;out.push(o);}for(var i=0;i<a.length;i++)add(a[i]);for(var j=0;j<b.length;j++)add(b[j]);return out;}");
+    h.push("function baseParams(tab,page){var top=TOP_META[tab]||TOP_META.dongtai;return {pageIndex:String(page||1),subCategory:'0',circleId:CIRCLE_ID,sortType:String(currentSort),postCategoryId:String(top.id||'0'),bookId:BOOK_ID,bookType:'1'};}");
+    h.push("function topRequest(tab,page,params){var p=params||baseParams(tab,page),rows=qfCachedList(p);if(rows.length)return rows.slice(0);var q={pageIndex:String(page||1),subCategory:String(p.subCategory!=null?p.subCategory:(p.subCategoryId!=null?p.subCategoryId:'0')),circleId:CIRCLE_ID,postSortType:String(currentSort),postCategoryId:String(p.postCategoryId||'0'),qdBookId:BOOK_ID,qdBookType:'1'};if(p.categoryId!=null)q.categoryId=String(p.categoryId);if(p.subCategoryId!=null)q.subCategoryId=String(p.subCategoryId);if(p.isJinghua!=null)q.isJinghua=String(p.isJinghua);if(p.isGodReview!=null)q.isGodReview=String(p.isGodReview);return qfCachedList(q).slice(0);}");
+    h.push("function discussionSingle(c,phase){var p=applyCandidate(baseParams('dongtai',1),c||{});if(Number(phase)===1){var q={pageIndex:'1',subCategory:String(p.subCategory!=null?p.subCategory:(p.subCategoryId!=null?p.subCategoryId:'0')),circleId:CIRCLE_ID,postSortType:String(currentSort),postCategoryId:String(p.postCategoryId||'0'),qdBookId:BOOK_ID,qdBookType:'1'};if(p.categoryId!=null)q.categoryId=String(p.categoryId);if(p.subCategoryId!=null)q.subCategoryId=String(p.subCategoryId);return (listRequest(q).rows||[]);}return (listRequest(p).rows||[]);}");
+    h.push("function discussionAccept(rows,c){rows=Array.isArray(rows)?rows:[];if(!rows.length)return [];var local=localCategoryFilter(rows,c,true);if(local.length)return local;var all=INITIAL_ROWS.dongtai||[],rf=feedFingerprint(rows),af=feedFingerprint(all);if(!all.length||!af||rf!==af)return rows;return [];}function discussionPreview(c){var key=cacheKey('dongtai','讨论'),p=discussionPreviewCache[key];if
+
+-- 3 @118993 --
+ray.isArray(b)?b:[];var out=[],seen={};function add(o){var id=rowPostId(o),k=id||String(o.title||o.Title||'')+'|'+String(o.body||o.Body||o.Content||'').slice(0,80);if(k&&seen[k])return;if(k)seen[k]=1;out.push(o);}for(var i=0;i<a.length;i++)add(a[i]);for(var j=0;j<b.length;j++)add(b[j]);return out;}");
+    h.push("function baseParams(tab,page){var top=TOP_META[tab]||TOP_META.dongtai;return {pageIndex:String(page||1),subCategory:'0',circleId:CIRCLE_ID,sortType:String(currentSort),postCategoryId:String(top.id||'0'),bookId:BOOK_ID,bookType:'1'};}");
+    h.push("function topRequest(tab,page,params){var p=params||baseParams(tab,page),rows=qfCachedList(p);if(rows.length)return rows.slice(0);var q={pageIndex:String(page||1),subCategory:String(p.subCategory!=null?p.subCategory:(p.subCategoryId!=null?p.subCategoryId:'0')),circleId:CIRCLE_ID,postSortType:String(currentSort),postCategoryId:String(p.postCategoryId||'0'),qdBookId:BOOK_ID,qdBookType:'1'};if(p.categoryId!=null)q.categoryId=String(p.categoryId);if(p.subCategoryId!=null)q.subCategoryId=String(p.subCategoryId);if(p.isJinghua!=null)q.isJinghua=String(p.isJinghua);if(p.isGodReview!=null)q.isGodReview=String(p.isGodReview);return qfCachedList(q).slice(0);}");
+    h.push("function discussionSingle(c,phase){var p=applyCandidate(baseParams('dongtai',1),c||{});if(Number(phase)===1){var q={pageIndex:'1',subCategory:String(p.subCategory!=null?p.subCategory:(p.subCategoryId!=null?p.subCategoryId:'0')),circleId:CIRCLE_ID,postSortType:String(currentSort),postCategoryId:String(p.postCategoryId||'0'),qdBookId:BOOK_ID,qdBookType:'1'};if(p.categoryId!=null)q.categoryId=String(p.categoryId);if(p.subCategoryId!=null)q.subCategoryId=String(p.subCategoryId);return (listRequest(q).rows||[]);}return (listRequest(p).rows||[]);}");
+    h.push("function discussionAccept(rows,c){rows=Array.isArray(rows)?rows:[];if(!rows.length)return [];var local=localCategoryFilter(rows,c,true);if(local.length)return local;var all=INITIAL_ROWS.dongtai||[],rf=feedFingerprint(rows),af=feedFingerprint(all);if(!all.length||!af||rf!==af)return rows;return [];}function discussionPreview(c){var key=cacheKey('dongtai','讨论'),p=discussionPreviewCache[key];if(p&&p.length)return p.slice(0);var local=localCategoryFilter(INITIAL_ROWS.dongtai||[],c,true);if(local.length){discussionPreviewCache[key]=local.slice(0);return local;}return [];}function discussionAllPageFallback(c,page){var rows=[];try{rows=topRequest('dongtai',page,baseParams('dongtai',page));}catch(_e)
+
+-- 4 @119645 --
+t(p);if(rows.length)return rows.slice(0);var q={pageIndex:String(page||1),subCategory:String(p.subCategory!=null?p.subCategory:(p.subCategoryId!=null?p.subCategoryId:'0')),circleId:CIRCLE_ID,postSortType:String(currentSort),postCategoryId:String(p.postCategoryId||'0'),qdBookId:BOOK_ID,qdBookType:'1'};if(p.categoryId!=null)q.categoryId=String(p.categoryId);if(p.subCategoryId!=null)q.subCategoryId=String(p.subCategoryId);if(p.isJinghua!=null)q.isJinghua=String(p.isJinghua);if(p.isGodReview!=null)q.isGodReview=String(p.isGodReview);return qfCachedList(q).slice(0);}");
+    h.push("function discussionSingle(c,phase){var p=applyCandidate(baseParams('dongtai',1),c||{});if(Number(phase)===1){var q={pageIndex:'1',subCategory:String(p.subCategory!=null?p.subCategory:(p.subCategoryId!=null?p.subCategoryId:'0')),circleId:CIRCLE_ID,postSortType:String(currentSort),postCategoryId:String(p.postCategoryId||'0'),qdBookId:BOOK_ID,qdBookType:'1'};if(p.categoryId!=null)q.categoryId=String(p.categoryId);if(p.subCategoryId!=null)q.subCategoryId=String(p.subCategoryId);return (listRequest(q).rows||[]);}return (listRequest(p).rows||[]);}");
+    h.push("function discussionAccept(rows,c){rows=Array.isArray(rows)?rows:[];if(!rows.length)return [];var local=localCategoryFilter(rows,c,true);if(local.length)return local;var all=INITIAL_ROWS.dongtai||[],rf=feedFingerprint(rows),af=feedFingerprint(all);if(!all.length||!af||rf!==af)return rows;return [];}function discussionPreview(c){var key=cacheKey('dongtai','讨论'),p=discussionPreviewCache[key];if(p&&p.length)return p.slice(0);var local=localCategoryFilter(INITIAL_ROWS.dongtai||[],c,true);if(local.length){discussionPreviewCache[key]=local.slice(0);return local;}return [];}function discussionAllPageFallback(c,page){var rows=[];try{rows=topRequest('dongtai',page,baseParams('dongtai',page));}catch(_e){}return localCategoryFilter(rows,c,true);}");
+    h.push("var feedCache={},controlCache={},discussionPreviewCache={};if(INITIAL_ROWS.discussion&&INITIAL_ROWS.discussion.length)feedCache['dongtai|6|讨论']=INITIAL_ROWS.discussion.slice(0);if(INITIAL_ROWS.discussionPreview&&INITIAL_ROWS.discussionPreview.length)discussionPreviewCache['dongtai|6|讨论']=INITIAL_ROWS.discussionPreview.slice(0);function paneList(tab){var pane=document.getElementById('pane_'+tab);return pane&&pane.querySelector('.feedList');}function cacheKey(tab,label){return tab+'|'+currentSort+'|'+label;}function renderFiltered(tab,rows,label){var list=paneList(tab);if(!list)return;var
+
+-- 5 @151572 --
+ids)circleId=String(t.sum.ids.circleId||circleId||"");
+        absorbMeta(t&&t.raw?t.raw:"");
+        if(!circleId&&t&&t.sum&&t.sum.posts){
+            for(var i=0;i<t.sum.posts.length;i++)if(t.sum.posts[i]&&t.sum.posts[i].circleId){circleId=String(t.sum.posts[i].circleId);break;}
+        }
+        return t;
+    }
+
+    detailOnce({bookId:String(bid),bookType:"1"});
+    if(!circleId)detailOnce({circleId:"0",bookId:String(bid),bookType:"1"});
+    /* beta5.6：不再为“长讨论 JsId”额外串行补拉详情。
+       beta5.4 起动态讨论已经有官方 PostCategoryId=2 短 ID 兜底，
+       保留当前首次详情返回的分类表即可，减少首开一次网络往返。 */
+
+    var cid=String(circleId||"0");
+    function listVariant(variant){
+        var p;
+        if(variant===1){
+            p={pageIndex:"1",subCategoryId:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }else if(variant===2){
+            p={pageIndex:"1",subCategory:"0",circleId:cid,postSortType:"6",postCategoryId:"0",qdBookId:String(bid),qdBookType:"1"};
+        }else{
+            p={pageIndex:"1",subCategory:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }
+        return qfCircleApiCall2970(j,"v1/circle/getcirclepostlist",p);
+    }
+
+    var dyn=null;
+    for(var v=0;v<3;v++){
+        var t=listVariant(v),rows=t&&t.sum&&t.sum.posts?t.sum.posts:[];
+        if(rows.length){dyn=t;break;}
+    }
+    if(dyn){
+        tabs.dongtai=dyn.sum.posts||[];
+        totals.dongtai=Number(dyn.sum.total||tabs.dongtai.length)||tabs.dongtai.length;
+        posts=tabs.dongtai.slice(0);
+    }
+
+    /*
+     * v2.9.93：讨论不再在打开书友圈前额外发“预热请求”。
+     * 之前这次网络请求既拖慢首开，也会碰到起点偶发忽略 subCategory 的情况。
+     * 现在直接从已经成功拿到的“动态全部”首屏里，依据帖子自身分类字段筛出
+     * 可确认属于“讨论”的帖子作为零网络预览。用户点击讨论时先秒显这批正确帖子，
+     * 再由 WebView 只做少量网络刷新；即使服务端本次仍异常，也不会再把页面刷成空白。
+     */
+    try{
+        var discussionIds=[],ds=(categoryMeta&&categoryMeta.filterSets&&categoryMeta.filterSets.dongtai)||[];
+        for(var di=0;di<ds.length;di++){
+            var df=ds[di]||{};if(String(df.name||"")!=="讨论")continue;
+            var dcs=Array.isArray(df.candidates)?df.candidates:[];
+            for(var dc=0;dc<dcs.length;dc++){
+                var dco=dcs[dc]||{},a=[String(dco.id||""),String(dco.altId||"")];
+                for(var ai=0;ai<a.length;ai++)if(a[ai]&&discussionIds.indexOf(a[ai])<0)discussionIds.push(a[ai]);
+            }
+        }
+        if(discussionIds.indexOf("2")<0)discussionIds.push("2");
+        var preview=[];
+        for(var pi=0;pi<(tabs.dongtai||[]).length;pi++){
+      
+
+-- 6 @151729 --
+ar i=0;i<t.sum.posts.length;i++)if(t.sum.posts[i]&&t.sum.posts[i].circleId){circleId=String(t.sum.posts[i].circleId);break;}
+        }
+        return t;
+    }
+
+    detailOnce({bookId:String(bid),bookType:"1"});
+    if(!circleId)detailOnce({circleId:"0",bookId:String(bid),bookType:"1"});
+    /* beta5.6：不再为“长讨论 JsId”额外串行补拉详情。
+       beta5.4 起动态讨论已经有官方 PostCategoryId=2 短 ID 兜底，
+       保留当前首次详情返回的分类表即可，减少首开一次网络往返。 */
+
+    var cid=String(circleId||"0");
+    function listVariant(variant){
+        var p;
+        if(variant===1){
+            p={pageIndex:"1",subCategoryId:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }else if(variant===2){
+            p={pageIndex:"1",subCategory:"0",circleId:cid,postSortType:"6",postCategoryId:"0",qdBookId:String(bid),qdBookType:"1"};
+        }else{
+            p={pageIndex:"1",subCategory:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }
+        return qfCircleApiCall2970(j,"v1/circle/getcirclepostlist",p);
+    }
+
+    var dyn=null;
+    for(var v=0;v<3;v++){
+        var t=listVariant(v),rows=t&&t.sum&&t.sum.posts?t.sum.posts:[];
+        if(rows.length){dyn=t;break;}
+    }
+    if(dyn){
+        tabs.dongtai=dyn.sum.posts||[];
+        totals.dongtai=Number(dyn.sum.total||tabs.dongtai.length)||tabs.dongtai.length;
+        posts=tabs.dongtai.slice(0);
+    }
+
+    /*
+     * v2.9.93：讨论不再在打开书友圈前额外发“预热请求”。
+     * 之前这次网络请求既拖慢首开，也会碰到起点偶发忽略 subCategory 的情况。
+     * 现在直接从已经成功拿到的“动态全部”首屏里，依据帖子自身分类字段筛出
+     * 可确认属于“讨论”的帖子作为零网络预览。用户点击讨论时先秒显这批正确帖子，
+     * 再由 WebView 只做少量网络刷新；即使服务端本次仍异常，也不会再把页面刷成空白。
+     */
+    try{
+        var discussionIds=[],ds=(categoryMeta&&categoryMeta.filterSets&&categoryMeta.filterSets.dongtai)||[];
+        for(var di=0;di<ds.length;di++){
+            var df=ds[di]||{};if(String(df.name||"")!=="讨论")continue;
+            var dcs=Array.isArray(df.candidates)?df.candidates:[];
+            for(var dc=0;dc<dcs.length;dc++){
+                var dco=dcs[dc]||{},a=[String(dco.id||""),String(dco.altId||"")];
+                for(var ai=0;ai<a.length;ai++)if(a[ai]&&discussionIds.indexOf(a[ai])<0)discussionIds.push(a[ai]);
+            }
+        }
+        if(discussionIds.indexOf("2")<0)discussionIds.push("2");
+        var preview=[];
+        for(var pi=0;pi<(tabs.dongtai||[]).length;pi++){
+            var po=tabs.dongtai[pi]||{};
+            var vals=[String(po.postCategoryId||po.PostCategoryId||""),String(po.categoryId||po.CategoryId||""),String(po.
+
+-- 7 @151876 --
+rn t;
+    }
+
+    detailOnce({bookId:String(bid),bookType:"1"});
+    if(!circleId)detailOnce({circleId:"0",bookId:String(bid),bookType:"1"});
+    /* beta5.6：不再为“长讨论 JsId”额外串行补拉详情。
+       beta5.4 起动态讨论已经有官方 PostCategoryId=2 短 ID 兜底，
+       保留当前首次详情返回的分类表即可，减少首开一次网络往返。 */
+
+    var cid=String(circleId||"0");
+    function listVariant(variant){
+        var p;
+        if(variant===1){
+            p={pageIndex:"1",subCategoryId:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }else if(variant===2){
+            p={pageIndex:"1",subCategory:"0",circleId:cid,postSortType:"6",postCategoryId:"0",qdBookId:String(bid),qdBookType:"1"};
+        }else{
+            p={pageIndex:"1",subCategory:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }
+        return qfCircleApiCall2970(j,"v1/circle/getcirclepostlist",p);
+    }
+
+    var dyn=null;
+    for(var v=0;v<3;v++){
+        var t=listVariant(v),rows=t&&t.sum&&t.sum.posts?t.sum.posts:[];
+        if(rows.length){dyn=t;break;}
+    }
+    if(dyn){
+        tabs.dongtai=dyn.sum.posts||[];
+        totals.dongtai=Number(dyn.sum.total||tabs.dongtai.length)||tabs.dongtai.length;
+        posts=tabs.dongtai.slice(0);
+    }
+
+    /*
+     * v2.9.93：讨论不再在打开书友圈前额外发“预热请求”。
+     * 之前这次网络请求既拖慢首开，也会碰到起点偶发忽略 subCategory 的情况。
+     * 现在直接从已经成功拿到的“动态全部”首屏里，依据帖子自身分类字段筛出
+     * 可确认属于“讨论”的帖子作为零网络预览。用户点击讨论时先秒显这批正确帖子，
+     * 再由 WebView 只做少量网络刷新；即使服务端本次仍异常，也不会再把页面刷成空白。
+     */
+    try{
+        var discussionIds=[],ds=(categoryMeta&&categoryMeta.filterSets&&categoryMeta.filterSets.dongtai)||[];
+        for(var di=0;di<ds.length;di++){
+            var df=ds[di]||{};if(String(df.name||"")!=="讨论")continue;
+            var dcs=Array.isArray(df.candidates)?df.candidates:[];
+            for(var dc=0;dc<dcs.length;dc++){
+                var dco=dcs[dc]||{},a=[String(dco.id||""),String(dco.altId||"")];
+                for(var ai=0;ai<a.length;ai++)if(a[ai]&&discussionIds.indexOf(a[ai])<0)discussionIds.push(a[ai]);
+            }
+        }
+        if(discussionIds.indexOf("2")<0)discussionIds.push("2");
+        var preview=[];
+        for(var pi=0;pi<(tabs.dongtai||[]).length;pi++){
+            var po=tabs.dongtai[pi]||{};
+            var vals=[String(po.postCategoryId||po.PostCategoryId||""),String(po.categoryId||po.CategoryId||""),String(po.subCategoryId||po.SubCategoryId||po.subCategory||po.SubCategory||"")];
+            var hit=false;
+            for(var vi=0;vi<vals.length&&!hit;vi+
+
+===== OCCURRENCES PageNum =====
+COUNT=0
+
+===== OCCURRENCES pageIndex =====
+COUNT=7
+
+-- 1 @97299 --
+cument.body.style.overflow='';};");
+    h.push("function loadReviewReplies(el,auto){if(!el||el.getAttribute('data-loading')==='1')return;var rid=String(el.getAttribute('data-rid')||'');if(!rid)return;el.setAttribute('data-loading','1');if(!auto){el.style.display='inline-block';el.textContent='正在加载回复…';}var attempts=[{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pageIndex:'1',pageSize:'50',sortType:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,pg:'1',pz:'50',type:'1',sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,pg:'1',pz:'50',sort:'0'}}],rows=[],lastErr='';if(state.detailRoot)rows=qfLinkedReplies(state.detailRoot,rid);for(var i=0;i<attempts.length&&!rows.length;i++){try{var req=signed(attempts[i].path,attempts[i].p),root=parse(ajax(req));rows=qfLinkedReplies(root,rid);if(!rows.length)rows=qfReviewDetailRows(root);if(!rows.length)rows=qfLooseReplyRows(root,rid);}catch(e){lastErr=String(e&&e.message?e.message:e);}}if(rows.length){var old=el.parentNode.querySelector('.subReplies');if(old)old.parentNode.removeChild(old);var box=document.createElement('div');box.className='subReplies';var hh='';for(var j=0;j<rows.length&&j<50;j++)hh+=subReplyHtml(rows[j]);box.innerHTML=hh;el.parentNode.insertBefore(box,el);el.style.display='none';}else{if(!auto){el.style.display='inline-block';el.textContent='暂未获取到回复'+(lastErr?' · '+lastErr:'');}else{el.style.display='none';}el.setAttribute('data-loading','0');}}");
+    h.push("function fetchDetail(reset){if(state.loading)return;state.loading=true;if(reset){state.pg=1;body.innerHTML='<div class=\\\"loading\\\">正在加载起点官方帖子详情…</div>';}try{var dk=state.cid+'|'+state.pid+'|'+state.pg,dc=qfDetailPageCache[dk],root=null;if(dc&&Date.now()-Number(dc.ts||0)<120000){root=dc.root;}else{var req=signed('v1/circle/getpostdetail',{circleId:state.cid,postId:state.pid,pg:String(state.pg),pz:'20',sort:'0'});root=parse
+
+-- 2 @118686 --
+fSeedPreviewRows(INITIAL_ROWS.tongren);qfSeedPreviewRows(INITIAL_ROWS.discussion);qfSeedPreviewRows(INITIAL_ROWS.discussionPreview);");
+    h.push("function rowPostId(o){o=o||{};return String(o.PostId||o.postId||o.Id||o.id||o.TopicId||o.topicId||'');}function mergeFeedRows(a,b){a=Array.isArray(a)?a:[];b=Array.isArray(b)?b:[];var out=[],seen={};function add(o){var id=rowPostId(o),k=id||String(o.title||o.Title||'')+'|'+String(o.body||o.Body||o.Content||'').slice(0,80);if(k&&seen[k])return;if(k)seen[k]=1;out.push(o);}for(var i=0;i<a.length;i++)add(a[i]);for(var j=0;j<b.length;j++)add(b[j]);return out;}");
+    h.push("function baseParams(tab,page){var top=TOP_META[tab]||TOP_META.dongtai;return {pageIndex:String(page||1),subCategory:'0',circleId:CIRCLE_ID,sortType:String(currentSort),postCategoryId:String(top.id||'0'),bookId:BOOK_ID,bookType:'1'};}");
+    h.push("function topRequest(tab,page,params){var p=params||baseParams(tab,page),rows=qfCachedList(p);if(rows.length)return rows.slice(0);var q={pageIndex:String(page||1),subCategory:String(p.subCategory!=null?p.subCategory:(p.subCategoryId!=null?p.subCategoryId:'0')),circleId:CIRCLE_ID,postSortType:String(currentSort),postCategoryId:String(p.postCategoryId||'0'),qdBookId:BOOK_ID,qdBookType:'1'};if(p.categoryId!=null)q.categoryId=String(p.categoryId);if(p.subCategoryId!=null)q.subCategoryId=String(p.subCategoryId);if(p.isJinghua!=null)q.isJinghua=String(p.isJinghua);if(p.isGodReview!=null)q.isGodReview=String(p.isGodReview);return qfCachedList(q).slice(0);}");
+    h.push("function discussionSingle(c,phase){var p=applyCandidate(baseParams('dongtai',1),c||{});if(Number(phase)===1){var q={pageIndex:'1',subCategory:String(p.subCategory!=null?p.subCategory:(p.subCategoryId!=null?p.subCategoryId:'0')),circleId:CIRCLE_ID,postSortType:String(currentSort),postCategoryId:String(p.postCategoryId||'0'),qdBookId:BOOK_ID,qdBookType:'1'};if(p.categoryId!=null)q.categoryId=String(p.categoryId);if(p.subCategoryId!=null)q.subCategoryId=String(p.subCategoryId);return (listRequest(q).rows||[]);}return (listRequest(p).rows||[]);}");
+    h.push("function discussionAccept(rows,c){rows=Array.isArray(rows)?rows:[];if(!rows.length)return [];var local=localCategoryFilter(rows,c,true);if(local.length)return local;var all=INITIAL_ROWS.dongtai||[],rf=feedFingerprint(rows),af=feedFingerprint(all);if(!all.length||!af||rf!==af)return rows;return [];}function discussionPreview(c){var key=cacheKey('dongtai','讨论'),p=discussionPreviewCache[key];if
+
+-- 3 @118993 --
+ray.isArray(b)?b:[];var out=[],seen={};function add(o){var id=rowPostId(o),k=id||String(o.title||o.Title||'')+'|'+String(o.body||o.Body||o.Content||'').slice(0,80);if(k&&seen[k])return;if(k)seen[k]=1;out.push(o);}for(var i=0;i<a.length;i++)add(a[i]);for(var j=0;j<b.length;j++)add(b[j]);return out;}");
+    h.push("function baseParams(tab,page){var top=TOP_META[tab]||TOP_META.dongtai;return {pageIndex:String(page||1),subCategory:'0',circleId:CIRCLE_ID,sortType:String(currentSort),postCategoryId:String(top.id||'0'),bookId:BOOK_ID,bookType:'1'};}");
+    h.push("function topRequest(tab,page,params){var p=params||baseParams(tab,page),rows=qfCachedList(p);if(rows.length)return rows.slice(0);var q={pageIndex:String(page||1),subCategory:String(p.subCategory!=null?p.subCategory:(p.subCategoryId!=null?p.subCategoryId:'0')),circleId:CIRCLE_ID,postSortType:String(currentSort),postCategoryId:String(p.postCategoryId||'0'),qdBookId:BOOK_ID,qdBookType:'1'};if(p.categoryId!=null)q.categoryId=String(p.categoryId);if(p.subCategoryId!=null)q.subCategoryId=String(p.subCategoryId);if(p.isJinghua!=null)q.isJinghua=String(p.isJinghua);if(p.isGodReview!=null)q.isGodReview=String(p.isGodReview);return qfCachedList(q).slice(0);}");
+    h.push("function discussionSingle(c,phase){var p=applyCandidate(baseParams('dongtai',1),c||{});if(Number(phase)===1){var q={pageIndex:'1',subCategory:String(p.subCategory!=null?p.subCategory:(p.subCategoryId!=null?p.subCategoryId:'0')),circleId:CIRCLE_ID,postSortType:String(currentSort),postCategoryId:String(p.postCategoryId||'0'),qdBookId:BOOK_ID,qdBookType:'1'};if(p.categoryId!=null)q.categoryId=String(p.categoryId);if(p.subCategoryId!=null)q.subCategoryId=String(p.subCategoryId);return (listRequest(q).rows||[]);}return (listRequest(p).rows||[]);}");
+    h.push("function discussionAccept(rows,c){rows=Array.isArray(rows)?rows:[];if(!rows.length)return [];var local=localCategoryFilter(rows,c,true);if(local.length)return local;var all=INITIAL_ROWS.dongtai||[],rf=feedFingerprint(rows),af=feedFingerprint(all);if(!all.length||!af||rf!==af)return rows;return [];}function discussionPreview(c){var key=cacheKey('dongtai','讨论'),p=discussionPreviewCache[key];if(p&&p.length)return p.slice(0);var local=localCategoryFilter(INITIAL_ROWS.dongtai||[],c,true);if(local.length){discussionPreviewCache[key]=local.slice(0);return local;}return [];}function discussionAllPageFallback(c,page){var rows=[];try{rows=topRequest('dongtai',page,baseParams('dongtai',page));}catch(_e)
+
+-- 4 @119645 --
+t(p);if(rows.length)return rows.slice(0);var q={pageIndex:String(page||1),subCategory:String(p.subCategory!=null?p.subCategory:(p.subCategoryId!=null?p.subCategoryId:'0')),circleId:CIRCLE_ID,postSortType:String(currentSort),postCategoryId:String(p.postCategoryId||'0'),qdBookId:BOOK_ID,qdBookType:'1'};if(p.categoryId!=null)q.categoryId=String(p.categoryId);if(p.subCategoryId!=null)q.subCategoryId=String(p.subCategoryId);if(p.isJinghua!=null)q.isJinghua=String(p.isJinghua);if(p.isGodReview!=null)q.isGodReview=String(p.isGodReview);return qfCachedList(q).slice(0);}");
+    h.push("function discussionSingle(c,phase){var p=applyCandidate(baseParams('dongtai',1),c||{});if(Number(phase)===1){var q={pageIndex:'1',subCategory:String(p.subCategory!=null?p.subCategory:(p.subCategoryId!=null?p.subCategoryId:'0')),circleId:CIRCLE_ID,postSortType:String(currentSort),postCategoryId:String(p.postCategoryId||'0'),qdBookId:BOOK_ID,qdBookType:'1'};if(p.categoryId!=null)q.categoryId=String(p.categoryId);if(p.subCategoryId!=null)q.subCategoryId=String(p.subCategoryId);return (listRequest(q).rows||[]);}return (listRequest(p).rows||[]);}");
+    h.push("function discussionAccept(rows,c){rows=Array.isArray(rows)?rows:[];if(!rows.length)return [];var local=localCategoryFilter(rows,c,true);if(local.length)return local;var all=INITIAL_ROWS.dongtai||[],rf=feedFingerprint(rows),af=feedFingerprint(all);if(!all.length||!af||rf!==af)return rows;return [];}function discussionPreview(c){var key=cacheKey('dongtai','讨论'),p=discussionPreviewCache[key];if(p&&p.length)return p.slice(0);var local=localCategoryFilter(INITIAL_ROWS.dongtai||[],c,true);if(local.length){discussionPreviewCache[key]=local.slice(0);return local;}return [];}function discussionAllPageFallback(c,page){var rows=[];try{rows=topRequest('dongtai',page,baseParams('dongtai',page));}catch(_e){}return localCategoryFilter(rows,c,true);}");
+    h.push("var feedCache={},controlCache={},discussionPreviewCache={};if(INITIAL_ROWS.discussion&&INITIAL_ROWS.discussion.length)feedCache['dongtai|6|讨论']=INITIAL_ROWS.discussion.slice(0);if(INITIAL_ROWS.discussionPreview&&INITIAL_ROWS.discussionPreview.length)discussionPreviewCache['dongtai|6|讨论']=INITIAL_ROWS.discussionPreview.slice(0);function paneList(tab){var pane=document.getElementById('pane_'+tab);return pane&&pane.querySelector('.feedList');}function cacheKey(tab,label){return tab+'|'+currentSort+'|'+label;}function renderFiltered(tab,rows,label){var list=paneList(tab);if(!list)return;var
+
+-- 5 @151572 --
+ids)circleId=String(t.sum.ids.circleId||circleId||"");
+        absorbMeta(t&&t.raw?t.raw:"");
+        if(!circleId&&t&&t.sum&&t.sum.posts){
+            for(var i=0;i<t.sum.posts.length;i++)if(t.sum.posts[i]&&t.sum.posts[i].circleId){circleId=String(t.sum.posts[i].circleId);break;}
+        }
+        return t;
+    }
+
+    detailOnce({bookId:String(bid),bookType:"1"});
+    if(!circleId)detailOnce({circleId:"0",bookId:String(bid),bookType:"1"});
+    /* beta5.6：不再为“长讨论 JsId”额外串行补拉详情。
+       beta5.4 起动态讨论已经有官方 PostCategoryId=2 短 ID 兜底，
+       保留当前首次详情返回的分类表即可，减少首开一次网络往返。 */
+
+    var cid=String(circleId||"0");
+    function listVariant(variant){
+        var p;
+        if(variant===1){
+            p={pageIndex:"1",subCategoryId:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }else if(variant===2){
+            p={pageIndex:"1",subCategory:"0",circleId:cid,postSortType:"6",postCategoryId:"0",qdBookId:String(bid),qdBookType:"1"};
+        }else{
+            p={pageIndex:"1",subCategory:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }
+        return qfCircleApiCall2970(j,"v1/circle/getcirclepostlist",p);
+    }
+
+    var dyn=null;
+    for(var v=0;v<3;v++){
+        var t=listVariant(v),rows=t&&t.sum&&t.sum.posts?t.sum.posts:[];
+        if(rows.length){dyn=t;break;}
+    }
+    if(dyn){
+        tabs.dongtai=dyn.sum.posts||[];
+        totals.dongtai=Number(dyn.sum.total||tabs.dongtai.length)||tabs.dongtai.length;
+        posts=tabs.dongtai.slice(0);
+    }
+
+    /*
+     * v2.9.93：讨论不再在打开书友圈前额外发“预热请求”。
+     * 之前这次网络请求既拖慢首开，也会碰到起点偶发忽略 subCategory 的情况。
+     * 现在直接从已经成功拿到的“动态全部”首屏里，依据帖子自身分类字段筛出
+     * 可确认属于“讨论”的帖子作为零网络预览。用户点击讨论时先秒显这批正确帖子，
+     * 再由 WebView 只做少量网络刷新；即使服务端本次仍异常，也不会再把页面刷成空白。
+     */
+    try{
+        var discussionIds=[],ds=(categoryMeta&&categoryMeta.filterSets&&categoryMeta.filterSets.dongtai)||[];
+        for(var di=0;di<ds.length;di++){
+            var df=ds[di]||{};if(String(df.name||"")!=="讨论")continue;
+            var dcs=Array.isArray(df.candidates)?df.candidates:[];
+            for(var dc=0;dc<dcs.length;dc++){
+                var dco=dcs[dc]||{},a=[String(dco.id||""),String(dco.altId||"")];
+                for(var ai=0;ai<a.length;ai++)if(a[ai]&&discussionIds.indexOf(a[ai])<0)discussionIds.push(a[ai]);
+            }
+        }
+        if(discussionIds.indexOf("2")<0)discussionIds.push("2");
+        var preview=[];
+        for(var pi=0;pi<(tabs.dongtai||[]).length;pi++){
+      
+
+-- 6 @151729 --
+ar i=0;i<t.sum.posts.length;i++)if(t.sum.posts[i]&&t.sum.posts[i].circleId){circleId=String(t.sum.posts[i].circleId);break;}
+        }
+        return t;
+    }
+
+    detailOnce({bookId:String(bid),bookType:"1"});
+    if(!circleId)detailOnce({circleId:"0",bookId:String(bid),bookType:"1"});
+    /* beta5.6：不再为“长讨论 JsId”额外串行补拉详情。
+       beta5.4 起动态讨论已经有官方 PostCategoryId=2 短 ID 兜底，
+       保留当前首次详情返回的分类表即可，减少首开一次网络往返。 */
+
+    var cid=String(circleId||"0");
+    function listVariant(variant){
+        var p;
+        if(variant===1){
+            p={pageIndex:"1",subCategoryId:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }else if(variant===2){
+            p={pageIndex:"1",subCategory:"0",circleId:cid,postSortType:"6",postCategoryId:"0",qdBookId:String(bid),qdBookType:"1"};
+        }else{
+            p={pageIndex:"1",subCategory:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }
+        return qfCircleApiCall2970(j,"v1/circle/getcirclepostlist",p);
+    }
+
+    var dyn=null;
+    for(var v=0;v<3;v++){
+        var t=listVariant(v),rows=t&&t.sum&&t.sum.posts?t.sum.posts:[];
+        if(rows.length){dyn=t;break;}
+    }
+    if(dyn){
+        tabs.dongtai=dyn.sum.posts||[];
+        totals.dongtai=Number(dyn.sum.total||tabs.dongtai.length)||tabs.dongtai.length;
+        posts=tabs.dongtai.slice(0);
+    }
+
+    /*
+     * v2.9.93：讨论不再在打开书友圈前额外发“预热请求”。
+     * 之前这次网络请求既拖慢首开，也会碰到起点偶发忽略 subCategory 的情况。
+     * 现在直接从已经成功拿到的“动态全部”首屏里，依据帖子自身分类字段筛出
+     * 可确认属于“讨论”的帖子作为零网络预览。用户点击讨论时先秒显这批正确帖子，
+     * 再由 WebView 只做少量网络刷新；即使服务端本次仍异常，也不会再把页面刷成空白。
+     */
+    try{
+        var discussionIds=[],ds=(categoryMeta&&categoryMeta.filterSets&&categoryMeta.filterSets.dongtai)||[];
+        for(var di=0;di<ds.length;di++){
+            var df=ds[di]||{};if(String(df.name||"")!=="讨论")continue;
+            var dcs=Array.isArray(df.candidates)?df.candidates:[];
+            for(var dc=0;dc<dcs.length;dc++){
+                var dco=dcs[dc]||{},a=[String(dco.id||""),String(dco.altId||"")];
+                for(var ai=0;ai<a.length;ai++)if(a[ai]&&discussionIds.indexOf(a[ai])<0)discussionIds.push(a[ai]);
+            }
+        }
+        if(discussionIds.indexOf("2")<0)discussionIds.push("2");
+        var preview=[];
+        for(var pi=0;pi<(tabs.dongtai||[]).length;pi++){
+            var po=tabs.dongtai[pi]||{};
+            var vals=[String(po.postCategoryId||po.PostCategoryId||""),String(po.categoryId||po.CategoryId||""),String(po.
+
+-- 7 @151876 --
+rn t;
+    }
+
+    detailOnce({bookId:String(bid),bookType:"1"});
+    if(!circleId)detailOnce({circleId:"0",bookId:String(bid),bookType:"1"});
+    /* beta5.6：不再为“长讨论 JsId”额外串行补拉详情。
+       beta5.4 起动态讨论已经有官方 PostCategoryId=2 短 ID 兜底，
+       保留当前首次详情返回的分类表即可，减少首开一次网络往返。 */
+
+    var cid=String(circleId||"0");
+    function listVariant(variant){
+        var p;
+        if(variant===1){
+            p={pageIndex:"1",subCategoryId:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }else if(variant===2){
+            p={pageIndex:"1",subCategory:"0",circleId:cid,postSortType:"6",postCategoryId:"0",qdBookId:String(bid),qdBookType:"1"};
+        }else{
+            p={pageIndex:"1",subCategory:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }
+        return qfCircleApiCall2970(j,"v1/circle/getcirclepostlist",p);
+    }
+
+    var dyn=null;
+    for(var v=0;v<3;v++){
+        var t=listVariant(v),rows=t&&t.sum&&t.sum.posts?t.sum.posts:[];
+        if(rows.length){dyn=t;break;}
+    }
+    if(dyn){
+        tabs.dongtai=dyn.sum.posts||[];
+        totals.dongtai=Number(dyn.sum.total||tabs.dongtai.length)||tabs.dongtai.length;
+        posts=tabs.dongtai.slice(0);
+    }
+
+    /*
+     * v2.9.93：讨论不再在打开书友圈前额外发“预热请求”。
+     * 之前这次网络请求既拖慢首开，也会碰到起点偶发忽略 subCategory 的情况。
+     * 现在直接从已经成功拿到的“动态全部”首屏里，依据帖子自身分类字段筛出
+     * 可确认属于“讨论”的帖子作为零网络预览。用户点击讨论时先秒显这批正确帖子，
+     * 再由 WebView 只做少量网络刷新；即使服务端本次仍异常，也不会再把页面刷成空白。
+     */
+    try{
+        var discussionIds=[],ds=(categoryMeta&&categoryMeta.filterSets&&categoryMeta.filterSets.dongtai)||[];
+        for(var di=0;di<ds.length;di++){
+            var df=ds[di]||{};if(String(df.name||"")!=="讨论")continue;
+            var dcs=Array.isArray(df.candidates)?df.candidates:[];
+            for(var dc=0;dc<dcs.length;dc++){
+                var dco=dcs[dc]||{},a=[String(dco.id||""),String(dco.altId||"")];
+                for(var ai=0;ai<a.length;ai++)if(a[ai]&&discussionIds.indexOf(a[ai])<0)discussionIds.push(a[ai]);
+            }
+        }
+        if(discussionIds.indexOf("2")<0)discussionIds.push("2");
+        var preview=[];
+        for(var pi=0;pi<(tabs.dongtai||[]).length;pi++){
+            var po=tabs.dongtai[pi]||{};
+            var vals=[String(po.postCategoryId||po.PostCategoryId||""),String(po.categoryId||po.CategoryId||""),String(po.subCategoryId||po.SubCategoryId||po.subCategory||po.SubCategory||"")];
+            var hit=false;
+            for(var vi=0;vi<vals.length&&!hit;vi+
+
+===== OCCURRENCES pageNum =====
+COUNT=0
+
+===== OCCURRENCES PageSize =====
+COUNT=1
+
+-- 1 @97313 --
+yle.overflow='';};");
+    h.push("function loadReviewReplies(el,auto){if(!el||el.getAttribute('data-loading')==='1')return;var rid=String(el.getAttribute('data-rid')||'');if(!rid)return;el.setAttribute('data-loading','1');if(!auto){el.style.display='inline-block';el.textContent='正在加载回复…';}var attempts=[{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pageIndex:'1',pageSize:'50',sortType:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,pg:'1',pz:'50',type:'1',sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,pg:'1',pz:'50',sort:'0'}}],rows=[],lastErr='';if(state.detailRoot)rows=qfLinkedReplies(state.detailRoot,rid);for(var i=0;i<attempts.length&&!rows.length;i++){try{var req=signed(attempts[i].path,attempts[i].p),root=parse(ajax(req));rows=qfLinkedReplies(root,rid);if(!rows.length)rows=qfReviewDetailRows(root);if(!rows.length)rows=qfLooseReplyRows(root,rid);}catch(e){lastErr=String(e&&e.message?e.message:e);}}if(rows.length){var old=el.parentNode.querySelector('.subReplies');if(old)old.parentNode.removeChild(old);var box=document.createElement('div');box.className='subReplies';var hh='';for(var j=0;j<rows.length&&j<50;j++)hh+=subReplyHtml(rows[j]);box.innerHTML=hh;el.parentNode.insertBefore(box,el);el.style.display='none';}else{if(!auto){el.style.display='inline-block';el.textContent='暂未获取到回复'+(lastErr?' · '+lastErr:'');}else{el.style.display='none';}el.setAttribute('data-loading','0');}}");
+    h.push("function fetchDetail(reset){if(state.loading)return;state.loading=true;if(reset){state.pg=1;body.innerHTML='<div class=\\\"loading\\\">正在加载起点官方帖子详情…</div>';}try{var dk=state.cid+'|'+state.pid+'|'+state.pg,dc=qfDetailPageCache[dk],root=null;if(dc&&Date.now()-Number(dc.ts||0)<120000){root=dc.root;}else{var req=signed('v1/circle/getpostdetail',{circleId:state.cid,postId:state.pid,pg:String(state.pg),pz:'20',sort:'0'});root=parse(ajax(req));qf
+
+===== OCCURRENCES pageSize =====
+COUNT=1
+
+-- 1 @97313 --
+yle.overflow='';};");
+    h.push("function loadReviewReplies(el,auto){if(!el||el.getAttribute('data-loading')==='1')return;var rid=String(el.getAttribute('data-rid')||'');if(!rid)return;el.setAttribute('data-loading','1');if(!auto){el.style.display='inline-block';el.textContent='正在加载回复…';}var attempts=[{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pageIndex:'1',pageSize:'50',sortType:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,pg:'1',pz:'50',type:'1',sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,pg:'1',pz:'50',sort:'0'}}],rows=[],lastErr='';if(state.detailRoot)rows=qfLinkedReplies(state.detailRoot,rid);for(var i=0;i<attempts.length&&!rows.length;i++){try{var req=signed(attempts[i].path,attempts[i].p),root=parse(ajax(req));rows=qfLinkedReplies(root,rid);if(!rows.length)rows=qfReviewDetailRows(root);if(!rows.length)rows=qfLooseReplyRows(root,rid);}catch(e){lastErr=String(e&&e.message?e.message:e);}}if(rows.length){var old=el.parentNode.querySelector('.subReplies');if(old)old.parentNode.removeChild(old);var box=document.createElement('div');box.className='subReplies';var hh='';for(var j=0;j<rows.length&&j<50;j++)hh+=subReplyHtml(rows[j]);box.innerHTML=hh;el.parentNode.insertBefore(box,el);el.style.display='none';}else{if(!auto){el.style.display='inline-block';el.textContent='暂未获取到回复'+(lastErr?' · '+lastErr:'');}else{el.style.display='none';}el.setAttribute('data-loading','0');}}");
+    h.push("function fetchDetail(reset){if(state.loading)return;state.loading=true;if(reset){state.pg=1;body.innerHTML='<div class=\\\"loading\\\">正在加载起点官方帖子详情…</div>';}try{var dk=state.cid+'|'+state.pid+'|'+state.pg,dc=qfDetailPageCache[dk],root=null;if(dc&&Date.now()-Number(dc.ts||0)<120000){root=dc.root;}else{var req=signed('v1/circle/getpostdetail',{circleId:state.cid,postId:state.pid,pg:String(state.pg),pz:'20',sort:'0'});root=parse(ajax(req));qf
+
+===== OCCURRENCES qfPostOpen =====
+COUNT=10
+
+-- 1 @72886 --
+id"+pc+"'>"];
+                        for(var px=0;px<pis.length;px++)if(/^https?:\/\//i.test(String(pis[px]||"")))ph.push("<img src='"+E(pis[px])+"' referrerpolicy='no-referrer' loading='lazy' decoding='async' fetchpriority='low'>");
+                        ph.push("</div>");h.push(ph.join(""));
+                    }
+                }
+                if(p.time)ms.push(p.time);
+                if(p.reply!=="")ms.push("💬 "+p.reply);
+                if(p.like!=="")ms.push("♡ "+p.like);
+                h.push("<div class='postFoot'>"+(ms.length?"<div class='meta'>"+E(ms.join("　"))+"</div>":"<div class='meta'></div>"));
+                if((p.circleId||circleId)&&p.postId)h.push("<span class='go qfPostOpen' role='button' tabindex='0' data-cid='"+E(String(p.circleId||circleId))+"' data-pid='"+E(String(p.postId))+"' data-img='"+E(String(p.image||""))+"'>查看详情 ›</span>");
+                h.push("</div></article>");
+            }
+        }else{
+            h.push("<div class='feedLoading'><div class='spinMini'></div>首次进入时按需加载</div>");
+        }
+        h.push("</div></main>");
+    }
+    for(var g=0;g<groups.length;g++)renderPane(groups[g],g);
+
+    h.push("<section id='detail'><div class='dHead'><button class='back' id='dBack'>‹</button><div class='dTitle'>帖子详情</div></div><div id='detailBody'><div class='loading'><div class='spin'></div>正在加载帖子详情…</div></div></section>");
+
+    h.push("<script>(function(){");
+    h.push("var BOOK_ID="+JSON.stringify(String(bid))+",CIRCLE_ID="+JSON.stringify(String(circleId||""))+";");
+    h.push("var SIGN_KEY='{1dYgqE)h9,R)hKqEcv4]k[h',SIGN_IV='01234567',INFO_KEY='0821CAAD409B84020821CAAD',INFO_IV='\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000';");
+
+    h.push("function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\\\"/g,'&quot;').replace(/'/g,'&#39;');}");
+    h.push("var QF_FACE={1:'👏',2:'🌹',3:'🤝',4:'😁',5:'😄',6:'🥺',7:'🙂',8:'😏',9:'😙',10:'👆🏻🐽',11:'🙄',12:'😭',13:'😵',14:'😥',15:'🖕🏻',16:'🥵',17:'😓',18:'🤫',19:'😂',20:'😢',21:'😍',22:'🤕🔨',23:'😑',24:'😫',25:'🤗',26:'🤪',27:'🙏',28:'😣',29:'💪',30:'💀',31:'😳',32:'😎',33:'🤭',34:'😄👏',35:'👍🏻',36:'🤓',37:'😡',38:'🙁',39:'😄❓',40:'😞',41:'😧',42:'💋',43:'☺️',44:'🤬',45:'😴',46:'🤠🚬',47:'😱',48:'🐷',49:'😪',50:'🤐',51:'🥴',52:'🌙',53:'❤️',54:'🔪',55:'🎁',56:'💔',57:'👊🏻',58:'😒',59:'✌🏻️',60:'😮',61:'🤨',62:'😴',63:'👏🏻',64:'🐲',65:'⭐',66:'🌧️',67:'🍉',68:'🍵',69:'🔥',70:'💯'};function faceText(s){s=String(s==null?'':s).replace(/&\\[fn=\\$1\\]b\\[fn=\\$1\\]p;/ig,' ').rep
+
+-- 2 @101518 --
+n.length>=total){btn.style.display='none';}else{btn.style.display='block';btn.onclick=function(){state.pg++;fetchDetail(false);};}}}catch(e){body.innerHTML='<div class=\\\"err\\\">帖子详情加载失败：'+esc(e&&e.message?e.message:e)+'</div>';}state.loading=false;}");
+    h.push("var qfDetailScrollTimer=0;detail.addEventListener('scroll',function(){if(qfDetailScrollTimer||state.loading)return;qfDetailScrollTimer=setTimeout(function(){qfDetailScrollTimer=0;var btn=document.getElementById('moreBtn');if(!btn||btn.style.display==='none')return;if(detail.scrollTop+detail.clientHeight>=detail.scrollHeight-420){state.pg++;fetchDetail(false);}},100);},{passive:true});");
+    h.push("var qfPostTouchAt=0;function qfPostOpenNode(t){while(t&&t!==document){if(t.classList&&t.classList.contains('qfPostOpen'))return t;t=t.parentNode;}return null;}function qfOpenPost(el,ev){if(!el)return;try{if(ev&&ev.preventDefault)ev.preventDefault();if(ev&&ev.stopPropagation)ev.stopPropagation();}catch(_ev){}state.cid=String(el.getAttribute('data-cid')||CIRCLE_ID);state.pid=String(el.getAttribute('data-pid')||'');if(!state.pid){try{window.java.toast('帖子ID为空，无法打开详情');}catch(_id){}return;}var pim=qfNormUrl(el.getAttribute('data-img')||''),pims=[];try{pims=(qfPostPreviewImgs&&qfPostPreviewImgs[state.pid])?qfPostPreviewImgs[state.pid].slice(0,9):[];}catch(_pm){}if(!Array.isArray(pims))pims=[];var pic=[],pis={};for(var px=0;px<pims.length&&pic.length<9;px++){var pu=qfNormUrl(pims[px]);if(/^https?:\\/\\//i.test(pu)&&!pis[pu]){pis[pu]=1;pic.push(pu);}}if(!pic.length&&pim)pic=[pim];state.previewImgs=pic;state.detailRoot=null;state.loading=false;state.pg=1;state.total=0;detail.style.display='block';detail.scrollTop=0;document.body.style.overflow='hidden';body.innerHTML='<div class=\\\"loading\\\"><div class=\\\"spin\\\"></div>正在加载帖子详情…</div>';setTimeout(function(){fetchDetail(true);},20);}function qfPostOpenEvent(ev){var el=qfPostOpenNode(ev&&ev.target);if(!el)return;var now=Date.now();if(ev.type==='click'&&now-qfPostTouchAt<700){try{ev.preventDefault();ev.stopPropagation();}catch(_d){}return;}if(ev.type==='touchend')qfPostTouchAt=now;qfOpenPost(el,ev);}function bindPostOpens(root){root=root||document;var opens=root.querySelectorAll('.qfPostOpen');for(var oi=0;oi<opens.length;oi++){opens[oi].setAttribute('role','button');opens[oi].setAttribute('tabindex','0');}}document.addEventListener('touchend',qfPostOpenEvent,true);document.addEventListener('click',qfPostOpenEvent,true);document.addEventListener('keydown
+
+-- 3 @101597 --
+nclick=function(){state.pg++;fetchDetail(false);};}}}catch(e){body.innerHTML='<div class=\\\"err\\\">帖子详情加载失败：'+esc(e&&e.message?e.message:e)+'</div>';}state.loading=false;}");
+    h.push("var qfDetailScrollTimer=0;detail.addEventListener('scroll',function(){if(qfDetailScrollTimer||state.loading)return;qfDetailScrollTimer=setTimeout(function(){qfDetailScrollTimer=0;var btn=document.getElementById('moreBtn');if(!btn||btn.style.display==='none')return;if(detail.scrollTop+detail.clientHeight>=detail.scrollHeight-420){state.pg++;fetchDetail(false);}},100);},{passive:true});");
+    h.push("var qfPostTouchAt=0;function qfPostOpenNode(t){while(t&&t!==document){if(t.classList&&t.classList.contains('qfPostOpen'))return t;t=t.parentNode;}return null;}function qfOpenPost(el,ev){if(!el)return;try{if(ev&&ev.preventDefault)ev.preventDefault();if(ev&&ev.stopPropagation)ev.stopPropagation();}catch(_ev){}state.cid=String(el.getAttribute('data-cid')||CIRCLE_ID);state.pid=String(el.getAttribute('data-pid')||'');if(!state.pid){try{window.java.toast('帖子ID为空，无法打开详情');}catch(_id){}return;}var pim=qfNormUrl(el.getAttribute('data-img')||''),pims=[];try{pims=(qfPostPreviewImgs&&qfPostPreviewImgs[state.pid])?qfPostPreviewImgs[state.pid].slice(0,9):[];}catch(_pm){}if(!Array.isArray(pims))pims=[];var pic=[],pis={};for(var px=0;px<pims.length&&pic.length<9;px++){var pu=qfNormUrl(pims[px]);if(/^https?:\\/\\//i.test(pu)&&!pis[pu]){pis[pu]=1;pic.push(pu);}}if(!pic.length&&pim)pic=[pim];state.previewImgs=pic;state.detailRoot=null;state.loading=false;state.pg=1;state.total=0;detail.style.display='block';detail.scrollTop=0;document.body.style.overflow='hidden';body.innerHTML='<div class=\\\"loading\\\"><div class=\\\"spin\\\"></div>正在加载帖子详情…</div>';setTimeout(function(){fetchDetail(true);},20);}function qfPostOpenEvent(ev){var el=qfPostOpenNode(ev&&ev.target);if(!el)return;var now=Date.now();if(ev.type==='click'&&now-qfPostTouchAt<700){try{ev.preventDefault();ev.stopPropagation();}catch(_d){}return;}if(ev.type==='touchend')qfPostTouchAt=now;qfOpenPost(el,ev);}function bindPostOpens(root){root=root||document;var opens=root.querySelectorAll('.qfPostOpen');for(var oi=0;oi<opens.length;oi++){opens[oi].setAttribute('role','button');opens[oi].setAttribute('tabindex','0');}}document.addEventListener('touchend',qfPostOpenEvent,true);document.addEventListener('click',qfPostOpenEvent,true);document.addEventListener('keydown',function(ev){var el=qfPostOpenNode(ev&&ev.target),k=String(ev&&ev.key||'');if
+
+-- 4 @102696 --
+l(el.getAttribute('data-img')||''),pims=[];try{pims=(qfPostPreviewImgs&&qfPostPreviewImgs[state.pid])?qfPostPreviewImgs[state.pid].slice(0,9):[];}catch(_pm){}if(!Array.isArray(pims))pims=[];var pic=[],pis={};for(var px=0;px<pims.length&&pic.length<9;px++){var pu=qfNormUrl(pims[px]);if(/^https?:\\/\\//i.test(pu)&&!pis[pu]){pis[pu]=1;pic.push(pu);}}if(!pic.length&&pim)pic=[pim];state.previewImgs=pic;state.detailRoot=null;state.loading=false;state.pg=1;state.total=0;detail.style.display='block';detail.scrollTop=0;document.body.style.overflow='hidden';body.innerHTML='<div class=\\\"loading\\\"><div class=\\\"spin\\\"></div>正在加载帖子详情…</div>';setTimeout(function(){fetchDetail(true);},20);}function qfPostOpenEvent(ev){var el=qfPostOpenNode(ev&&ev.target);if(!el)return;var now=Date.now();if(ev.type==='click'&&now-qfPostTouchAt<700){try{ev.preventDefault();ev.stopPropagation();}catch(_d){}return;}if(ev.type==='touchend')qfPostTouchAt=now;qfOpenPost(el,ev);}function bindPostOpens(root){root=root||document;var opens=root.querySelectorAll('.qfPostOpen');for(var oi=0;oi<opens.length;oi++){opens[oi].setAttribute('role','button');opens[oi].setAttribute('tabindex','0');}}document.addEventListener('touchend',qfPostOpenEvent,true);document.addEventListener('click',qfPostOpenEvent,true);document.addEventListener('keydown',function(ev){var el=qfPostOpenNode(ev&&ev.target),k=String(ev&&ev.key||'');if(el&&(k==='Enter'||k===' '))qfOpenPost(el,ev);},true);bindPostOpens(document);");
+
+    h.push("function qfFreshVideo(cid,pid,poster,fallback){var vd={url:qfNormUrl(fallback||''),urls:[],poster:qfNormUrl(poster||''),pageUrl:''};function add(u){u=qfNormUrl(u);if(/^https?:\\/\\//i.test(u)&&vd.urls.indexOf(u)<0)vd.urls.push(u);}function adopt(fresh){if(!fresh)return;var old=vd.url,page=vd.pageUrl;vd=fresh;if(!Array.isArray(vd.urls))vd.urls=[];if(old&&vd.urls.indexOf(old)<0)vd.urls.push(old);if(!vd.poster)vd.poster=qfNormUrl(poster||'');if(!vd.pageUrl)vd.pageUrl=page||'';}add(vd.url);if(pid){var page='https://h5.if.qidian.com/h5/share/post/topic?circleId='+encodeURIComponent(String(cid||CIRCLE_ID))+'&postId='+encodeURIComponent(String(pid));vd.pageUrl=page;try{var req=signed('v1/circle/getpostdetail',{circleId:String(cid||CIRCLE_ID),postId:String(pid),pg:'1',pz:'1',sort:'0'}),root0=parse(ajax(req)),d=dataOf(root0),topic=d.TopicData||d.topicData||{},fresh=videoInfo(root0,richOf(topic).raw);if(fresh&&fresh.url)adopt(fresh);}catch(_e){}if(!vd.url){try{var opt={method:'GET',timeout:10000,hea
+
+-- 5 @102723 --
+')||''),pims=[];try{pims=(qfPostPreviewImgs&&qfPostPreviewImgs[state.pid])?qfPostPreviewImgs[state.pid].slice(0,9):[];}catch(_pm){}if(!Array.isArray(pims))pims=[];var pic=[],pis={};for(var px=0;px<pims.length&&pic.length<9;px++){var pu=qfNormUrl(pims[px]);if(/^https?:\\/\\//i.test(pu)&&!pis[pu]){pis[pu]=1;pic.push(pu);}}if(!pic.length&&pim)pic=[pim];state.previewImgs=pic;state.detailRoot=null;state.loading=false;state.pg=1;state.total=0;detail.style.display='block';detail.scrollTop=0;document.body.style.overflow='hidden';body.innerHTML='<div class=\\\"loading\\\"><div class=\\\"spin\\\"></div>正在加载帖子详情…</div>';setTimeout(function(){fetchDetail(true);},20);}function qfPostOpenEvent(ev){var el=qfPostOpenNode(ev&&ev.target);if(!el)return;var now=Date.now();if(ev.type==='click'&&now-qfPostTouchAt<700){try{ev.preventDefault();ev.stopPropagation();}catch(_d){}return;}if(ev.type==='touchend')qfPostTouchAt=now;qfOpenPost(el,ev);}function bindPostOpens(root){root=root||document;var opens=root.querySelectorAll('.qfPostOpen');for(var oi=0;oi<opens.length;oi++){opens[oi].setAttribute('role','button');opens[oi].setAttribute('tabindex','0');}}document.addEventListener('touchend',qfPostOpenEvent,true);document.addEventListener('click',qfPostOpenEvent,true);document.addEventListener('keydown',function(ev){var el=qfPostOpenNode(ev&&ev.target),k=String(ev&&ev.key||'');if(el&&(k==='Enter'||k===' '))qfOpenPost(el,ev);},true);bindPostOpens(document);");
+
+    h.push("function qfFreshVideo(cid,pid,poster,fallback){var vd={url:qfNormUrl(fallback||''),urls:[],poster:qfNormUrl(poster||''),pageUrl:''};function add(u){u=qfNormUrl(u);if(/^https?:\\/\\//i.test(u)&&vd.urls.indexOf(u)<0)vd.urls.push(u);}function adopt(fresh){if(!fresh)return;var old=vd.url,page=vd.pageUrl;vd=fresh;if(!Array.isArray(vd.urls))vd.urls=[];if(old&&vd.urls.indexOf(old)<0)vd.urls.push(old);if(!vd.poster)vd.poster=qfNormUrl(poster||'');if(!vd.pageUrl)vd.pageUrl=page||'';}add(vd.url);if(pid){var page='https://h5.if.qidian.com/h5/share/post/topic?circleId='+encodeURIComponent(String(cid||CIRCLE_ID))+'&postId='+encodeURIComponent(String(pid));vd.pageUrl=page;try{var req=signed('v1/circle/getpostdetail',{circleId:String(cid||CIRCLE_ID),postId:String(pid),pg:'1',pz:'1',sort:'0'}),root0=parse(ajax(req)),d=dataOf(root0),topic=d.TopicData||d.topicData||{},fresh=videoInfo(root0,richOf(topic).raw);if(fresh&&fresh.url)adopt(fresh);}catch(_e){}if(!vd.url){try{var opt={method:'GET',timeout:10000,headers:{'User-Agent':'Mozilla
+
+-- 6 @103040 --
+u);}}if(!pic.length&&pim)pic=[pim];state.previewImgs=pic;state.detailRoot=null;state.loading=false;state.pg=1;state.total=0;detail.style.display='block';detail.scrollTop=0;document.body.style.overflow='hidden';body.innerHTML='<div class=\\\"loading\\\"><div class=\\\"spin\\\"></div>正在加载帖子详情…</div>';setTimeout(function(){fetchDetail(true);},20);}function qfPostOpenEvent(ev){var el=qfPostOpenNode(ev&&ev.target);if(!el)return;var now=Date.now();if(ev.type==='click'&&now-qfPostTouchAt<700){try{ev.preventDefault();ev.stopPropagation();}catch(_d){}return;}if(ev.type==='touchend')qfPostTouchAt=now;qfOpenPost(el,ev);}function bindPostOpens(root){root=root||document;var opens=root.querySelectorAll('.qfPostOpen');for(var oi=0;oi<opens.length;oi++){opens[oi].setAttribute('role','button');opens[oi].setAttribute('tabindex','0');}}document.addEventListener('touchend',qfPostOpenEvent,true);document.addEventListener('click',qfPostOpenEvent,true);document.addEventListener('keydown',function(ev){var el=qfPostOpenNode(ev&&ev.target),k=String(ev&&ev.key||'');if(el&&(k==='Enter'||k===' '))qfOpenPost(el,ev);},true);bindPostOpens(document);");
+
+    h.push("function qfFreshVideo(cid,pid,poster,fallback){var vd={url:qfNormUrl(fallback||''),urls:[],poster:qfNormUrl(poster||''),pageUrl:''};function add(u){u=qfNormUrl(u);if(/^https?:\\/\\//i.test(u)&&vd.urls.indexOf(u)<0)vd.urls.push(u);}function adopt(fresh){if(!fresh)return;var old=vd.url,page=vd.pageUrl;vd=fresh;if(!Array.isArray(vd.urls))vd.urls=[];if(old&&vd.urls.indexOf(old)<0)vd.urls.push(old);if(!vd.poster)vd.poster=qfNormUrl(poster||'');if(!vd.pageUrl)vd.pageUrl=page||'';}add(vd.url);if(pid){var page='https://h5.if.qidian.com/h5/share/post/topic?circleId='+encodeURIComponent(String(cid||CIRCLE_ID))+'&postId='+encodeURIComponent(String(pid));vd.pageUrl=page;try{var req=signed('v1/circle/getpostdetail',{circleId:String(cid||CIRCLE_ID),postId:String(pid),pg:'1',pz:'1',sort:'0'}),root0=parse(ajax(req)),d=dataOf(root0),topic=d.TopicData||d.topicData||{},fresh=videoInfo(root0,richOf(topic).raw);if(fresh&&fresh.url)adopt(fresh);}catch(_e){}if(!vd.url){try{var opt={method:'GET',timeout:10000,headers:{'User-Agent':'Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36','Accept':'text/html,application/xhtml+xml,*/*','Referer':'https://h5.if.qidian.com/'}},raw=String(window.java.ajax(page+','+JSON.stringify(opt))||''),fresh2=videoInfo(raw,raw);if(fresh2&&fresh2.url)adopt(fresh2);}catch(_p){}}vd.pa
+
+-- 7 @103206 --
+Top=0;document.body.style.overflow='hidden';body.innerHTML='<div class=\\\"loading\\\"><div class=\\\"spin\\\"></div>正在加载帖子详情…</div>';setTimeout(function(){fetchDetail(true);},20);}function qfPostOpenEvent(ev){var el=qfPostOpenNode(ev&&ev.target);if(!el)return;var now=Date.now();if(ev.type==='click'&&now-qfPostTouchAt<700){try{ev.preventDefault();ev.stopPropagation();}catch(_d){}return;}if(ev.type==='touchend')qfPostTouchAt=now;qfOpenPost(el,ev);}function bindPostOpens(root){root=root||document;var opens=root.querySelectorAll('.qfPostOpen');for(var oi=0;oi<opens.length;oi++){opens[oi].setAttribute('role','button');opens[oi].setAttribute('tabindex','0');}}document.addEventListener('touchend',qfPostOpenEvent,true);document.addEventListener('click',qfPostOpenEvent,true);document.addEventListener('keydown',function(ev){var el=qfPostOpenNode(ev&&ev.target),k=String(ev&&ev.key||'');if(el&&(k==='Enter'||k===' '))qfOpenPost(el,ev);},true);bindPostOpens(document);");
+
+    h.push("function qfFreshVideo(cid,pid,poster,fallback){var vd={url:qfNormUrl(fallback||''),urls:[],poster:qfNormUrl(poster||''),pageUrl:''};function add(u){u=qfNormUrl(u);if(/^https?:\\/\\//i.test(u)&&vd.urls.indexOf(u)<0)vd.urls.push(u);}function adopt(fresh){if(!fresh)return;var old=vd.url,page=vd.pageUrl;vd=fresh;if(!Array.isArray(vd.urls))vd.urls=[];if(old&&vd.urls.indexOf(old)<0)vd.urls.push(old);if(!vd.poster)vd.poster=qfNormUrl(poster||'');if(!vd.pageUrl)vd.pageUrl=page||'';}add(vd.url);if(pid){var page='https://h5.if.qidian.com/h5/share/post/topic?circleId='+encodeURIComponent(String(cid||CIRCLE_ID))+'&postId='+encodeURIComponent(String(pid));vd.pageUrl=page;try{var req=signed('v1/circle/getpostdetail',{circleId:String(cid||CIRCLE_ID),postId:String(pid),pg:'1',pz:'1',sort:'0'}),root0=parse(ajax(req)),d=dataOf(root0),topic=d.TopicData||d.topicData||{},fresh=videoInfo(root0,richOf(topic).raw);if(fresh&&fresh.url)adopt(fresh);}catch(_e){}if(!vd.url){try{var opt={method:'GET',timeout:10000,headers:{'User-Agent':'Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36','Accept':'text/html,application/xhtml+xml,*/*','Referer':'https://h5.if.qidian.com/'}},raw=String(window.java.ajax(page+','+JSON.stringify(opt))||''),fresh2=videoInfo(raw,raw);if(fresh2&&fresh2.url)adopt(fresh2);}catch(_p){}}vd.pageUrl=page;}if(!Array.isArray(vd.urls))vd.urls=[];add(vd.url);if(!vd.url&&vd.urls.length)vd.url=vd.urls[0];return vd;}\nfunction qfStartVideoBox(box,external){if(!box
+
+-- 8 @103262 --
+ML='<div class=\\\"loading\\\"><div class=\\\"spin\\\"></div>正在加载帖子详情…</div>';setTimeout(function(){fetchDetail(true);},20);}function qfPostOpenEvent(ev){var el=qfPostOpenNode(ev&&ev.target);if(!el)return;var now=Date.now();if(ev.type==='click'&&now-qfPostTouchAt<700){try{ev.preventDefault();ev.stopPropagation();}catch(_d){}return;}if(ev.type==='touchend')qfPostTouchAt=now;qfOpenPost(el,ev);}function bindPostOpens(root){root=root||document;var opens=root.querySelectorAll('.qfPostOpen');for(var oi=0;oi<opens.length;oi++){opens[oi].setAttribute('role','button');opens[oi].setAttribute('tabindex','0');}}document.addEventListener('touchend',qfPostOpenEvent,true);document.addEventListener('click',qfPostOpenEvent,true);document.addEventListener('keydown',function(ev){var el=qfPostOpenNode(ev&&ev.target),k=String(ev&&ev.key||'');if(el&&(k==='Enter'||k===' '))qfOpenPost(el,ev);},true);bindPostOpens(document);");
+
+    h.push("function qfFreshVideo(cid,pid,poster,fallback){var vd={url:qfNormUrl(fallback||''),urls:[],poster:qfNormUrl(poster||''),pageUrl:''};function add(u){u=qfNormUrl(u);if(/^https?:\\/\\//i.test(u)&&vd.urls.indexOf(u)<0)vd.urls.push(u);}function adopt(fresh){if(!fresh)return;var old=vd.url,page=vd.pageUrl;vd=fresh;if(!Array.isArray(vd.urls))vd.urls=[];if(old&&vd.urls.indexOf(old)<0)vd.urls.push(old);if(!vd.poster)vd.poster=qfNormUrl(poster||'');if(!vd.pageUrl)vd.pageUrl=page||'';}add(vd.url);if(pid){var page='https://h5.if.qidian.com/h5/share/post/topic?circleId='+encodeURIComponent(String(cid||CIRCLE_ID))+'&postId='+encodeURIComponent(String(pid));vd.pageUrl=page;try{var req=signed('v1/circle/getpostdetail',{circleId:String(cid||CIRCLE_ID),postId:String(pid),pg:'1',pz:'1',sort:'0'}),root0=parse(ajax(req)),d=dataOf(root0),topic=d.TopicData||d.topicData||{},fresh=videoInfo(root0,richOf(topic).raw);if(fresh&&fresh.url)adopt(fresh);}catch(_e){}if(!vd.url){try{var opt={method:'GET',timeout:10000,headers:{'User-Agent':'Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36','Accept':'text/html,application/xhtml+xml,*/*','Referer':'https://h5.if.qidian.com/'}},raw=String(window.java.ajax(page+','+JSON.stringify(opt))||''),fresh2=videoInfo(raw,raw);if(fresh2&&fresh2.url)adopt(fresh2);}catch(_p){}}vd.pageUrl=page;}if(!Array.isArray(vd.urls))vd.urls=[];add(vd.url);if(!vd.url&&vd.urls.length)vd.url=vd.urls[0];return vd;}\nfunction qfStartVideoBox(box,external){if(!box||box.getAttribute('data-loading')==='1')return;box.setA
+
+-- 9 @103340 --
+setTimeout(function(){fetchDetail(true);},20);}function qfPostOpenEvent(ev){var el=qfPostOpenNode(ev&&ev.target);if(!el)return;var now=Date.now();if(ev.type==='click'&&now-qfPostTouchAt<700){try{ev.preventDefault();ev.stopPropagation();}catch(_d){}return;}if(ev.type==='touchend')qfPostTouchAt=now;qfOpenPost(el,ev);}function bindPostOpens(root){root=root||document;var opens=root.querySelectorAll('.qfPostOpen');for(var oi=0;oi<opens.length;oi++){opens[oi].setAttribute('role','button');opens[oi].setAttribute('tabindex','0');}}document.addEventListener('touchend',qfPostOpenEvent,true);document.addEventListener('click',qfPostOpenEvent,true);document.addEventListener('keydown',function(ev){var el=qfPostOpenNode(ev&&ev.target),k=String(ev&&ev.key||'');if(el&&(k==='Enter'||k===' '))qfOpenPost(el,ev);},true);bindPostOpens(document);");
+
+    h.push("function qfFreshVideo(cid,pid,poster,fallback){var vd={url:qfNormUrl(fallback||''),urls:[],poster:qfNormUrl(poster||''),pageUrl:''};function add(u){u=qfNormUrl(u);if(/^https?:\\/\\//i.test(u)&&vd.urls.indexOf(u)<0)vd.urls.push(u);}function adopt(fresh){if(!fresh)return;var old=vd.url,page=vd.pageUrl;vd=fresh;if(!Array.isArray(vd.urls))vd.urls=[];if(old&&vd.urls.indexOf(old)<0)vd.urls.push(old);if(!vd.poster)vd.poster=qfNormUrl(poster||'');if(!vd.pageUrl)vd.pageUrl=page||'';}add(vd.url);if(pid){var page='https://h5.if.qidian.com/h5/share/post/topic?circleId='+encodeURIComponent(String(cid||CIRCLE_ID))+'&postId='+encodeURIComponent(String(pid));vd.pageUrl=page;try{var req=signed('v1/circle/getpostdetail',{circleId:String(cid||CIRCLE_ID),postId:String(pid),pg:'1',pz:'1',sort:'0'}),root0=parse(ajax(req)),d=dataOf(root0),topic=d.TopicData||d.topicData||{},fresh=videoInfo(root0,richOf(topic).raw);if(fresh&&fresh.url)adopt(fresh);}catch(_e){}if(!vd.url){try{var opt={method:'GET',timeout:10000,headers:{'User-Agent':'Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36','Accept':'text/html,application/xhtml+xml,*/*','Referer':'https://h5.if.qidian.com/'}},raw=String(window.java.ajax(page+','+JSON.stringify(opt))||''),fresh2=videoInfo(raw,raw);if(fresh2&&fresh2.url)adopt(fresh2);}catch(_p){}}vd.pageUrl=page;}if(!Array.isArray(vd.urls))vd.urls=[];add(vd.url);if(!vd.url&&vd.urls.length)vd.url=vd.urls[0];return vd;}\nfunction qfStartVideoBox(box,external){if(!box||box.getAttribute('data-loading')==='1')return;box.setAttribute('data-loading','1');box.classList.add('qfVideoLoading');var cid=Strin
+
+-- 10 @112686 --
+?imgTag(av,'avatar',''):'<span class=\"avatarFb\">'+esc(fb)+'</span>')+'<span class=\"u\">'+esc(nm)+'</span>'+(label&&label!=='全部'?'<span class=\"kindTag\">'+esc(label)+'</span>':'')+'</div>';if(title)r+='<div class=\"t\">'+esc(title)+'</div>';if(bd&&bd!==title)r+='<div class=\"b\">'+esc(bd)+'</div>';if((vd&&vd.url)||(label==='同人视频'&&pid)){if(!vd)vd={url:'',poster:''};if(!vd.poster&&ims.length)vd.poster=ims[0];r+=videoTag(vd,'postVideo',cid,pid);}else if(ims.length)r+=imageGridTag(ims);var ms=[];if(tm)ms.push(tm);if(rp!==''&&rp!=null)ms.push('💬 '+rp);if(lk!==''&&lk!=null)ms.push('♡ '+lk);r+='<div class=\"postFoot\"><div class=\"meta\">'+esc(ms.join('　'))+'</div>';if(pid)r+='<span class=\"go qfPostOpen\" role=\"button\" tabindex=\"0\" data-cid=\"'+esc(cid)+'\" data-pid=\"'+esc(pid)+'\" data-img=\"'+esc(ims.length?ims[0]:'')+'\">查看详情 ›</span>';return r+'</div></article>';}");
+    h.push("var INITIAL_ROWS="+JSON.stringify({
+        dongtai:tabs.dongtai||posts||[],
+        jinghua:tabs.jinghua||[],
+        tongren:tabs.tongren||[],
+        discussion:tabs.discussion||[],
+        discussionPreview:tabs.discussionPreview||[]
+    })+";");
+    h.push("var currentSort='6',currentTab='dongtai';");
+    h.push("var TOP_META="+JSON.stringify({
+        dongtai:{id:"0"},
+        jinghua:{id:"2",essence:true},
+        tongren:{id:"316",parentId:String((categoryMeta.tongren&&categoryMeta.tongren.treePostCategoryId)||"")}
+    })+";");
+    h.push("function feedFingerprint(rows){var a=[];rows=Array.isArray(rows)?rows:[];for(var i=0;i<rows.length&&i<8;i++){var o=rows[i]||{},id=String(o.PostId||o.postId||o.Id||o.id||o.TopicId||o.topicId||'');if(id)a.push(id);else a.push(String(o.Title||o.title||'')+'|'+txt(o.Body||o.body||o.Content||o.content).slice(0,60));}return a.join('||');}");
+    h.push("function qfCatValues(o,keys){o=o||{};var out=[],seen={};function add(v){if(v===undefined||v===null||String(v)==='')return;v=String(v);if(!seen[v]){seen[v]=1;out.push(v);}}var bs=[o,o.PostBasicInfo,o.postBasicInfo,o.PostBasicBean,o.postBasicBean,o.BasicInfo,o.basicInfo,o.PostInfo,o.postInfo,o.TopicInfo,o.topicInfo,o.PostCategoryInfo,o.postCategoryInfo,o.CategoryInfo,o.categoryInfo,o.SubCategoryInfo,o.subCategoryInfo,o.ExtInfo,o.extInfo];for(var b=0;b<bs.length;b++){var x=bs[b];if(!x||typeof x!=='object')continue;for(var k=0;k<keys.length;k++)add(x[keys[k]]);}return out;}function qfCatField(o,keys){var a=qfCatValues(o,keys);return a.length?a[0]:'';}function rowCats(o){return qfCatValues(o,[
+
+===== OCCURRENCES 查看详情 =====
+COUNT=3
+
+-- 1 @73045 --
+olicy='no-referrer' loading='lazy' decoding='async' fetchpriority='low'>");
+                        ph.push("</div>");h.push(ph.join(""));
+                    }
+                }
+                if(p.time)ms.push(p.time);
+                if(p.reply!=="")ms.push("💬 "+p.reply);
+                if(p.like!=="")ms.push("♡ "+p.like);
+                h.push("<div class='postFoot'>"+(ms.length?"<div class='meta'>"+E(ms.join("　"))+"</div>":"<div class='meta'></div>"));
+                if((p.circleId||circleId)&&p.postId)h.push("<span class='go qfPostOpen' role='button' tabindex='0' data-cid='"+E(String(p.circleId||circleId))+"' data-pid='"+E(String(p.postId))+"' data-img='"+E(String(p.image||""))+"'>查看详情 ›</span>");
+                h.push("</div></article>");
+            }
+        }else{
+            h.push("<div class='feedLoading'><div class='spinMini'></div>首次进入时按需加载</div>");
+        }
+        h.push("</div></main>");
+    }
+    for(var g=0;g<groups.length;g++)renderPane(groups[g],g);
+
+    h.push("<section id='detail'><div class='dHead'><button class='back' id='dBack'>‹</button><div class='dTitle'>帖子详情</div></div><div id='detailBody'><div class='loading'><div class='spin'></div>正在加载帖子详情…</div></div></section>");
+
+    h.push("<script>(function(){");
+    h.push("var BOOK_ID="+JSON.stringify(String(bid))+",CIRCLE_ID="+JSON.stringify(String(circleId||""))+";");
+    h.push("var SIGN_KEY='{1dYgqE)h9,R)hKqEcv4]k[h',SIGN_IV='01234567',INFO_KEY='0821CAAD409B84020821CAAD',INFO_IV='\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000';");
+
+    h.push("function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\\\"/g,'&quot;').replace(/'/g,'&#39;');}");
+    h.push("var QF_FACE={1:'👏',2:'🌹',3:'🤝',4:'😁',5:'😄',6:'🥺',7:'🙂',8:'😏',9:'😙',10:'👆🏻🐽',11:'🙄',12:'😭',13:'😵',14:'😥',15:'🖕🏻',16:'🥵',17:'😓',18:'🤫',19:'😂',20:'😢',21:'😍',22:'🤕🔨',23:'😑',24:'😫',25:'🤗',26:'🤪',27:'🙏',28:'😣',29:'💪',30:'💀',31:'😳',32:'😎',33:'🤭',34:'😄👏',35:'👍🏻',36:'🤓',37:'😡',38:'🙁',39:'😄❓',40:'😞',41:'😧',42:'💋',43:'☺️',44:'🤬',45:'😴',46:'🤠🚬',47:'😱',48:'🐷',49:'😪',50:'🤐',51:'🥴',52:'🌙',53:'❤️',54:'🔪',55:'🎁',56:'💔',57:'👊🏻',58:'😒',59:'✌🏻️',60:'😮',61:'🤨',62:'😴',63:'👏🏻',64:'🐲',65:'⭐',66:'🌧️',67:'🍉',68:'🍵',69:'🔥',70:'💯'};function faceText(s){s=String(s==null?'':s).replace(/&\\[fn=\\$1\\]b\\[fn=\\$1\\]p;/ig,' ').replace(/\\[fn=\\$1\\]/g,'').replace(/&#91;/ig,'[').replace(/&#93;/ig,']');return s.replace(/\\[(?:fn|em|face|emoji)[ ]*[=:][ ]*([0-9]{1,3})\\]/ig,function(_,n){r
+
+-- 2 @110456 --
+ev){if(ev&&ev.stopPropagation)ev.stopPropagation();var box=this,cid=String(box.getAttribute('data-cid')||CIRCLE_ID),pid=String(box.getAttribute('data-pid')||''),poster=qfNormUrl(box.getAttribute('data-poster')||''),vd=qfFreshVideo(cid,pid,poster,'');if(vd&&vd.url){var holder=document.createElement('div');holder.innerHTML=videoTag(vd,'postVideo',cid,pid);var nw=holder.firstChild;box.parentNode.replaceChild(nw,box);bindVideoFallback(nw.parentNode||document);qfStartVideoBox(nw,false);return;}if(vd&&vd.pageUrl){var tx0=box.querySelector('.qfPlayText');if(tx0)tx0.textContent='正在打开起点官方帖子播放…';openMediaUrl(vd.pageUrl);return;}var tx=box.querySelector('.qfPlayText');if(tx)tx.textContent='暂未解析到播放地址，点“查看详情”再试';};}}bindVideoLazy(document);bindVideoFallback(document);");
+    /* 动态分类筛选：使用已真机命中的 getcirclepostlist 字段。 */
+    h.push("function feedRows(root){var d=dataOf(root),a=d.TopicDataList||d.topicDataList||d.PostList||d.postList||[];return Array.isArray(a)?a:[];}");
+    h.push("var qfPostPreviewImgs={};");
+    h.push("function feedCard(o,label){o=o||{};label=String(label||'');var cid=String(o.CircleId||o.circleId||CIRCLE_ID),pid=String(o.PostId||o.postId||o.Id||o.id||o.TopicId||o.topicId||''),nm=String(o.user||user(o)||'书友'),av=qfNormUrl(o.avatar||avatar(o)||''),title=String(o.title||titleOf(o)||''),rr=richOf(o),rich=rr.raw,bd=qfCleanPollText(String(o.body||rr.text||'')),ims=imageUrls(o,rich),tm=String(o.time||time(o)||''),rp=o.reply!=null?o.reply:(o.PostCount!=null?o.PostCount:(o.CommentCount!=null?o.CommentCount:(o.commentCount!=null?o.commentCount:''))),lk=o.like!=null?o.like:(o.StarCount!=null?o.StarCount:(o.LikeCount!=null?o.LikeCount:o.likeCount));var directImgs=Array.isArray(o.images)?o.images:[];for(var dix=directImgs.length-1;dix>=0;dix--){var diu=qfNormUrl(directImgs[dix]);if(diu&&ims.indexOf(diu)<0)ims.unshift(diu);}var directImg=qfNormUrl(o.image||'');if(directImg&&ims.indexOf(directImg)<0)ims.unshift(directImg);if(pid)qfPostPreviewImgs[String(pid)]=ims.slice(0,9);var vd={url:qfNormUrl(o.video||''),poster:qfNormUrl(o.videoPoster||'')};if(!vd.url)vd=videoInfo(o,rich);if(!vd.poster&&ims.length)vd.poster=ims[0];var fb=(nm||'书').slice(0,1);var r='<article class=\"post\"><div class=\"user\">'+(av?imgTag(av,'avatar',''):'<span class=\"avatarFb\">'+esc(fb)+'</span>')+'<span class=\"u\">'+esc(nm)+'</span>'+(label&&label!=='全部'?'<span class=\"kindTag\">'+esc(label)+'</span>':'')+'</div>';if(title)r+='<div class=\"t\">'+esc(title)+'</div>';if(bd&&bd!==title)r+='<div
+
+-- 3 @112825 --
+lass=\"kindTag\">'+esc(label)+'</span>':'')+'</div>';if(title)r+='<div class=\"t\">'+esc(title)+'</div>';if(bd&&bd!==title)r+='<div class=\"b\">'+esc(bd)+'</div>';if((vd&&vd.url)||(label==='同人视频'&&pid)){if(!vd)vd={url:'',poster:''};if(!vd.poster&&ims.length)vd.poster=ims[0];r+=videoTag(vd,'postVideo',cid,pid);}else if(ims.length)r+=imageGridTag(ims);var ms=[];if(tm)ms.push(tm);if(rp!==''&&rp!=null)ms.push('💬 '+rp);if(lk!==''&&lk!=null)ms.push('♡ '+lk);r+='<div class=\"postFoot\"><div class=\"meta\">'+esc(ms.join('　'))+'</div>';if(pid)r+='<span class=\"go qfPostOpen\" role=\"button\" tabindex=\"0\" data-cid=\"'+esc(cid)+'\" data-pid=\"'+esc(pid)+'\" data-img=\"'+esc(ims.length?ims[0]:'')+'\">查看详情 ›</span>';return r+'</div></article>';}");
+    h.push("var INITIAL_ROWS="+JSON.stringify({
+        dongtai:tabs.dongtai||posts||[],
+        jinghua:tabs.jinghua||[],
+        tongren:tabs.tongren||[],
+        discussion:tabs.discussion||[],
+        discussionPreview:tabs.discussionPreview||[]
+    })+";");
+    h.push("var currentSort='6',currentTab='dongtai';");
+    h.push("var TOP_META="+JSON.stringify({
+        dongtai:{id:"0"},
+        jinghua:{id:"2",essence:true},
+        tongren:{id:"316",parentId:String((categoryMeta.tongren&&categoryMeta.tongren.treePostCategoryId)||"")}
+    })+";");
+    h.push("function feedFingerprint(rows){var a=[];rows=Array.isArray(rows)?rows:[];for(var i=0;i<rows.length&&i<8;i++){var o=rows[i]||{},id=String(o.PostId||o.postId||o.Id||o.id||o.TopicId||o.topicId||'');if(id)a.push(id);else a.push(String(o.Title||o.title||'')+'|'+txt(o.Body||o.body||o.Content||o.content).slice(0,60));}return a.join('||');}");
+    h.push("function qfCatValues(o,keys){o=o||{};var out=[],seen={};function add(v){if(v===undefined||v===null||String(v)==='')return;v=String(v);if(!seen[v]){seen[v]=1;out.push(v);}}var bs=[o,o.PostBasicInfo,o.postBasicInfo,o.PostBasicBean,o.postBasicBean,o.BasicInfo,o.basicInfo,o.PostInfo,o.postInfo,o.TopicInfo,o.topicInfo,o.PostCategoryInfo,o.postCategoryInfo,o.CategoryInfo,o.categoryInfo,o.SubCategoryInfo,o.subCategoryInfo,o.ExtInfo,o.extInfo];for(var b=0;b<bs.length;b++){var x=bs[b];if(!x||typeof x!=='object')continue;for(var k=0;k<keys.length;k++)add(x[keys[k]]);}return out;}function qfCatField(o,keys){var a=qfCatValues(o,keys);return a.length?a[0]:'';}function rowCats(o){return qfCatValues(o,['PostCategoryId','postCategoryId','CategoryId','categoryId','PostCategoryJsId','postCategoryJsId','CategoryJsId','categoryJsId']);}function
+
+===== OCCURRENCES overflow-y =====
+COUNT=0
+
+===== OCCURRENCES overflow:auto =====
+COUNT=1
+
+-- 1 @61757 --
+order-radius:50%;margin:0 auto 9px;animation:qfspin .75s linear infinite}");
+    h.push(".imgGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:11px;border-radius:13px;overflow:hidden}.imgGrid.one{grid-template-columns:1fr}.imgGrid.two{grid-template-columns:repeat(2,1fr)}.imgGrid img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#eef1f5}.imgGrid.one img{aspect-ratio:auto;max-height:360px;object-fit:contain}.feedAuto{margin:6px 12px 18px;padding:12px;text-align:center;color:#9aa2af;font-size:11.5px}.feedAuto.loading{color:#70798a}.feedAuto.done{opacity:.66}");
+    h.push("#detail{display:none;position:fixed;inset:0;z-index:30;background:var(--bg);overflow:auto}.dHead{position:sticky;top:0;z-index:31;background:var(--card);height:54px;display:flex;align-items:center;border-bottom:1px solid var(--line);padding:0 14px}.back{font-size:28px;line-height:1;border:0;background:none;color:var(--text);padding:6px 12px 6px 0}.dTitle{font-size:17px;font-weight:760}.loading{padding:50px 20px;text-align:center;color:var(--sub)}.spin{width:26px;height:26px;border:3px solid #e6e7ea;border-top-color:var(--red);border-radius:50%;margin:0 auto 12px;animation:qfspin .75s linear infinite}@keyframes qfspin{to{transform:rotate(360deg)}}.topic{background:var(--card);padding:16px}.topicUser{display:flex;gap:10px;align-items:center}.topicName{font-size:14px;font-weight:650}.topicTime{font-size:11px;color:var(--sub);margin-top:3px}.topicTitle{font-size:20px;font-weight:800;line-height:1.45;margin-top:14px}.topicBody{font-size:16px;line-height:1.75;margin-top:10px;white-space:pre-wrap}.topicImg{display:block;max-width:88%;max-height:520px;object-fit:contain;border-radius:10px;margin-top:12px;background:#f2f3f5}.topicVideo,.postVideo{display:block;width:100%;max-height:66vh;border-radius:12px;background:#000;object-fit:contain}.postVideo{max-height:48vh}.qfVideoWrap{position:relative;margin-top:12px;border-radius:13px;overflow:hidden;background:#111;min-height:118px}.qfVideoWrap .topicVideo,.qfVideoWrap .postVideo{margin:0}.qfVideoPoster{display:block;width:100%;max-height:66vh;object-fit:cover;background:#111}.postVideoPoster{max-height:48vh}.qfVideoPlayBtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;border:0;background:rgba(17,17,20,.72);color:#fff;font-size:28px;padding-left:5px;box-shadow:0 5px 20px rgba(0,0,0,.28)}.qfVideoStatus{position:absolute;left:50%;bottom:12px;transf
+
+===== OCCURRENCES overflow:auto =====
+COUNT=1
+
+-- 1 @61757 --
+order-radius:50%;margin:0 auto 9px;animation:qfspin .75s linear infinite}");
+    h.push(".imgGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:11px;border-radius:13px;overflow:hidden}.imgGrid.one{grid-template-columns:1fr}.imgGrid.two{grid-template-columns:repeat(2,1fr)}.imgGrid img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#eef1f5}.imgGrid.one img{aspect-ratio:auto;max-height:360px;object-fit:contain}.feedAuto{margin:6px 12px 18px;padding:12px;text-align:center;color:#9aa2af;font-size:11.5px}.feedAuto.loading{color:#70798a}.feedAuto.done{opacity:.66}");
+    h.push("#detail{display:none;position:fixed;inset:0;z-index:30;background:var(--bg);overflow:auto}.dHead{position:sticky;top:0;z-index:31;background:var(--card);height:54px;display:flex;align-items:center;border-bottom:1px solid var(--line);padding:0 14px}.back{font-size:28px;line-height:1;border:0;background:none;color:var(--text);padding:6px 12px 6px 0}.dTitle{font-size:17px;font-weight:760}.loading{padding:50px 20px;text-align:center;color:var(--sub)}.spin{width:26px;height:26px;border:3px solid #e6e7ea;border-top-color:var(--red);border-radius:50%;margin:0 auto 12px;animation:qfspin .75s linear infinite}@keyframes qfspin{to{transform:rotate(360deg)}}.topic{background:var(--card);padding:16px}.topicUser{display:flex;gap:10px;align-items:center}.topicName{font-size:14px;font-weight:650}.topicTime{font-size:11px;color:var(--sub);margin-top:3px}.topicTitle{font-size:20px;font-weight:800;line-height:1.45;margin-top:14px}.topicBody{font-size:16px;line-height:1.75;margin-top:10px;white-space:pre-wrap}.topicImg{display:block;max-width:88%;max-height:520px;object-fit:contain;border-radius:10px;margin-top:12px;background:#f2f3f5}.topicVideo,.postVideo{display:block;width:100%;max-height:66vh;border-radius:12px;background:#000;object-fit:contain}.postVideo{max-height:48vh}.qfVideoWrap{position:relative;margin-top:12px;border-radius:13px;overflow:hidden;background:#111;min-height:118px}.qfVideoWrap .topicVideo,.qfVideoWrap .postVideo{margin:0}.qfVideoPoster{display:block;width:100%;max-height:66vh;object-fit:cover;background:#111}.postVideoPoster{max-height:48vh}.qfVideoPlayBtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;border:0;background:rgba(17,17,20,.72);color:#fff;font-size:28px;padding-left:5px;box-shadow:0 5px 20px rgba(0,0,0,.28)}.qfVideoStatus{position:absolute;left:50%;bottom:12px;transf
+
+===== OCCURRENCES 100vh =====
+COUNT=0
+
+===== OCCURRENCES position:fixed =====
+COUNT=1
+
+-- 1 @61702 --
+rder:3px solid #e9ecf2;border-top-color:var(--accent);border-radius:50%;margin:0 auto 9px;animation:qfspin .75s linear infinite}");
+    h.push(".imgGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:11px;border-radius:13px;overflow:hidden}.imgGrid.one{grid-template-columns:1fr}.imgGrid.two{grid-template-columns:repeat(2,1fr)}.imgGrid img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#eef1f5}.imgGrid.one img{aspect-ratio:auto;max-height:360px;object-fit:contain}.feedAuto{margin:6px 12px 18px;padding:12px;text-align:center;color:#9aa2af;font-size:11.5px}.feedAuto.loading{color:#70798a}.feedAuto.done{opacity:.66}");
+    h.push("#detail{display:none;position:fixed;inset:0;z-index:30;background:var(--bg);overflow:auto}.dHead{position:sticky;top:0;z-index:31;background:var(--card);height:54px;display:flex;align-items:center;border-bottom:1px solid var(--line);padding:0 14px}.back{font-size:28px;line-height:1;border:0;background:none;color:var(--text);padding:6px 12px 6px 0}.dTitle{font-size:17px;font-weight:760}.loading{padding:50px 20px;text-align:center;color:var(--sub)}.spin{width:26px;height:26px;border:3px solid #e6e7ea;border-top-color:var(--red);border-radius:50%;margin:0 auto 12px;animation:qfspin .75s linear infinite}@keyframes qfspin{to{transform:rotate(360deg)}}.topic{background:var(--card);padding:16px}.topicUser{display:flex;gap:10px;align-items:center}.topicName{font-size:14px;font-weight:650}.topicTime{font-size:11px;color:var(--sub);margin-top:3px}.topicTitle{font-size:20px;font-weight:800;line-height:1.45;margin-top:14px}.topicBody{font-size:16px;line-height:1.75;margin-top:10px;white-space:pre-wrap}.topicImg{display:block;max-width:88%;max-height:520px;object-fit:contain;border-radius:10px;margin-top:12px;background:#f2f3f5}.topicVideo,.postVideo{display:block;width:100%;max-height:66vh;border-radius:12px;background:#000;object-fit:contain}.postVideo{max-height:48vh}.qfVideoWrap{position:relative;margin-top:12px;border-radius:13px;overflow:hidden;background:#111;min-height:118px}.qfVideoWrap .topicVideo,.qfVideoWrap .postVideo{margin:0}.qfVideoPoster{display:block;width:100%;max-height:66vh;object-fit:cover;background:#111}.postVideoPoster{max-height:48vh}.qfVideoPlayBtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;border:0;background:rgba(17,17,20,.72);color:#fff;font-size:28px;padding-left:5px;box-shadow:0 5px 20px rgba(0,0,0,.28)}.qfVi
+
+===== STYLE =====
+<style>");
+    html.push(":root{color-scheme:light dark;--bg:#f4f5f7;--card:#fff;--text:#202226;--sub:#8a8e96;--line:#eceef1;--red:#ef4553;--chip:#f1f2f4}");
+    html.push("*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif}");
+    html.push("body{padding:0 0 26px}.head{position:sticky;top:0;z-index:8;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);padding:14px 16px 11px;backdrop-filter:blur(12px)}");
+    html.push(".topline{display:flex;align-items:center;gap:10px}.ttl{font-size:19px;font-weight:760;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.count{font-size:12px;color:var(--sub);margin-top:4px}");
+    html.push(".official{margin-left:auto;color:#777;text-decoration:none;font-size:12px;border:1px solid #ddd;padding:6px 10px;border-radius:999px;white-space:nowrap}");
+    html.push(".tabs{display:flex;gap:18px;margin-top:12px;font-size:14px}.tab{font-weight:700;color:#222;position:relative;padding-bottom:6px}.tab:after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:99px;background:var(--red)}.future{color:#aaa}");
+    html.push(".feed{padding:8px 0}.card{background:var(--card);padding:14px 16px;margin:0 0 9px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}");
+    html.push(".user{display:flex;align-items:center;gap:9px;color:var(--sub);font-size:12px;margin-bottom:8px}.avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;background:#eee}.avatarFallback{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#eee;color:#999}");
+    html.push(".ct{font-size:16px;font-weight:720;line-height:1.45;margin-bottom:6px}.cb{font-size:14px;line-height:1.65;color:#555;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}.pic{display:block;margin-top:10px;max-width:48%;max-height:180px;border-radius:9px;object-fit:cover}");
+    html.push(".actions{margin-top:11px;display:flex;align-items:center;justify-content:space-between}.go{color:#d64651;text-decoration:none;font-size:13px;font-weight:680}.hint{color:var(--sub);font-size:11px}");
+    html.push(".empty{margin:14px;background:var(--card);border-radius:14px;padding:28px 18px;text-align:center;color:var(--sub)}.empty b{display:block;color:var(--text);font-size:16px;margin-bottom:8px}.diag{margin-top:12px;font-size:11px;line-height:1.55;word-break:break-all;text-align:left;background:var(--chip);padding:10px;border-radius:9px}");
+    html.push(".foot{text-align:center;color:#a2a5ab;font-size:11px;padding:14px}");
+    html.push("@media(prefers-color-scheme:dark){:root{--bg:#101115;--card:#181a20;--text:#eef0f3;--sub:#9297a2;--line:#292c34;--chip:#22252d}.head{background:rgba(24,26,32,.97)}.tab{color:#eee}.official{border-color:#3b3e47;color:#bbb}.cb{color:#c0c4ca}.avatarFallback{background:#2c2f37}.empty b{color:#eee}}");
+    html.push("</style>
