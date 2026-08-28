@@ -1,0 +1,70 @@
+name: diag-qidian-circle-runtime
+
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-circle-runtime.trigger'
+
+permissions:
+  contents: read
+
+jobs:
+  diag:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Inspect circle runtime structure
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,re,base64,gzip
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          doc=json.loads(p.read_text(encoding='utf-8'))
+          def find(o):
+              if isinstance(o,dict):
+                  if o.get('bookSourceName')=='🌈 起点增强 · Beta': return o
+                  for v in o.values():
+                      r=find(v)
+                      if r:return r
+              elif isinstance(o,list):
+                  for v in o:
+                      r=find(v)
+                      if r:return r
+          src=find(doc); assert src
+          print('COMMENT',src.get('bookSourceComment',''))
+          js=src.get('jsLib','')
+          m=re.search(r'"circle"\s*:\s*"gz:([A-Za-z0-9+/=]+)"',js); assert m
+          code=gzip.decompress(base64.b64decode(m.group(1))).decode('utf-8')
+          print('LEN',len(code))
+          keys=[
+            'function qfCircleHtml', 'function feedCard', 'qfPostOpen', '查看详情',
+            'overflow:', 'overflow-y', 'position:fixed', 'class=\\"pane', "class='pane",
+            'id=\\"detail', "id='detail", 'paneList', 'renderFiltered',
+            'qfNextFeed', 'qfNearBottom', 'IntersectionObserver', 'window.addEventListener(\'scroll\'',
+            'addEventListener(\'scroll\'', 'onscroll', 'touchend', 'onclick=',
+            'feedAuto', 'INITIAL_ROWS', 'getpostlist', 'topRequest', 'listRequest',
+            'PageIndex', 'PageNum', 'pageIndex', 'pageNum', 'pageSize', 'PageSize'
+          ]
+          seen=set()
+          for key in keys:
+              starts=[m.start() for m in re.finditer(re.escape(key),code,re.I)]
+              print('\n###',key,'MATCH',len(starts))
+              for s in starts[:12]:
+                  a=max(0,s-1800); b=min(len(code),s+4200)
+                  sig=(a,b)
+                  if sig in seen: continue
+                  seen.add(sig)
+                  print('\n--- POS',s,'---')
+                  print(code[a:b])
+          # Print all CSS declarations containing overflow and all likely scrollable containers.
+          print('\n### OVERFLOW DECLARATIONS')
+          for mm in re.finditer(r'[^{}]{0,100}\{[^{}]{0,500}(?:overflow|height:100vh|max-height|min-height)[^{}]{0,500}\}',code,re.I):
+              print(mm.group(0)[:1200])
+          # Print nearby initialization of root HTML and tabs/panes.
+          print('\n### HTML PUSH SAMPLES')
+          for mm in list(re.finditer(r'h\.push\(',code))[:80]:
+              s=mm.start(); print('\n--HPUSH',s,'--'); print(code[s:s+1800])
+          PY
