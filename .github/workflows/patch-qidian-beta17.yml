@@ -1,4 +1,4 @@
-name: patch-qidian-beta17
+name: sync-qidian-beta17
 
 on:
   push:
@@ -9,117 +9,88 @@ permissions:
   contents: write
 
 jobs:
-  patch:
+  sync:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Patch circle detail and pagination
+      - name: Sync manifest subscription bundle and release log
         shell: bash
         run: |
           python - <<'PY'
-          import json,re,base64,gzip,hashlib
+          import json,hashlib
           from pathlib import Path
-
-          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
-          doc=json.loads(p.read_text(encoding='utf-8'))
-          def find(o):
+          TS='2026-08-28T22:23:00+08:00'
+          DATE='2026-08-28'
+          VER='1.1.0-beta17'; VC=11017
+          summary='书友圈 beta17：修复帖子详情点击事件链，并重做连续分页触发与空页判定。'
+          tags=['起点','测试版','书友圈','帖子详情','连续分页','触底加载','评论']
+          changes=[
+            '帖子详情由单节点 onclick 改为 WebView 捕获级 touchend/click 事件委托，并补 TopicId/topicId 帖子标识兼容',
+            '分页空结果不再缓存 45 秒，避免瞬时空页被固化为“没有更多”',
+            '单次空页不再直接结束；连续 3 次无新增才判定到底，重复页会推进页码继续探测',
+            '新增 scrollingElement、IntersectionObserver 与近底 watchdog 三重触底触发，降低 Android WebView 漏掉 window scroll 的概率',
+            '移除书友圈合并列表 200 条硬渲染上限；其它评论/楼中楼、分类、视频、正文 Provider、角色卡和账号链冻结'
+          ]
+          sp=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          raw=sp.read_bytes(); sha=hashlib.sha256(raw).hexdigest()
+          source_doc=json.loads(raw.decode('utf-8'))
+          def find_source(o):
               if isinstance(o,dict):
                   if o.get('bookSourceName')=='🌈 起点增强 · Beta': return o
                   for v in o.values():
-                      r=find(v)
+                      r=find_source(v)
                       if r:return r
-              if isinstance(o,list):
+              elif isinstance(o,list):
                   for v in o:
-                      r=find(v)
+                      r=find_source(v)
                       if r:return r
-          src=find(doc); assert src, 'beta source not found'
-          old_comment=str(src.get('bookSourceComment',''))
-          assert 'beta16' in old_comment.lower(), old_comment
-          js=src.get('jsLib','')
-          m=re.search(r'"circle"\s*:\s*"gz:([A-Za-z0-9+/=]+)"',js)
-          assert m, 'circle payload not found'
-          old_b64=m.group(1)
-          code=gzip.decompress(base64.b64decode(old_b64)).decode('utf-8')
-          before_hash=hashlib.sha256(code.encode()).hexdigest()
+          src=find_source(source_doc); assert src and 'beta17' in src.get('bookSourceComment','').lower()
 
-          def replace_once(old,new,label):
-              global code
-              n=code.count(old)
-              assert n>=1, f'{label}: marker not found'
-              code=code.replace(old,new,1)
-              print(label,'old_count=',n)
+          mp=Path('manifest.json'); man=json.loads(mp.read_text(encoding='utf-8')); man['updatedAt']=TS
+          e=next(x for x in man['sources'] if x.get('id')=='qidian-next-beta')
+          e.update({'version':VER,'versionCode':VC,'updatedAt':TS,'sourceUrl':f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={VC}','summary':summary,'tags':tags,'changelog':changes,'sha256':sha})
+          mp.write_text(json.dumps(man,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 
-          # 1) Detail tap reliability: keep compact DOM payload, but make tap target explicit and
-          # route events through a capture-level delegated handler. Also accept TopicId as post id.
-          replace_once('.go{display:inline-flex;', '.go{display:inline-flex;border:0;background:transparent;-webkit-appearance:none;appearance:none;touch-action:manipulation;', 'detail button css')
-          replace_once("class='go qfPostOpen' data-cid=", "class='go qfPostOpen' role='button' tabindex='0' data-cid=", 'initial detail target accessibility')
-          replace_once('class=\\"go qfPostOpen\\" data-cid=', 'class=\\"go qfPostOpen\\" role=\\"button\\" tabindex=\\"0\\" data-cid=', 'dynamic detail target accessibility')
+          cp=Path('subscription/beta.json'); cat=json.loads(cp.read_text(encoding='utf-8')); cat['updatedAt']=TS; cat['generatedAt']=TS
+          ce=next(x for x in cat['items'] if x.get('id')=='qidian-next-beta')
+          ce.update({'summary':summary,'version':VER,'updatedAt':DATE,'tags':tags,'changelog':changes,
+                     'sourceUrl':f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={VC}',
+                     'backupUrl':f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v={VC}',
+                     'importUrl':f'legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={VC}'})
+          cp.write_text(json.dumps(cat,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 
-          # Only alter the pid expression inside feedCard; rowPostId already supports TopicId.
-          feed_start=code.index('function feedCard(o,label)')
-          feed_end=code.index('var INITIAL_ROWS=',feed_start)
-          feed=code[feed_start:feed_end]
-          old_pid="o.PostId||o.postId||o.Id||o.id||''"
-          assert old_pid in feed, 'feedCard pid marker missing'
-          feed=feed.replace(old_pid,"o.PostId||o.postId||o.Id||o.id||o.TopicId||o.topicId||''",1)
-          code=code[:feed_start]+feed+code[feed_end:]
+          bp=Path('bundles/all-beta.json'); bundle=json.loads(bp.read_text(encoding='utf-8'))
+          count=0
+          def repl(o):
+              global count
+              if isinstance(o,list):
+                  for i,v in enumerate(o):
+                      if isinstance(v,dict) and v.get('bookSourceName')=='🌈 起点增强 · Beta': o[i]=src; count+=1
+                      else: repl(v)
+              elif isinstance(o,dict):
+                  for k,v in list(o.items()):
+                      if isinstance(v,dict) and v.get('bookSourceName')=='🌈 起点增强 · Beta': o[k]=src; count+=1
+                      else: repl(v)
+          repl(bundle); assert count>=1, 'beta source not found in all-beta bundle'
+          bp.write_text(json.dumps(bundle,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
 
-          bind_pat=re.compile(r'\s*h\.push\("function bindPostOpens\(root\).*?bindPostOpens\(document\);"\);')
-          bm=bind_pat.search(code)
-          assert bm, 'bindPostOpens block not found'
-          new_bind=r'''    h.push("var qfPostTouchAt=0;function qfPostOpenNode(t){while(t&&t!==document){if(t.classList&&t.classList.contains('qfPostOpen'))return t;t=t.parentNode;}return null;}function qfOpenPost(el,ev){if(!el)return;try{if(ev&&ev.preventDefault)ev.preventDefault();if(ev&&ev.stopPropagation)ev.stopPropagation();}catch(_ev){}state.cid=String(el.getAttribute('data-cid')||CIRCLE_ID);state.pid=String(el.getAttribute('data-pid')||'');if(!state.pid){try{window.java.toast('帖子ID为空，无法打开详情');}catch(_id){}return;}var pim=qfNormUrl(el.getAttribute('data-img')||''),pims=[];try{pims=(qfPostPreviewImgs&&qfPostPreviewImgs[state.pid])?qfPostPreviewImgs[state.pid].slice(0,9):[];}catch(_pm){}if(!Array.isArray(pims))pims=[];var pic=[],pis={};for(var px=0;px<pims.length&&pic.length<9;px++){var pu=qfNormUrl(pims[px]);if(/^https?:\\/\\//i.test(pu)&&!pis[pu]){pis[pu]=1;pic.push(pu);}}if(!pic.length&&pim)pic=[pim];state.previewImgs=pic;state.detailRoot=null;state.loading=false;state.pg=1;state.total=0;detail.style.display='block';detail.scrollTop=0;document.body.style.overflow='hidden';body.innerHTML='<div class=\\\"loading\\\"><div class=\\\"spin\\\"></div>正在加载帖子详情…</div>';setTimeout(function(){fetchDetail(true);},20);}function qfPostOpenEvent(ev){var el=qfPostOpenNode(ev&&ev.target);if(!el)return;var now=Date.now();if(ev.type==='click'&&now-qfPostTouchAt<700){try{ev.preventDefault();ev.stopPropagation();}catch(_d){}return;}if(ev.type==='touchend')qfPostTouchAt=now;qfOpenPost(el,ev);}function bindPostOpens(root){root=root||document;var opens=root.querySelectorAll('.qfPostOpen');for(var oi=0;oi<opens.length;oi++){opens[oi].setAttribute('role','button');opens[oi].setAttribute('tabindex','0');}}document.addEventListener('touchend',qfPostOpenEvent,true);document.addEventListener('click',qfPostOpenEvent,true);document.addEventListener('keydown',function(ev){var el=qfPostOpenNode(ev&&ev.target),k=String(ev&&ev.key||'');if(el&&(k==='Enter'||k===' '))qfOpenPost(el,ev);},true);bindPostOpens(document);");'''
-          code=code[:bm.start()]+'\n'+new_bind+code[bm.end():]
-
-          # 2) Pagination: never cache transient empty pages.
-          cache_pat=re.compile(r'h\.push\("var qfPageRequestCache=\{\};function qfParamKey\(p\).*?return rows;\}\"\);')
-          cm=cache_pat.search(code)
-          assert cm, 'qfCachedList block not found'
-          old_cache=cm.group(0)
-          new_cache=r'''h.push("var qfPageRequestCache={};function qfParamKey(p){p=p||{};var ks=Object.keys(p).sort(),a=[];for(var i=0;i<ks.length;i++)a.push(ks[i]+'='+String(p[ks[i]]==null?'':p[ks[i]]));return a.join('&');}function qfCachedList(p){var k=qfParamKey(p),now=Date.now(),hit=qfPageRequestCache[k];if(hit&&now-Number(hit.ts||0)<45000)return Array.isArray(hit.rows)?hit.rows.slice(0):[];var rows=(listRequest(p).rows||[]);if(rows.length){qfPageRequestCache[k]={ts:now,rows:rows.slice(0)};var ks=Object.keys(qfPageRequestCache);if(ks.length>72){ks.sort(function(a,b){return Number((qfPageRequestCache[a]||{}).ts||0)-Number((qfPageRequestCache[b]||{}).ts||0);});while(ks.length>72)delete qfPageRequestCache[ks.shift()];}}else{delete qfPageRequestCache[k];}return rows;}");'''
-          code=code[:cm.start()]+new_cache+code[cm.end():]
-
-          # Render every merged row; the former 200-row hard cap could itself become a visible stop.
-          replace_once("for(var i=0;i<rows.length&&i<200;i++)hh+=feedCard", "for(var i=0;i<rows.length;i++)hh+=feedCard", 'remove feed render cap')
-          replace_once('bindPostOpens(list);bindVideoLazy(list);bindVideoFallback(list);}function showFilterBusy', 'bindPostOpens(list);bindVideoLazy(list);bindVideoFallback(list);qfArmFeedObserver();}function showFilterBusy', 'rearm feed observer after render')
-
-          page_pat=re.compile(r'\s*h\.push\("var qfFeedPageState=\{\},qfFeedScrollTimer=0;.*?qfHeadCompact\(\);"\);')
-          pm=page_pat.search(code)
-          assert pm, 'pagination block not found'
-          new_page=r'''    h.push("var qfFeedPageState={},qfFeedScrollTimer=0,qfFeedObserver=null;function qfActiveChip(){for(var i=0;i<chips.length;i++)if(chips[i].classList.contains('active')&&chipVisibleFor(chips[i],currentTab))return chips[i];return null;}function qfPageRows(tab,label,c,page){page=Math.max(2,Number(page)||2);var vs=(label==='全部')?[baseParams(tab,page)]:paramVariants(tab,c||{},page);for(var vi=0;vi<vs.length;vi++){var rows=[];try{rows=topRequest(tab,page,vs[vi])||[];}catch(_e){rows=[];}if(!rows.length)continue;if(label==='全部')return rows;if(tab==='tongren'){var fa=fanAccept(rows,c,label);if(fa.length)return fa;continue;}if(tab==='jinghua'){var ea=qfEssenceAccept(rows,c,label);if(ea.length)return ea;continue;}if(tab==='dongtai'){var da=qfDynamicAccept(rows,c,label);if(da.length)return da;continue;}var local=localCategoryFilter(rows,c,true);if(local.length)return local;if(qfCandidateTrust(c)>=2)return rows;}return [];}function qfNextFeed(){if(detail&&detail.style.display==='block')return;var chip=qfActiveChip();if(!chip)return;var label=String(chip.getAttribute('data-name')||'全部'),key=cacheKey(currentTab,label),st=qfFeedPageState[key]||{page:1,loading:false,done:false,empty:0};if(st.loading||st.done)return;var ds=fanDirectState[key],fs=fanScanState[key];if(currentTab==='tongren'&&label!=='全部'){st.page=Math.max(st.page,Number(ds&&ds.page||0),Number(fs&&fs.page||0));if((ds&&!ds.done)||(fs&&!fs.done)){qfFeedPageState[key]=st;return;}}st.loading=true;qfFeedPageState[key]=st;var list=paneList(currentTab),hint=document.createElement('div');hint.className='feedAuto loading';hint.textContent='正在加载下一页…';if(list)list.appendChild(hint);setTimeout(function(){try{var cands=parseCandidateAttr(chip),c=cands.length?cands[0]:{mode:'all',id:String((TOP_META[currentTab]||{}).id||'0')},pg=st.page+1,rows=qfPageRows(currentTab,label,c,pg),base=feedCache[key];if(!base||!base.length){if(label==='全部'&&INITIAL_ROWS[currentTab]&&INITIAL_ROWS[currentTab].length)base=INITIAL_ROWS[currentTab].slice(0);else base=[];}var merged=mergeFeedRows(base,rows);if(rows.length&&merged.length>base.length){st.page=pg;st.empty=0;feedCache[key]=merged.slice(0);renderFiltered(currentTab,merged,label);}else if(rows.length){st.page=pg;st.empty++;if(st.empty>=3)st.done=true;}else{st.empty++;if(st.empty>=3)st.done=true;}try{if(hint&&hint.parentNode)hint.parentNode.removeChild(hint);}catch(_rm){}if(st.done&&list){var d=document.createElement('div');d.className='feedAuto done';d.textContent='已经到底了';list.appendChild(d);}}catch(_e){st.empty++;if(st.empty>=3)st.done=true;try{if(hint&&hint.parentNode)hint.parentNode.removeChild(hint);}catch(_rm2){}}st.loading=false;qfFeedPageState[key]=st;if(!st.done)setTimeout(qfArmFeedObserver,40);},30);}function qfNearBottom(){var se=document.scrollingElement||document.documentElement,b=document.body,top=Number((se&&se.scrollTop)||window.pageYOffset||0),h=window.innerHeight||document.documentElement.clientHeight||0,sh=Math.max((se&&se.scrollHeight)||0,document.documentElement.scrollHeight||0,b.scrollHeight||0);return top+h>=sh-520;}function qfArmFeedObserver(){try{if(qfFeedObserver){qfFeedObserver.disconnect();qfFeedObserver=null;}if(typeof IntersectionObserver!=='function')return;var list=paneList(currentTab),posts=list?list.querySelectorAll('.post'):null,last=posts&&posts.length?posts[posts.length-1]:null;if(!last)return;qfFeedObserver=new IntersectionObserver(function(es){for(var i=0;i<es.length;i++){if(es[i].isIntersecting){qfNextFeed();break;}}},{root:null,rootMargin:'0px 0px 520px 0px',threshold:0.01});qfFeedObserver.observe(last);}catch(_o){}}function qfHeadCompact(){try{var hd=document.querySelector('.head'),se=document.scrollingElement||document.documentElement,y=Number((se&&se.scrollTop)||window.pageYOffset||0);if(hd){if(y>86)hd.classList.add('compact');else hd.classList.remove('compact');}}catch(_h){}}window.addEventListener('scroll',function(){qfHeadCompact();if(qfFeedScrollTimer)return;qfFeedScrollTimer=setTimeout(function(){qfFeedScrollTimer=0;if(qfNearBottom())qfNextFeed();},90);},{passive:true});setInterval(function(){try{if(qfNearBottom())qfNextFeed();}catch(_w){}},900);qfHeadCompact();setTimeout(qfArmFeedObserver,60);");'''
-          code=code[:pm.start()]+'\n'+new_page+code[pm.end():]
-
-          # Sanity markers.
-          assert "document.addEventListener('touchend',qfPostOpenEvent,true)" in code
-          assert "st.empty>=3" in code
-          assert "delete qfPageRequestCache[k]" in code
-          assert "o.TopicId||o.topicId" in code[code.index('function feedCard(o,label)'):code.index('var INITIAL_ROWS=',code.index('function feedCard(o,label)'))]
-          assert "rows.length&&i<200" not in code
-          print('circle sha256 before',before_hash)
-          print('circle sha256 after ',hashlib.sha256(code.encode()).hexdigest())
-
-          new_b64=base64.b64encode(gzip.compress(code.encode('utf-8'),compresslevel=9,mtime=0)).decode('ascii')
-          js=js[:m.start(1)]+new_b64+js[m.end(1):]
-          src['jsLib']=js
-          src['bookSourceComment']='v1.1.0-beta17：书友圈详情与连续分页双修。详情打开改为 WebView 捕获级 touchend/click 委托，避免嵌套 BottomSheet 中直接 onclick 丢失，并补 TopicId 兼容；连续分页不再缓存空页或单次空页即判到底，改为连续 3 次无新增才结束，并增加 scrollingElement、IntersectionObserver 与近底 watchdog 三重触发。其余域冻结。'
-          p.write_text(json.dumps(doc,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
-
-          # Re-read and validate gzip payload from the written full importable JSON.
-          out=json.loads(p.read_text(encoding='utf-8')); s2=find(out); assert s2
-          m2=re.search(r'"circle"\s*:\s*"gz:([A-Za-z0-9+/=]+)"',s2['jsLib']); assert m2
-          c2=gzip.decompress(base64.b64decode(m2.group(1))).decode('utf-8')
-          assert c2==code
-          print('written bytes',p.stat().st_size)
-          print('comment',s2['bookSourceComment'])
+          rp=Path('docs/RELEASE_LOG.md'); old=rp.read_text(encoding='utf-8')
+          head='## 2026-08-28 — 起点增强 1.1.0-beta17\n\n'
+          if head not in old:
+              entry=head+'Status: Beta/Test; circle detail-tap and continuous-pagination repair awaiting real-device confirmation.\n\nChanges:\n\n'+''.join('- '+x+'\n' for x in changes)+f'- SHA256: `{sha}`.\n\n'
+              rp.write_text(entry+old,encoding='utf-8')
+          print('bundle replacements',count)
+          print('source sha256',sha)
           PY
           git diff --check
           git status --short
-      - name: Commit beta17
+      - name: Commit metadata
         shell: bash
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add sources/novel/qidian-next/qidian-next-beta.json
-          git commit -m "fix(qidian): repair circle detail tap and infinite paging beta17"
+          git add manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
+          git commit -m "chore(qidian): publish beta17 metadata"
           git push origin main
