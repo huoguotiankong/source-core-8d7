@@ -1,0 +1,31 @@
+name: diag-qidian-beta20-pagination-body
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta20-pagination-body.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Inspect beta20 pagination and body parsing
+        run: |
+          python - <<'PY'
+          import json,re,base64,gzip
+          from pathlib import Path
+          d=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text(encoding='utf-8'))
+          s=d[0] if isinstance(d,list) else d
+          js=s['jsLib']
+          m=re.search(r'"circle":"gz:([A-Za-z0-9+/=]+)"',js); assert m
+          c=gzip.decompress(base64.b64decode(m.group(1))).decode('utf-8')
+          pats=['function qfNextFeed','function qfPageRows','function qfFeedParams','function renderFeed','feedFingerprint','getcirclepostlist','function richOf','function txt(','Options','VoteId','VoteType']
+          for pat in pats:
+              print('\n###',pat)
+              st=0
+              for _ in range(20):
+                  i=c.find(pat,st)
+                  if i<0:break
+                  print('POS',i,c[max(0,i-1200):min(len(c),i+3500)].replace('\n','\\n'))
+                  st=i+len(pat)
+          PY
