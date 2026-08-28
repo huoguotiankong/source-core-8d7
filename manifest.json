@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-28T23:15:00+08:00",
+  "updatedAt": "2026-08-28T23:14:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -182,33 +182,32 @@
       "category": "comic",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "0.1.0-beta12",
-      "versionCode": 1012,
-      "updatedAt": "2026-08-28T23:05:00+08:00",
+      "version": "0.1.0-beta13",
+      "versionCode": 1013,
+      "updatedAt": "2026-08-28T23:14:00+08:00",
       "sourcePath": "sources/comic/manwa/manwa-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1012",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1013",
       "bookSourceUrl": "https://sc8d7.invalid/legado/manwa-8d7",
-      "summary": "Beta12：评论卡片改为 Grid 修复楼中楼挤到右侧；新增自动/手动连续加载更多评论。",
+      "summary": "Beta13：取消猜测式 fetch，保留漫蛙原评论 DOM 与原生滚动环境，并加入 8 秒加载 watchdog，避免永久“加载中”。",
       "tags": [
         "漫蛙",
         "漫画",
         "测试版",
-        "评论UI",
+        "评论加载",
+        "原生DOM",
+        "加载监控",
         "CSS Grid",
-        "连续加载",
-        "评论翻页",
         "动态域名"
       ],
       "changelog": [
-        "顶层评论由 Flex 改为两列 Grid，头像固定左列、正文固定右列",
-        "顶层直接挂载的楼中楼/回复节点强制进入下一行，修复右侧第三列挤压",
-        "带头像子回复同样改为 Grid，保留头像角标/等级徽章处理",
-        "接近底部自动识别并触发站点加载更多/下一页控件",
-        "下一页有 URL 时同源 fetch 后去重追加，避免整页跳转",
-        "新增手动加载更多与已显示 X / 总数状态；排除查看更多回复数误触发",
-        "正文、详情、目录、登录页和域名模块冻结"
+        "移除 Beta12 generic fetch 翻页，避免未知请求永久 pending",
+        "不再搬移 #comment，保留漫蛙原父级结构、事件委托与懒加载环境",
+        "到底时触发 window/document/jQuery 原生 scroll，并优先点击站内真实更多评论/下一页控件",
+        "每次加载增加 8 秒 watchdog；无新增时自动解除加载中并允许继续重试",
+        "MutationObserver 保留，官网一旦追加评论立即恢复正常状态",
+        "保留 Beta12 Grid 排版；正文、详情、目录、登录页和域名模块冻结"
       ],
-      "sha256": "0284fd6d63cb92025737e6c97916bdf99c2dd475e3db737a08cde80abf7ff45f",
+      "sha256": "64348d1e056f8cf9c1126e3fad1be5601eae8f4b84e7f80738da659e81fcd2a5",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],
