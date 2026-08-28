@@ -5,7 +5,7 @@ Updated: 2026-08-27
 ## Current release
 
 - Channel: Beta/Test
-- Version: `0.1.0-beta11`
+- Version: `0.1.0-beta12`
 - Display name: `◈ 漫蛙漫画`
 - Legado identity: `https://sc8d7.invalid/legado/manwa-8d7`
 - Beta source: `sources/comic/manwa/manwa-beta.json`
@@ -15,6 +15,35 @@ Updated: 2026-08-27
 ## Baseline
 
 This is a new reconstruction. The user-provided Manwa source was used only to confirm working HTML selectors, query parameters and the current image-decryption chain. Its selector-combination discovery UI is not retained.
+
+## Beta12 grid comments + continuous loading
+
+Latest real-device feedback:
+
+- The first comment card can still split into a left parent-comment column and a right nested-reply column.
+- The header reports hundreds of comments, but scrolling reaches the end of the initially rendered batch and does not load more.
+
+Layout diagnosis from the screenshot and current rule:
+
+- Beta11 sets the top-level comment `li` to `display:flex`.
+- If the live site's nested reply/sublist is a direct sibling of `.detail-list-comment-info` rather than nested inside it, flex treats it as a third horizontal child.
+- That exactly matches the observed right-side reply column and squeezed parent text.
+
+Beta12 design:
+
+1. Top-level comment card is a two-column CSS Grid: avatar / content.
+2. Direct child reply/sublist/go nodes are forced into the next grid row on the content column.
+3. Full nested comments use a 34px + content Grid.
+4. Keep Beta11 dynamic MutationObserver/media handling concept, but fold it into the new V12 runtime instead of stacking another compatibility layer.
+5. Add a load-more controller:
+   - near-bottom scroll;
+   - touch-end;
+   - IntersectionObserver sentinel;
+   - manual load-more button.
+6. Prefer native site controls. Recognize loading-more / more-comments / next-page patterns and explicitly reject reply-more controls.
+7. If a next-page URL exists, fetch it same-origin, parse its `#comment` list, de-duplicate by id/user/date/content signature, and append.
+8. Show `已显示 X / 总数` status and visible failure text instead of silently stopping.
+9. Keep content/detail/TOC/login/domain frozen.
 
 ## Beta11 dynamic reply + media comment UI
 
