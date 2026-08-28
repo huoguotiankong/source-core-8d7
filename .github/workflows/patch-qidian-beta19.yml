@@ -1,0 +1,163 @@
+name: patch-qidian-beta19
+on:
+  push:
+    paths:
+      - '.staging/patch-qidian-beta19.trigger'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch qidian beta19
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,re,base64,gzip,hashlib
+          from pathlib import Path
+
+          sp=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          doc=json.loads(sp.read_text(encoding='utf-8'))
+          def find_source(o):
+              if isinstance(o,dict):
+                  if o.get('bookSourceName')=='🌈 起点增强 · Beta': return o
+                  for v in o.values():
+                      r=find_source(v)
+                      if r:return r
+              elif isinstance(o,list):
+                  for v in o:
+                      r=find_source(v)
+                      if r:return r
+          src=find_source(doc); assert src
+          assert 'beta18' in str(src.get('bookSourceComment','')).lower(), src.get('bookSourceComment')
+          js=src['jsLib']
+
+          # Extract and patch current beta18 circle payload only for the new module key.
+          m=re.search(r'"circle"\s*:\s*"gz:([A-Za-z0-9+/=]+)"',js); assert m
+          circle_b64=m.group(1)
+          circle=gzip.decompress(base64.b64decode(circle_b64)).decode('utf-8')
+          assert 'qfEnsureFeedMoreButton' in circle and 'qfOpenPostDirect' in circle
+
+          # Add unmistakable runtime marker to the NEW module's page only.
+          marker_old="<title>起点书友圈</title><style>"
+          marker_new="<title>起点书友圈 · B19</title><style>"
+          assert marker_old in circle
+          circle19=circle.replace(marker_old,marker_new,1)
+          # Add a tiny fixed badge after body starts; diagnostic only, does not change data path.
+          body_old="<body>"
+          if body_old in circle19:
+              circle19=circle19.replace(body_old,"<body><div id=\\\"qfB19Badge\\\" style=\\\"position:fixed;right:7px;bottom:7px;z-index:99;background:rgba(20,22,28,.72);color:#fff;font-size:9px;padding:2px 5px;border-radius:7px;pointer-events:none\\\">B19</div>",1)
+          else:
+              # generator emits body through h.push; add CSS-visible badge via script if body literal differs
+              insertion=";try{var qfb=document.createElement('div');qfb.id='qfB19Badge';qfb.textContent='B19';qfb.style.cssText='position:fixed;right:7px;bottom:7px;z-index:99;background:rgba(20,22,28,.72);color:#fff;font-size:9px;padding:2px 5px;border-radius:7px;pointer-events:none';document.body.appendChild(qfb);}catch(_b19){};"
+              pos=circle19.rfind("h.push(\"})();</script></body></html>\");")
+              assert pos>0
+              circle19=circle19[:pos]+"h.push(\""+insertion.replace('\\','\\\\').replace('"','\\"')+"\");\n    "+circle19[pos:]
+          assert 'B19' in circle19
+          circle19_b64=base64.b64encode(gzip.compress(circle19.encode('utf-8'),compresslevel=9,mtime=0)).decode('ascii')
+
+          # Duplicate pack entry immediately after circle without removing original.
+          pack_pat='"circle":"gz:'+circle_b64+'"'
+          assert pack_pat in js
+          js=js.replace(pack_pat,pack_pat+',"circle_b19":"gz:'+circle19_b64+'"',1)
+
+          # Duplicate exports array from circle -> circle_b19.
+          em=re.search(r'"circle"\s*:\s*(\[[^\]]+\])',js); assert em
+          exports_arr=em.group(1)
+          # ensure this is export manifest occurrence, not unrelated structure
+          assert 'qfCircleData' in exports_arr and 'qfCircleView' in exports_arr
+          js=js[:em.end()]+',"circle_b19":'+exports_arr+js[em.end():]
+
+          # Duplicate deps. Current circle deps are [] in this baseline.
+          # Locate QF_MOD38_DEPS object section first to avoid touching other JSON snippets.
+          dpos=js.find('var QF_MOD38_DEPS='); assert dpos>=0
+          dend=js.find(';',dpos); assert dend>dpos
+          dseg=js[dpos:dend]
+          dm=re.search(r'"circle"\s*:\s*(\[[^\]]*\])',dseg); assert dm
+          dseg2=dseg[:dm.end()]+',"circle_b19":'+dm.group(1)+dseg[dm.end():]
+          js=js[:dpos]+dseg2+js[dend:]
+
+          # Route ALL official circle capabilities and domain-service spec to the new key.
+          replacements={
+              'circleOpen:{module:"circle",entry:"qfOpenQidianCircleV2961",sideEffect:true}':'circleOpen:{module:"circle_b19",entry:"qfOpenQidianCircleV2961",sideEffect:true}',
+              'circleData:{module:"circle",entry:"qfCircleData",model:"circleSet"}':'circleData:{module:"circle_b19",entry:"qfCircleData",model:"circleSet"}',
+              'circleView:{module:"circle",entry:"qfCircleView"}':'circleView:{module:"circle_b19",entry:"qfCircleView"}',
+              'circle:{data:"circleData",view:"circleView",model:"circleSet",module:"circle",schema:"qf.circle-set/1"}':'circle:{data:"circleData",view:"circleView",model:"circleSet",module:"circle_b19",schema:"qf.circle-set/1"}'
+          }
+          for old,new in replacements.items():
+              n=js.count(old); assert n>=1,(old,n)
+              js=js.replace(old,new,1)
+
+          # Assertions: old module preserved, new module exists, dispatch moved.
+          assert '"circle":"gz:' in js and '"circle_b19":"gz:' in js
+          assert 'circleOpen:{module:"circle_b19"' in js
+          assert 'circleData:{module:"circle_b19"' in js
+          assert 'circleView:{module:"circle_b19"' in js
+          assert 'module:"circle_b19",schema:"qf.circle-set/1"' in js
+          assert gzip.decompress(base64.b64decode(circle19_b64)).decode('utf-8')==circle19
+
+          src['jsLib']=js
+          src['bookSourceComment']='v1.1.0-beta19：书友圈模块键强制失效诊断版。保留旧 circle 模块不动，新增 circle_b19 并将 Official Capability / Domain Service 的书友圈调度全部切换到新模块键，绕过可能残留的旧 QF_MOD38_CACHE["circle"]；页面右下角显示极小 B19 标记用于确认真机实际运行链。详情与分页业务逻辑沿用 beta18，其它域冻结。'
+          sp.write_text(json.dumps(doc,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
+
+          # Roundtrip and source hash.
+          d2=json.loads(sp.read_text(encoding='utf-8')); s2=find_source(d2); assert s2
+          assert 'beta19' in s2['bookSourceComment'].lower()
+          assert 'circle_b19' in s2['jsLib']
+          sha=hashlib.sha256(sp.read_bytes()).hexdigest()
+
+          # Manifest
+          mp=Path('manifest.json'); man=json.loads(mp.read_text(encoding='utf-8'))
+          found=False
+          for it in man.get('sources',[]):
+              if it.get('id')=='qidian-next-beta':
+                  it.update({'version':'1.1.0-beta19','versionCode':11019,'updatedAt':'2026-08-28T23:24:00+08:00','summary':'书友圈 beta19：切换到全新 circle_b19 模块键，强制绕过旧 lazy-module 内存缓存并加入 B19 真机链路标记。','tags':['起点','测试版','书友圈','模块失效','运行链诊断','帖子详情','连续分页'],'changelog':['不再修改旧 circle 模块；复制 beta18 当前实现为新模块 circle_b19','Official Capability 的 circleOpen/circleData/circleView 与 OfficialDomainService circle spec 全部改走 circle_b19','旧 circle 保留用于回滚，避免影响其它潜在兼容调用','新书友圈页面右下角显示极小 B19 标记，用于确认真机是否真正执行新模块','详情与分页逻辑沿用 beta18，其它功能域冻结'],'sha256':sha})
+                  found=True;break
+          assert found
+          man['updatedAt']='2026-08-28T23:24:00+08:00'
+          mp.write_text(json.dumps(man,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          # Subscription beta
+          bp=Path('subscription/beta.json'); sub=json.loads(bp.read_text(encoding='utf-8')); found=False
+          for it in sub.get('items',[]):
+              if it.get('id')=='qidian-next-beta':
+                  it.update({'summary':'书友圈 beta19：新 circle_b19 模块键强制失效旧运行缓存，并加入 B19 真机链路标记。','version':'1.1.0-beta19','updatedAt':'2026-08-28','tags':['起点','测试版','书友圈','模块失效','运行链诊断','帖子详情','连续分页'],'changelog':['书友圈从 circle 切换为全新 circle_b19 lazy-module 键','四个官方社区调度点统一指向 circle_b19，旧模块保留但不走正常新入口','右下角 B19 极小标记用于判定真机是否命中新运行链','详情/分页继续使用 beta18 逻辑，其它域冻结'],'sourceUrl':'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11019','backupUrl':'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11019','importUrl':'legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11019'})
+                  found=True;break
+          assert found
+          sub['updatedAt']='2026-08-28T23:24:00+08:00'; sub['generatedAt']='2026-08-28T23:24:00+08:00'
+          bp.write_text(json.dumps(sub,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          # Bundle replace current beta source recursively.
+          bunp=Path('bundles/all-beta.json'); bun=json.loads(bunp.read_text(encoding='utf-8')); repl=[0]
+          def rb(o):
+              if isinstance(o,list):
+                  for i,v in enumerate(o):
+                      if isinstance(v,dict) and v.get('bookSourceUrl')==s2.get('bookSourceUrl') and '起点增强' in str(v.get('bookSourceName','')):
+                          o[i]=s2; repl[0]+=1
+                      else: rb(v)
+              elif isinstance(o,dict):
+                  for k,v in list(o.items()):
+                      if isinstance(v,dict) and v.get('bookSourceUrl')==s2.get('bookSourceUrl') and '起点增强' in str(v.get('bookSourceName','')):
+                          o[k]=s2; repl[0]+=1
+                      else: rb(v)
+          rb(bun); assert repl[0]>=1,repl
+          bunp.write_text(json.dumps(bun,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
+
+          # Release log
+          rp=Path('docs/RELEASE_LOG.md'); old=rp.read_text(encoding='utf-8')
+          entry=f'''## 2026-08-28 — 起点增强 1.1.0-beta19\n\nStatus: Beta/Test; module-key invalidation diagnostic after Beta18 still showed no real-device behavior change.\n\nChanges:\n\n- Real-device Beta18 again left both “查看详情” and continuous paging unchanged, so internal detail/paging fallbacks are no longer the primary target.\n- Preserved the old `circle` lazy module and duplicated the current Beta18 implementation as a new `circle_b19` module.\n- `circleOpen`, `circleData`, `circleView`, and `OfficialDomainService` circle routing now target `circle_b19`, bypassing any surviving in-memory `QF_MOD38_CACHE["circle"]`.\n- Added a tiny `B19` runtime badge to the new circle page. If it is absent on device, the active page is definitively not executing the Beta19 circle module and further API/UI patching must stop.\n- Stable and all non-community domains remain unchanged.\n- SHA256: `{sha}`.\n\n'''
+          rp.write_text(entry+old,encoding='utf-8')
+          print('OK beta19',sha,'bundle',repl[0], 'circle_old',len(circle),'circle_b19',len(circle19))
+          PY
+          git diff --check
+          git status --short
+      - name: Commit beta19
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
+          git commit -m "fix(qidian): force fresh circle module in beta19"
+          git push origin main
