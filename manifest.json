@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-28T22:23:00+08:00",
+  "updatedAt": "2026-08-28T22:36:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -181,32 +181,32 @@
       "category": "comic",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "0.1.0-beta10",
-      "versionCode": 1010,
-      "updatedAt": "2026-08-27T18:10:00+08:00",
+      "version": "0.1.0-beta11",
+      "versionCode": 1011,
+      "updatedAt": "2026-08-28T22:36:00+08:00",
       "sourcePath": "sources/comic/manwa/manwa-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1010",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1011",
       "bookSourceUrl": "https://sc8d7.invalid/legado/manwa-8d7",
-      "summary": "Beta10：评论卡片/楼中楼按真实漫蛙 CSS 做彻底布局重置，修复竖排与大徽章；登录设置改为双列紧凑布局。",
+      "summary": "Beta11：动态展开楼中楼后自动重新套用布局；图片/表情评论、章节来源与“查看更多回复数”进一步优化。",
       "tags": [
         "漫蛙",
         "漫画",
         "测试版",
         "评论UI",
-        "楼中楼",
-        "登录设置",
-        "双列布局",
+        "动态楼中楼",
+        "表情评论",
+        "MutationObserver",
         "动态域名"
       ],
       "changelog": [
-        "重置漫蛙原站评论头像 absolute 定位和 info padding-left，避免自定义 flex 与原站 CSS 叠加",
-        "顶层评论、普通回复、楼中楼和带头像子回复分开布局，回复容器固定 100% 宽并清除 float",
-        "头像与等级/钻石图标拆分：头像圆形固定，额外徽章缩小至头像右下角",
-        "评论正文换行、时间/点赞、发表评论区域和移动端间距统一收紧",
-        "登录页 8 个常用入口改为 4 行双列，保留网页登录、会员中心、收藏、主页、刷新域名、诊断、公告和说明",
-        "正文、详情、目录、动态域名逻辑冻结"
+        "保留 Beta10 评论布局 reset，并为动态插入的更多回复增加 MutationObserver 自动归一化",
+        "点击“查看更多回复数”后新加载的楼中楼无需刷新即可应用同一套布局",
+        "评论列表若被站点脚本动态替换，也会重新标记顶层/子回复节点",
+        "图片/表情评论限制最大 180px，纯图片评论减少无效留白",
+        "章节来源链接与“查看更多回复数”按钮重新收口",
+        "登录页保持 Beta10 四行双列；正文、详情、目录和域名逻辑冻结"
       ],
-      "sha256": "5e85dac3eae1dc828304d29fccb87f3fae22a1cb2c94aedf7769e1c4d5330f92",
+      "sha256": "3b1c7029c21adae4a3bb85624b9a273ac992f0406921bff6ee349df846ced996",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     }
   ],
