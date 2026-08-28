@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-28T23:43:00+08:00",
+  "updatedAt": "2026-08-28T23:53:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -38,29 +38,29 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "书友圈 beta20：回退 Beta14 真机稳定基线，只改多图参数传递。",
+      "summary": "书友圈 beta21：下一页恢复已验证参数；帖子正文清理尾部投票 JSON。",
       "icon": "",
       "channel": "beta",
-      "version": "1.1.0-beta20",
+      "version": "1.1.0-beta21",
       "updatedAt": "2026-08-28",
       "tags": [
         "起点",
         "测试版",
         "书友圈",
-        "Beta14回退",
-        "帖子详情",
-        "多图",
-        "最小修复"
+        "连续分页",
+        "帖子正文",
+        "投票清理",
+        "Beta20基线"
       ],
       "changelog": [
-        "恢复 Beta14/Stable 书友圈全部交互和分页代码",
-        "只将已有图片数组安全传给原 state.previewImgs",
-        "不修改原详情点击、详情 API、滚动分页和评论逻辑",
+        "“全部”分页恢复历史真机成功参数，不再用错误 postCategoryId 组合",
+        "正文尾部 Options/VoteId/VoteType 投票对象精确清理",
+        "查看详情、多图、评论/楼中楼保持 beta20 原样",
         "其它域冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11020",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11020",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11020",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11021",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11021",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11021",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
     },
     {
@@ -95,5 +95,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-08-28T23:43:00+08:00"
+  "generatedAt": "2026-08-28T23:53:00+08:00"
 }

@@ -1,3 +1,13 @@
+## 2026-08-28 — 起点增强 1.1.0-beta21
+
+Status: Beta/Test; narrow follow-up on Beta20.
+
+- Beta20 real-device feedback confirms detail opening and multi-image display are restored; those paths are untouched.
+- Top-level feed paging restores the v2.9.72 on-device verified query spelling: `pageIndex + subCategoryId + circleId + sortType + categoryId + bookId + bookType`.
+- Post text strips only a trailing valid JSON poll metadata object containing `Options`, `VoteId`, and `VoteType`.
+- Existing scroll trigger, comments, nested replies and non-community domains remain unchanged.
+- SHA256: `b7062661aab645e54f68009322c8bdbc7f0d1983ae7b58a394108c1047538853`.
+
 ## 2026-08-28 — 起点增强 1.1.0-beta20
 
 Status: Beta/Test; rollback-first recovery after Beta15+ community regressions.
