@@ -1,0 +1,84 @@
+name: dump-qidian-circle-focus
+
+on:
+  push:
+    paths:
+      - '.staging/dump-qidian-circle-focus.trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  dump:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Dump focused circle internals
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,re,base64,gzip
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          doc=json.loads(p.read_text(encoding='utf-8'))
+          def find(o):
+              if isinstance(o,dict):
+                  if o.get('bookSourceName')=='🌈 起点增强 · Beta': return o
+                  for v in o.values():
+                      r=find(v)
+                      if r:return r
+              elif isinstance(o,list):
+                  for v in o:
+                      r=find(v)
+                      if r:return r
+          src=find(doc); assert src
+          js=src['jsLib']; m=re.search(r'"circle"\s*:\s*"gz:([A-Za-z0-9+/=]+)"',js); assert m
+          code=gzip.decompress(base64.b64decode(m.group(1))).decode('utf-8')
+          out=[]
+          out.append('COMMENT='+str(src.get('bookSourceComment',''))+'\n')
+          def section(name, start_token, end_token=None, before=0, after=0):
+              out.append('\n===== '+name+' =====\n')
+              pos=code.find(start_token)
+              out.append('POS='+str(pos)+'\n')
+              if pos<0:return
+              a=max(0,pos-before)
+              if end_token:
+                  e=code.find(end_token,pos+len(start_token))
+                  b=(e+len(end_token)) if e>=0 else min(len(code),pos+after)
+              else:b=min(len(code),pos+after)
+              out.append(code[a:b]+'\n')
+          section('LIST REQUEST','function listRequest(', 'function ',0,12000)
+          section('BASE PARAMS','function baseParams(', 'function ',0,8000)
+          section('TOP REQUEST','function topRequest(', 'function ',0,10000)
+          section('PARAM VARIANTS','function paramVariants(', 'function ',0,12000)
+          section('FEED CARD','function feedCard(', 'var INITIAL_ROWS=',0,20000)
+          section('PANE LIST','function paneList(', 'function ',0,6000)
+          section('RENDER FILTERED','function renderFiltered(', 'function ',0,10000)
+          section('PAGINATION','var qfFeedPageState=', 'qfHeadCompact();',0,30000)
+          section('POST OPEN','var qfPostTouchAt=', 'bindPostOpens(document);',0,20000)
+          section('DETAIL FETCH','function fetchDetail(', 'function ',0,20000)
+          # All relevant request/API strings with local context
+          for key in ['getpostlist','GetPostList','PageIndex','PageNum','pageIndex','pageNum','PageSize','pageSize','qfPostOpen','查看详情','overflow-y','overflow:auto','overflow:auto','100vh','position:fixed']:
+              out.append('\n===== OCCURRENCES '+key+' =====\n')
+              ms=list(re.finditer(re.escape(key),code,re.I))
+              out.append('COUNT='+str(len(ms))+'\n')
+              for i,mm in enumerate(ms[:30]):
+                  s=mm.start(); out.append('\n-- '+str(i+1)+' @'+str(s)+' --\n'+code[max(0,s-700):min(len(code),s+1800)]+'\n')
+          # CSS head specifically
+          hp=code.find('<style>')
+          if hp>=0:
+              he=code.find('</style>',hp)
+              out.append('\n===== STYLE =====\n'+code[hp:he+8]+'\n')
+          Path('.staging/qidian-circle-focus.txt').write_text(''.join(out),encoding='utf-8')
+          print('dump bytes',Path('.staging/qidian-circle-focus.txt').stat().st_size)
+          PY
+      - name: Commit dump
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-circle-focus.txt
+          git commit -m 'chore: dump focused qidian circle internals'
+          git push origin main
