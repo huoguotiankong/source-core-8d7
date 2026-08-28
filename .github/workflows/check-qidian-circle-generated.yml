@@ -1,0 +1,74 @@
+name: check-qidian-circle-generated
+
+on:
+  push:
+    paths:
+      - '.staging/check-qidian-circle-generated.trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Inspect focused runtime evidence
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,re,base64,gzip
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          doc=json.loads(p.read_text(encoding='utf-8'))
+          def find(o):
+              if isinstance(o,dict):
+                  if o.get('bookSourceName')=='🌈 起点增强 · Beta': return o
+                  for v in o.values():
+                      r=find(v)
+                      if r:return r
+              elif isinstance(o,list):
+                  for v in o:
+                      r=find(v)
+                      if r:return r
+          src=find(doc); assert src
+          m=re.search(r'"circle"\s*:\s*"gz:([A-Za-z0-9+/=]+)"',src['jsLib']); assert m
+          code=gzip.decompress(base64.b64decode(m.group(1))).decode()
+          out=[]
+          # Function signature / beginning and ending of circle html generator
+          for key in ['qfCircleHtml','return h.join','return h.join(\'\')','return h.join(\"\")']:
+              out.append('\n=== '+key+' ===\n')
+              for mm in list(re.finditer(re.escape(key),code,re.I))[:8]:
+                  s=mm.start(); out.append(code[max(0,s-1500):min(len(code),s+4000)]+'\n')
+          # CSS rules containing relevant selectors/properties.
+          out.append('\n=== CSS RULES ===\n')
+          for mm in re.finditer(r'([^{}]+)\{([^{}]+)\}',code):
+              sel,body=mm.group(1),mm.group(2)
+              txt=sel+'{'+body+'}'
+              if any(x in txt for x in ['.go','.postFoot','.pane','.feedList','html','body','.tabs','.head','.detail','#detail','overflow','pointer-events','z-index','position:fixed','height:100','100vh']):
+                  out.append(txt[:2500]+'\n')
+          # all assignments/declarations of detail/body/chips/currentTab
+          for key in ['var detail=','detail=document','var body=','body=document','var chips=','chips=document','currentTab=']:
+              out.append('\n=== '+key+' ===\n')
+              for mm in list(re.finditer(re.escape(key),code,re.I))[:20]:
+                  s=mm.start(); out.append(code[max(0,s-1000):min(len(code),s+2200)]+'\n')
+          # ordering of emitted h.push blocks around DOM refs and post binding
+          markers=['id=\\\"detail','id=\\\"detailBody','getElementById(\'detail\')','getElementById(\'detailBody\')','qfPostTouchAt','bindPostOpens(document)','qfFeedPageState','window.addEventListener(\'scroll\'']
+          out.append('\n=== MARKER POSITIONS ===\n')
+          for k in markers: out.append(k+' => '+str(code.find(k))+'\n')
+          # Exact full direct initialization region around first getElementById detail.
+          for k in ["getElementById('detail')","getElementById('detailBody')"]:
+              s=code.find(k)
+              if s>=0: out.append('\n=== INIT '+k+' ===\n'+code[max(0,s-6000):min(len(code),s+10000)]+'\n')
+          Path('.staging/qidian-circle-generated-check.txt').write_text(''.join(out),encoding='utf-8')
+          PY
+      - name: Commit check
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-circle-generated-check.txt
+          git commit -m 'chore: dump qidian generated circle runtime evidence'
+          git push origin main
