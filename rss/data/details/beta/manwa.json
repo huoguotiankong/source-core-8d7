@@ -1,35 +1,31 @@
 {
   "kind": "source",
   "title": "◈ 漫蛙漫画",
-  "summary": "漫蛙漫画 0.1.0-beta10：评论页按真实 DOM/CSS 重做布局 reset，修复楼中楼挤压和等级徽章过大；登录设置改为紧凑双列。",
+  "summary": "漫蛙漫画 0.1.0-beta11：在 Beta10 布局基础上补齐动态楼中楼和图片/表情评论的兼容。",
   "badges": [
     "Beta",
-    "0.1.0-beta10",
+    "0.1.0-beta11",
     "漫画",
-    "UI优化"
+    "动态回复"
   ],
   "sections": [
     {
-      "title": "评论布局",
-      "text": "原站 .detail-list-comment-cover 使用 absolute、.detail-list-comment-info 自带 padding-left；与 Beta9 的 flex 叠加后会在有楼中楼时压缩主评论宽度。Beta10 显式重置定位、padding、float 和宽度。"
+      "title": "动态楼中楼",
+      "text": "点击“查看更多回复数”后，站点脚本新插入的回复会被 MutationObserver 自动捕获并重新标记，不再只对首屏 DOM 生效。"
     },
     {
-      "title": "楼中楼",
-      "text": "顶层评论、普通回复、楼中楼列表与带头像完整子回复分别处理；所有回复容器固定 100% 宽并清除 float，避免正文出现单字竖排。"
+      "title": "图片/表情评论",
+      "text": "评论正文中的图片统一限制在 180px 和手机可用宽度以内；纯图片/表情评论减少额外留白。"
     },
     {
-      "title": "头像与徽章",
-      "text": "只把第一个图片作为 44px 圆形头像；后续等级/钻石图片缩小并贴在头像右下角，不再作为第二个大头像占位。"
-    },
-    {
-      "title": "登录设置",
-      "text": "8 个入口改为 4 行双列：网页登录/会员中心、我的收藏/漫蛙主页、刷新域名/线路诊断、最新公告/使用说明。"
+      "title": "评论细节",
+      "text": "章节来源链接采用轻量胶囊样式，“查看更多回复数”改为整行可点击区域；Beta10 顶层评论/楼中楼布局 reset 保留。"
     },
     {
       "title": "冻结范围",
-      "text": "正文、详情、目录和动态域名逻辑本轮不改。"
+      "text": "登录页继续使用 Beta10 双列布局；正文、详情、目录和动态域名本轮不改。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1010",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1010"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1011",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1011"
 }
