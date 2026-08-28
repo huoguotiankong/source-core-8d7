@@ -1,0 +1,45 @@
+name: diag-qidian-active-path
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-active-path.trigger'
+permissions:
+  contents: read
+jobs:
+  diag:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Diagnose stable/beta identity and circle route
+        run: |
+          python - <<'PY'
+          import json,re,base64,gzip
+          from pathlib import Path
+          for label,p in [('stable','sources/novel/qidian-next/qidian-next.json'),('beta','sources/novel/qidian-next/qidian-next-beta.json'),('official','sources/novel/qidian/qidian-official.json')]:
+              print('\n###',label,p)
+              d=json.loads(Path(p).read_text(encoding='utf-8'))
+              def find(o):
+                  if isinstance(o,dict) and 'bookSourceUrl' in o and ('ruleSearch' in o or 'ruleBookInfo' in o): return o
+                  if isinstance(o,dict):
+                      for v in o.values():
+                          r=find(v)
+                          if r:return r
+                  if isinstance(o,list):
+                      for v in o:
+                          r=find(v)
+                          if r:return r
+              s=find(d) or (d[0] if isinstance(d,list) and d else d)
+              for k in ['bookSourceName','bookSourceUrl','bookSourceComment','customButton','loginUrl']:
+                  v=s.get(k,'') if isinstance(s,dict) else ''
+                  print(k,'=',str(v)[:1200].replace('\n','\\n'))
+              js=str(s.get('jsLib','')) if isinstance(s,dict) else ''
+              m=re.search(r'"circle"\s*:\s*"gz:([A-Za-z0-9+/=]+)"',js)
+              print('circle_gz=',bool(m))
+              if m:
+                  c=gzip.decompress(base64.b64decode(m.group(1))).decode('utf-8')
+                  for token in ['beta18','qfEnsureFeedMoreButton','qfOpenPostDirect','查看详情','qfCircleHtml']:
+                      print(token,'=',token in c)
+                  print('circle_len=',len(c))
+          PY
