@@ -1,0 +1,953 @@
+
+=== qfCircleHtml ===
+RealUrl2965(j,bid){
+    var bookUrls=[
+        "https://www.qidian.com/book/"+encodeURIComponent(String(bid))+"/",
+        "https://book.qidian.com/info/"+encodeURIComponent(String(bid))+"/"
+    ];
+    var script="(function(){"
+        +"function n(s){return String(s||'').replace(/\\s+/g,'').trim();}"
+        +"var a=document.querySelectorAll('a[href],button,[role=button],[onclick]'),best='',bs=0;"
+        +"for(var i=0;i<a.length;i++){var t=n(a[i].innerText||a[i].textContent||a[i].getAttribute('title')||''),h=String(a[i].href||a[i].getAttribute('href')||''),s=0;"
+        +"if(/书友圈/.test(t))s+=150;if(/书友互动/.test(t))s+=100;if(/书评区|书评/.test(t))s+=80;if(/forum|circle|comment|review|discuss|topic|thread/i.test(h))s+=55;"
+        +"if(s>bs&&h&&h.indexOf('javascript:')!==0){bs=s;best=h;}}return best;})()";
+    for(var i=0;i<bookUrls.length;i++){
+        try{
+            var raw=qfCircleCleanResult2964(j.webView(null,bookUrls[i],script));
+            if(/^https?:\/\//i.test(raw))return raw;
+        }catch(e){}
+    }
+    return "";
+}
+
+function qfCircleEsc2964(v){
+    return String(v==null?"":v)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#39;");
+}
+
+function qfCircleBookName2964(b){
+    var n="";
+    try{n=String(b&&b.getVariable?b.getVariable("qf_name"):"").trim();}catch(e0){}
+    try{if(!n)n=String(b&&(b.name||b.bookName||b.title)||"").trim();}catch(e1){}
+    return n;
+}
+
+function qfCircleHtml2964(bookName,bid,pack,officialUrl){
+    pack=pack||{};
+    var rawItems=Array.isArray(pack.items)?pack.items:[];
+    var items=[],seenTitle={};
+
+    function qfCircleKey2968(s){
+        s=String(s||"")
+            .replace(/[\s·•，。！？、：；（）()【】《》<>\[\]_-]+/g,"")
+            .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,"")
+            .toLowerCase();
+        return s;
+    }
+
+    function qfCircleRich2968(x){
+        var v=0;
+        try{if(x.body)v+=Math.min(260,String(x.body).length);}catch(e0){}
+        try{if(x.img)v+=100;}catch(e1){}
+        try{if(x.avatar)v+=25;}catch(e2){}
+        try{if(x.user)v+=18;}catch(e3){}
+        try{if(x.url)v+=45;}catch(e4){}
+        return v;
+    }
+
+    for(var di=0;di<rawItems.length;di++){
+        var it0=rawItems[di]||{};
+        var dk=qfCircleKey2968(it0.title||"");
+        if(!dk)dk=qfCircleKey2968(String(it0.body||"").slice(0,100));
+        if(!dk)continue;
+
+        if(seenTitle[dk]!==undefined){
+            var oi=seenTitle[dk];
+            var oldIt=items[oi]||{};
+            if(qfCircleRich2968(it0)>qfCircleRich2968(oldIt)){
+                if(!it0.body&&oldIt.body)it0.body=oldIt.body;
+                if(!it0.user&&oldIt.user)it0.user=oldIt.user;
+                if(!it0.avatar&&oldIt.avatar)it0.avatar=oldIt.avatar;
+                if(!it0.img&&oldIt.img)it0.img=oldIt.img;
+                if(!it0.url&&oldIt.url)it0.url=oldIt.url;
+                items[oi]=it0;
+            }else{
+                if(!oldIt.body&&it0.body)oldIt.body=it0.body;
+                if(!oldIt.user&&it0.user)oldIt.user=it0.user;
+                if(!oldIt.avatar&&it0.avatar)oldIt.avatar=it0.avatar;
+                if(!oldIt.img&&it0.img)oldIt.img=it0.img;
+                if(!oldIt.url&&it0.url)oldIt.url=it0.url;
+            }
+            continue;
+        }
+
+        seenTitle[dk]=items.length;
+        items.push(it0);
+    }
+
+    var count=String(pack.count||"");
+    var all=pack.all||{};
+    var html=[];
+    html.push("<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>");
+    html.push("<title>起点书友圈</title><style>");
+    html.push(":root{color-scheme:light dark;--bg:#f4f5f7;--card:#fff;--text:#202226;--sub:#8a8e96;--line:#eceef1;--red:#ef4553;--chip:#f1f2f4}");
+    html.push("*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif}");
+    html.push("body{padding:0 0 26px}.head{position:sticky;top:0;z-index:8;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);padding:14px 16px 11px;backdrop-filter:blur(12px)}");
+    html.push(".topline{display:flex;align-items:center;gap:10px}.ttl{font-size:19px;font-weight:760;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.count{font-size:12px;color:var(--sub);margin-top:4px}");
+    html.push(".official{margin-left:auto;color:#777;text-decoration:none;font-size:12px;border:1px solid #ddd;padding:6px 10px;border-radius:999px;white-space:nowrap}");
+    html.push(".tabs{display:flex;gap:18px;margin-top:12px;font-size:14px}.tab{font-weight:700;color:#222;position:relative;padding-bottom:6px}.tab:after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:99px;background:var(--red)}.future{color:#aaa}");
+    html.push(".feed{padding:8px 0}.card{background:var(--card);padding:14px 16px;margin:0 0 9px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}");
+    html.push(".user{display:flex;align-items:center;gap:9px;color:var(--sub);font-size:12px;margin-bottom:8px}.avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;background:#eee}.avatarFallback{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#eee;color:#999}");
+    html.push(".ct{font-size:16px;font-weight:720;line-height:1.45;margin-bottom:6px}.cb{font
+
+=== return h.join ===
+h;i++){var ok=chipVisibleFor(chips[i],tab);chips[i].style.display=ok?'':'none';chips[i].classList.remove('active');if(ok&&!first)first=chips[i];}if(first)first.classList.add('active');}for(var ci=0;ci<chips.length;ci++){chips[ci].onclick=function(){if(!chipVisibleFor(this,currentTab)||this.classList.contains('active'))return;for(var j=0;j<chips.length;j++)chips[j].classList.remove('active');this.classList.add('active');loadCategory(this);};}sortSel.onchange=function(){currentSort=String(this.value||'6');var active=null;for(var i=0;i<chips.length;i++){if(chips[i].classList.contains('active')&&chipVisibleFor(chips[i],currentTab)){active=chips[i];break;}}if(active)loadCategory(active);};");
+    h.push("var bs=document.querySelectorAll('.tab'),filterBar=document.getElementById('filterBar');for(var i=0;i<bs.length;i++){bs[i].onclick=function(){var k=this.getAttribute('data-tab');if(k===currentTab)return;currentTab=k;for(var a=0;a<bs.length;a++){if(bs[a]===this)bs[a].classList.add('active');else bs[a].classList.remove('active');}var ps=document.querySelectorAll('.pane');for(var p=0;p<ps.length;p++){if(ps[p].id==='pane_'+k)ps[p].classList.add('active');else ps[p].classList.remove('active');}filterBar.classList.add('show');applyChipSet(k);var first=null;for(var c=0;c<chips.length;c++){if(chips[c].classList.contains('active')&&chipVisibleFor(chips[c],k)){first=chips[c];break;}}if(first)loadCategory(first);};}applyChipSet('dongtai');");
+
+    h.push("})();</script></body></html>");
+    return h.join("");
+}
+
+var QF_CIRCLE_BOOT_CACHE_V352={};
+function qfCircleBootGetV352(bid,maxAge){
+    var x=QF_CIRCLE_BOOT_CACHE_V352[String(bid||"")];
+    if(!x||!x.ts||Date.now()-Number(x.ts)>Number(maxAge||300000))return null;
+    return x.data||null;
+}
+function qfCircleBootPutV352(bid,data){
+    var k=String(bid||"");if(!k||!data)return data;
+    QF_CIRCLE_BOOT_CACHE_V352[k]={ts:Date.now(),data:data};
+    var ks=Object.keys(QF_CIRCLE_BOOT_CACHE_V352);
+    if(ks.length>6){ks.sort(function(a,b){return Number(QF_CIRCLE_BOOT_CACHE_V352[a].ts||0)-Number(QF_CIRCLE_BOOT_CACHE_V352[b].ts||0);});while(ks.length>6)delete QF_CIRCLE_BOOT_CACHE_V352[ks.shift()];}
+    return data;
+}
+
+function qfCircleApiProbe2970(j,bid){
+    var circleId="",posts=[];
+    var tabs={dongtai:[],jinghua:[],tongren:[],discussion:[],discussionPreview:[]};
+    var totals={dongtai:0,jinghua:0,tongren:0};
+    var categoryMode={jinghua:"按需加载",tongren:"按需加载"};
+    var categoryMeta=qfCircleCategoryMeta2984("");
+
+    /*
+     * v2.9.91：同一本书的 getcircledetail 偶尔会只返回简化分类表，
+     * 此时“讨论”只剩短 PostCategoryId=2，而缺少真正可用的长 JsId。
+     * 之前因此表现为：同一个讨论分类有时有帖、有时为空。
+     * 这里对分类元数据做质量评分，只保留信息更完整的一份；缺长 JsId 时
+     * 再用已经拿到的 CircleId 补请求一次详情，不影响其它已正确分类。
+     */
+    function metaScore(m){
+        var score=0,ds=(m&&m.filterSets&&m.filterSets.dongtai)||[];
+        score+=ds.length*4;
+        for(var i=0;i<ds.length;i++){
+            var x=ds[i]||{},nm=String(x.name||"");
+            if(nm==="讨论"){
+                var cs=Array.isArray(x.candidates)?x.candidates:[];
+                for(var c=0;c<cs.length;c++){
+                    var z=cs[c]||{},id=String(z.id||"");
+                    if((z.mode==="sub"||z.mode==="subId")&&/^\d{8,22}$/.test(id))score+=120;
+                    else if(z.mode==="post"&&id==="2")score+=8;
+                }
+            }
+            if(nm==="其他")score+=3;
+            if(nm==="作家说"||nm==="作者说"||nm==="版权信息")score+=2;
+        }
+        return score;
+    }
+    function hasStableDiscussion(m){
+        var ds=(m&&m.filterSets&&m.filterSets.dongtai)||[];
+        for(var i=0;i<ds.length;i++){
+            var x=ds[i]||{};if(String(x.name||"")!=="讨论")continue;
+            var cs=Array.isArray(x.candidates)?x.candidates:[];
+            for(var c=0;c<cs.length;c++){
+                var z=cs[c]||{},id=String(z.id||"");
+                if((z.mode==="sub"||z.mode==="subId")&&/^\d{8,22}$/.test(id))return true;
+            }
+        }
+        return false;
+    }
+    function absorbMeta(raw){
+        try{
+            var m=qfCircleCategoryMeta2984(raw);
+            if(metaScore(m)>metaScore(categoryMeta))categoryMeta=m;
+        }catch(_m){}
+    }
+    function detailOnce(params){
+        var t=qfCircleApiCall2970(j,"v1/circle/getcircledetail",params);
+        if(t&&t.sum&&t.sum.ids)circleId=String(t.sum.ids.circleId||circleId||"");
+        absorbMeta(t&&t.raw?t.raw:"");
+        if(!circleId&&t&&t.sum&&t.sum.posts){
+            for(var i=0;i<t.sum.posts.length;i++)if(t.sum.posts[i]&&t.sum.posts[i].circleId){circleId=String(t.sum.posts[i].circleId);break;}
+        }
+        return t;
+    }
+
+    detailOnce({bookId:String(bid),bookType:"1"});
+    if(!circleId)detailOnce({circleId:"0",bookId:String(bid),bookType:"1"});
+    /* beta5.6：不再为“长讨论 JsId”额外串行补拉详情。
+       beta5.4 起动态讨论已经有官方 PostCategoryId=2 短 ID 兜底，
+       保留当前首次详情返回的分类表即可，减少首开一次网络往返。 */
+
+    var cid=String(circleId||"0");
+    function listVariant(variant){
+        var p;
+        if(variant===1){
+            p={pageIndex:"1",subCategoryId:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }else if(variant===2){
+            p={pageIndex:"1",subCategory:"0",circleId:cid,postSortType:"6",postCategoryId:"0",qdBookId:String(bid),qdBookType:"1"};
+        }else{
+            p={pageIndex:"1",subCategory:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }
+        return qfCircleApiCall2970(j,"v1/circle/getcirclepostlist",p);
+    }
+
+    var dyn=null;
+ 
+
+=== return h.join('') ===
+
+=== return h.join("") ===
+h;i++){var ok=chipVisibleFor(chips[i],tab);chips[i].style.display=ok?'':'none';chips[i].classList.remove('active');if(ok&&!first)first=chips[i];}if(first)first.classList.add('active');}for(var ci=0;ci<chips.length;ci++){chips[ci].onclick=function(){if(!chipVisibleFor(this,currentTab)||this.classList.contains('active'))return;for(var j=0;j<chips.length;j++)chips[j].classList.remove('active');this.classList.add('active');loadCategory(this);};}sortSel.onchange=function(){currentSort=String(this.value||'6');var active=null;for(var i=0;i<chips.length;i++){if(chips[i].classList.contains('active')&&chipVisibleFor(chips[i],currentTab)){active=chips[i];break;}}if(active)loadCategory(active);};");
+    h.push("var bs=document.querySelectorAll('.tab'),filterBar=document.getElementById('filterBar');for(var i=0;i<bs.length;i++){bs[i].onclick=function(){var k=this.getAttribute('data-tab');if(k===currentTab)return;currentTab=k;for(var a=0;a<bs.length;a++){if(bs[a]===this)bs[a].classList.add('active');else bs[a].classList.remove('active');}var ps=document.querySelectorAll('.pane');for(var p=0;p<ps.length;p++){if(ps[p].id==='pane_'+k)ps[p].classList.add('active');else ps[p].classList.remove('active');}filterBar.classList.add('show');applyChipSet(k);var first=null;for(var c=0;c<chips.length;c++){if(chips[c].classList.contains('active')&&chipVisibleFor(chips[c],k)){first=chips[c];break;}}if(first)loadCategory(first);};}applyChipSet('dongtai');");
+
+    h.push("})();</script></body></html>");
+    return h.join("");
+}
+
+var QF_CIRCLE_BOOT_CACHE_V352={};
+function qfCircleBootGetV352(bid,maxAge){
+    var x=QF_CIRCLE_BOOT_CACHE_V352[String(bid||"")];
+    if(!x||!x.ts||Date.now()-Number(x.ts)>Number(maxAge||300000))return null;
+    return x.data||null;
+}
+function qfCircleBootPutV352(bid,data){
+    var k=String(bid||"");if(!k||!data)return data;
+    QF_CIRCLE_BOOT_CACHE_V352[k]={ts:Date.now(),data:data};
+    var ks=Object.keys(QF_CIRCLE_BOOT_CACHE_V352);
+    if(ks.length>6){ks.sort(function(a,b){return Number(QF_CIRCLE_BOOT_CACHE_V352[a].ts||0)-Number(QF_CIRCLE_BOOT_CACHE_V352[b].ts||0);});while(ks.length>6)delete QF_CIRCLE_BOOT_CACHE_V352[ks.shift()];}
+    return data;
+}
+
+function qfCircleApiProbe2970(j,bid){
+    var circleId="",posts=[];
+    var tabs={dongtai:[],jinghua:[],tongren:[],discussion:[],discussionPreview:[]};
+    var totals={dongtai:0,jinghua:0,tongren:0};
+    var categoryMode={jinghua:"按需加载",tongren:"按需加载"};
+    var categoryMeta=qfCircleCategoryMeta2984("");
+
+    /*
+     * v2.9.91：同一本书的 getcircledetail 偶尔会只返回简化分类表，
+     * 此时“讨论”只剩短 PostCategoryId=2，而缺少真正可用的长 JsId。
+     * 之前因此表现为：同一个讨论分类有时有帖、有时为空。
+     * 这里对分类元数据做质量评分，只保留信息更完整的一份；缺长 JsId 时
+     * 再用已经拿到的 CircleId 补请求一次详情，不影响其它已正确分类。
+     */
+    function metaScore(m){
+        var score=0,ds=(m&&m.filterSets&&m.filterSets.dongtai)||[];
+        score+=ds.length*4;
+        for(var i=0;i<ds.length;i++){
+            var x=ds[i]||{},nm=String(x.name||"");
+            if(nm==="讨论"){
+                var cs=Array.isArray(x.candidates)?x.candidates:[];
+                for(var c=0;c<cs.length;c++){
+                    var z=cs[c]||{},id=String(z.id||"");
+                    if((z.mode==="sub"||z.mode==="subId")&&/^\d{8,22}$/.test(id))score+=120;
+                    else if(z.mode==="post"&&id==="2")score+=8;
+                }
+            }
+            if(nm==="其他")score+=3;
+            if(nm==="作家说"||nm==="作者说"||nm==="版权信息")score+=2;
+        }
+        return score;
+    }
+    function hasStableDiscussion(m){
+        var ds=(m&&m.filterSets&&m.filterSets.dongtai)||[];
+        for(var i=0;i<ds.length;i++){
+            var x=ds[i]||{};if(String(x.name||"")!=="讨论")continue;
+            var cs=Array.isArray(x.candidates)?x.candidates:[];
+            for(var c=0;c<cs.length;c++){
+                var z=cs[c]||{},id=String(z.id||"");
+                if((z.mode==="sub"||z.mode==="subId")&&/^\d{8,22}$/.test(id))return true;
+            }
+        }
+        return false;
+    }
+    function absorbMeta(raw){
+        try{
+            var m=qfCircleCategoryMeta2984(raw);
+            if(metaScore(m)>metaScore(categoryMeta))categoryMeta=m;
+        }catch(_m){}
+    }
+    function detailOnce(params){
+        var t=qfCircleApiCall2970(j,"v1/circle/getcircledetail",params);
+        if(t&&t.sum&&t.sum.ids)circleId=String(t.sum.ids.circleId||circleId||"");
+        absorbMeta(t&&t.raw?t.raw:"");
+        if(!circleId&&t&&t.sum&&t.sum.posts){
+            for(var i=0;i<t.sum.posts.length;i++)if(t.sum.posts[i]&&t.sum.posts[i].circleId){circleId=String(t.sum.posts[i].circleId);break;}
+        }
+        return t;
+    }
+
+    detailOnce({bookId:String(bid),bookType:"1"});
+    if(!circleId)detailOnce({circleId:"0",bookId:String(bid),bookType:"1"});
+    /* beta5.6：不再为“长讨论 JsId”额外串行补拉详情。
+       beta5.4 起动态讨论已经有官方 PostCategoryId=2 短 ID 兜底，
+       保留当前首次详情返回的分类表即可，减少首开一次网络往返。 */
+
+    var cid=String(circleId||"0");
+    function listVariant(variant){
+        var p;
+        if(variant===1){
+            p={pageIndex:"1",subCategoryId:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }else if(variant===2){
+            p={pageIndex:"1",subCategory:"0",circleId:cid,postSortType:"6",postCategoryId:"0",qdBookId:String(bid),qdBookType:"1"};
+        }else{
+            p={pageIndex:"1",subCategory:"0",circleId:cid,sortType:"6",postCategoryId:"0",bookId:String(bid),bookType:"1"};
+        }
+        return qfCircleApiCall2970(j,"v1/circle/getcirclepostlist",p);
+    }
+
+    var dyn=null;
+ 
+
+=== CSS RULES ===
+);if(!lines.length)return;"
+            +"var user='',title='',body='';"
+            +"if(lines.length>=2&&lines[0].length<=20&&!/[，。！？：]/.test(lines[0]))user=lines.shift();"
+            +"if(lines.length)title=lines.shift();"
+            +"if(lines.length)body=lines.slice(0,7).join('\\n');"
+            +"if(!title&&user){title=user;user='';}
+"
+            +"var meaningful=(title?title.length:0)+(body?body.length:0);if(meaningful<8)return;if(!body&&title.length<10&&!imgOf(el))return;"
+            +"var h=hrefOf(el),im=imgOf(el),av=avatarOf(el);"
+            +"var k=n((user+'|'+title+'|'+body).substring(0,320));if(seen[k])return;seen[k]=1;"
+            +"out.push({user:user,title:title,body:body,url:h,img:im,avatar:av}
+
+        var raw=qfCircleCleanResult2964(j.webView(null,String(url),qfCircleExtractScript2965()));
+        if(!raw)return pack;
+        var x=JSON.parse(raw);
+        if(x&&typeof x==="object"){
+            pack.url=String(x.url||url);
+            pack.count=String(x.count||"");
+            pack.all=x.all||pack.all;
+            pack.items=Array.isArray(x.items)?x.items:[];
+            pack.title=String(x.title||"");
+            pack.body=String(x.body||"");
+            pack.cand=Number(x.cand||0)||0;
+        }
+
+        var v=0;
+        try{if(x.body)v+=Math.min(260,String(x.body).length);}
+;
+            if(qfCircleRich2968(it0)>qfCircleRich2968(oldIt)){
+                if(!it0.body&&oldIt.body)it0.body=oldIt.body;
+                if(!it0.user&&oldIt.user)it0.user=oldIt.user;
+                if(!it0.avatar&&oldIt.avatar)it0.avatar=oldIt.avatar;
+                if(!it0.img&&oldIt.img)it0.img=oldIt.img;
+                if(!it0.url&&oldIt.url)it0.url=oldIt.url;
+                items[oi]=it0;
+            }
+else{
+                if(!oldIt.body&&it0.body)oldIt.body=it0.body;
+                if(!oldIt.user&&it0.user)oldIt.user=it0.user;
+                if(!oldIt.avatar&&it0.avatar)oldIt.avatar=it0.avatar;
+                if(!oldIt.img&&it0.img)oldIt.img=it0.img;
+                if(!oldIt.url&&it0.url)oldIt.url=it0.url;
+            }
+;
+    var html=[];
+    html.push("<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>");
+    html.push("<title>起点书友圈</title><style>");
+    html.push(":root{color-scheme:light dark;--bg:#f4f5f7;--card:#fff;--text:#202226;--sub:#8a8e96;--line:#eceef1;--red:#ef4553;--chip:#f1f2f4}
+");
+    html.push("*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif}
+");
+    html.push("body{padding:0 0 26px}
+.head{position:sticky;top:0;z-index:8;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);padding:14px 16px 11px;backdrop-filter:blur(12px)}
+");
+    html.push(".topline{display:flex;align-items:center;gap:10px}
+.ttl{font-size:19px;font-weight:760;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+");
+    html.push(".official{margin-left:auto;color:#777;text-decoration:none;font-size:12px;border:1px solid #ddd;padding:6px 10px;border-radius:999px;white-space:nowrap}
+");
+    html.push(".tabs{display:flex;gap:18px;margin-top:12px;font-size:14px}
+");
+    html.push(".feed{padding:8px 0}
+");
+    html.push(".user{display:flex;align-items:center;gap:9px;color:var(--sub);font-size:12px;margin-bottom:8px}
+");
+    html.push(".ct{font-size:16px;font-weight:720;line-height:1.45;margin-bottom:6px}
+.cb{font-size:14px;line-height:1.65;color:#555;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+");
+    html.push(".actions{margin-top:11px;display:flex;align-items:center;justify-content:space-between}
+.go{color:#d64651;text-decoration:none;font-size:13px;font-weight:680}
+");
+    html.push(".empty{margin:14px;background:var(--card);border-radius:14px;padding:28px 18px;text-align:center;color:var(--sub)}
+");
+    html.push(".foot{text-align:center;color:#a2a5ab;font-size:11px;padding:14px}
+.head{background:rgba(24,26,32,.97)}
+;
+            html.push("<article class='card'>");
+            if(it.user||it.avatar){
+                html.push("<div class='user'>");
+                if(it.avatar)html.push("<img class='avatar' src='"+qfCircleEsc2964(it.avatar)+"' referrerpolicy='no-referrer'>");
+                else html.push("<span class='avatarFallback'>书</span>");
+                html.push("<span>"+qfCircleEsc2964(it.user||"书友")+"</span></div>");
+            }
+else{
+        html.push("<div class='empty'><b>暂未提取到帖子</b><div>本版已改用旧版曾成功显示帖子卡片的宽松提取规则，并先定位真实书友圈 URL。</div>");
+        html.push("<div class='diag'>最终页："+qfCircleEsc2964(String(pack.url||officialUrl))+"<br>页面标题："+qfCircleEsc2964(String(pack.title||""))+"<br>候选容器："+qfCircleEsc2964(String(pack.cand||0))+"<br>“查看全部帖子”："+qfCircleEsc2964(String((all&&all.text)||"未识别"))+"<br>链接："+qfCircleEsc2964(String((all&&all.url)||"未暴露"))+"<br><br>页面正文前1200字：<br>"+qfCircleEsc2964(String(pack.body||""))+"</div>");
+        html.push("</div>");
+    }
+
+        if(v==null||d>7)return;
+        if(typeof v==="string"){
+            var s=String(v),m;
+            var re=/["'](?:ImageUrl|imageUrl|ImgUrl|imgUrl|OriginUrl|originUrl|OriginalUrl|originalUrl|PictureUrl|pictureUrl|PicUrl|picUrl|PreImage|preImage|BitmapUrl|bitmapUrl|CoverUrl|coverUrl|Poster|poster|PhotoUrl|photoUrl|Src|src)["']\s*:\s*["']([^"']+)["']/ig;
+            while((m=re.exec(s))!==null)target(norm(m[1]),path+".embedded");
+            var hi=/<img[^>]+(?:src|data-src)=["']([^"']+)["']/ig;
+            while((m=hi.exec(s))!==null)target(norm(m[1]),path+".htmlimg");
+            return;
+        }
+
+        if(!o||typeof o!=="object")return;
+
+        /*
+         * 真机 TopicDataList 的帖子主键就是 Id，
+         * 不一定另外提供 PostId。
+         */
+        var postId=cleanId(
+            o.PostId||o.postId||
+            o.MasterPostId||o.masterPostId||
+            (force?(o.Id||o.id):"")||""
+        );
+
+        var topicId=cleanId(
+            o.TopicId||o.topicId||
+            o.ContentId||o.contentId||""
+        );
+
+        var circleId=cleanId(
+            o.CircleId||o.circleId||
+            o.BookCircleId||o.bookCircleId||""
+        );
+
+        var title=plain(
+            o.Title!=null?o.Title:
+            o.title!=null?o.title:
+            o.PostTitle!=null?o.PostTitle:
+            o.postTitle!=null?o.postTitle:
+            o.TopicTitle!=null?o.TopicTitle:
+            o.topicTitle!=null?o.topicTitle:
+            o.Subject!=null?o.Subject:
+            o.subject!=null?o.subject:
+            o.PostName!=null?o.PostName:
+            o.postName!=null?o.postName:
+            o.TopicName!=null?o.TopicName:
+            o.topicName!=null?o.topicName:
+            o.ContentTitle!=null?o.ContentTitle:
+            o.contentTitle!=null?o.contentTitle:
+            o.TitleDetail!=null?o.TitleDetail:
+            o.TitleDetailBigBook!=null?o.TitleDetailBigBook:
+            o.TitleDetailBigbook!=null?o.TitleDetailBigbook:
+            ""
+        );
+
+        var body=plain(
+            o.BodyRichText!=null?o.BodyRichText:
+            o.bodyRichText!=null?o.bodyRichText:
+            o.RichText!=null?o.RichText:
+            o.richText!=null?o.richText:
+            o.PostContent!=null?o.PostContent:
+            o.postContent!=null?o.postContent:
+            o.ContentText!=null?o.ContentText:
+            o.contentText!=null?o.contentText:
+            o.Body!=null?o.Body:
+            o.body!=null?o.body:
+            o.Content!=null?o.Content:
+            o.content!=null?o.content:
+            o.Summary!=null?o.Summary:
+            o.summary!=null?o.summary:
+            ""
+        );
+
+        if(!body&&o.text!=null)body=plain(o.text);
+
+        var h5=String(
+            o.H5Url||o.h5Url||
+            o.H5URL||o.h5URL||
+            o.Url||o.url||""
+        );
+        if(/^\/\//.test(h5))h5="https:"+h5;
+
+        var postish=!!(
+            force||postId||topicId||circleId||h5||
+            o.PostType!=null||o.postType!=null||
+            o.Type!=null||o.type!=null||
+            o.PostCategoryId!=null||o.postCategoryId!=null||
+            o.QDBookId!=null||o.qdBookId!=null||
+            o.B
+
+
+        out.push({
+            circleId:circleId,
+            postId:postId,
+            topicId:topicId,
+            user:userOf(o),
+            avatar:avatarOf(o),
+            title:title,
+            body:body,
+            image:mediaImages.length?String(mediaImages[0]):"",
+            images:mediaImages,
+            video:String(vinfo.url||""),
+            videoPoster:String(vinfo.poster||(mediaImages.length?mediaImages[0]:"")||""),
+            videoDuration:Number(vinfo.duration||0)||0,
+            url:/^https?:\/\//i.test(h5)?h5:"",
+            reply:String(
+                o.CommentCount!=null?o.CommentCount:
+                o.commentCount!=null?o.commentCount:
+                o.ReviewCount!=null?o.ReviewCount:
+                o.reviewCount!=null?o.reviewCount:
+                o.PostCount!=null?o.PostCount:
+                o.postCount!=null?o.postCount:""
+            ),
+            like:String(
+                o.LikeCount!=null?o.LikeCount:
+                o.likeCount!=null?o.likeCount:
+                o.AgreeAmount!=null?o.AgreeAmount:
+                o.agreeAmount!=null?o.agreeAmount:
+                o.StarCount!=null?o.StarCount:
+                o.starCount!=null?o.starCount:""
+            ),
+            time:timeOf(o),
+            postCategoryId:String(
+                o.PostCategoryId!=null?o.PostCategoryId:
+                o.postCategoryId!=null?o.postCategoryId:""
+            ),
+            categoryId:String(
+                o.CategoryId!=null?o.CategoryId:
+                o.categoryId!=null?o.categoryId:
+                o.PostCategoryId!=null?o.PostCategoryId:
+                o.postCategoryId!=null?o.postCategoryId:""
+            ),
+            subCategoryId:String(
+                o.SubCategoryId!=null?o.SubCategoryId:
+                o.subCategoryId!=null?o.subCategoryId:
+                o.SubCategory!=null?o.SubCategory:
+                o.subCategory!=null?o.subCategory:""
+            ),
+            postType:String(
+                o.PostType!=null?o.PostType:
+                o.postType!=null?o.postType:
+                o.Type!=null?o.Type:
+                o.type!=null?o.type:""
+            )
+        }
+
+    ];
+
+    var h=[];
+    h.push("<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>");
+    h.push("<title>起点书友圈</title><style>");
+
+    h.push(":root{--bg:#f5f7fb;--card:#fff;--text:#202633;--sub:#8b94a5;--line:#e9edf3;--accent:#ff5a6b;--accent2:#7b7ff6;--soft:#f1f4f8;--blue:#5b7fa8;--shadow:0 8px 24px rgba(35,45,70,.07)}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif}
+body{padding:0 0 28px;background:linear-gradient(180deg,#f1f4fb 0,#f7f8fb 170px,var(--bg) 320px)}
+.head{position:sticky;top:0;z-index:8;padding:10px 12px 0;background:rgba(245,247,251,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.ttl{font-size:19px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.2px;transition:.2s ease}
+.head.compact{padding-top:5px}
+.head.compact .hero{padding:8px 12px;border-radius:15px;box-shadow:0 5px 16px rgba(34,42,64,.13)}
+.head.compact .heroIcon{width:31px;height:31px;border-radius:10px;font-size:17px}
+.head.compact .ttl{font-size:15px}
+.head.compact .sub{display:none}
+.head.compact .tabs{margin-top:5px}
+.head.compact .tab{height:34px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:9px;padding:4px;border-radius:15px;background:rgba(255,255,255,.88);box-shadow:0 4px 16px rgba(40,50,75,.06)}
+");
+    h.push(".filters{display:none;margin:9px -12px 0;padding:8px 13px 10px;background:rgba(255,255,255,.94);border-bottom:1px solid var(--line);align-items:center;gap:8px;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+");
+    h.push(".pane{display:none;padding-top:2px}
+.pane.active{display:block}
+.feedList{padding:0 12px}
+.b{font-size:14px;color:#566071;line-height:1.68;margin-top:6px;white-space:pre-wrap;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:6;overflow:hidden}
+.postFoot{display:flex;align-items:center;gap:8px;margin-top:11px;padding-top:10px;border-top:1px solid #f0f2f6}
+.meta{font-size:11px;color:#9aa2af;min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.go{display:inline-flex;border:0;background:transparent;-webkit-appearance:none;appearance:none;touch-action:manipulation;align-items:center;gap:3px;color:#df5360;font-size:11.5px;font-weight:750;cursor:pointer;flex:none}
+");
+    h.push(".imgGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:11px;border-radius:13px;overflow:hidden}
+");
+    h.push("#detail{display:none;position:fixed;inset:0;z-index:30;background:var(--bg);overflow:auto}
+.dHead{position:sticky;top:0;z-index:31;background:var(--card);height:54px;display:flex;align-items:center;border-bottom:1px solid var(--line);padding:0 14px}
+.qfVideoWrap{position:relative;margin-top:12px;border-radius:13px;overflow:hidden;background:#111;min-height:118px}
+.qfVideoStatus{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);max-width:88%;padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.58);color:#fff;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qfVideoWrap.qfVideoNeedTap .qfVideoStatus{display:block;cursor:pointer;z-index:4}
+");
+
+    /* beta5.6：更接近原生社区的紧凑视觉，减少首屏占屏和重阴影。 */
+    h.push("body{background:#f6f7f9}
+.head{padding:7px 10px 0;background:rgba(246,247,249,.96)}
+.tabs{margin-top:6px;padding:3px;border-radius:13px;box-shadow:none;border:1px solid rgba(230,233,239,.9)}
+.feedList{padding:0 10px}
+.postFoot{margin-top:9px;padding-top:8px}
+.go{font-size:11.5px;color:#e44f5e}
+.qfSkeleton{position:relative;overflow:hidden;text-align:left;padding:18px 16px}
+body{background:linear-gradient(180deg,#151821 0,#111318 320px)}
+.head{background:rgba(17,19,24,.92)}
+.tabs,.filters{background:rgba(26,29,36,.94)}
+.postFoot{border-top-color:#272c35}
+");
+    h.push("</style></head><body>");
+
+    h.push("<header class='head'><div class='hero'><div class='heroIcon'>💬</div><div class='heroText'><div class='ttl'>"+E(bookName||"起点书友圈")+"</div><div class='sub'>书友圈 · 起点官方数据直连</div></div></div><div class='tabs'>");
+    for(var gi=0;gi<groups.length;gi++){
+        var gc=groups[gi];
+        h.push("<button class='tab"+(gi===0?" active":"")+"' data-tab='"+gc.key+"'>"+gc.name+"</button>");
+    }
+
+                if(p.title)h.push("<div class='t'>"+E(p.title)+"</div>");
+                if(p.body&&p.body!==p.title)h.push("<div class='b'>"+E(p.body)+"</div>");
+                if(p.video&&/^https?:\/\//i.test(p.video)){
+                    var vp=String(p.videoPoster||p.image||"");
+                    h.push("<video class='postVideo' controls playsinline webkit-playsinline preload='none' "+(vp&&/^https?:\/\//i.test(vp)?"poster='"+E(vp)+"' ":"")+"src='"+E(p.video)+"'></video>");
+                }
+if(!o||typeof o!=='object'||Array.isArray(o))return false;var ks=Object.keys(o),hasText=false,meta=true;for(var i=0;i<ks.length;i++){var k=String(ks[i]).toLowerCase();if(/text|content|body|title|summary|desc|value/.test(k))hasText=true;if(!/roleid|height|width|size|url|imageurl|imgurl|type|format|md5|key|id/.test(k))meta=false;}
+;var av=avatar(o),nm=user(o)||'书友';var rich=o.BodyRichText!=null?o.BodyRichText:(o.bodyRichText!=null?o.bodyRichText:(o.text!=null?o.text:(o.content!=null?o.content:(o.Body!=null?o.Body:(o.body!=null?o.body:(o.Content!=null?o.Content:o.content))))));var body=txt(rich),ims=imageUrls(o,rich),vd=videoInfo(o,rich),tm=time(o);var rp=qfReplyCount(o);var lk=o.digg_count!=null?o.digg_count:(o.StarCount!=null?o.StarCount:(o.LikeCount!=null?o.LikeCount:(o.likeCount!=null?o.likeCount:(o.AgreeAmount!=null?o.AgreeAmount:o.agreeAmount))));if(!body)body=txt(o.Title!=null?o.Title:o.title);var r='<article class=\\\"review\\\"><div class=\\\"reviewTop\\\">'+(av?imgTag(av,'avatar',''):'<span class=\\\"avatarFb\\\">书</span>')+'<div class=\\\"reviewName\\\">'+esc(nm)+'</div></div>';if(body)r+='<div class=\\\"reviewBody\\\">'+esc(body)+'</div>';for(var ii=0;ii<ims.length;ii++)r+=imgTag(ims[ii],'topicImg','margin-left:41px;max-width:72%');if(vd&&vd.url)r+=videoTag(vd,'topicVideo');var subs=qfReplyRows(o);if(subs.length){r+='<div class=\\\"subReplies\\\">';for(var si=0;si<subs.length&&si<5;si++)r+=subReplyHtml(subs[si]);r+='</div>';}
+var k=id||user(v)+'|'+txt(v.Body||v.body||v.Content||v.content).slice(0,80);if(k&&!seen[k]){seen[k]=1;all.push(v);}
+;document.getElementById('dBack').onclick=function(){detail.style.display='none';document.body.style.overflow='';}
+if(state.loading)return;state.loading=true;if(reset){state.pg=1;body.innerHTML='<div class=\\\"loading\\\">正在加载起点官方帖子详情…</div>';}
+,rows=arrays(d),total=Number(d.TotalCount||d.totalCount||rows.length)||rows.length;state.total=total;if(reset){body.innerHTML=topicHtml(topic,root)+'<div class=\\\"reviewTitle\\\">全部回复'+(total?'（'+total+'）':'')+'</div><div id=\\\"reviewList\\\"></div><button class=\\\"moreBtn\\\" id=\\\"moreBtn\\\">加载更多评论</button>';}
+catch(e){body.innerHTML='<div class=\\\"err\\\">帖子详情加载失败：'+esc(e&&e.message?e.message:e)+'</div>';}
+if(!pic.length&&pim)pic=[pim];state.previewImgs=pic;state.detailRoot=null;state.loading=false;state.pg=1;state.total=0;detail.style.display='block';detail.scrollTop=0;document.body.style.overflow='hidden';body.innerHTML='<div class=\\\"loading\\\"><div class=\\\"spin\\\"></div>正在加载帖子详情…</div>';setTimeout(function(){fetchDetail(true);}
+method:'GET',timeout:10000,headers:{'User-Agent':'Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36','Accept':'text/html,application/xhtml+xml,*/*','Referer':'https://h5.if.qidian.com/'}
+;label=String(label||'');var cid=String(o.CircleId||o.circleId||CIRCLE_ID),pid=String(o.PostId||o.postId||o.Id||o.id||o.TopicId||o.topicId||''),nm=String(o.user||user(o)||'书友'),av=qfNormUrl(o.avatar||avatar(o)||''),title=String(o.title||titleOf(o)||''),rr=richOf(o),rich=rr.raw,bd=qfCleanPollText(String(o.body||rr.text||'')),ims=imageUrls(o,rich),tm=String(o.time||time(o)||''),rp=o.reply!=null?o.reply:(o.PostCount!=null?o.PostCount:(o.CommentCount!=null?o.CommentCount:(o.commentCount!=null?o.commentCount:''))),lk=o.like!=null?o.like:(o.StarCount!=null?o.StarCount:(o.LikeCount!=null?o.LikeCount:o.likeCount));var directImgs=Array.isArray(o.images)?o.images:[];for(var dix=directImgs.length-1;dix>=0;dix--){var diu=qfNormUrl(directImgs[dix]);if(diu&&ims.indexOf(diu)<0)ims.unshift(diu);}
+;function add(o){var id=rowPostId(o),k=id||String(o.title||o.Title||'')+'|'+String(o.body||o.Body||o.Content||'').slice(0,80);if(k&&seen[k])return;if(k)seen[k]=1;out.push(o);}
+;if(INITIAL_ROWS.discussion&&INITIAL_ROWS.discussion.length)feedCache['dongtai|6|讨论']=INITIAL_ROWS.discussion.slice(0);if(INITIAL_ROWS.discussionPreview&&INITIAL_ROWS.discussionPreview.length)discussionPreviewCache['dongtai|6|讨论']=INITIAL_ROWS.discussionPreview.slice(0);function paneList(tab){var pane=document.getElementById('pane_'+tab);return pane&&pane.querySelector('.feedList');}
+function qfNearBottom(){var se=document.scrollingElement||document.documentElement,b=document.body,top=Number((se&&se.scrollTop)||window.pageYOffset||0),h=window.innerHeight||document.documentElement.clientHeight||0,sh=Math.max((se&&se.scrollHeight)||0,document.documentElement.scrollHeight||0,b.scrollHeight||0);return top+h>=sh-520;}
+var hd=document.querySelector('.head'),se=document.scrollingElement||document.documentElement,y=Number((se&&se.scrollTop)||window.pageYOffset||0);if(hd){if(y>86)hd.classList.add('compact');else hd.classList.remove('compact');}
+var ps=document.querySelectorAll('.pane');for(var p=0;p<ps.length;p++){if(ps[p].id==='pane_'+k)ps[p].classList.add('active');else ps[p].classList.remove('active');}
+";
+    return {ok:!!html,html:String(html||''),target:'https://local.qidian.circle.api/'+encodeURIComponent(bid),pre:pre,config:cfg,message:html?'':'书友圈页面为空'}
+";
+
+    try{
+        j.showBrowser(
+            "https://local.qidian.circle.api/"+encodeURIComponent(bid),
+            html,
+            pre,
+            JSON.stringify(cfg)
+        );
+        return true;
+    }
+
+=== var detail= ===
+);}function walk(v,d){if(!v||d>12||typeof v!=='object')return;if(seenObj.indexOf(v)>=0)return;seenObj.push(v);if(Array.isArray(v)){for(var i=0;i<v.length&&i<300;i++)walk(v[i],d+1);return;}add(v);var ks=Object.keys(v);for(var j=0;j<ks.length;j++){var x=v[ks[j]];if(x&&typeof x==='object')walk(x,d+1);}}walk(root,0);return out;}");
+    h.push("function qfLooseReplyRows(root,rid){var linked=qfLinkedReplies(root,rid);if(linked.length)return linked;var all=[],seen={},seenObj=[];function walk(v,d){if(!v||d>11||typeof v!=='object')return;if(seenObj.indexOf(v)>=0)return;seenObj.push(v);if(Array.isArray(v)){for(var i=0;i<v.length&&i<300;i++)walk(v[i],d+1);return;}if(qfLooksReview(v)){var id=qfObjId(v);if(id!==String(rid||'')){var k=id||user(v)+'|'+txt(v.Body||v.body||v.Content||v.content).slice(0,80);if(k&&!seen[k]){seen[k]=1;all.push(v);}}}var ks=Object.keys(v);for(var j=0;j<ks.length;j++){var x=v[ks[j]];if(x&&typeof x==='object')walk(x,d+1);}}walk(dataOf(root),0);return all;}");
+;
+
+    h.push("var detail=document.getElementById('detail'),body=document.getElementById('detailBody'),qfDetailPageCache={},state={cid:'',pid:'',pg:1,total:0,loading:false,previewImgs:[],detailRoot:null};document.getElementById('dBack').onclick=function(){detail.style.display='none';document.body.style.overflow='';};");
+    h.push("function loadReviewReplies(el,auto){if(!el||el.getAttribute('data-loading')==='1')return;var rid=String(el.getAttribute('data-rid')||'');if(!rid)return;el.setAttribute('data-loading','1');if(!auto){el.style.display='inline-block';el.textContent='正在加载回复…';}var attempts=[{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pageIndex:'1',pageSize:'50',sortType:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,pg:'1',pz:'50',type:'1',sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,pg:'1',pz:'50',sort:'0'}}],rows=[],lastErr='';if(state.detailRoot)rows=qfLinkedReplies(state.detailRoot,rid);for(var i=0;i<attempts.length&&!rows.length;i++){try{var req=signed(attempts[i].path,attempts[i].p),root=parse(ajax(req));rows=qfLinkedReplies(root,rid);if(!rows.length)rows=qfReviewDetailRows(root);if(!rows.length)rows=qfLooseReplyRows(root,rid);}catch(e){lastErr=String(e&&e.message?e.message:e);}}if(rows.length){var old=el.parentNode.querySelector('.subReplies');if(old)old.parentNode.removeChild(old);var box=document.createElement('div');box.className='subReplies';var hh='';for(var j=0;j<rows.length&&j<50;j++)hh+=subReplyHtml(rows[j]);box.innerHTML=hh;el.parentNode.insertBefore(box,el);el.style.display='none';}else{if(!auto){el.style.display='inline-bl
+
+=== detail=document ===
+unction walk(v,d){if(!v||d>12||typeof v!=='object')return;if(seenObj.indexOf(v)>=0)return;seenObj.push(v);if(Array.isArray(v)){for(var i=0;i<v.length&&i<300;i++)walk(v[i],d+1);return;}add(v);var ks=Object.keys(v);for(var j=0;j<ks.length;j++){var x=v[ks[j]];if(x&&typeof x==='object')walk(x,d+1);}}walk(root,0);return out;}");
+    h.push("function qfLooseReplyRows(root,rid){var linked=qfLinkedReplies(root,rid);if(linked.length)return linked;var all=[],seen={},seenObj=[];function walk(v,d){if(!v||d>11||typeof v!=='object')return;if(seenObj.indexOf(v)>=0)return;seenObj.push(v);if(Array.isArray(v)){for(var i=0;i<v.length&&i<300;i++)walk(v[i],d+1);return;}if(qfLooksReview(v)){var id=qfObjId(v);if(id!==String(rid||'')){var k=id||user(v)+'|'+txt(v.Body||v.body||v.Content||v.content).slice(0,80);if(k&&!seen[k]){seen[k]=1;all.push(v);}}}var ks=Object.keys(v);for(var j=0;j<ks.length;j++){var x=v[ks[j]];if(x&&typeof x==='object')walk(x,d+1);}}walk(dataOf(root),0);return all;}");
+;
+
+    h.push("var detail=document.getElementById('detail'),body=document.getElementById('detailBody'),qfDetailPageCache={},state={cid:'',pid:'',pg:1,total:0,loading:false,previewImgs:[],detailRoot:null};document.getElementById('dBack').onclick=function(){detail.style.display='none';document.body.style.overflow='';};");
+    h.push("function loadReviewReplies(el,auto){if(!el||el.getAttribute('data-loading')==='1')return;var rid=String(el.getAttribute('data-rid')||'');if(!rid)return;el.setAttribute('data-loading','1');if(!auto){el.style.display='inline-block';el.textContent='正在加载回复…';}var attempts=[{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pageIndex:'1',pageSize:'50',sortType:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,pg:'1',pz:'50',type:'1',sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,pg:'1',pz:'50',sort:'0'}}],rows=[],lastErr='';if(state.detailRoot)rows=qfLinkedReplies(state.detailRoot,rid);for(var i=0;i<attempts.length&&!rows.length;i++){try{var req=signed(attempts[i].path,attempts[i].p),root=parse(ajax(req));rows=qfLinkedReplies(root,rid);if(!rows.length)rows=qfReviewDetailRows(root);if(!rows.length)rows=qfLooseReplyRows(root,rid);}catch(e){lastErr=String(e&&e.message?e.message:e);}}if(rows.length){var old=el.parentNode.querySelector('.subReplies');if(old)old.parentNode.removeChild(old);var box=document.createElement('div');box.className='subReplies';var hh='';for(var j=0;j<rows.length&&j<50;j++)hh+=subReplyHtml(rows[j]);box.innerHTML=hh;el.parentNode.insertBefore(box,el);el.style.display='none';}else{if(!auto){el.style.display='inline-block'
+
+=== var body= ===
+|
+            o.ContentId||o.contentId||""
+        );
+
+        var circleId=cleanId(
+            o.CircleId||o.circleId||
+            o.BookCircleId||o.bookCircleId||""
+        );
+
+        var title=plain(
+            o.Title!=null?o.Title:
+            o.title!=null?o.title:
+            o.PostTitle!=null?o.PostTitle:
+            o.postTitle!=null?o.postTitle:
+            o.TopicTitle!=null?o.TopicTitle:
+            o.topicTitle!=null?o.topicTitle:
+            o.Subject!=null?o.Subject:
+            o.subject!=null?o.subject:
+            o.PostName!=null?o.PostName:
+            o.postName!=null?o.postName:
+            o.TopicName!=null?o.TopicName:
+            o.topicName!=null?o.topicName:
+            o.ContentTitle!=null?o.ContentTitle:
+            o.contentTitle!=null?o.contentTitle:
+            o.TitleDetail!=null?o.TitleDetail:
+            o.TitleDetailBigBook!=null?o.TitleDetailBigBook:
+            o.TitleDetailBigbook!=null?o.TitleDetailBigbook:
+            ""
+        );
+
+        var body=plain(
+            o.BodyRichText!=null?o.BodyRichText:
+            o.bodyRichText!=null?o.bodyRichText:
+            o.RichText!=null?o.RichText:
+            o.richText!=null?o.richText:
+            o.PostContent!=null?o.PostContent:
+            o.postContent!=null?o.postContent:
+            o.ContentText!=null?o.ContentText:
+            o.contentText!=null?o.contentText:
+            o.Body!=null?o.Body:
+            o.body!=null?o.body:
+            o.Content!=null?o.Content:
+            o.content!=null?o.content:
+            o.Summary!=null?o.Summary:
+            o.summary!=null?o.summary:
+            ""
+        );
+
+        if(!body&&o.text!=null)body=plain(o.text);
+
+        var h5=String(
+            o.H5Url||o.h5Url||
+            o.H5URL||o.h5URL||
+            o.Url||o.url||""
+        );
+        if(/^\/\//.test(h5))h5="https:"+h5;
+
+        var postish=!!(
+            force||postId||topicId||circleId||h5||
+            o.PostType!=null||o.postType!=null||
+            o.Type!=null||o.type!=null||
+            o.PostCategoryId!=null||o.postCategoryId!=null||
+            o.QDBookId!=null||o.qdBookId!=null||
+            o.BookId!=null||o.bookId!=null
+        );
+
+        if(!postish)return;
+        if(!title&&!body&&!postId&&!topicId&&!h5)return;
+
+        if(!postId)postId=cleanId(o.Id||o.id||"");
+
+        var key=
+            postId||topicId||
+            normKey(title||body.slice(0,140));
+
+        if(!key||seenPost[key])return;
+        seenPost[key]=1;
+
+        var mediaImages=[];
+        try{mediaImages=qfCirclePostImagesV310(o)||[];}catch(_images){mediaImages=[];}
+        var vinfo={url:"",poster:"",duration:0};
+        try{vinfo=qfCircleVideoInfo2975(o)||vinfo;}catch(_video){}
+
+        out.push({
+            circleId:circleId,
+            postId:postId,
+            topicId:topicId,
+            user:userOf(o),
+            avatar:avatarOf(o),
+            title:title,
+            body:body,
+            image:mediaImages.length?String(mediaImages[0]):"",
+            images:mediaImages,
+            video:String(vinfo.url||""),
+            videoPoster:String(vinfo.poster||(mediaImages.length?mediaImages[0]:"")||""),
+            videoDuration:Number(vinfo.durat
+.length;i++){if(vals[i]!==undefined&&vals[i]!==null&&String(vals[i])!==''){var n=Number(vals[i]);if(isFinite(n)&&n>=0)return n;}}return 0;}");
+    h.push("function subReplyHtml(o){o=o||{};var nm=user(o)||'书友',body=txt(o.Body!=null?o.Body:(o.body!=null?o.body:(o.Content!=null?o.Content:(o.content!=null?o.content:(o.BodyRichText!=null?o.BodyRichText:o.bodyRichText)))));if(!body)body=txt(o.Title!=null?o.Title:o.title);var qn=String(o.ReplyUserName||o.replyUserName||o.QuoteUserName||o.quoteUserName||o.RelatedUser||o.relatedUser||'');return '<div class=\\\"subReply\\\"><span class=\\\"subName\\\">'+esc(nm)+'</span>'+(qn?' 回复 <span class=\\\"subName\\\">'+esc(qn)+'</span>':'')+'：'+esc(body)+'</div>';}");
+    h.push("function reviewHtml(o){o=o||{};var av=avatar(o),nm=user(o)||'书友';var rich=o.BodyRichText!=null?o.BodyRichText:(o.bodyRichText!=null?o.bodyRichText:(o.text!=null?o.text:(o.content!=null?o.content:(o.Body!=null?o.Body:(o.body!=null?o.body:(o.Content!=null?o.Content:o.content))))));var body=txt(rich),ims=imageUrls(o,rich),vd=videoInfo(o,rich),tm=time(o);var rp=qfReplyCount(o);var lk=o.digg_count!=null?o.digg_count:(o.StarCount!=null?o.StarCount:(o.LikeCount!=null?o.LikeCount:(o.likeCount!=null?o.likeCount:(o.AgreeAmount!=null?o.AgreeAmount:o.agreeAmount))));if(!body)body=txt(o.Title!=null?o.Title:o.title);var r='<article class=\\\"review\\\"><div class=\\\"reviewTop\\\">'+(av?imgTag(av,'avatar',''):'<span class=\\\"avatarFb\\\">书</span>')+'<div class=\\\"reviewName\\\">'+esc(nm)+'</div></div>';if(body)r+='<div class=\\\"reviewBody\\\">'+esc(body)+'</div>';for(var ii=0;ii<ims.length;ii++)r+=imgTag(ims[ii],'topicImg','margin-left:41px;max-width:72%');if(vd&&vd.url)r+=videoTag(vd,'topicVideo');var subs=qfReplyRows(o);if(subs.length){r+='<div class=\\\"subReplies\\\">';for(var si=0;si<subs.length&&si<5;si++)r+=subReplyHtml(subs[si]);r+='</div>';}var rid=qfReviewId(o);if(rid){var hidden=(rp<=subs.length)?' style=\\\"display:none\\\"':'';var label=rp>subs.length?'查看全部 '+rp+' 条回复 ›':'查看回复 ›';r+='<span class=\\\"replyMore qfReplyMore\\\"'+hidden+' data-rid=\\\"'+esc(rid)+'\\\" data-count=\\\"'+rp+'\\\">'+label+'</span>';}r+='<div class=\\\"reviewMeta\\\">'+esc(tm)+(rp?' · '+esc(rp)+'回复':'')+(lk!=null&&lk!==''?' · '+esc(lk)+'赞':'')+'</div></article>';return r;}");
+    h.push("function arrays(d){var a=d.ReviewDataList||d.reviewDataList||[],b=d.AuthorReviewDataList||d.authorReviewDataList||[];if(!Array.isArray(a))a=[];if(!Array.isArray(b))b=[];return b.concat(a);}");
+
+    h.push("function qfFindReplyArray(v,d){if(!v||d>9||typeof v!=='object')return [];var names=['ReplyList','replyList','ReviewList','reviewList','ReplyDataList','replyDataList','ReviewDataList','reviewDataList','SubReviewList','subReviewList'];for(var i=0;i<names.length;i++){var a=v[names[i]];if(Array.isArray(a)&&a.length)return a;}if(Array.isArray(v)){for(var j=0;j<v.length;j++){var z=qfFindReplyArray(v[j],d+1);if(z.length)return z;}return [];}var ks=Object.keys(v);for(var k=0;k<ks.length;k++){var x=v[ks[k]];if(x&&typeof x==='object'){var y=qfFindReplyArray(x,d+1);if(y.length)return y;}}return [];}");
+    h.push("function qfReviewDetailRows(root){return qfFindReplyArray(dataOf(root),0
+
+=== body=document ===
+='object')return;if(seenObj.indexOf(v)>=0)return;seenObj.push(v);if(Array.isArray(v)){for(var i=0;i<v.length&&i<300;i++)walk(v[i],d+1);return;}add(v);var ks=Object.keys(v);for(var j=0;j<ks.length;j++){var x=v[ks[j]];if(x&&typeof x==='object')walk(x,d+1);}}walk(root,0);return out;}");
+    h.push("function qfLooseReplyRows(root,rid){var linked=qfLinkedReplies(root,rid);if(linked.length)return linked;var all=[],seen={},seenObj=[];function walk(v,d){if(!v||d>11||typeof v!=='object')return;if(seenObj.indexOf(v)>=0)return;seenObj.push(v);if(Array.isArray(v)){for(var i=0;i<v.length&&i<300;i++)walk(v[i],d+1);return;}if(qfLooksReview(v)){var id=qfObjId(v);if(id!==String(rid||'')){var k=id||user(v)+'|'+txt(v.Body||v.body||v.Content||v.content).slice(0,80);if(k&&!seen[k]){seen[k]=1;all.push(v);}}}var ks=Object.keys(v);for(var j=0;j<ks.length;j++){var x=v[ks[j]];if(x&&typeof x==='object')walk(x,d+1);}}walk(dataOf(root),0);return all;}");
+;
+
+    h.push("var detail=document.getElementById('detail'),body=document.getElementById('detailBody'),qfDetailPageCache={},state={cid:'',pid:'',pg:1,total:0,loading:false,previewImgs:[],detailRoot:null};document.getElementById('dBack').onclick=function(){detail.style.display='none';document.body.style.overflow='';};");
+    h.push("function loadReviewReplies(el,auto){if(!el||el.getAttribute('data-loading')==='1')return;var rid=String(el.getAttribute('data-rid')||'');if(!rid)return;el.setAttribute('data-loading','1');if(!auto){el.style.display='inline-block';el.textContent='正在加载回复…';}var attempts=[{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pageIndex:'1',pageSize:'50',sortType:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,pg:'1',pz:'50',type:'1',sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,pg:'1',pz:'50',sort:'0'}}],rows=[],lastErr='';if(state.detailRoot)rows=qfLinkedReplies(state.detailRoot,rid);for(var i=0;i<attempts.length&&!rows.length;i++){try{var req=signed(attempts[i].path,attempts[i].p),root=parse(ajax(req));rows=qfLinkedReplies(root,rid);if(!rows.length)rows=qfReviewDetailRows(root);if(!rows.length)rows=qfLooseReplyRows(root,rid);}catch(e){lastErr=String(e&&e.message?e.message:e);}}if(rows.length){var old=el.parentNode.querySelector('.subReplies');if(old)old.parentNode.removeChild(old);var box=document.createElement('div');box.className='subReplies';var hh='';for(var j=0;j<rows.length&&j<50;j++)hh+=subReplyHtml(rows[j]);box.innerHTML=hh;el.parentNode.insertBefore(box,el);el.style.display='none';}else{if(!auto){el.style.display='inline-block';el.textContent='暂未获取到回复'+(lastErr?' · '+
+
+=== var chips= ===
+on')return;var list=paneList(currentTab),posts=list?list.querySelectorAll('.post'):null,last=posts&&posts.length?posts[posts.length-1]:null;if(!last)return;qfFeedObserver=new IntersectionObserver(function(es){for(var i=0;i<es.length;i++){if(es[i].isIntersecting){qfNextFeed();break;}}},{root:null,rootMargin:'0px 0px 520px 0px',threshold:0.01});qfFeedObserver.observe(last);}catch(_o){}}function qfHeadCompact(){try{var hd=document.querySelector('.head'),se=document.scrollingElement||document.documentElement,y=Number((se&&se.scrollTop)||window.pageYOffset||0);if(hd){if(y>86)hd.classList.add('compact');else hd.classList.remove('compact');}}catch(_h){}}window.addEventListener('scroll',function(){qfHeadCompact();if(qfFeedScrollTimer)return;qfFeedScrollTimer=setTimeout(function(){qfFeedScrollTimer=0;if(qfNearBottom())qfNextFeed();},90);},{passive:true});setInterval(function(){try{if(qfNearBottom())qfNextFeed();}catch(_w){}},900);qfHeadCompact();setTimeout(qfArmFeedObserver,60);");
+    h.push("var chips=document.querySelectorAll('.chip'),sortSel=document.getElementById('sortSel');function chipVisibleFor(chip,tab){var ts=String(chip.getAttribute('data-tabs')||'dongtai,jinghua');return ts.split(',').indexOf(tab)>=0;}function applyChipSet(tab){var first=null;for(var i=0;i<chips.length;i++){var ok=chipVisibleFor(chips[i],tab);chips[i].style.display=ok?'':'none';chips[i].classList.remove('active');if(ok&&!first)first=chips[i];}if(first)first.classList.add('active');}for(var ci=0;ci<chips.length;ci++){chips[ci].onclick=function(){if(!chipVisibleFor(this,currentTab)||this.classList.contains('active'))return;for(var j=0;j<chips.length;j++)chips[j].classList.remove('active');this.classList.add('active');loadCategory(this);};}sortSel.onchange=function(){currentSort=String(this.value||'6');var active=null;for(var i=0;i<chips.length;i++){if(chips[i].classList.contains('active')&&chipVisibleFor(chips[i],currentTab)){active=chips[i];break;}}if(active)loadCategory(active);};");
+    h.push("var bs=document.querySelectorAll('.tab'),filterBar=document.getElementById('filterBar');for(var i=0;i<bs.length;i++){bs[i].onclick=function(){var k=this.getAttribute('data-tab');if(k===currentTab)return;currentTab=k;for(var a=0;a<bs.length;a++){if(bs[a]===this)bs[a].classList.add('active');else bs[a].classList.remove('active');}var ps=document.querySelectorAll('.pane');for(var p=0;p<ps.length;p++){if(ps[p].id==='pane_'+k)ps[p].classList.add('active');else ps[p].classList.remove('active');}filterBar.classList.add('show');applyChipSet(k);var first=null;for(var c=0;c<chips.length;c++){if(chips[c].classList.contains('active')&&chipVisibleFor(chips[c],k)){first=chips[c];break;}}if(first)loadCategory(first);};}applyChipSet('dongtai');");
+
+    h.push("})();</script></body></html>");
+    return h.join("");
+}
+
+var QF_CIRCLE_BOOT_CACHE_V352={};
+function qfCircleBootGetV352(bid,maxAge){
+    var x=QF_CIRCLE_BOOT_CACHE_V352[String(bid||"")];
+    if(!x||!x.ts||Date.now()-Number(x.ts)>Number(maxAge||300000))return null;
+    return x.data||null;
+}
+function qfCircleBootPutV352(bid,data){
+    var k=String(bid||"");if(!k||!data)return data;
+    QF_CIRCLE_BOOT_CACHE_V352[k]={ts:Date.now(),data:data};
+
+=== chips=document ===
+return;var list=paneList(currentTab),posts=list?list.querySelectorAll('.post'):null,last=posts&&posts.length?posts[posts.length-1]:null;if(!last)return;qfFeedObserver=new IntersectionObserver(function(es){for(var i=0;i<es.length;i++){if(es[i].isIntersecting){qfNextFeed();break;}}},{root:null,rootMargin:'0px 0px 520px 0px',threshold:0.01});qfFeedObserver.observe(last);}catch(_o){}}function qfHeadCompact(){try{var hd=document.querySelector('.head'),se=document.scrollingElement||document.documentElement,y=Number((se&&se.scrollTop)||window.pageYOffset||0);if(hd){if(y>86)hd.classList.add('compact');else hd.classList.remove('compact');}}catch(_h){}}window.addEventListener('scroll',function(){qfHeadCompact();if(qfFeedScrollTimer)return;qfFeedScrollTimer=setTimeout(function(){qfFeedScrollTimer=0;if(qfNearBottom())qfNextFeed();},90);},{passive:true});setInterval(function(){try{if(qfNearBottom())qfNextFeed();}catch(_w){}},900);qfHeadCompact();setTimeout(qfArmFeedObserver,60);");
+    h.push("var chips=document.querySelectorAll('.chip'),sortSel=document.getElementById('sortSel');function chipVisibleFor(chip,tab){var ts=String(chip.getAttribute('data-tabs')||'dongtai,jinghua');return ts.split(',').indexOf(tab)>=0;}function applyChipSet(tab){var first=null;for(var i=0;i<chips.length;i++){var ok=chipVisibleFor(chips[i],tab);chips[i].style.display=ok?'':'none';chips[i].classList.remove('active');if(ok&&!first)first=chips[i];}if(first)first.classList.add('active');}for(var ci=0;ci<chips.length;ci++){chips[ci].onclick=function(){if(!chipVisibleFor(this,currentTab)||this.classList.contains('active'))return;for(var j=0;j<chips.length;j++)chips[j].classList.remove('active');this.classList.add('active');loadCategory(this);};}sortSel.onchange=function(){currentSort=String(this.value||'6');var active=null;for(var i=0;i<chips.length;i++){if(chips[i].classList.contains('active')&&chipVisibleFor(chips[i],currentTab)){active=chips[i];break;}}if(active)loadCategory(active);};");
+    h.push("var bs=document.querySelectorAll('.tab'),filterBar=document.getElementById('filterBar');for(var i=0;i<bs.length;i++){bs[i].onclick=function(){var k=this.getAttribute('data-tab');if(k===currentTab)return;currentTab=k;for(var a=0;a<bs.length;a++){if(bs[a]===this)bs[a].classList.add('active');else bs[a].classList.remove('active');}var ps=document.querySelectorAll('.pane');for(var p=0;p<ps.length;p++){if(ps[p].id==='pane_'+k)ps[p].classList.add('active');else ps[p].classList.remove('active');}filterBar.classList.add('show');applyChipSet(k);var first=null;for(var c=0;c<chips.length;c++){if(chips[c].classList.contains('active')&&chipVisibleFor(chips[c],k)){first=chips[c];break;}}if(first)loadCategory(first);};}applyChipSet('dongtai');");
+
+    h.push("})();</script></body></html>");
+    return h.join("");
+}
+
+var QF_CIRCLE_BOOT_CACHE_V352={};
+function qfCircleBootGetV352(bid,maxAge){
+    var x=QF_CIRCLE_BOOT_CACHE_V352[String(bid||"")];
+    if(!x||!x.ts||Date.now()-Number(x.ts)>Number(maxAge||300000))return null;
+    return x.data||null;
+}
+function qfCircleBootPutV352(bid,data){
+    var k=String(bid||"");if(!k||!data)return data;
+    QF_CIRCLE_BOOT_CACHE_V352[k]={ts:Date.now(),data:data};
+   
+
+=== currentTab= ===
++'</div>';if(title)r+='<div class=\"t\">'+esc(title)+'</div>';if(bd&&bd!==title)r+='<div class=\"b\">'+esc(bd)+'</div>';if((vd&&vd.url)||(label==='同人视频'&&pid)){if(!vd)vd={url:'',poster:''};if(!vd.poster&&ims.length)vd.poster=ims[0];r+=videoTag(vd,'postVideo',cid,pid);}else if(ims.length)r+=imageGridTag(ims);var ms=[];if(tm)ms.push(tm);if(rp!==''&&rp!=null)ms.push('💬 '+rp);if(lk!==''&&lk!=null)ms.push('♡ '+lk);r+='<div class=\"postFoot\"><div class=\"meta\">'+esc(ms.join('　'))+'</div>';if(pid)r+='<span class=\"go qfPostOpen\" role=\"button\" tabindex=\"0\" data-cid=\"'+esc(cid)+'\" data-pid=\"'+esc(pid)+'\" data-img=\"'+esc(ims.length?ims[0]:'')+'\">查看详情 ›</span>';return r+'</div></article>';}");
+    h.push("var INITIAL_ROWS="+JSON.stringify({
+        dongtai:tabs.dongtai||posts||[],
+        jinghua:tabs.jinghua||[],
+        tongren:tabs.tongren||[],
+        discussion:tabs.discussion||[],
+        discussionPreview:tabs.discussionPreview||[]
+    })+";");
+    h.push("var currentSort='6',currentTab='dongtai';");
+    h.push("var TOP_META="+JSON.stringify({
+        dongtai:{id:"0"},
+        jinghua:{id:"2",essence:true},
+        tongren:{id:"316",parentId:String((categoryMeta.tongren&&categoryMeta.tongren.treePostCategoryId)||"")}
+    })+";");
+    h.push("function feedFingerprint(rows){var a=[];rows=Array.isArray(rows)?rows:[];for(var i=0;i<rows.length&&i<8;i++){var o=rows[i]||{},id=String(o.PostId||o.postId||o.Id||o.id||o.TopicId||o.topicId||'');if(id)a.push(id);else a.push(String(o.Title||o.title||'')+'|'+txt(o.Body||o.body||o.Content||o.content).slice(0,60));}return a.join('||');}");
+    h.push("function qfCatValues(o,keys){o=o||{};var out=[],seen={};function add(v){if(v===undefined||v===null||String(v)==='')return;v=String(v);if(!seen[v]){seen[v]=1;out.push(v);}}var bs=[o,o.PostBasicInfo,o.postBasicInfo,o.PostBasicBean,o.postBasicBean,o.BasicInfo,o.basicInfo,o.PostInfo,o.postInfo,o.TopicInfo,o.topicInfo,o.PostCategoryInfo,o.postCategoryInfo,o.CategoryInfo,o.categoryInfo,o.SubCategoryInfo,o.subCategoryInfo,o.ExtInfo,o.extInfo];for(var b=0;b<bs.length;b++){var x=bs[b];if(!x||typeof x!=='object')continue;for(var k=0;k<keys.length;k++)add(x[keys[k]]);}return out;}function qfCatField(o,keys){var a=qfCatValues(o,keys);return a.length?a[0]:'';}function rowCats(o){return qfCatValues(o,['PostCategoryId','postCategoryId','CategoryId','categoryId','PostCategoryJsId','postCategoryJsId','CategoryJsId','categoryJsId']);}function rowSubs(o){return qfCatValues(o,['SubCategoryId','subCategoryId','SubCategory','subCategory','SubCategoryJsId','subCategoryJsId','SubJsId','subJsId','JsCategoryId','jsCategoryId']);}function rowCat(o){var a=rowCats(o);return a.length?a[0]:'';}function rowSub(o){var a=rowSubs(o);return a.length?a[0]:'';}function rowEssence(o){var vs=qfCatValues(o,['IsJinghua','isJinghua','IsJingHua','isJingHua','IsGodReview','isGodReview','IsEssence','isEssence','IsBest','isBest']);for(var i=0;i<vs.length;i++){var v=String(vs[i]).toLowerCase();if(v==='1'||v==='true')return true;}return false;}function idsOf(c){var a=[String(c&&c.id||''),String(c&&c.altId||'')],r=[];for(var i=0;i<a.length;i++)if(a[i]&&r.indexOf(a[i])<0)r.push(a[i]);return r;}function 
+nction fanDirectProgressive(chip,label,c,seed,maxPages){var key=cacheKey('tongren',label),token=(fanDirectState[key]&&fanDirectState[key].token||0)+1;var best=Array.isArray(seed)?seed.slice(0):[];fanDirectState[key]={token:token,page:1,done:false,cand:c};maxPages=Math.max(2,Math.min(Number(maxPages)||8,16));var pg=2,seen={},empty=0;var fp0=feedFingerprint(best);if(fp0)seen[fp0]=1;function step(){var st=fanDirectState[key];if(!st||st.token!==token)return;if(currentTab!=='tongren'||!chip||!chip.classList.contains('active'))return;if(pg>maxPages){st.done=true;return;}setTimeout(function(){var st2=fanDirectState[key];if(!st2||st2.token!==token)return;var rows=fanDirectFetch(c,label,pg);st2.page=pg;if(!rows.length){empty++;if(empty>=2||pg>=maxPages){st2.done=true;return;}pg++;step();return;}empty=0;var fp=feedFingerprint(rows);if(fp&&seen[fp]){st2.done=true;return;}if(fp)seen[fp]=1;var merged=mergeFeedRows(best,rows);if(merged.length>best.length){best=merged;feedCache[key]=best.slice(0);if(currentTab==='tongren'&&chip.classList.contains('active'))renderFiltered('tongren',best,label);}pg++;step();},55);}step();}\nfunction fanProgressive(chip,label,c,seed,maxPages,target){var key=cacheKey('tongren',label),token=(fanScanState[key]&&fanScanState[key].token||0)+1;fanScanState[key]={token:token,page:1,done:false};var all=fanAllControl().slice(0),best=Array.isArray(seed)?seed.slice(0):fanLocalByLabel(all,c,label),seenPage={};var fp1=feedFingerprint(fanPage(1));if(fp1)seenPage[fp1]=1;if(best.length){feedCache[key]=best.slice(0);if(currentTab==='tongren'&&chip&&chip.classList.contains('active'))renderFiltered('tongren',best,label);}maxPages=Math.max(2,Math.min(Number(maxPages)||10,18));target=Math.max(2,Number(target)||4);var pg=2;function step(){var st=fanScanState[key];if(!st||st.token!==token)return;if(currentTab!=='tongren'||!chip||!chip.classList.contains('active')){st.page=pg-1;return;}if(pg>maxPages){st.done=true;return;}setTimeout(function(){var st2=fanScanState[key];if(!st2||st2.token!==token)return;var rows=fanPage(pg);st2.page=pg;if(!rows.length){st2.done=true;return;}var fp=feedFingerprint(rows);if(fp&&seenPage[fp]){st2.done=true;return;}if(fp)seenPage[fp]=1;all=mergeFeedRows(all,rows);var next=fanLocalByLabel(all,c,label);if(next.length>best.length){best=next;feedCache[key]=best.slice(0);if(currentTab==='tongren'&&chip.classList.contains('active'))renderFiltered('tongren',best,label);}if(best.length>=target){st2.done=true;return;}pg++;step();},45);}step();}\n");
+    h.push("function requestCategory(tab,c,isAll,label){var vs=paramVariants(tab,c,1),last=[];for(var v=0;v<vs.length;v++){try{var rows=topRequest(tab,1,vs[v]);last=rows;if(!rows.length)continue;if(tab==='jinghua'){if(isAll||label==='全部'){if(essenceVerified(rows,c,label))return {rows:rows,via:v};continue;}var ea=qfEssenceAccept(rows,c,label);if(ea.length)return {rows:ea,via:v};continue;}if(tab==='dongtai'){if(isAll)return {rows:rows,via:v};var da=qfDynamicAccept(rows,c,label);if(da.length)return {rows:da,via:v};continue;}if(tab==='tongren'){if(isAll||label==='全部')return {rows:rows,via:v};var fa=fanAccept(rows,c,label);if(fa.length)return {rows:fa,via:v};continue;}if(feedFingerprint(row
+ages){st.done=true;return;}setTimeout(function(){var st2=fanDirectState[key];if(!st2||st2.token!==token)return;var rows=fanDirectFetch(c,label,pg);st2.page=pg;if(!rows.length){empty++;if(empty>=2||pg>=maxPages){st2.done=true;return;}pg++;step();return;}empty=0;var fp=feedFingerprint(rows);if(fp&&seen[fp]){st2.done=true;return;}if(fp)seen[fp]=1;var merged=mergeFeedRows(best,rows);if(merged.length>best.length){best=merged;feedCache[key]=best.slice(0);if(currentTab==='tongren'&&chip.classList.contains('active'))renderFiltered('tongren',best,label);}pg++;step();},55);}step();}\nfunction fanProgressive(chip,label,c,seed,maxPages,target){var key=cacheKey('tongren',label),token=(fanScanState[key]&&fanScanState[key].token||0)+1;fanScanState[key]={token:token,page:1,done:false};var all=fanAllControl().slice(0),best=Array.isArray(seed)?seed.slice(0):fanLocalByLabel(all,c,label),seenPage={};var fp1=feedFingerprint(fanPage(1));if(fp1)seenPage[fp1]=1;if(best.length){feedCache[key]=best.slice(0);if(currentTab==='tongren'&&chip&&chip.classList.contains('active'))renderFiltered('tongren',best,label);}maxPages=Math.max(2,Math.min(Number(maxPages)||10,18));target=Math.max(2,Number(target)||4);var pg=2;function step(){var st=fanScanState[key];if(!st||st.token!==token)return;if(currentTab!=='tongren'||!chip||!chip.classList.contains('active')){st.page=pg-1;return;}if(pg>maxPages){st.done=true;return;}setTimeout(function(){var st2=fanScanState[key];if(!st2||st2.token!==token)return;var rows=fanPage(pg);st2.page=pg;if(!rows.length){st2.done=true;return;}var fp=feedFingerprint(rows);if(fp&&seenPage[fp]){st2.done=true;return;}if(fp)seenPage[fp]=1;all=mergeFeedRows(all,rows);var next=fanLocalByLabel(all,c,label);if(next.length>best.length){best=next;feedCache[key]=best.slice(0);if(currentTab==='tongren'&&chip.classList.contains('active'))renderFiltered('tongren',best,label);}if(best.length>=target){st2.done=true;return;}pg++;step();},45);}step();}\n");
+    h.push("function requestCategory(tab,c,isAll,label){var vs=paramVariants(tab,c,1),last=[];for(var v=0;v<vs.length;v++){try{var rows=topRequest(tab,1,vs[v]);last=rows;if(!rows.length)continue;if(tab==='jinghua'){if(isAll||label==='全部'){if(essenceVerified(rows,c,label))return {rows:rows,via:v};continue;}var ea=qfEssenceAccept(rows,c,label);if(ea.length)return {rows:ea,via:v};continue;}if(tab==='dongtai'){if(isAll)return {rows:rows,via:v};var da=qfDynamicAccept(rows,c,label);if(da.length)return {rows:da,via:v};continue;}if(tab==='tongren'){if(isAll||label==='全部')return {rows:rows,via:v};var fa=fanAccept(rows,c,label);if(fa.length)return {rows:fa,via:v};continue;}if(feedFingerprint(rows)===feedFingerprint(INITIAL_ROWS.dongtai||[]))continue;if(isAll)return {rows:rows,via:v};var hit=localCategoryFilter(rows,c,true);if(hit.length)return {rows:hit,via:v};if(qfCandidateTrust(c)>=2)return {rows:rows,via:v};}catch(_e){}}return {rows:[],via:-1,last:last};}");
+    h.push("function performCategory(chip,label,retry){retry=Number(retry||0);var tab=currentTab,key=cacheKey(tab,label);if(tab!=='tongren'&&feedCache[key]){renderFiltered(tab,feedCache[key],label);return;}if(label==='全部'&&currentSort==='6'&&INITIAL_ROWS[tab]&&INITIAL_ROW
+=fanAllControl().slice(0),best=Array.isArray(seed)?seed.slice(0):fanLocalByLabel(all,c,label),seenPage={};var fp1=feedFingerprint(fanPage(1));if(fp1)seenPage[fp1]=1;if(best.length){feedCache[key]=best.slice(0);if(currentTab==='tongren'&&chip&&chip.classList.contains('active'))renderFiltered('tongren',best,label);}maxPages=Math.max(2,Math.min(Number(maxPages)||10,18));target=Math.max(2,Number(target)||4);var pg=2;function step(){var st=fanScanState[key];if(!st||st.token!==token)return;if(currentTab!=='tongren'||!chip||!chip.classList.contains('active')){st.page=pg-1;return;}if(pg>maxPages){st.done=true;return;}setTimeout(function(){var st2=fanScanState[key];if(!st2||st2.token!==token)return;var rows=fanPage(pg);st2.page=pg;if(!rows.length){st2.done=true;return;}var fp=feedFingerprint(rows);if(fp&&seenPage[fp]){st2.done=true;return;}if(fp)seenPage[fp]=1;all=mergeFeedRows(all,rows);var next=fanLocalByLabel(all,c,label);if(next.length>best.length){best=next;feedCache[key]=best.slice(0);if(currentTab==='tongren'&&chip.classList.contains('active'))renderFiltered('tongren',best,label);}if(best.length>=target){st2.done=true;return;}pg++;step();},45);}step();}\n");
+    h.push("function requestCategory(tab,c,isAll,label){var vs=paramVariants(tab,c,1),last=[];for(var v=0;v<vs.length;v++){try{var rows=topRequest(tab,1,vs[v]);last=rows;if(!rows.length)continue;if(tab==='jinghua'){if(isAll||label==='全部'){if(essenceVerified(rows,c,label))return {rows:rows,via:v};continue;}var ea=qfEssenceAccept(rows,c,label);if(ea.length)return {rows:ea,via:v};continue;}if(tab==='dongtai'){if(isAll)return {rows:rows,via:v};var da=qfDynamicAccept(rows,c,label);if(da.length)return {rows:da,via:v};continue;}if(tab==='tongren'){if(isAll||label==='全部')return {rows:rows,via:v};var fa=fanAccept(rows,c,label);if(fa.length)return {rows:fa,via:v};continue;}if(feedFingerprint(rows)===feedFingerprint(INITIAL_ROWS.dongtai||[]))continue;if(isAll)return {rows:rows,via:v};var hit=localCategoryFilter(rows,c,true);if(hit.length)return {rows:hit,via:v};if(qfCandidateTrust(c)>=2)return {rows:rows,via:v};}catch(_e){}}return {rows:[],via:-1,last:last};}");
+    h.push("function performCategory(chip,label,retry){retry=Number(retry||0);var tab=currentTab,key=cacheKey(tab,label);if(tab!=='tongren'&&feedCache[key]){renderFiltered(tab,feedCache[key],label);return;}if(label==='全部'&&currentSort==='6'&&INITIAL_ROWS[tab]&&INITIAL_ROWS[tab].length){feedCache[key]=INITIAL_ROWS[tab].slice(0);renderFiltered(tab,feedCache[key],label);return;}var cands=parseCandidateAttr(chip);if(!cands.length){renderFiltered(tab,[],label);return;}if(tab==='dongtai'&&label==='讨论'){var main=cands[0],preview=discussionPreview(main),rows=[],ok=[];try{rows=discussionSingle(main,0);ok=discussionAccept(rows,main);}catch(_d0){}if(ok.length){feedCache[key]=ok;renderFiltered(tab,ok,label);return;}try{rows=discussionSingle(main,1);ok=discussionAccept(rows,main);}catch(_d1){}if(ok.length){feedCache[key]=ok;renderFiltered(tab,ok,label);return;}if(preview.length<8){try{var p2=discussionAllPageFallback(main,2);if(p2.length)preview=mergeFeedRows(preview,p2);}catch(_p2){}}if(preview.length){feedCache[key]=preview;renderFiltered(tab,preview,lab
+ice(0);feedCache[key]=seed.slice(0);renderFiltered(tab,seed,label);fanDirectProgressive(chip,label,directCand,seed,label==='同人视频'?8:(label==='精华'?10:6));return;}var maxp=label==='同人视频'?10:(label==='精华'?12:7),target=label==='同人视频'?3:(label==='精华'?6:5);fanProgressive(chip,label,mainFan,seed,maxp,target);return;}for(var i=0;i<cands.length;i++){var got=requestCategory(tab,cands[i],label==='全部',label);if(got.rows.length){feedCache[key]=got.rows;renderFiltered(tab,got.rows,label);return;}}if(tab==='jinghua'&&label==='讨论'){var ix=qfEssenceDiscussionFallback();if(ix.length){feedCache[key]=ix;renderFiltered(tab,ix,label);return;}}if(tab==='jinghua'&&label!=='全部'){var fb=essenceLocalPages(cands[0],3);if(fb.length){feedCache[key]=fb;renderFiltered(tab,fb,label);return;}}renderFiltered(tab,[],label);}");
+    h.push("function loadCategory(chip){var label=String(chip.getAttribute('data-name')||'全部'),key=cacheKey(currentTab,label);if(feedCache[key]){renderFiltered(currentTab,feedCache[key],label);if(currentTab==='tongren'&&label!=='全部'){var fc0=parseCandidateAttr(chip),fm0=fc0.length?fc0[0]:null,ds0=fanDirectState[key],st=fanScanState[key],resume0=(ds0&&ds0.cand)||fm0;if(resume0&&ds0&&!ds0.done){fanDirectProgressive(chip,label,resume0,feedCache[key],label==='同人视频'?8:(label==='精华'?10:6));}else if(fm0&&(!st||!st.done)){var maxp0=label==='同人视频'?10:(label==='精华'?12:7),target0=label==='同人视频'?3:(label==='精华'?6:5);fanProgressive(chip,label,fm0,feedCache[key],maxp0,target0);}}return;}if(currentTab==='dongtai'&&label==='讨论'){var cands=parseCandidateAttr(chip),main=cands.length?cands[0]:null,preview=main?discussionPreview(main):[];if(preview.length){renderFiltered(currentTab,preview,label);setTimeout(function(){if(currentTab==='dongtai'&&chip.classList.contains('active')&&!feedCache[key])performCategory(chip,label,0);},70);return;}}if(currentTab==='tongren'&&label!=='全部'){var fc=parseCandidateAttr(chip),fm=fc.length?fc[0]:null,fp=fm?fanPreview(fm,label):[];if(fp.length){renderFiltered(currentTab,fp,label);setTimeout(function(){if(currentTab==='tongren'&&chip.classList.contains('active'))performCategory(chip,label,0);},20);return;}}showFilterBusy(currentTab,label);setTimeout(function(){performCategory(chip,label,0);},12);}");
+    h.push("var qfFeedPageState={},qfFeedScrollTimer=0,qfFeedObserver=null;function qfActiveChip(){for(var i=0;i<chips.length;i++)if(chips[i].classList.contains('active')&&chipVisibleFor(chips[i],currentTab))return chips[i];return null;}function qfPageRows(tab,label,c,page){page=Math.max(2,Number(page)||2);var vs=(label==='全部')?[baseParams(tab,page)]:paramVariants(tab,c||{},page);for(var vi=0;vi<vs.length;vi++){var rows=[];try{rows=topRequest(tab,page,vs[vi])||[];}catch(_e){rows=[];}if(!rows.length)continue;if(label==='全部')return rows;if(tab==='tongren'){var fa=fanAccept(rows,c,label);if(fa.length)return fa;continue;}if(tab==='jinghua'){var ea=qfEssenceAccept(rows,c,label);if(ea.length)return ea;continue;}if(tab==='dongtai'){var da=qfDynamicAccept(rows,c,label);if(da.length)return da;continue;}var local=localCategoryFilter(rows,c,true);if(local.length)return local;if(qfCandidateTrust(c)>=2)return rows;}return [];}function qfNextFeed(){if(detail&&
+f(tab==='jinghua'&&label==='讨论'){var ix=qfEssenceDiscussionFallback();if(ix.length){feedCache[key]=ix;renderFiltered(tab,ix,label);return;}}if(tab==='jinghua'&&label!=='全部'){var fb=essenceLocalPages(cands[0],3);if(fb.length){feedCache[key]=fb;renderFiltered(tab,fb,label);return;}}renderFiltered(tab,[],label);}");
+    h.push("function loadCategory(chip){var label=String(chip.getAttribute('data-name')||'全部'),key=cacheKey(currentTab,label);if(feedCache[key]){renderFiltered(currentTab,feedCache[key],label);if(currentTab==='tongren'&&label!=='全部'){var fc0=parseCandidateAttr(chip),fm0=fc0.length?fc0[0]:null,ds0=fanDirectState[key],st=fanScanState[key],resume0=(ds0&&ds0.cand)||fm0;if(resume0&&ds0&&!ds0.done){fanDirectProgressive(chip,label,resume0,feedCache[key],label==='同人视频'?8:(label==='精华'?10:6));}else if(fm0&&(!st||!st.done)){var maxp0=label==='同人视频'?10:(label==='精华'?12:7),target0=label==='同人视频'?3:(label==='精华'?6:5);fanProgressive(chip,label,fm0,feedCache[key],maxp0,target0);}}return;}if(currentTab==='dongtai'&&label==='讨论'){var cands=parseCandidateAttr(chip),main=cands.length?cands[0]:null,preview=main?discussionPreview(main):[];if(preview.length){renderFiltered(currentTab,preview,label);setTimeout(function(){if(currentTab==='dongtai'&&chip.classList.contains('active')&&!feedCache[key])performCategory(chip,label,0);},70);return;}}if(currentTab==='tongren'&&label!=='全部'){var fc=parseCandidateAttr(chip),fm=fc.length?fc[0]:null,fp=fm?fanPreview(fm,label):[];if(fp.length){renderFiltered(currentTab,fp,label);setTimeout(function(){if(currentTab==='tongren'&&chip.classList.contains('active'))performCategory(chip,label,0);},20);return;}}showFilterBusy(currentTab,label);setTimeout(function(){performCategory(chip,label,0);},12);}");
+    h.push("var qfFeedPageState={},qfFeedScrollTimer=0,qfFeedObserver=null;function qfActiveChip(){for(var i=0;i<chips.length;i++)if(chips[i].classList.contains('active')&&chipVisibleFor(chips[i],currentTab))return chips[i];return null;}function qfPageRows(tab,label,c,page){page=Math.max(2,Number(page)||2);var vs=(label==='全部')?[baseParams(tab,page)]:paramVariants(tab,c||{},page);for(var vi=0;vi<vs.length;vi++){var rows=[];try{rows=topRequest(tab,page,vs[vi])||[];}catch(_e){rows=[];}if(!rows.length)continue;if(label==='全部')return rows;if(tab==='tongren'){var fa=fanAccept(rows,c,label);if(fa.length)return fa;continue;}if(tab==='jinghua'){var ea=qfEssenceAccept(rows,c,label);if(ea.length)return ea;continue;}if(tab==='dongtai'){var da=qfDynamicAccept(rows,c,label);if(da.length)return da;continue;}var local=localCategoryFilter(rows,c,true);if(local.length)return local;if(qfCandidateTrust(c)>=2)return rows;}return [];}function qfNextFeed(){if(detail&&detail.style.display==='block')return;var chip=qfActiveChip();if(!chip)return;var label=String(chip.getAttribute('data-name')||'全部'),key=cacheKey(currentTab,label),st=qfFeedPageState[key]||{page:1,loading:false,done:false,empty:0};if(st.loading||st.done)return;var ds=fanDirectState[key],fs=fanScanState[key];if(currentTab==='tongren'&&label!=='全部'){st.page=Math.max(st.page,Number(ds&&ds.page||0),Number(fs&&fs.page||0));if((ds&&!ds.done)||(fs&&!fs.done)){qfFeedPageState[key]=st;return;}
+ache[key]=fb;renderFiltered(tab,fb,label);return;}}renderFiltered(tab,[],label);}");
+    h.push("function loadCategory(chip){var label=String(chip.getAttribute('data-name')||'全部'),key=cacheKey(currentTab,label);if(feedCache[key]){renderFiltered(currentTab,feedCache[key],label);if(currentTab==='tongren'&&label!=='全部'){var fc0=parseCandidateAttr(chip),fm0=fc0.length?fc0[0]:null,ds0=fanDirectState[key],st=fanScanState[key],resume0=(ds0&&ds0.cand)||fm0;if(resume0&&ds0&&!ds0.done){fanDirectProgressive(chip,label,resume0,feedCache[key],label==='同人视频'?8:(label==='精华'?10:6));}else if(fm0&&(!st||!st.done)){var maxp0=label==='同人视频'?10:(label==='精华'?12:7),target0=label==='同人视频'?3:(label==='精华'?6:5);fanProgressive(chip,label,fm0,feedCache[key],maxp0,target0);}}return;}if(currentTab==='dongtai'&&label==='讨论'){var cands=parseCandidateAttr(chip),main=cands.length?cands[0]:null,preview=main?discussionPreview(main):[];if(preview.length){renderFiltered(currentTab,preview,label);setTimeout(function(){if(currentTab==='dongtai'&&chip.classList.contains('active')&&!feedCache[key])performCategory(chip,label,0);},70);return;}}if(currentTab==='tongren'&&label!=='全部'){var fc=parseCandidateAttr(chip),fm=fc.length?fc[0]:null,fp=fm?fanPreview(fm,label):[];if(fp.length){renderFiltered(currentTab,fp,label);setTimeout(function(){if(currentTab==='tongren'&&chip.classList.contains('active'))performCategory(chip,label,0);},20);return;}}showFilterBusy(currentTab,label);setTimeout(function(){performCategory(chip,label,0);},12);}");
+    h.push("var qfFeedPageState={},qfFeedScrollTimer=0,qfFeedObserver=null;function qfActiveChip(){for(var i=0;i<chips.length;i++)if(chips[i].classList.contains('active')&&chipVisibleFor(chips[i],currentTab))return chips[i];return null;}function qfPageRows(tab,label,c,page){page=Math.max(2,Number(page)||2);var vs=(label==='全部')?[baseParams(tab,page)]:paramVariants(tab,c||{},page);for(var vi=0;vi<vs.length;vi++){var rows=[];try{rows=topRequest(tab,page,vs[vi])||[];}catch(_e){rows=[];}if(!rows.length)continue;if(label==='全部')return rows;if(tab==='tongren'){var fa=fanAccept(rows,c,label);if(fa.length)return fa;continue;}if(tab==='jinghua'){var ea=qfEssenceAccept(rows,c,label);if(ea.length)return ea;continue;}if(tab==='dongtai'){var da=qfDynamicAccept(rows,c,label);if(da.length)return da;continue;}var local=localCategoryFilter(rows,c,true);if(local.length)return local;if(qfCandidateTrust(c)>=2)return rows;}return [];}function qfNextFeed(){if(detail&&detail.style.display==='block')return;var chip=qfActiveChip();if(!chip)return;var label=String(chip.getAttribute('data-name')||'全部'),key=cacheKey(currentTab,label),st=qfFeedPageState[key]||{page:1,loading:false,done:false,empty:0};if(st.loading||st.done)return;var ds=fanDirectState[key],fs=fanScanState[key];if(currentTab==='tongren'&&label!=='全部'){st.page=Math.max(st.page,Number(ds&&ds.page||0),Number(fs&&fs.page||0));if((ds&&!ds.done)||(fs&&!fs.done)){qfFeedPageState[key]=st;return;}}st.loading=true;qfFeedPageState[key]=st;var list=paneList(currentTab),hint=document.createElement('div');hint.className='feedAuto loading';hint.textContent='正在加载下一页…';if(list)list.appendChild(hint);setTimeout(function(){try{var c
+){var label=String(chip.getAttribute('data-name')||'全部'),key=cacheKey(currentTab,label);if(feedCache[key]){renderFiltered(currentTab,feedCache[key],label);if(currentTab==='tongren'&&label!=='全部'){var fc0=parseCandidateAttr(chip),fm0=fc0.length?fc0[0]:null,ds0=fanDirectState[key],st=fanScanState[key],resume0=(ds0&&ds0.cand)||fm0;if(resume0&&ds0&&!ds0.done){fanDirectProgressive(chip,label,resume0,feedCache[key],label==='同人视频'?8:(label==='精华'?10:6));}else if(fm0&&(!st||!st.done)){var maxp0=label==='同人视频'?10:(label==='精华'?12:7),target0=label==='同人视频'?3:(label==='精华'?6:5);fanProgressive(chip,label,fm0,feedCache[key],maxp0,target0);}}return;}if(currentTab==='dongtai'&&label==='讨论'){var cands=parseCandidateAttr(chip),main=cands.length?cands[0]:null,preview=main?discussionPreview(main):[];if(preview.length){renderFiltered(currentTab,preview,label);setTimeout(function(){if(currentTab==='dongtai'&&chip.classList.contains('active')&&!feedCache[key])performCategory(chip,label,0);},70);return;}}if(currentTab==='tongren'&&label!=='全部'){var fc=parseCandidateAttr(chip),fm=fc.length?fc[0]:null,fp=fm?fanPreview(fm,label):[];if(fp.length){renderFiltered(currentTab,fp,label);setTimeout(function(){if(currentTab==='tongren'&&chip.classList.contains('active'))performCategory(chip,label,0);},20);return;}}showFilterBusy(currentTab,label);setTimeout(function(){performCategory(chip,label,0);},12);}");
+    h.push("var qfFeedPageState={},qfFeedScrollTimer=0,qfFeedObserver=null;function qfActiveChip(){for(var i=0;i<chips.length;i++)if(chips[i].classList.contains('active')&&chipVisibleFor(chips[i],currentTab))return chips[i];return null;}function qfPageRows(tab,label,c,page){page=Math.max(2,Number(page)||2);var vs=(label==='全部')?[baseParams(tab,page)]:paramVariants(tab,c||{},page);for(var vi=0;vi<vs.length;vi++){var rows=[];try{rows=topRequest(tab,page,vs[vi])||[];}catch(_e){rows=[];}if(!rows.length)continue;if(label==='全部')return rows;if(tab==='tongren'){var fa=fanAccept(rows,c,label);if(fa.length)return fa;continue;}if(tab==='jinghua'){var ea=qfEssenceAccept(rows,c,label);if(ea.length)return ea;continue;}if(tab==='dongtai'){var da=qfDynamicAccept(rows,c,label);if(da.length)return da;continue;}var local=localCategoryFilter(rows,c,true);if(local.length)return local;if(qfCandidateTrust(c)>=2)return rows;}return [];}function qfNextFeed(){if(detail&&detail.style.display==='block')return;var chip=qfActiveChip();if(!chip)return;var label=String(chip.getAttribute('data-name')||'全部'),key=cacheKey(currentTab,label),st=qfFeedPageState[key]||{page:1,loading:false,done:false,empty:0};if(st.loading||st.done)return;var ds=fanDirectState[key],fs=fanScanState[key];if(currentTab==='tongren'&&label!=='全部'){st.page=Math.max(st.page,Number(ds&&ds.page||0),Number(fs&&fs.page||0));if((ds&&!ds.done)||(fs&&!fs.done)){qfFeedPageState[key]=st;return;}}st.loading=true;qfFeedPageState[key]=st;var list=paneList(currentTab),hint=document.createElement('div');hint.className='feedAuto loading';hint.textContent='正在加载下一页…';if(list)list.appendChild(hint);setTimeout(function(){try{var cands=parseCandidateAttr(chip),c=cands.length?cands[0]:{mode:'all',id:String((TOP_META[currentTab]||{}).id||'0')},pg=st.page
+ fc0=parseCandidateAttr(chip),fm0=fc0.length?fc0[0]:null,ds0=fanDirectState[key],st=fanScanState[key],resume0=(ds0&&ds0.cand)||fm0;if(resume0&&ds0&&!ds0.done){fanDirectProgressive(chip,label,resume0,feedCache[key],label==='同人视频'?8:(label==='精华'?10:6));}else if(fm0&&(!st||!st.done)){var maxp0=label==='同人视频'?10:(label==='精华'?12:7),target0=label==='同人视频'?3:(label==='精华'?6:5);fanProgressive(chip,label,fm0,feedCache[key],maxp0,target0);}}return;}if(currentTab==='dongtai'&&label==='讨论'){var cands=parseCandidateAttr(chip),main=cands.length?cands[0]:null,preview=main?discussionPreview(main):[];if(preview.length){renderFiltered(currentTab,preview,label);setTimeout(function(){if(currentTab==='dongtai'&&chip.classList.contains('active')&&!feedCache[key])performCategory(chip,label,0);},70);return;}}if(currentTab==='tongren'&&label!=='全部'){var fc=parseCandidateAttr(chip),fm=fc.length?fc[0]:null,fp=fm?fanPreview(fm,label):[];if(fp.length){renderFiltered(currentTab,fp,label);setTimeout(function(){if(currentTab==='tongren'&&chip.classList.contains('active'))performCategory(chip,label,0);},20);return;}}showFilterBusy(currentTab,label);setTimeout(function(){performCategory(chip,label,0);},12);}");
+    h.push("var qfFeedPageState={},qfFeedScrollTimer=0,qfFeedObserver=null;function qfActiveChip(){for(var i=0;i<chips.length;i++)if(chips[i].classList.contains('active')&&chipVisibleFor(chips[i],currentTab))return chips[i];return null;}function qfPageRows(tab,label,c,page){page=Math.max(2,Number(page)||2);var vs=(label==='全部')?[baseParams(tab,page)]:paramVariants(tab,c||{},page);for(var vi=0;vi<vs.length;vi++){var rows=[];try{rows=topRequest(tab,page,vs[vi])||[];}catch(_e){rows=[];}if(!rows.length)continue;if(label==='全部')return rows;if(tab==='tongren'){var fa=fanAccept(rows,c,label);if(fa.length)return fa;continue;}if(tab==='jinghua'){var ea=qfEssenceAccept(rows,c,label);if(ea.length)return ea;continue;}if(tab==='dongtai'){var da=qfDynamicAccept(rows,c,label);if(da.length)return da;continue;}var local=localCategoryFilter(rows,c,true);if(local.length)return local;if(qfCandidateTrust(c)>=2)return rows;}return [];}function qfNextFeed(){if(detail&&detail.style.display==='block')return;var chip=qfActiveChip();if(!chip)return;var label=String(chip.getAttribute('data-name')||'全部'),key=cacheKey(currentTab,label),st=qfFeedPageState[key]||{page:1,loading:false,done:false,empty:0};if(st.loading||st.done)return;var ds=fanDirectState[key],fs=fanScanState[key];if(currentTab==='tongren'&&label!=='全部'){st.page=Math.max(st.page,Number(ds&&ds.page||0),Number(fs&&fs.page||0));if((ds&&!ds.done)||(fs&&!fs.done)){qfFeedPageState[key]=st;return;}}st.loading=true;qfFeedPageState[key]=st;var list=paneList(currentTab),hint=document.createElement('div');hint.className='feedAuto loading';hint.textContent='正在加载下一页…';if(list)list.appendChild(hint);setTimeout(function(){try{var cands=parseCandidateAttr(chip),c=cands.length?cands[0]:{mode:'all',id:String((TOP_META[currentTab]||{}).id||'0')},pg=st.page+1,rows=qfPageRows(currentTab,label,c,pg),base=feedCache[key];if(!base||!base.length){if(label==='全部'&&INITIAL_ROWS[currentTab]&&INITIAL_ROWS[currentTab].length)base=INITIAL_ROWS[currentTab].slice(0)
+e){page=Math.max(2,Number(page)||2);var vs=(label==='全部')?[baseParams(tab,page)]:paramVariants(tab,c||{},page);for(var vi=0;vi<vs.length;vi++){var rows=[];try{rows=topRequest(tab,page,vs[vi])||[];}catch(_e){rows=[];}if(!rows.length)continue;if(label==='全部')return rows;if(tab==='tongren'){var fa=fanAccept(rows,c,label);if(fa.length)return fa;continue;}if(tab==='jinghua'){var ea=qfEssenceAccept(rows,c,label);if(ea.length)return ea;continue;}if(tab==='dongtai'){var da=qfDynamicAccept(rows,c,label);if(da.length)return da;continue;}var local=localCategoryFilter(rows,c,true);if(local.length)return local;if(qfCandidateTrust(c)>=2)return rows;}return [];}function qfNextFeed(){if(detail&&detail.style.display==='block')return;var chip=qfActiveChip();if(!chip)return;var label=String(chip.getAttribute('data-name')||'全部'),key=cacheKey(currentTab,label),st=qfFeedPageState[key]||{page:1,loading:false,done:false,empty:0};if(st.loading||st.done)return;var ds=fanDirectState[key],fs=fanScanState[key];if(currentTab==='tongren'&&label!=='全部'){st.page=Math.max(st.page,Number(ds&&ds.page||0),Number(fs&&fs.page||0));if((ds&&!ds.done)||(fs&&!fs.done)){qfFeedPageState[key]=st;return;}}st.loading=true;qfFeedPageState[key]=st;var list=paneList(currentTab),hint=document.createElement('div');hint.className='feedAuto loading';hint.textContent='正在加载下一页…';if(list)list.appendChild(hint);setTimeout(function(){try{var cands=parseCandidateAttr(chip),c=cands.length?cands[0]:{mode:'all',id:String((TOP_META[currentTab]||{}).id||'0')},pg=st.page+1,rows=qfPageRows(currentTab,label,c,pg),base=feedCache[key];if(!base||!base.length){if(label==='全部'&&INITIAL_ROWS[currentTab]&&INITIAL_ROWS[currentTab].length)base=INITIAL_ROWS[currentTab].slice(0);else base=[];}var merged=mergeFeedRows(base,rows);if(rows.length&&merged.length>base.length){st.page=pg;st.empty=0;feedCache[key]=merged.slice(0);renderFiltered(currentTab,merged,label);}else if(rows.length){st.page=pg;st.empty++;if(st.empty>=3)st.done=true;}else{st.empty++;if(st.empty>=3)st.done=true;}try{if(hint&&hint.parentNode)hint.parentNode.removeChild(hint);}catch(_rm){}if(st.done&&list){var d=document.createElement('div');d.className='feedAuto done';d.textContent='已经到底了';list.appendChild(d);}}catch(_e){st.empty++;if(st.empty>=3)st.done=true;try{if(hint&&hint.parentNode)hint.parentNode.removeChild(hint);}catch(_rm2){}}st.loading=false;qfFeedPageState[key]=st;if(!st.done)setTimeout(qfArmFeedObserver,40);},30);}function qfNearBottom(){var se=document.scrollingElement||document.documentElement,b=document.body,top=Number((se&&se.scrollTop)||window.pageYOffset||0),h=window.innerHeight||document.documentElement.clientHeight||0,sh=Math.max((se&&se.scrollHeight)||0,document.documentElement.scrollHeight||0,b.scrollHeight||0);return top+h>=sh-520;}function qfArmFeedObserver(){try{if(qfFeedObserver){qfFeedObserver.disconnect();qfFeedObserver=null;}if(typeof IntersectionObserver!=='function')return;var list=paneList(currentTab),posts=list?list.querySelectorAll('.post'):null,last=posts&&posts.length?posts[posts.length-1]:null;if(!last)return;qfFeedObserver=new IntersectionObserver(function(es){for(var i=0;i<es.length;i++){if(es[i].isIntersecting){qfNex
+,').indexOf(tab)>=0;}function applyChipSet(tab){var first=null;for(var i=0;i<chips.length;i++){var ok=chipVisibleFor(chips[i],tab);chips[i].style.display=ok?'':'none';chips[i].classList.remove('active');if(ok&&!first)first=chips[i];}if(first)first.classList.add('active');}for(var ci=0;ci<chips.length;ci++){chips[ci].onclick=function(){if(!chipVisibleFor(this,currentTab)||this.classList.contains('active'))return;for(var j=0;j<chips.length;j++)chips[j].classList.remove('active');this.classList.add('active');loadCategory(this);};}sortSel.onchange=function(){currentSort=String(this.value||'6');var active=null;for(var i=0;i<chips.length;i++){if(chips[i].classList.contains('active')&&chipVisibleFor(chips[i],currentTab)){active=chips[i];break;}}if(active)loadCategory(active);};");
+    h.push("var bs=document.querySelectorAll('.tab'),filterBar=document.getElementById('filterBar');for(var i=0;i<bs.length;i++){bs[i].onclick=function(){var k=this.getAttribute('data-tab');if(k===currentTab)return;currentTab=k;for(var a=0;a<bs.length;a++){if(bs[a]===this)bs[a].classList.add('active');else bs[a].classList.remove('active');}var ps=document.querySelectorAll('.pane');for(var p=0;p<ps.length;p++){if(ps[p].id==='pane_'+k)ps[p].classList.add('active');else ps[p].classList.remove('active');}filterBar.classList.add('show');applyChipSet(k);var first=null;for(var c=0;c<chips.length;c++){if(chips[c].classList.contains('active')&&chipVisibleFor(chips[c],k)){first=chips[c];break;}}if(first)loadCategory(first);};}applyChipSet('dongtai');");
+
+    h.push("})();</script></body></html>");
+    return h.join("");
+}
+
+var QF_CIRCLE_BOOT_CACHE_V352={};
+function qfCircleBootGetV352(bid,maxAge){
+    var x=QF_CIRCLE_BOOT_CACHE_V352[String(bid||"")];
+    if(!x||!x.ts||Date.now()-Number(x.ts)>Number(maxAge||300000))return null;
+    return x.data||null;
+}
+function qfCircleBootPutV352(bid,data){
+    var k=String(bid||"");if(!k||!data)return data;
+    QF_CIRCLE_BOOT_CACHE_V352[k]={ts:Date.now(),data:data};
+    var ks=Object.keys(QF_CIRCLE_BOOT_CACHE_V352);
+    if(ks.length>6){ks.sort(function(a,b){return Number(QF_CIRCLE_BOOT_CACHE_V352[a].ts||0)-Number(QF_CIRCLE_BOOT_CACHE_V352[b].ts||0);});while(ks.length>6)delete QF_CIRCLE_BOOT_CACHE_V352[ks.shift()];}
+    return data;
+}
+
+function qfCircleApiProbe2970(j,bid){
+    var circleId="",posts=[];
+    var tabs={dongtai:[],jinghua:[],tongren:[],discussion:[],discussionPreview:[]};
+    var totals={dongtai:0,jinghua:0,tongren:0};
+    var categoryMode={jinghua:"按需加载",tongren:"按需加载"};
+    var categoryMeta=qfCircleCategoryMeta2984("");
+
+    /*
+     * v2.9.91：同一本书的 getcircledetail 偶尔会只返回简化分类表，
+     * 此时“讨论”只剩短 PostCategoryId=2，而缺少真正可用的长 JsId。
+     * 之前因此表现为：同一个讨论分类有时有帖、有时为空。
+     * 这里对分类元数据做质量评分，只保留信息更完整的一份；缺长 JsId 时
+     * 再用已经拿到的 CircleId 补请求一次详情，不影响其它已正确分类。
+     */
+    function metaScore(m){
+        var score=0,ds=(m&&m.filterSets&&m.filterSets.dongtai)||[];
+        score+=ds.length*4;
+        for(var i=0;i<ds.length;i++){
+            var x=ds[i]||{},nm=String(x.name||"");
+            if(nm==="讨论"){
+                var cs=Array.isArray(x.candidates)?x.candidates:[];
+                for(var c=0;c<cs.length;c++){
+                    var z=cs[c]||{}
+
+=== MARKER POSITIONS ===
+id=\"detail => -1
+id=\"detailBody => -1
+getElementById('detail') => 96348
+getElementById('detailBody') => 96387
+qfPostTouchAt => 101493
+bindPostOpens(document) => 103451
+qfFeedPageState => 142112
+window.addEventListener('scroll' => 145955
+
+=== INIT getElementById('detail') ===
+ount,o.commentCount,o.ReviewCount,o.reviewCount];for(var i=0;i<vals.length;i++){if(vals[i]!==undefined&&vals[i]!==null&&String(vals[i])!==''){var n=Number(vals[i]);if(isFinite(n)&&n>=0)return n;}}return 0;}");
+    h.push("function subReplyHtml(o){o=o||{};var nm=user(o)||'书友',body=txt(o.Body!=null?o.Body:(o.body!=null?o.body:(o.Content!=null?o.Content:(o.content!=null?o.content:(o.BodyRichText!=null?o.BodyRichText:o.bodyRichText)))));if(!body)body=txt(o.Title!=null?o.Title:o.title);var qn=String(o.ReplyUserName||o.replyUserName||o.QuoteUserName||o.quoteUserName||o.RelatedUser||o.relatedUser||'');return '<div class=\\\"subReply\\\"><span class=\\\"subName\\\">'+esc(nm)+'</span>'+(qn?' 回复 <span class=\\\"subName\\\">'+esc(qn)+'</span>':'')+'：'+esc(body)+'</div>';}");
+    h.push("function reviewHtml(o){o=o||{};var av=avatar(o),nm=user(o)||'书友';var rich=o.BodyRichText!=null?o.BodyRichText:(o.bodyRichText!=null?o.bodyRichText:(o.text!=null?o.text:(o.content!=null?o.content:(o.Body!=null?o.Body:(o.body!=null?o.body:(o.Content!=null?o.Content:o.content))))));var body=txt(rich),ims=imageUrls(o,rich),vd=videoInfo(o,rich),tm=time(o);var rp=qfReplyCount(o);var lk=o.digg_count!=null?o.digg_count:(o.StarCount!=null?o.StarCount:(o.LikeCount!=null?o.LikeCount:(o.likeCount!=null?o.likeCount:(o.AgreeAmount!=null?o.AgreeAmount:o.agreeAmount))));if(!body)body=txt(o.Title!=null?o.Title:o.title);var r='<article class=\\\"review\\\"><div class=\\\"reviewTop\\\">'+(av?imgTag(av,'avatar',''):'<span class=\\\"avatarFb\\\">书</span>')+'<div class=\\\"reviewName\\\">'+esc(nm)+'</div></div>';if(body)r+='<div class=\\\"reviewBody\\\">'+esc(body)+'</div>';for(var ii=0;ii<ims.length;ii++)r+=imgTag(ims[ii],'topicImg','margin-left:41px;max-width:72%');if(vd&&vd.url)r+=videoTag(vd,'topicVideo');var subs=qfReplyRows(o);if(subs.length){r+='<div class=\\\"subReplies\\\">';for(var si=0;si<subs.length&&si<5;si++)r+=subReplyHtml(subs[si]);r+='</div>';}var rid=qfReviewId(o);if(rid){var hidden=(rp<=subs.length)?' style=\\\"display:none\\\"':'';var label=rp>subs.length?'查看全部 '+rp+' 条回复 ›':'查看回复 ›';r+='<span class=\\\"replyMore qfReplyMore\\\"'+hidden+' data-rid=\\\"'+esc(rid)+'\\\" data-count=\\\"'+rp+'\\\">'+label+'</span>';}r+='<div class=\\\"reviewMeta\\\">'+esc(tm)+(rp?' · '+esc(rp)+'回复':'')+(lk!=null&&lk!==''?' · '+esc(lk)+'赞':'')+'</div></article>';return r;}");
+    h.push("function arrays(d){var a=d.ReviewDataList||d.reviewDataList||[],b=d.AuthorReviewDataList||d.authorReviewDataList||[];if(!Array.isArray(a))a=[];if(!Array.isArray(b))b=[];return b.concat(a);}");
+
+    h.push("function qfFindReplyArray(v,d){if(!v||d>9||typeof v!=='object')return [];var names=['ReplyList','replyList','ReviewList','reviewList','ReplyDataList','replyDataList','ReviewDataList','reviewDataList','SubReviewList','subReviewList'];for(var i=0;i<names.length;i++){var a=v[names[i]];if(Array.isArray(a)&&a.length)return a;}if(Array.isArray(v)){for(var j=0;j<v.length;j++){var z=qfFindReplyArray(v[j],d+1);if(z.length)return z;}return [];}var ks=Object.keys(v);for(var k=0;k<ks.length;k++){var x=v[ks[k]];if(x&&typeof x==='object'){var y=qfFindReplyArray(x,d+1);if(y.length)return y;}}return [];}");
+    h.push("function qfReviewDetailRows(root){return qfFindReplyArray(dataOf(root),0);}")
+    h.push("function qfObjId(o){o=o||{};return String(o.comment_id||o.review_id||o.ReviewId||o.reviewId||o.CommentId||o.commentId||o.Id||o.id||o.PostId||o.postId||'');}");
+    h.push("function qfParentIds(o){o=o||{};var a=[o.reffer_comment_id,o.ref_comment_id,o.reply_review_id,o.reply_to_review_id,o.quote_review_id,o.source_review_id,o.root_review_id,o.parent_review_id,o.parent_id,o.RefferCommentId,o.refferCommentId,o.RefCommentId,o.refCommentId,o.ReplyReviewId,o.replyReviewId,o.ReplyToReviewId,o.replyToReviewId,o.QuoteReviewId,o.quoteReviewId,o.SourceReviewId,o.sourceReviewId,o.RootReviewId,o.rootReviewId,o.ParentReviewId,o.parentReviewId,o.ParentId,o.parentId];var out=[];for(var i=0;i<a.length;i++){if(a[i]!=null&&String(a[i])!=='')out.push(String(a[i]));}return out;}");
+    h.push("function qfLooksReview(o){if(!o||typeof o!=='object'||Array.isArray(o))return false;var u=o.user_info||o.UserInfo||o.userInfo||o.User||o.user||{};var hasUser=!!(o.user_name||o.UserName||o.userName||o.NickName||o.nickName||u.user_name||u.UserName||u.userName||u.NickName||u.nickName);var hasBody=!!txt(o.text!=null?o.text:(o.content!=null?o.content:(o.Body!=null?o.Body:(o.body!=null?o.body:(o.Content!=null?o.Content:(o.BodyRichText!=null?o.BodyRichText:o.bodyRichText))))));return hasUser&&hasBody;}");
+    h.push("function qfLinkedReplies(root,rid){rid=String(rid||'');var out=[],seen={},seenObj=[];function add(o){if(!qfLooksReview(o))return;var id=qfObjId(o);if(id&&id===rid)return;var ps=qfParentIds(o),ok=false;for(var i=0;i<ps.length;i++)if(ps[i]===rid){ok=true;break;}if(!ok)return;var k=id||user(o)+'|'+txt(o.Body||o.body||o.Content||o.content).slice(0,80);if(k&&seen[k])return;if(k)seen[k]=1;out.push(o);}function walk(v,d){if(!v||d>12||typeof v!=='object')return;if(seenObj.indexOf(v)>=0)return;seenObj.push(v);if(Array.isArray(v)){for(var i=0;i<v.length&&i<300;i++)walk(v[i],d+1);return;}add(v);var ks=Object.keys(v);for(var j=0;j<ks.length;j++){var x=v[ks[j]];if(x&&typeof x==='object')walk(x,d+1);}}walk(root,0);return out;}");
+    h.push("function qfLooseReplyRows(root,rid){var linked=qfLinkedReplies(root,rid);if(linked.length)return linked;var all=[],seen={},seenObj=[];function walk(v,d){if(!v||d>11||typeof v!=='object')return;if(seenObj.indexOf(v)>=0)return;seenObj.push(v);if(Array.isArray(v)){for(var i=0;i<v.length&&i<300;i++)walk(v[i],d+1);return;}if(qfLooksReview(v)){var id=qfObjId(v);if(id!==String(rid||'')){var k=id||user(v)+'|'+txt(v.Body||v.body||v.Content||v.content).slice(0,80);if(k&&!seen[k]){seen[k]=1;all.push(v);}}}var ks=Object.keys(v);for(var j=0;j<ks.length;j++){var x=v[ks[j]];if(x&&typeof x==='object')walk(x,d+1);}}walk(dataOf(root),0);return all;}");
+;
+
+    h.push("var detail=document.getElementById('detail'),body=document.getElementById('detailBody'),qfDetailPageCache={},state={cid:'',pid:'',pg:1,total:0,loading:false,previewImgs:[],detailRoot:null};document.getElementById('dBack').onclick=function(){detail.style.display='none';document.body.style.overflow='';};");
+    h.push("function loadReviewReplies(el,auto){if(!el||el.getAttribute('data-loading')==='1')return;var rid=String(el.getAttribute('data-rid')||'');if(!rid)return;el.setAttribute('data-loading','1');if(!auto){el.style.display='inline-block';el.textContent='正在加载回复…';}var attempts=[{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pageIndex:'1',pageSize:'50',sortType:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,pg:'1',pz:'50',type:'1',sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,pg:'1',pz:'50',sort:'0'}}],rows=[],lastErr='';if(state.detailRoot)rows=qfLinkedReplies(state.detailRoot,rid);for(var i=0;i<attempts.length&&!rows.length;i++){try{var req=signed(attempts[i].path,attempts[i].p),root=parse(ajax(req));rows=qfLinkedReplies(root,rid);if(!rows.length)rows=qfReviewDetailRows(root);if(!rows.length)rows=qfLooseReplyRows(root,rid);}catch(e){lastErr=String(e&&e.message?e.message:e);}}if(rows.length){var old=el.parentNode.querySelector('.subReplies');if(old)old.parentNode.removeChild(old);var box=document.createElement('div');box.className='subReplies';var hh='';for(var j=0;j<rows.length&&j<50;j++)hh+=subReplyHtml(rows[j]);box.innerHTML=hh;el.parentNode.insertBefore(box,el);el.style.display='none';}else{if(!auto){el.style.display='inline-block';el.textContent='暂未获取到回复'+(lastErr?' · '+lastErr:'');}else{el.style.display='none';}el.setAttribute('data-loading','0');}}");
+    h.push("function fetchDetail(reset){if(state.loading)return;state.loading=true;if(reset){state.pg=1;body.innerHTML='<div class=\\\"loading\\\">正在加载起点官方帖子详情…</div>';}try{var dk=state.cid+'|'+state.pid+'|'+state.pg,dc=qfDetailPageCache[dk],root=null;if(dc&&Date.now()-Number(dc.ts||0)<120000){root=dc.root;}else{var req=signed('v1/circle/getpostdetail',{circleId:state.cid,postId:state.pid,pg:String(state.pg),pz:'20',sort:'0'});root=parse(ajax(req));qfDetailPageCache[dk]={ts:Date.now(),root:root};var dks=Object.keys(qfDetailPageCache);if(dks.length>24){dks.sort(function(a,b){return Number((qfDetailPageCache[a]||{}).ts||0)-Number((qfDetailPageCache[b]||{}).ts||0);});while(dks.length>24)delete qfDetailPageCache[dks.shift()];}}state.detailRoot=root;var d=dataOf(root),topic=d.TopicData||d.topicData||{},rows=arrays(d),total=Number(d.TotalCount||d.totalCount||rows.length)||rows.length;state.total=total;if(reset){body.innerHTML=topicHtml(topic,root)+'<div class=\\\"reviewTitle\\\">全部回复'+(total?'（'+total+'）':'')+'</div><div id=\\\"reviewList\\\"></div><button class=\\\"moreBtn\\\" id=\\\"moreBtn\\\">加载更多评论</button>';}bindVideoFallback(body);var list=document.getElementById('reviewList');for(var i=0;i<rows.length;i++)list.insertAdjacentHTML('beforeend',reviewHtml(rows[i]));var arts=list.querySelectorAll('.review');for(var ai=0;ai<arts.length&&ai<rows.length;ai++){var rid=qfReviewId(rows[ai]);if(!rid)continue;var linked=qfLinkedReplies(root,rid);if(linked.length&&!arts[ai].querySelector('.subReplies')){var box=document.createElement('div');box.className='subReplies';var hh='';for(var li=0;li<linked.length&&li<5;li++)hh+=subReplyHtml(linked[li]);box.innerHTML=hh;var meta=arts[ai].querySelector('.reviewMeta');arts[ai].insertBefore(box,meta||null);}}var rms=list.querySelectorAll('.qfReplyMore');for(var ri=0;ri<rms.length;ri++){if(!rms[ri].getAttribute('data-bound')){rms[ri].setAttribute('data-bound','1');rms[ri].onclick=function(){var el=this;el.style.display='inline-block';el.textContent='正在加载回复…';setTimeout(function(){loadReviewReplies(el,false);},30);};}}var btn=document.getElementById('moreBtn');if(btn){if(!rows.length||list.children.length>=total){btn.style.display='none';}else{btn.style.display='block';btn.onclick=function(){state.pg++;fetchDetail(false);};}}}catch(e){body.innerHTML='<div class=\\\"err\\\">帖子详情加载失败：'+esc(e&&e.message?e.message:e)+'</div>';}state.loading=false;}");
+    h.push("var qfDetailScrollTimer=0;detail.addEventListener('scroll',function(){if(qfDetailScrollTimer||state.loading)return;qfDetailScrollTimer=setTimeout(function(){qfDetailScrollTimer=0;var btn=document.getElementById('moreBtn');if(!btn||btn.style.display==='none')return;if(detail.scrollTop+detail.clientHeight>=detail.scrollHeight-420){state.pg++;fetchDetail(false);}},100);},{passive:true});");
+    h.push("var qfPostTouchAt=0;function qfPostOpenNode(t){while(t&&t!==document){if(t.classList&&t.classList.contains('qfPostOpen'))return t;t=t.parentNode;}return null;}function qfOpenPost(el,ev){if(!el)return;try{if(ev&&ev.preventDefault)ev.preventDefault();if(ev&&ev.stopPropagation)ev.stopPropagation();}catch(_ev){}state.cid=String(el.getAttribute('data-cid')||CIRCLE_ID);state.pid=String(el.getAttribute('data-pid')||'');if(!state.pid){try{window.java.toast('帖子ID为空，无法打开详情');}catch(_id){}return;}var pim=qfNormUrl(el.getAttribute('data-img')||''),pims=[];try{pims=(qfPostPreviewImgs&&qfPostPreviewImgs[state.pid])?qfPostPreviewImgs[state.pid].slice(0,9):[];}catch(_pm){}if(!Array.isArray(pims))pims=[];var pic=[],pis={};for(var px=0;px<pims.length&&pic.length<9;px++){var pu=qfNormUrl(pims[px]);if(/^https?:\\/\\//i.test(pu)&&!pis[pu]){pis[pu]=1;pic.push(pu);}}if(!pic.length&&pim)pic=[pim];state.previewImgs=pic;state.detailRoot=null;state.loading=false;state.pg=1;state.total=0;detail.style.display='block';detail.scrollTop=0;document.body.style.overflow='hidden';body.innerHTML='<div class=\\\"loading\\\"><div class=\\\"spin\\\"></div>正在加载帖子详情…</div>';setTimeout(function(){fetchDetail(true);},20);}function qfPostOpenEvent(ev){var el=qfPostOpenNode(ev&&ev.target);if(!el)return;var now=Date.now();if(ev.type==='click'&&now-qfPostTouchAt<700){try{ev.preventDefault();ev.stopPropagation();}catch(_d){}return;}if(ev.type==='touchend')qfPostTouchAt=now;qfOpenPost(el,ev);}function bindPostOpens(root){root=root||document;var opens=root.querySelectorAll('.qfPostOpen');for(var oi=0;oi<opens.length;oi++){opens[oi].setAttribute('role','button');opens[oi].setAttribute('tabindex','0');}}document.addEventListener('touchend',qfPostOpenEvent,true);document.addEventListener('click',qfPostOpenEvent,true);document.addEventListener('keydown',function(ev){var el=qfPostOpenNode(ev&&ev.target),k=String(ev&&ev.key||'');if(el&&(k==='Enter'||k===' '))qfOpenPost(el,ev);},true);bindPostOpens(document);");
+
+    h.push("function qfFreshVideo(cid,pid,poster,fallback){var vd={url:qfNormUrl(fallback||''),urls:[],poster:qfNormUrl(poster||''),pageUrl:''};function add(u){u=qfNormUrl(u);if(/^https?:\\/\\//i.test(u)&&vd.urls.indexOf(u)<0)vd.urls.push(u);}function adopt(fresh){if(!fresh)return;var old=vd.url,page=vd.pageUrl;vd=fresh;if(!Array.isArray(vd.urls))vd.urls=[];if(old&&vd.urls.indexOf(old)<0)vd.urls.push(old);if(!vd.poster)vd.poster=qfNormUrl(poster||'');if(!vd.pageUrl)vd.pageUrl=page||'';}add(vd.url);if(pid){var page='https://h5.if.qidian.com/h5/share/post/topic?circleId='+encodeURIComponent(String(cid||CIRCLE_ID))+'&postId='+encodeURIComponent(String(pid));vd.pageUrl=page;try{var req=signed('v1/circle/getpostdetail',{circleId:String(cid||CIRCLE_ID),postId:String(pid),pg:'1',pz:'1',sort:'0'}),root0=parse(ajax(req)),d=dataOf(root0),topic=d.TopicData||d.topicData||{},fresh=videoInfo(root0,richOf(topic).raw);if(fresh&&fresh.url)adopt(fresh);}catch(_e){}if(!vd.url){try{var opt={method:'GET',timeout:10000,headers:{'User-Agent':'Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36','Accept':'text/html,application/xhtml+xml,*/*','Referer':'https://h5.if.qidian.com/'}},raw=String(window.java.ajax(page+','+JSON.stringify(opt))||''),fresh2=videoInfo(raw,raw);if(fresh2&&fresh2.url)adopt(fresh2);}catch(_p){}}vd.pageUrl=page;}if(!Array.isArray(vd.urls))vd.urls=[];add(vd.url);if(!vd.url&&vd.urls.length)vd.url=vd.urls[0];return vd;}\nfunction qfStartVideoBox(box,external){if(!box||box.getAttribute('data-loading')==='1')return;box.setAttribute('data-loading','1');box.classList.add('qfVideoLoading');var cid=String(box.getAttribute('data-cid')||CIRCLE_ID),pid=String(box.getAttribute('data-pid')||''),poster=qfNormUrl(box.getAttribute('data-poster')||''),fallback=qfNormUrl(box.getAttribute('data-url')||''),status=box.querySelector('.qfVideoStatus');if(status)status.textContent=external?'正在获取最新播放地址…':'正在准备视频…';var vd=qfFreshVideo(cid,pid,poster,fallback),urls=[],u='';function add(u0){u0=qfNormUrl(u0);if(/^https?:\\/\\//i.test(u0)&&urls.indexOf(u0)<0)urls.push(u0);}if(vd&&Array.isArray(vd.urls)){for(var ui=0;ui<vd.urls.length;ui++)add(vd.urls[ui]);}add(vd&&vd.url);add(fallback);u=urls.length?urls[0]:'';box.removeAttribute('data-loading');box.classList.remove('qfVideoLoading');if(!u){if(vd&&vd.pageUrl){box.classList.add('qfVideoFailed');if(status)status.textContent='未拿到直链，正在打开起点官方帖子播放…';openMediaUrl(vd.pageUrl);return;}box.classList.add('qfVideoFailed');if(status)status.textContent='暂未解析到有效播放地址';return;}box.setAttribute('data-url',u);if(vd.poster)box.setAttribute('data-poster',qfNormUrl(vd.poster));if(external){openMediaUrl(u);return;}var oldv=box.querySelector('video');if(oldv){try{oldv.pause();}catch(_ov){}try{oldv.parentNode.removeChild(oldv);}catch(_or){}}var cls=String(box.getAttribute('data-vclass
+
+=== INIT getElementById('detailBody') ===
+iewCount];for(var i=0;i<vals.length;i++){if(vals[i]!==undefined&&vals[i]!==null&&String(vals[i])!==''){var n=Number(vals[i]);if(isFinite(n)&&n>=0)return n;}}return 0;}");
+    h.push("function subReplyHtml(o){o=o||{};var nm=user(o)||'书友',body=txt(o.Body!=null?o.Body:(o.body!=null?o.body:(o.Content!=null?o.Content:(o.content!=null?o.content:(o.BodyRichText!=null?o.BodyRichText:o.bodyRichText)))));if(!body)body=txt(o.Title!=null?o.Title:o.title);var qn=String(o.ReplyUserName||o.replyUserName||o.QuoteUserName||o.quoteUserName||o.RelatedUser||o.relatedUser||'');return '<div class=\\\"subReply\\\"><span class=\\\"subName\\\">'+esc(nm)+'</span>'+(qn?' 回复 <span class=\\\"subName\\\">'+esc(qn)+'</span>':'')+'：'+esc(body)+'</div>';}");
+    h.push("function reviewHtml(o){o=o||{};var av=avatar(o),nm=user(o)||'书友';var rich=o.BodyRichText!=null?o.BodyRichText:(o.bodyRichText!=null?o.bodyRichText:(o.text!=null?o.text:(o.content!=null?o.content:(o.Body!=null?o.Body:(o.body!=null?o.body:(o.Content!=null?o.Content:o.content))))));var body=txt(rich),ims=imageUrls(o,rich),vd=videoInfo(o,rich),tm=time(o);var rp=qfReplyCount(o);var lk=o.digg_count!=null?o.digg_count:(o.StarCount!=null?o.StarCount:(o.LikeCount!=null?o.LikeCount:(o.likeCount!=null?o.likeCount:(o.AgreeAmount!=null?o.AgreeAmount:o.agreeAmount))));if(!body)body=txt(o.Title!=null?o.Title:o.title);var r='<article class=\\\"review\\\"><div class=\\\"reviewTop\\\">'+(av?imgTag(av,'avatar',''):'<span class=\\\"avatarFb\\\">书</span>')+'<div class=\\\"reviewName\\\">'+esc(nm)+'</div></div>';if(body)r+='<div class=\\\"reviewBody\\\">'+esc(body)+'</div>';for(var ii=0;ii<ims.length;ii++)r+=imgTag(ims[ii],'topicImg','margin-left:41px;max-width:72%');if(vd&&vd.url)r+=videoTag(vd,'topicVideo');var subs=qfReplyRows(o);if(subs.length){r+='<div class=\\\"subReplies\\\">';for(var si=0;si<subs.length&&si<5;si++)r+=subReplyHtml(subs[si]);r+='</div>';}var rid=qfReviewId(o);if(rid){var hidden=(rp<=subs.length)?' style=\\\"display:none\\\"':'';var label=rp>subs.length?'查看全部 '+rp+' 条回复 ›':'查看回复 ›';r+='<span class=\\\"replyMore qfReplyMore\\\"'+hidden+' data-rid=\\\"'+esc(rid)+'\\\" data-count=\\\"'+rp+'\\\">'+label+'</span>';}r+='<div class=\\\"reviewMeta\\\">'+esc(tm)+(rp?' · '+esc(rp)+'回复':'')+(lk!=null&&lk!==''?' · '+esc(lk)+'赞':'')+'</div></article>';return r;}");
+    h.push("function arrays(d){var a=d.ReviewDataList||d.reviewDataList||[],b=d.AuthorReviewDataList||d.authorReviewDataList||[];if(!Array.isArray(a))a=[];if(!Array.isArray(b))b=[];return b.concat(a);}");
+
+    h.push("function qfFindReplyArray(v,d){if(!v||d>9||typeof v!=='object')return [];var names=['ReplyList','replyList','ReviewList','reviewList','ReplyDataList','replyDataList','ReviewDataList','reviewDataList','SubReviewList','subReviewList'];for(var i=0;i<names.length;i++){var a=v[names[i]];if(Array.isArray(a)&&a.length)return a;}if(Array.isArray(v)){for(var j=0;j<v.length;j++){var z=qfFindReplyArray(v[j],d+1);if(z.length)return z;}return [];}var ks=Object.keys(v);for(var k=0;k<ks.length;k++){var x=v[ks[k]];if(x&&typeof x==='object'){var y=qfFindReplyArray(x,d+1);if(y.length)return y;}}return [];}");
+    h.push("function qfReviewDetailRows(root){return qfFindReplyArray(dataOf(root),0);}")
+    h.push("function qfObjId(o){o=o||{};return String(o.comment_id||o.review_id||o.ReviewId||o.reviewId||o.CommentId||o.commentId||o.Id||o.id||o.PostId||o.postId||'');}");
+    h.push("function qfParentIds(o){o=o||{};var a=[o.reffer_comment_id,o.ref_comment_id,o.reply_review_id,o.reply_to_review_id,o.quote_review_id,o.source_review_id,o.root_review_id,o.parent_review_id,o.parent_id,o.RefferCommentId,o.refferCommentId,o.RefCommentId,o.refCommentId,o.ReplyReviewId,o.replyReviewId,o.ReplyToReviewId,o.replyToReviewId,o.QuoteReviewId,o.quoteReviewId,o.SourceReviewId,o.sourceReviewId,o.RootReviewId,o.rootReviewId,o.ParentReviewId,o.parentReviewId,o.ParentId,o.parentId];var out=[];for(var i=0;i<a.length;i++){if(a[i]!=null&&String(a[i])!=='')out.push(String(a[i]));}return out;}");
+    h.push("function qfLooksReview(o){if(!o||typeof o!=='object'||Array.isArray(o))return false;var u=o.user_info||o.UserInfo||o.userInfo||o.User||o.user||{};var hasUser=!!(o.user_name||o.UserName||o.userName||o.NickName||o.nickName||u.user_name||u.UserName||u.userName||u.NickName||u.nickName);var hasBody=!!txt(o.text!=null?o.text:(o.content!=null?o.content:(o.Body!=null?o.Body:(o.body!=null?o.body:(o.Content!=null?o.Content:(o.BodyRichText!=null?o.BodyRichText:o.bodyRichText))))));return hasUser&&hasBody;}");
+    h.push("function qfLinkedReplies(root,rid){rid=String(rid||'');var out=[],seen={},seenObj=[];function add(o){if(!qfLooksReview(o))return;var id=qfObjId(o);if(id&&id===rid)return;var ps=qfParentIds(o),ok=false;for(var i=0;i<ps.length;i++)if(ps[i]===rid){ok=true;break;}if(!ok)return;var k=id||user(o)+'|'+txt(o.Body||o.body||o.Content||o.content).slice(0,80);if(k&&seen[k])return;if(k)seen[k]=1;out.push(o);}function walk(v,d){if(!v||d>12||typeof v!=='object')return;if(seenObj.indexOf(v)>=0)return;seenObj.push(v);if(Array.isArray(v)){for(var i=0;i<v.length&&i<300;i++)walk(v[i],d+1);return;}add(v);var ks=Object.keys(v);for(var j=0;j<ks.length;j++){var x=v[ks[j]];if(x&&typeof x==='object')walk(x,d+1);}}walk(root,0);return out;}");
+    h.push("function qfLooseReplyRows(root,rid){var linked=qfLinkedReplies(root,rid);if(linked.length)return linked;var all=[],seen={},seenObj=[];function walk(v,d){if(!v||d>11||typeof v!=='object')return;if(seenObj.indexOf(v)>=0)return;seenObj.push(v);if(Array.isArray(v)){for(var i=0;i<v.length&&i<300;i++)walk(v[i],d+1);return;}if(qfLooksReview(v)){var id=qfObjId(v);if(id!==String(rid||'')){var k=id||user(v)+'|'+txt(v.Body||v.body||v.Content||v.content).slice(0,80);if(k&&!seen[k]){seen[k]=1;all.push(v);}}}var ks=Object.keys(v);for(var j=0;j<ks.length;j++){var x=v[ks[j]];if(x&&typeof x==='object')walk(x,d+1);}}walk(dataOf(root),0);return all;}");
+;
+
+    h.push("var detail=document.getElementById('detail'),body=document.getElementById('detailBody'),qfDetailPageCache={},state={cid:'',pid:'',pg:1,total:0,loading:false,previewImgs:[],detailRoot:null};document.getElementById('dBack').onclick=function(){detail.style.display='none';document.body.style.overflow='';};");
+    h.push("function loadReviewReplies(el,auto){if(!el||el.getAttribute('data-loading')==='1')return;var rid=String(el.getAttribute('data-rid')||'');if(!rid)return;el.setAttribute('data-loading','1');if(!auto){el.style.display='inline-block';el.textContent='正在加载回复…';}var attempts=[{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pageIndex:'1',pageSize:'50',sortType:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,postId:state.pid,commentId:rid,pg:'1',pz:'50',type:'1',sort:'0'}},{path:'v1/circle/getreviewdetail',p:{circleId:state.cid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,reviewId:rid,pg:'1',pz:'50',sort:'0'}},{path:'v1/circle/getpostdetail',p:{circleId:state.cid,postId:state.pid,rootReviewId:rid,pg:'1',pz:'50',sort:'0'}}],rows=[],lastErr='';if(state.detailRoot)rows=qfLinkedReplies(state.detailRoot,rid);for(var i=0;i<attempts.length&&!rows.length;i++){try{var req=signed(attempts[i].path,attempts[i].p),root=parse(ajax(req));rows=qfLinkedReplies(root,rid);if(!rows.length)rows=qfReviewDetailRows(root);if(!rows.length)rows=qfLooseReplyRows(root,rid);}catch(e){lastErr=String(e&&e.message?e.message:e);}}if(rows.length){var old=el.parentNode.querySelector('.subReplies');if(old)old.parentNode.removeChild(old);var box=document.createElement('div');box.className='subReplies';var hh='';for(var j=0;j<rows.length&&j<50;j++)hh+=subReplyHtml(rows[j]);box.innerHTML=hh;el.parentNode.insertBefore(box,el);el.style.display='none';}else{if(!auto){el.style.display='inline-block';el.textContent='暂未获取到回复'+(lastErr?' · '+lastErr:'');}else{el.style.display='none';}el.setAttribute('data-loading','0');}}");
+    h.push("function fetchDetail(reset){if(state.loading)return;state.loading=true;if(reset){state.pg=1;body.innerHTML='<div class=\\\"loading\\\">正在加载起点官方帖子详情…</div>';}try{var dk=state.cid+'|'+state.pid+'|'+state.pg,dc=qfDetailPageCache[dk],root=null;if(dc&&Date.now()-Number(dc.ts||0)<120000){root=dc.root;}else{var req=signed('v1/circle/getpostdetail',{circleId:state.cid,postId:state.pid,pg:String(state.pg),pz:'20',sort:'0'});root=parse(ajax(req));qfDetailPageCache[dk]={ts:Date.now(),root:root};var dks=Object.keys(qfDetailPageCache);if(dks.length>24){dks.sort(function(a,b){return Number((qfDetailPageCache[a]||{}).ts||0)-Number((qfDetailPageCache[b]||{}).ts||0);});while(dks.length>24)delete qfDetailPageCache[dks.shift()];}}state.detailRoot=root;var d=dataOf(root),topic=d.TopicData||d.topicData||{},rows=arrays(d),total=Number(d.TotalCount||d.totalCount||rows.length)||rows.length;state.total=total;if(reset){body.innerHTML=topicHtml(topic,root)+'<div class=\\\"reviewTitle\\\">全部回复'+(total?'（'+total+'）':'')+'</div><div id=\\\"reviewList\\\"></div><button class=\\\"moreBtn\\\" id=\\\"moreBtn\\\">加载更多评论</button>';}bindVideoFallback(body);var list=document.getElementById('reviewList');for(var i=0;i<rows.length;i++)list.insertAdjacentHTML('beforeend',reviewHtml(rows[i]));var arts=list.querySelectorAll('.review');for(var ai=0;ai<arts.length&&ai<rows.length;ai++){var rid=qfReviewId(rows[ai]);if(!rid)continue;var linked=qfLinkedReplies(root,rid);if(linked.length&&!arts[ai].querySelector('.subReplies')){var box=document.createElement('div');box.className='subReplies';var hh='';for(var li=0;li<linked.length&&li<5;li++)hh+=subReplyHtml(linked[li]);box.innerHTML=hh;var meta=arts[ai].querySelector('.reviewMeta');arts[ai].insertBefore(box,meta||null);}}var rms=list.querySelectorAll('.qfReplyMore');for(var ri=0;ri<rms.length;ri++){if(!rms[ri].getAttribute('data-bound')){rms[ri].setAttribute('data-bound','1');rms[ri].onclick=function(){var el=this;el.style.display='inline-block';el.textContent='正在加载回复…';setTimeout(function(){loadReviewReplies(el,false);},30);};}}var btn=document.getElementById('moreBtn');if(btn){if(!rows.length||list.children.length>=total){btn.style.display='none';}else{btn.style.display='block';btn.onclick=function(){state.pg++;fetchDetail(false);};}}}catch(e){body.innerHTML='<div class=\\\"err\\\">帖子详情加载失败：'+esc(e&&e.message?e.message:e)+'</div>';}state.loading=false;}");
+    h.push("var qfDetailScrollTimer=0;detail.addEventListener('scroll',function(){if(qfDetailScrollTimer||state.loading)return;qfDetailScrollTimer=setTimeout(function(){qfDetailScrollTimer=0;var btn=document.getElementById('moreBtn');if(!btn||btn.style.display==='none')return;if(detail.scrollTop+detail.clientHeight>=detail.scrollHeight-420){state.pg++;fetchDetail(false);}},100);},{passive:true});");
+    h.push("var qfPostTouchAt=0;function qfPostOpenNode(t){while(t&&t!==document){if(t.classList&&t.classList.contains('qfPostOpen'))return t;t=t.parentNode;}return null;}function qfOpenPost(el,ev){if(!el)return;try{if(ev&&ev.preventDefault)ev.preventDefault();if(ev&&ev.stopPropagation)ev.stopPropagation();}catch(_ev){}state.cid=String(el.getAttribute('data-cid')||CIRCLE_ID);state.pid=String(el.getAttribute('data-pid')||'');if(!state.pid){try{window.java.toast('帖子ID为空，无法打开详情');}catch(_id){}return;}var pim=qfNormUrl(el.getAttribute('data-img')||''),pims=[];try{pims=(qfPostPreviewImgs&&qfPostPreviewImgs[state.pid])?qfPostPreviewImgs[state.pid].slice(0,9):[];}catch(_pm){}if(!Array.isArray(pims))pims=[];var pic=[],pis={};for(var px=0;px<pims.length&&pic.length<9;px++){var pu=qfNormUrl(pims[px]);if(/^https?:\\/\\//i.test(pu)&&!pis[pu]){pis[pu]=1;pic.push(pu);}}if(!pic.length&&pim)pic=[pim];state.previewImgs=pic;state.detailRoot=null;state.loading=false;state.pg=1;state.total=0;detail.style.display='block';detail.scrollTop=0;document.body.style.overflow='hidden';body.innerHTML='<div class=\\\"loading\\\"><div class=\\\"spin\\\"></div>正在加载帖子详情…</div>';setTimeout(function(){fetchDetail(true);},20);}function qfPostOpenEvent(ev){var el=qfPostOpenNode(ev&&ev.target);if(!el)return;var now=Date.now();if(ev.type==='click'&&now-qfPostTouchAt<700){try{ev.preventDefault();ev.stopPropagation();}catch(_d){}return;}if(ev.type==='touchend')qfPostTouchAt=now;qfOpenPost(el,ev);}function bindPostOpens(root){root=root||document;var opens=root.querySelectorAll('.qfPostOpen');for(var oi=0;oi<opens.length;oi++){opens[oi].setAttribute('role','button');opens[oi].setAttribute('tabindex','0');}}document.addEventListener('touchend',qfPostOpenEvent,true);document.addEventListener('click',qfPostOpenEvent,true);document.addEventListener('keydown',function(ev){var el=qfPostOpenNode(ev&&ev.target),k=String(ev&&ev.key||'');if(el&&(k==='Enter'||k===' '))qfOpenPost(el,ev);},true);bindPostOpens(document);");
+
+    h.push("function qfFreshVideo(cid,pid,poster,fallback){var vd={url:qfNormUrl(fallback||''),urls:[],poster:qfNormUrl(poster||''),pageUrl:''};function add(u){u=qfNormUrl(u);if(/^https?:\\/\\//i.test(u)&&vd.urls.indexOf(u)<0)vd.urls.push(u);}function adopt(fresh){if(!fresh)return;var old=vd.url,page=vd.pageUrl;vd=fresh;if(!Array.isArray(vd.urls))vd.urls=[];if(old&&vd.urls.indexOf(old)<0)vd.urls.push(old);if(!vd.poster)vd.poster=qfNormUrl(poster||'');if(!vd.pageUrl)vd.pageUrl=page||'';}add(vd.url);if(pid){var page='https://h5.if.qidian.com/h5/share/post/topic?circleId='+encodeURIComponent(String(cid||CIRCLE_ID))+'&postId='+encodeURIComponent(String(pid));vd.pageUrl=page;try{var req=signed('v1/circle/getpostdetail',{circleId:String(cid||CIRCLE_ID),postId:String(pid),pg:'1',pz:'1',sort:'0'}),root0=parse(ajax(req)),d=dataOf(root0),topic=d.TopicData||d.topicData||{},fresh=videoInfo(root0,richOf(topic).raw);if(fresh&&fresh.url)adopt(fresh);}catch(_e){}if(!vd.url){try{var opt={method:'GET',timeout:10000,headers:{'User-Agent':'Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36','Accept':'text/html,application/xhtml+xml,*/*','Referer':'https://h5.if.qidian.com/'}},raw=String(window.java.ajax(page+','+JSON.stringify(opt))||''),fresh2=videoInfo(raw,raw);if(fresh2&&fresh2.url)adopt(fresh2);}catch(_p){}}vd.pageUrl=page;}if(!Array.isArray(vd.urls))vd.urls=[];add(vd.url);if(!vd.url&&vd.urls.length)vd.url=vd.urls[0];return vd;}\nfunction qfStartVideoBox(box,external){if(!box||box.getAttribute('data-loading')==='1')return;box.setAttribute('data-loading','1');box.classList.add('qfVideoLoading');var cid=String(box.getAttribute('data-cid')||CIRCLE_ID),pid=String(box.getAttribute('data-pid')||''),poster=qfNormUrl(box.getAttribute('data-poster')||''),fallback=qfNormUrl(box.getAttribute('data-url')||''),status=box.querySelector('.qfVideoStatus');if(status)status.textContent=external?'正在获取最新播放地址…':'正在准备视频…';var vd=qfFreshVideo(cid,pid,poster,fallback),urls=[],u='';function add(u0){u0=qfNormUrl(u0);if(/^https?:\\/\\//i.test(u0)&&urls.indexOf(u0)<0)urls.push(u0);}if(vd&&Array.isArray(vd.urls)){for(var ui=0;ui<vd.urls.length;ui++)add(vd.urls[ui]);}add(vd&&vd.url);add(fallback);u=urls.length?urls[0]:'';box.removeAttribute('data-loading');box.classList.remove('qfVideoLoading');if(!u){if(vd&&vd.pageUrl){box.classList.add('qfVideoFailed');if(status)status.textContent='未拿到直链，正在打开起点官方帖子播放…';openMediaUrl(vd.pageUrl);return;}box.classList.add('qfVideoFailed');if(status)status.textContent='暂未解析到有效播放地址';return;}box.setAttribute('data-url',u);if(vd.poster)box.setAttribute('data-poster',qfNormUrl(vd.poster));if(external){openMediaUrl(u);return;}var oldv=box.querySelector('video');if(oldv){try{oldv.pause();}catch(_ov){}try{oldv.parentNode.removeChild(oldv);}catch(_or){}}var cls=String(box.getAttribute('data-vclass')||'topicVideo'),v=document.createElem
