@@ -1,0 +1,40 @@
+name: diag-qidian-beta14-circle
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta14-circle.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Inspect stable beta14 circle image/detail path
+        run: |
+          python - <<'PY'
+          import json,re,base64,gzip
+          from pathlib import Path
+          d=json.loads(Path('sources/novel/qidian-next/qidian-next.json').read_text(encoding='utf-8'))
+          def fs(o):
+              if isinstance(o,dict) and o.get('bookSourceName')=='🌈 起点增强': return o
+              if isinstance(o,dict):
+                  for v in o.values():
+                      r=fs(v)
+                      if r:return r
+              if isinstance(o,list):
+                  for v in o:
+                      r=fs(v)
+                      if r:return r
+          s=fs(d); js=s['jsLib']
+          m=re.search(r'"circle":"gz:([A-Za-z0-9+/=]+)"',js); assert m
+          c=gzip.decompress(base64.b64decode(m.group(1))).decode('utf-8')
+          pats=['function feedCard','function fetchDetail','previewImgs','state.preview','detailImgs','getpostdetail','qfCirclePostImage2970','images']
+          for pat in pats:
+              print('\n###',pat)
+              st=0
+              for _ in range(12):
+                  i=c.find(pat,st)
+                  if i<0:break
+                  print('POS',i,c[max(0,i-800):min(len(c),i+2200)].replace('\n','\\n'))
+                  st=i+len(pat)
+          PY
