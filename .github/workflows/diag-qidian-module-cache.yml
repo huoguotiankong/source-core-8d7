@@ -1,0 +1,42 @@
+name: diag-qidian-module-cache
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-module-cache.trigger'
+permissions:
+  contents: read
+jobs:
+  diag:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Inspect jsLib loader/cache
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          d=json.loads(p.read_text(encoding='utf-8'))
+          def find(o):
+              if isinstance(o,dict) and o.get('bookSourceName')=='🌈 起点增强 · Beta': return o
+              if isinstance(o,dict):
+                  for v in o.values():
+                      r=find(v)
+                      if r:return r
+              if isinstance(o,list):
+                  for v in o:
+                      r=find(v)
+                      if r:return r
+          s=find(d); js=s['jsLib']
+          pats=['gz:','gunzip','gzip','Base64','MODULE','moduleCache','qfLoad','qfRequire','source.get','source.put','eval(','new Function']
+          for pat in pats:
+              print('\n###',pat)
+              st=0
+              for n in range(8):
+                  i=js.find(pat,st)
+                  if i<0: break
+                  print(js[max(0,i-500):min(len(js),i+1200)].replace('\n','\\n'))
+                  st=i+len(pat)
+          PY
