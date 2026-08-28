@@ -1,3 +1,19 @@
+## 2026-08-28 — 漫蛙漫画 0.1.0-beta13
+
+Status: Beta/Test; native-comment-DOM loading repair awaiting real-device confirmation.
+
+Changes:
+
+- Beta12 real-device test showed the load controller entering a permanent “正在加载更多评论 / 加载中” state.
+- The direct cause is architectural: Beta12 tried to infer a next-page URL/control and issued its own `fetch()`. On current Manwa lines this request can stay pending under the site's transport/Cloudflare behavior, so the UI never exits loading.
+- Beta13 removes the generic page fetch completely.
+- `#comment` is no longer moved into a new custom container. It stays inside the site's original DOM/parent chain so native event delegation, scroll handlers, observers and dynamic append logic remain intact.
+- The custom view now isolates the page by hiding unrelated sibling nodes while preserving the comment ancestor chain.
+- Near-bottom loading triggers native `window/document` scroll plus jQuery scroll when available, and clicks only comment-area “更多评论/下一页” style controls.
+- An 8-second watchdog guarantees every load attempt exits. If no new items appear, the button becomes usable again and the status reports that the site returned no new comments.
+- Beta12 CSS Grid layout remains; content/detail/TOC/login/domain modules are frozen.
+- SHA256: `64348d1e056f8cf9c1126e3fad1be5601eae8f4b84e7f80738da659e81fcd2a5`.
+
 ## 2026-08-28 — 起点增强 1.1.0-beta18
 
 Status: Beta/Test; persistent circle detail/pagination failures reworked with hard fallbacks, awaiting real-device confirmation.
