@@ -1,1 +1,1 @@
-2026-08-29 isolated role renderer 8
+2026-08-29 compressed role renderer 9
