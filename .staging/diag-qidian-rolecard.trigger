@@ -1,1 +1,1 @@
-2026-08-29 current role signatures 12
+2026-08-29 beta22 role runtime validation 13
