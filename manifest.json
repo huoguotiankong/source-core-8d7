@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-29T09:45:00+08:00",
+  "updatedAt": "2026-08-29T09:55:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -80,31 +80,31 @@
       "name": "🌈 起点增强 · Beta",
       "category": "novel",
       "channel": "beta",
-      "version": "1.1.0-beta23",
-      "versionCode": 11023,
-      "updatedAt": "2026-08-29T09:45:00+08:00",
+      "version": "1.1.0-beta24",
+      "versionCode": 11024,
+      "updatedAt": "2026-08-29T09:55:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11023",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11024",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "角色卡 beta23：默认显示角色档案，修复真机页签点击无响应；星耀守护降为次级页。",
+      "summary": "角色卡 beta24：默认角色档案，页签改为纯 HTML/CSS 原生切换，修复真机点击星耀守护不响应。",
       "tags": [
         "起点",
         "测试版",
         "角色卡",
         "角色档案",
-        "页签修复",
+        "星耀守护",
+        "纯CSS页签",
         "高清立绘",
-        "官方数据",
-        "多角色切换"
+        "官方数据"
       ],
       "changelog": [
-        "角色卡默认页由“星耀守护”改为“角色档案”",
-        "页签按钮改为直接点击切换，修复真机点击角色档案无响应",
-        "星耀守护保留为次级页；官方没有星耀数据时只显示暂无，不影响角色档案",
-        "保留官方高清立绘、左右切换、原图查看和 88% BottomSheet",
+        "角色卡默认显示角色档案",
+        "角色档案/星耀守护改为 radio + label + CSS 切换，完全移除 onclick 依赖",
+        "星耀守护无数据仍作为独立数据问题保留，不伪造数值",
+        "保留高清立绘、左右切换、原图查看和 88% BottomSheet",
         "书友圈、正文、目录、评论、Provider 与其它域冻结"
       ],
-      "sha256": "07721202fa3356f26d76cfdd83554eeaa6a63f331fad38d0fc26f733916eaf6d"
+      "sha256": "0db8c496d16faa57751880107b70cb66747d254a9f8cb5ec52c52439fe315aae"
     },
     {
       "id": "picacg",
