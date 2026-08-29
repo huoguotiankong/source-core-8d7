@@ -1,0 +1,55 @@
+name: patch-qidian-beta29-role-perf
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.staging/patch-qidian-beta29-role-perf.trigger']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Fetch beta25 source
+        run: |
+          git fetch --depth=1 origin 6da4fdf71bc11d1f6473ac8300cf1e6d1f5f0f4c
+          git show 6da4fdf71bc11d1f6473ac8300cf1e6d1f5f0f4c:sources/novel/qidian-next/qidian-next-beta.json > /tmp/qidian-beta25.json
+      - name: Restore beta25 role module
+        run: python .staging/patch-qidian-beta29-role-perf.py
+      - name: Validate exact role rollback
+        run: |
+          python - <<'PY'
+          import json,re,base64,gzip,hashlib
+          def role_payload(path):
+              d=json.load(open(path,encoding='utf-8')); s=d[0] if isinstance(d,list) else d; js=s['jsLib']
+              m=re.search(r'\\?"role\\?"\s*:\s*\\?"gz:([A-Za-z0-9+/=]+)',js); assert m
+              return m.group(1)
+          a=role_payload('sources/novel/qidian-next/qidian-next-beta.json')
+          b=role_payload('/tmp/qidian-beta25.json')
+          assert a==b, 'role payload must exactly match beta25'
+          raw=a+'='*((4-len(a)%4)%4); t=gzip.decompress(base64.b64decode(raw)).decode('utf-8')
+          assert 'interactive=!!(e.target&&e.target.closest&&e.target.closest(".tabs"))' in t
+          assert 'qfRoleRelationshipB26' not in t
+          assert 'Relationship诊断' not in t
+          open('/tmp/qidian-role-beta29.js','w',encoding='utf-8').write(t)
+          print('role exact beta25',len(t.encode('utf-8')),hashlib.sha256(a.encode()).hexdigest())
+          PY
+          node --check /tmp/qidian-role-beta29.js
+          git diff --check
+      - name: Sync metadata
+        run: python .staging/sync-qidian-beta29.py
+      - name: Validate and publish
+        run: |
+          python -m json.tool sources/novel/qidian-next/qidian-next-beta.json >/dev/null
+          python -m json.tool manifest.json >/dev/null
+          python -m json.tool subscription/beta.json >/dev/null
+          python -m json.tool bundles/all-beta.json >/dev/null
+          git diff --check
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
+          git commit -m "release(qidian): publish beta29 role performance rollback"
+          git push origin main
