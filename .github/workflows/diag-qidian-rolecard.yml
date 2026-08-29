@@ -12,26 +12,19 @@ jobs:
       - shell: bash
         run: |
           python - <<'PY'
-          import json,re,base64,gzip
-          d=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8'));s=d[0] if isinstance(d,list) else d;js=s['jsLib']
-          sources=[('RAW',js)]
-          for name,b64 in re.findall(r'"([^"]+)":"gz:([A-Za-z0-9+/=]+)"',js):
-            try:sources.append((name,gzip.decompress(base64.b64decode(b64)).decode()))
-            except:pass
-          pats=[r'function\s+([A-Za-z0-9_$]*Role[A-Za-z0-9_$]*)\s*\(',r'function\s+([A-Za-z0-9_$]*role[A-Za-z0-9_$]*)\s*\(',r'QF_[A-Za-z0-9_$]*Role[A-Za-z0-9_$]*',r'roleData',r'roleView',r'RoleSetModel',r'relationship',r'lookfor']
-          for name,t in sources:
-            hits=[]
-            for pat in pats:
-              for m in re.finditer(pat,t,re.I):
-                hits.append((m.start(),m.group(0)))
-            if not hits: continue
-            uniq=[];seen=set()
-            for p,k in sorted(hits):
-              q=(p//500,k.lower())
-              if q in seen: continue
-              seen.add(q);uniq.append((p,k))
-            print('\n===== MODULE',name,'LEN',len(t),'HITS',len(uniq),'=====')
-            for p,k in uniq[:40]:
-              print('\n### HIT',p,k,'###\n')
-              print(t[max(0,p-3000):min(len(t),p+12000)])
+          import json,re
+          d=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8'));s=d[0] if isinstance(d,list) else d;t=s['jsLib']
+          for fn in ['qfRoleModelV4','qfRoleHtmlV33']:
+            m=re.search(r'function\s+'+re.escape(fn)+r'\s*\(',t)
+            if not m:
+              print('MISSING',fn);continue
+            start=m.start()
+            nxt=re.search(r'\nfunction\s+[A-Za-z0-9_$]+\s*\(',t[m.end():])
+            end=m.end()+nxt.start() if nxt else len(t)
+            print('\n===== '+fn+' =====\n')
+            print(t[start:end])
+          print('\n===== SOURCE META =====')
+          for k in ['bookSourceName','bookSourceComment','bookSourceGroup','bookSourceUrl']:
+            print(k,repr(s.get(k)))
+          print('version-like top keys',[(k,s.get(k)) for k in s if 'version' in k.lower() or 'code' in k.lower()][:20])
           PY
