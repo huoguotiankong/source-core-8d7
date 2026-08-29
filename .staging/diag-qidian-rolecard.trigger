@@ -1,1 +1,1 @@
-2026-08-29 beta22 role runtime validation 13
+2026-08-29 beta24 role gesture diagnostic 14
