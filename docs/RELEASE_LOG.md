@@ -1,3 +1,13 @@
+## 2026-08-29 · 🌈 起点增强 1.1.0-beta26
+
+- 通道：Beta / 测试版，等待真机确认；Stable 1.1.0 不变。
+- 角色卡：保留 beta25 已真机确认的页签触摸根因修复，默认“角色档案”。
+- 星耀守护：角色基础资料继续使用 `v3/bookdetail/lookfor`；新增官方 `https://h5.if.qidian.com/h5/relationship?roleId=<RoleId>&bookId=<BookId>` 数据链。
+- 接口发现：从 Relationship HTML 与少量关联脚本动态提取 Role/Star/Guard/Relationship Argus 路径，复用现有 `qfArgusOuterRequest2931` 签名请求器，避免硬编码易变路径。
+- 数据合并：真实星耀值、守护人数、等级/排名按 RoleId 合并；接口失败保持“暂无”，不拿点赞数等其它数据冒充。
+- 性能：接口路径和角色结果使用会话缓存，单本最多 enrich 前10个角色。
+- 冻结：书友圈、正文、目录、评论、Provider 与其它域均不改。
+
 ## 2026-08-29 · 🌈 起点增强 1.1.0-beta25
 
 - 通道：Beta / 测试版，等待真机确认；Stable 1.1.0 不变。
