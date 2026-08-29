@@ -1,3 +1,13 @@
+## 2026-08-29 · 🌈 起点增强 1.1.0-beta27
+
+- 通道：Beta / 测试版，等待真机确认；Stable 1.1.0 不变。
+- 角色卡：保留 beta26 已确认运行的 B26 页面、角色档案与星耀页签交互。
+- Relationship：从单一 `h5.if.qidian.com/h5/relationship` 扩展到 h5/h5v6 的 relationship 与 new/role/share 四个官方入口。
+- 动态发现：最多扫描10个关联脚本、36个 Role/Star/Guard/Relationship Argus 候选，继续复用现有签名请求器。
+- 可观测性：星耀页临时显示 Relationship 诊断，包括页面命中/字节数、脚本数、候选 API 数、已尝试数或实际命中路径。
+- 数据原则：没有官方真实返回仍显示暂无，不使用点赞数等替代。
+- 冻结：书友圈、正文、目录、评论、Provider 与其它域均不改。
+
 ## 2026-08-29 · 🌈 起点增强 1.1.0-beta26
 
 - 通道：Beta / 测试版，等待真机确认；Stable 1.1.0 不变。
