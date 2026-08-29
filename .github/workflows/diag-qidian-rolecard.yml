@@ -12,19 +12,23 @@ jobs:
       - shell: bash
         run: |
           python - <<'PY'
-          import json,re
-          d=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8'));s=d[0] if isinstance(d,list) else d;t=s['jsLib']
+          import json,re,base64,gzip
+          d=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8'));s=d[0] if isinstance(d,list) else d;js=s['jsLib']
+          sources=[('RAW',js)]
+          for name,b64 in re.findall(r'"([^"]+)":"gz:([A-Za-z0-9+/=]+)"',js):
+            try:sources.append((name,gzip.decompress(base64.b64decode(b64)).decode()))
+            except Exception:pass
           for fn in ['qfRoleModelV4','qfRoleHtmlV33']:
-            m=re.search(r'function\s+'+re.escape(fn)+r'\s*\(',t)
-            if not m:
-              print('MISSING',fn);continue
-            start=m.start()
-            nxt=re.search(r'\nfunction\s+[A-Za-z0-9_$]+\s*\(',t[m.end():])
-            end=m.end()+nxt.start() if nxt else len(t)
-            print('\n===== '+fn+' =====\n')
-            print(t[start:end])
+            found=False
+            for name,t in sources:
+              m=re.search(r'function\s+'+re.escape(fn)+r'\s*\(',t)
+              if not m:continue
+              found=True;start=m.start()
+              nxt=re.search(r'\nfunction\s+[A-Za-z0-9_$]+\s*\(',t[m.end():])
+              end=m.end()+nxt.start() if nxt else len(t)
+              print('\n===== '+fn+' MODULE='+name+' =====\n')
+              print(t[start:end])
+            if not found:print('MISSING',fn)
           print('\n===== SOURCE META =====')
-          for k in ['bookSourceName','bookSourceComment','bookSourceGroup','bookSourceUrl']:
-            print(k,repr(s.get(k)))
-          print('version-like top keys',[(k,s.get(k)) for k in s if 'version' in k.lower() or 'code' in k.lower()][:20])
+          print('bookSourceComment',repr(s.get('bookSourceComment')))
           PY
