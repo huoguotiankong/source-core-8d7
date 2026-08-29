@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-29T14:00:00+08:00",
+  "updatedAt": "2026-08-29T17:00:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -38,27 +38,27 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "版权信息页 beta30：日期标签由“上架”修正为“首发”。",
+      "summary": "版权信息页 beta31：刷新版权虚拟章节缓存，确保显示“首发”；订阅详情卡同步修复。",
       "icon": "",
       "channel": "beta",
-      "version": "1.1.0-beta30",
+      "version": "1.1.0-beta31",
       "updatedAt": "2026-08-29",
       "tags": [
         "起点",
         "测试版",
         "版权信息",
         "首发时间",
-        "语义修正"
+        "缓存刷新",
+        "订阅同步"
       ],
       "changelog": [
-        "版权信息页日期标签“上架”改为“首发”",
-        "不再把首发时间误称为上架时间",
-        "角色卡保持 beta29 性能回退",
+        "版权虚拟章节 qfCv 升至 3101，绕过旧页面缓存",
+        "订阅详情卡改为随 Beta 发布元数据同步",
         "其它域冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11030",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11030",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11030",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11031",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
     },
     {
@@ -93,5 +93,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-08-29T14:00:00+08:00"
+  "generatedAt": "2026-08-29T17:00:00+08:00"
 }

@@ -1,27 +1,27 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "书友圈 beta16：恢复帖子“查看详情”点击，并保留列表多图进入详情。",
+  "summary": "版权信息页 beta31：刷新版权虚拟章节缓存，确保显示“首发”；订阅详情卡同步修复。",
   "badges": [
     "Beta",
-    "1.1.0-beta16",
-    "书友圈点击热修"
+    "1.1.0-beta31",
+    "版权信息"
   ],
   "sections": [
     {
-      "title": "查看详情恢复",
-      "text": "详情按钮恢复为 Beta14 已验证的紧凑 DOM，仅携带帖子 ID 和首图，不再塞入长图片数组属性。"
+      "title": "本版更新",
+      "text": "版权虚拟章节 qfCv 升至 3101，绕过旧页面缓存；订阅详情卡改为随 Beta 发布元数据同步；其它域冻结"
     },
     {
-      "title": "多图仍保留",
-      "text": "初始列表与动态筛选列表的完整配图均按 postId 暂存在当前 WebView 内存，点击详情后与详情接口图片去重合并，最多 9 张。"
+      "title": "版本状态",
+      "text": "当前为 Beta / 测试通道，需真机确认后才会晋升正式版。"
     },
     {
-      "title": "冻结范围",
-      "text": "投票元数据精确清理保留；评论/楼中楼、分类、视频以及其它书源域不变。"
+      "title": "更新方式",
+      "text": "从本订阅页重新导入/更新即可覆盖现有 🌈 起点增强 · Beta。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11016",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11016",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11016"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11031",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031"
 }
