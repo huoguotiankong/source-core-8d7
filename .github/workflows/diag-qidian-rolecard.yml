@@ -13,11 +13,17 @@ jobs:
         run: |
           python - <<'PY'
           import json,re,base64,gzip
-          d=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8'));s=d[0] if isinstance(d,list) else d
-          m=re.search(r'"circle":"gz:([A-Za-z0-9+/=]+)"',s['jsLib']);t=gzip.decompress(base64.b64decode(m.group(1))).decode()
-          for mm in re.finditer(r'function\s+([A-Za-z0-9_$]*(?:role|character|card)[A-Za-z0-9_$]*)\s*\(',t,re.I): print(mm.group(1),mm.start())
-          for key in ['getrole','roleId','RoleId','character','角色简介','生日：','左右滑动切换角色','点击立绘查看原图']:
-            print('\nKEY',key)
-            for mm in list(re.finditer(re.escape(key),t,re.I))[:10]:
-              p=mm.start(); print('POS',p,'\n',t[max(0,p-1500):min(len(t),p+5000)])
+          d=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8'));s=d[0] if isinstance(d,list) else d;js=s['jsLib']
+          sources=[('RAW',js)]
+          for name,b64 in re.findall(r'"([^"]+)":"gz:([A-Za-z0-9+/=]+)"',js):
+            try:sources.append((name,gzip.decompress(base64.b64decode(b64)).decode()))
+            except:pass
+          keys=['守护者','星耀值','比心','送礼','角色信息','角色详情','档案','角色标签','角色卡','立绘','生日','性别']
+          for name,t in sources:
+            ps=[]
+            for k in keys:
+              for m in list(re.finditer(re.escape(k),t))[:5]:ps.append((m.start(),k))
+            if ps:
+              print('\nMODULE',name,'LEN',len(t),'HITS',sorted(ps)[:30])
+              for p,k in sorted(ps)[:8]: print('\n--',k,p,'--\n',t[max(0,p-1800):min(len(t),p+6500)])
           PY
