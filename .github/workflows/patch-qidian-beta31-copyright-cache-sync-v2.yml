@@ -1,0 +1,74 @@
+name: patch-qidian-beta31-copyright-cache-sync-v2
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta31-copyright-cache-sync-v2.trigger']
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Patch and publish
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,hashlib
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(p.read_text()); s=arr[0]; lib=s['jsLib']
+          p0='var QF_MOD38_PACK='; p1='var QF_MOD38_EXPORTS='; p2='var QF_MOD38_DEPS='; p3='var QF_MOD38_CACHE='
+          a=lib.index(p0)+len(p0); b=lib.index(p1,a); c=lib.index(p2,b); d=lib.index(p3,c)
+          def clean(seg): return seg.strip().rstrip(';').strip()
+          pack=json.loads(clean(lib[a:b])); exports=json.loads(clean(lib[b+len(p1):c])); deps=json.loads(clean(lib[c+len(p2):d]))
+          assert 'copyright' in pack and 'copyright' in exports
+          cv=pack['copyright']; code=gzip.decompress(base64.b64decode(cv[3:])).decode() if isinstance(cv,str) and cv.startswith('gz:') else str(cv)
+          code=code.replace('上架','首发')
+          pack['copyright_b31']='gz:'+base64.b64encode(gzip.compress(code.encode(),9)).decode()
+          exports['copyright_b31']=list(exports['copyright'])
+          if 'copyright' in deps: deps['copyright_b31']=list(deps['copyright'])
+          lib=lib[:a]+json.dumps(pack,ensure_ascii=False,separators=(',',':'))+';\n'+p1+json.dumps(exports,ensure_ascii=False,separators=(',',':'))+';\n'+p2+json.dumps(deps,ensure_ascii=False,separators=(',',':'))+';\n'+lib[d:]
+          hits=lib.count('module:"copyright"'); assert hits>=3, hits
+          lib=lib.replace('module:"copyright"','module:"copyright_b31"')
+          rev=lib.count('qfCv=2967'); assert rev>=1, rev
+          lib=lib.replace('qfCv=2967','qfCv=3101')
+          old='function qfTocLoadV70(raw,baseUrl){     return qfCatalogLoad.call(this,raw,baseUrl); }'
+          assert old in lib
+          new='''function qfTocLoadV70(raw,baseUrl){\n    var out=qfCatalogLoad.call(this,raw,baseUrl);\n    try{\n        var a=Array.isArray(out)?out:[];\n        for(var i=0;i<a.length;i++){\n            var x=a[i]||{};\n            if(String(x.N||'')!=='版权信息'||!x.C)continue;\n            var u=String(x.C||'');\n            if(!/[?&]qfType=copyright/i.test(u))continue;\n            if(/[?&]qfCv=\\d+/i.test(u))u=u.replace(/([?&]qfCv=)\\d+/i,'$1'+'3101');\n            else u=u+(u.indexOf('?')>=0?'&':'?')+'qfCv=3101';\n            x.C=u;\n        }\n    }catch(_cv31){}\n    return out;\n}'''
+          lib=lib.replace(old,new,1)
+          s['jsLib']=lib
+          s['bookSourceComment']='v1.1.0-beta31：版权信息页缓存链修复。版权日期明确显示“首发”；版权懒模块切换为 copyright_b31，版权目录项 qfCv 升至 3101，并在目录返回层自动迁移旧版权 URL，避免继续复用旧“上架”缓存。订阅详情卡同步机制一并补齐。其它域冻结。'
+          p.write_text(json.dumps(arr,ensure_ascii=False,indent=2)+'\n'); sha=hashlib.sha256(p.read_bytes()).hexdigest()
+          mp=Path('manifest.json'); m=json.loads(mp.read_text()); m['updatedAt']='2026-08-29T16:40:00+08:00'
+          for x in m.get('sources',[]):
+            if x.get('id')=='qidian-next-beta':
+              x.update(version='1.1.0-beta31',versionCode=11031,updatedAt='2026-08-29T16:40:00+08:00',sourceUrl='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',summary='版权信息页 beta31：强制刷新版权模块/章节缓存，日期标签统一为“首发”；订阅详情同步补齐。',sha256=sha,tags=['起点','测试版','版权信息','首发时间','缓存刷新','订阅同步'],changelog=['版权页日期标签统一为“首发”','版权模块换键 copyright_b31','版权目录项 qfCv 升至 3101，旧目录返回时自动迁移','订阅详情卡纳入发布同步','其它域冻结'])
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
+          sp=Path('subscription/beta.json'); sub=json.loads(sp.read_text()); sub['updatedAt']=sub['generatedAt']='2026-08-29T16:40:00+08:00'
+          for x in sub.get('items',[]):
+            if x.get('id')=='qidian-next-beta':
+              x.update(version='1.1.0-beta31',updatedAt='2026-08-29',summary='版权信息页 beta31：强制刷新版权模块/章节缓存，日期标签统一为“首发”；订阅详情同步补齐。',sourceUrl='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',backupUrl='https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',importUrl='legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',tags=['起点','测试版','版权信息','首发时间','缓存刷新','订阅同步'],changelog=['版权页日期标签统一为“首发”','版权模块换键 copyright_b31','版权目录项 qfCv 升至 3101，旧目录返回时自动迁移','订阅详情卡纳入发布同步','其它域冻结'])
+          sp.write_text(json.dumps(sub,ensure_ascii=False,indent=2)+'\n')
+          bp=Path('bundles/all-beta.json'); bundle=json.loads(bp.read_text())
+          def walk(o):
+            if isinstance(o,dict):
+              if o.get('bookSourceUrl')==s.get('bookSourceUrl') and 'bookSourceName' in o: o.clear(); o.update(s); return
+              for v in list(o.values()): walk(v)
+            elif isinstance(o,list):
+              for v in o: walk(v)
+          walk(bundle); bp.write_text(json.dumps(bundle,ensure_ascii=False,indent=2)+'\n')
+          rp=Path('docs/RELEASE_LOG.md'); rp.write_text('## 2026-08-29 · 🌈 起点增强 1.1.0-beta31\n\n- 通道：Beta / 测试版；Stable 不变。\n- 版权页：日期统一标记为“首发”；版权 lazy module 换键为 `copyright_b31`。\n- 缓存：版权目录项 `qfCv` 升至 3101，并在目录返回层迁移旧缓存 URL，避免继续复用旧“上架”章节内容。\n- 订阅：`rss/data/details/beta/qidian-next.json` 纳入同步脚本，修复详情卡停留 beta16。\n- 冻结：角色卡保持 beta29 性能回退；其它域不改。\n\n'+rp.read_text())
+          PY
+          python3 tools/sync_qidian_next_beta_detail.py
+          python3 - <<'PY'
+          import json,gzip,base64
+          s=json.load(open('sources/novel/qidian-next/qidian-next-beta.json'))[0]; lib=s['jsLib']
+          assert '1.1.0-beta31' in s['bookSourceComment'] and 'module:"copyright_b31"' in lib and 'qfCv=3101' in lib
+          a=lib.index('var QF_MOD38_PACK=')+len('var QF_MOD38_PACK='); b=lib.index('var QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b].strip().rstrip(';').strip())
+          code=gzip.decompress(base64.b64decode(pack['copyright_b31'][3:])).decode(); assert '上架' not in code and '首发' in code
+          d=json.load(open('rss/data/details/beta/qidian-next.json')); assert '1.1.0-beta31' in d.get('badges',[])
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md
+          git commit -m 'release(qidian): publish beta31 copyright cache and subscription sync'
+          git push origin HEAD:main
