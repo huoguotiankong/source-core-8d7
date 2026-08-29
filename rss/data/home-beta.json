@@ -1,12 +1,12 @@
 {
   "type": "home",
   "name": "首页中心",
-  "updatedAt": "2026-08-26T09:15:00+08:00",
+  "updatedAt": "2026-08-29T16:50:00+08:00",
   "items": [
     {
       "id": "repo-overview",
       "name": "🌈 阅读书源仓库",
-      "summary": "正式版、测试版和批量导入统一管理；详情页只展示当前状态，不堆积版本历史。",
+      "summary": "小说、漫画按类型分类；正式版、测试版按发布状态管理；订阅与批量导入独立维护。",
       "updatedAt": "当前仓库",
       "icon": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/assets/reader-repo-icon.png",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/overview.json",
@@ -22,8 +22,8 @@
     },
     {
       "id": "repo-update",
-      "name": "🔄 更新仓库订阅源",
-      "summary": "仓库界面或规则升级时，从这里重新导入当前 Beta 定义并覆盖现有订阅源。",
+      "name": "🔄 更新订阅源",
+      "summary": "仓库界面、分类或规则升级时，从这里重新导入当前定义并覆盖现有订阅源。",
       "updatedAt": "一键更新",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/update-beta.json",
       "meta": "订阅更新"
