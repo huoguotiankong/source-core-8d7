@@ -1,0 +1,60 @@
+name: patch-qidian-beta31-copyright-cache-sync-v6
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta31-copyright-cache-sync-v6.trigger']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Publish beta31
+        run: |
+          python3 - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          sp=Path('sources/novel/qidian-next/qidian-next-beta.json'); doc=json.loads(sp.read_text()); src=doc[0]; js=src['jsLib']
+          n=js.count('qfCv=2967'); js=js.replace('qfCv=2967','qfCv=3101'); print('qfCv replaced',n)
+          if 'qfCv=3101' not in js: raise SystemExit('copyright revision update failed')
+          src['jsLib']=js
+          src['bookSourceComment']='v1.1.0-beta31：版权信息页缓存链修复。Beta30 已修正版权页日期语义，本版将版权虚拟章节 qfCv 升至 3101，强制绕过阅读已缓存的旧“上架”页面；同时补齐订阅详情卡同步，避免订阅页继续停留旧版本信息。其它域冻结。'
+          sp.write_text(json.dumps(doc,ensure_ascii=False,separators=(',',':'))); sha=hashlib.sha256(sp.read_bytes()).hexdigest()
+          summary='版权信息页 beta31：刷新版权虚拟章节缓存，确保显示“首发”；订阅详情卡同步修复。'
+          changes=['版权虚拟章节 qfCv 升至 3101，绕过旧页面缓存','订阅详情卡改为随 Beta 发布元数据同步','其它域冻结']
+          mp=Path('manifest.json'); m=json.loads(mp.read_text()); m['updatedAt']='2026-08-29T17:00:00+08:00'
+          for x in m.get('sources',[]):
+              if x.get('id')=='qidian-next-beta': x.update(version='1.1.0-beta31',versionCode=11031,updatedAt='2026-08-29T17:00:00+08:00',sourceUrl='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',summary=summary,sha256=sha,tags=['起点','测试版','版权信息','首发时间','缓存刷新','订阅同步'],changelog=changes)
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
+          bp=Path('subscription/beta.json'); sub=json.loads(bp.read_text()); sub['updatedAt']=sub['generatedAt']='2026-08-29T17:00:00+08:00'
+          for x in sub.get('items',[]):
+              if x.get('id')=='qidian-next-beta': x.update(version='1.1.0-beta31',updatedAt='2026-08-29',summary=summary,sourceUrl='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',backupUrl='https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',importUrl='legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',tags=['起点','测试版','版权信息','首发时间','缓存刷新','订阅同步'],changelog=changes)
+          bp.write_text(json.dumps(sub,ensure_ascii=False,indent=2)+'\n')
+          bunp=Path('bundles/all-beta.json'); bun=json.loads(bunp.read_text()); cnt=[0]
+          def rb(o):
+              if isinstance(o,list):
+                  for i,v in enumerate(o):
+                      if isinstance(v,dict) and v.get('bookSourceUrl')==src.get('bookSourceUrl') and '起点增强' in str(v.get('bookSourceName','')):o[i]=src;cnt[0]+=1
+                      else:rb(v)
+              elif isinstance(o,dict):
+                  for k,v in list(o.items()):
+                      if isinstance(v,dict) and v.get('bookSourceUrl')==src.get('bookSourceUrl') and '起点增强' in str(v.get('bookSourceName','')):o[k]=src;cnt[0]+=1
+                      else:rb(v)
+          rb(bun); print('bundle replacements',cnt[0]); bunp.write_text(json.dumps(bun,ensure_ascii=False,separators=(',',':')))
+          rp=Path('docs/RELEASE_LOG.md'); rp.write_text('## 2026-08-29 · 🌈 起点增强 1.1.0-beta31\n\n- 通道：Beta / 测试版；Stable 不变。\n- 版权页：将版权虚拟章节 `qfCv` 从 2967 升至 3101，强制绕过阅读旧章节缓存，使“首发”语义修正真正生效。\n- 订阅：详情卡改由同步脚本从 Beta 元数据生成，后续发布同步更新版本、摘要和导入链接。\n- 其它域冻结。\n\n'+rp.read_text())
+          PY
+          python3 tools/sync_qidian_next_beta_detail.py
+          python3 - <<'PY'
+          import json
+          s=json.load(open('sources/novel/qidian-next/qidian-next-beta.json'))[0]
+          assert 'beta31' in s.get('bookSourceComment','') and 'qfCv=3101' in s.get('jsLib','')
+          q=next(x for x in json.load(open('subscription/beta.json')).get('items',[]) if x.get('id')=='qidian-next-beta'); assert q.get('version')=='1.1.0-beta31'
+          d=json.load(open('rss/data/details/beta/qidian-next.json')); assert '1.1.0-beta31' in d.get('badges',[]); assert d.get('sourceUrl','').endswith('?v=11031'); assert 'beta31' in d.get('summary','')
+          print('VALID',d['summary'],d['badges'])
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md
+          git commit -m 'release(qidian): publish beta31 copyright cache and subscription sync'
+          git push origin main
