@@ -2,24 +2,26 @@ name: diag-qidian-rolecard
 on:
   workflow_dispatch:
   push:
-    paths: ['.staging/diag-qidian-rolecard.trigger']
+    paths:
+      - '.staging/diag-qidian-rolecard.trigger'
 jobs:
   inspect:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main}
-      - shell: bash
+        with:
+          ref: main
+      - name: Extract role module
         run: |
           python - <<'PY'
           import json,re,base64,gzip
           d=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8'));s=d[0] if isinstance(d,list) else d;js=s['jsLib']
           m=re.search(r'\\?"role\\?"\s*:\s*\\?"gz:([A-Za-z0-9+/=]+)',js);assert m
           b=m.group(1);b+='='*((4-len(b)%4)%4);t=gzip.decompress(base64.b64decode(b)).decode()
-          print('ROLE_LEN',len(t))
-          print('FUNCTIONS',re.findall(r'function\s+([A-Za-z0-9_$]+)\s*\(',t))
-          for key in ['scroll-snap-type','relationship','lookfor','heightPercentage','暂无角色立绘','点击立绘查看原图','星耀','守护','roleList','roleId']:
-            print('\n###',key,'###')
-            for mm in list(re.finditer(re.escape(key),t,re.I))[:8]:
-              p=mm.start();print(t[max(0,p-1800):min(len(t),p+5000)])
+          open('/tmp/qidian-role-beta22.js','w',encoding='utf-8').write(t)
+          for x in ['function qfRoleMetaB22','星耀守护','角色档案','heightPercentage:0.88','v3/bookdetail/lookfor']:
+              assert x in t,x
+          print('role bytes',len(t.encode('utf-8')))
           PY
+      - name: Syntax check
+        run: node --check /tmp/qidian-role-beta22.js
