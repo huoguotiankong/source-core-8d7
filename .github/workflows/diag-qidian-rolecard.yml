@@ -14,19 +14,12 @@ jobs:
           python - <<'PY'
           import json,re,base64,gzip
           d=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8'));s=d[0] if isinstance(d,list) else d;js=s['jsLib']
-          for name in ['role','circle']:
-            m=re.search(r'\\?"'+name+r'\\?"\s*:\s*\\?"gz:([A-Za-z0-9+/=]+)',js)
-            print('MATCH',name,bool(m))
-            if not m:continue
-            b=m.group(1);b += '='*((4-len(b)%4)%4)
-            try:t=gzip.decompress(base64.b64decode(b)).decode()
-            except Exception as e:print('DECODE_ERR',name,e,len(b));continue
-            print('MODULE',name,'LEN',len(t),'ROLEHTML',t.find('function qfRoleHtmlV33('),'ROLEMODEL',t.find('function qfRoleModelV4('))
-            for fn in ['qfRoleModelV4','qfRoleHtmlV33']:
-              p=t.find('function '+fn+'(')
-              if p<0:continue
-              q=t.find('\nfunction ',p+10)
-              if q<0:q=len(t)
-              print('\n===== '+fn+' =====\n'+t[p:q])
-          print('COMMENT',repr(s.get('bookSourceComment')))
+          m=re.search(r'\\?"role\\?"\s*:\s*\\?"gz:([A-Za-z0-9+/=]+)',js);assert m
+          b=m.group(1);b+='='*((4-len(b)%4)%4);t=gzip.decompress(base64.b64decode(b)).decode()
+          print('ROLE_LEN',len(t))
+          print('FUNCTIONS',re.findall(r'function\s+([A-Za-z0-9_$]+)\s*\(',t))
+          for key in ['scroll-snap-type','relationship','lookfor','heightPercentage','暂无角色立绘','点击立绘查看原图','星耀','守护','roleList','roleId']:
+            print('\n###',key,'###')
+            for mm in list(re.finditer(re.escape(key),t,re.I))[:8]:
+              p=mm.start();print(t[max(0,p-1800):min(len(t),p+5000)])
           PY
