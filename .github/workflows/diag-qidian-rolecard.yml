@@ -13,13 +13,15 @@ jobs:
         run: |
           python - <<'PY'
           import json,re,base64,gzip
-          p='sources/novel/qidian-next/qidian-next-beta.json'
-          d=json.load(open(p,encoding='utf-8')); s=d[0] if isinstance(d,list) else d
-          js=s['jsLib']
-          for name,b64 in re.findall(r'"([^"]+)":"gz:([A-Za-z0-9+/=]+)"',js):
-            try: t=gzip.decompress(base64.b64decode(b64)).decode('utf-8')
-            except: continue
-            if any(k in t for k in ['角色卡','星耀守护','Role ID','角色标签']):
-              print('\n===== MODULE',name,'LEN',len(t),'=====')
-              print(t)
+          d=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8'));s=d[0] if isinstance(d,list) else d
+          for name,b64 in re.findall(r'"([^"]+)":"gz:([A-Za-z0-9+/=]+)"',s['jsLib']):
+            try:t=gzip.decompress(base64.b64decode(b64)).decode('utf-8')
+            except:continue
+            hits=[]
+            for k in ['星耀守护','Role ID','角色标签','角色档案','qfRole','roleHtml','角色卡']:
+              pos=t.find(k)
+              if pos>=0:hits.append((k,pos))
+            if hits:
+              print('MODULE',name,'LEN',len(t),'HITS',hits)
+              for k,pos in hits[:4]: print('---',k,'---\n',t[max(0,pos-2500):min(len(t),pos+6000)])
           PY
