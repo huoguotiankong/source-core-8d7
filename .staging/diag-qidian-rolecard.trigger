@@ -1,1 +1,1 @@
-2026-08-29 padded role diagnostic 11
+2026-08-29 current role signatures 12
