@@ -15,6 +15,9 @@ jobs:
           import json,re,base64,gzip
           d=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8'));s=d[0] if isinstance(d,list) else d
           m=re.search(r'"circle":"gz:([A-Za-z0-9+/=]+)"',s['jsLib']);t=gzip.decompress(base64.b64decode(m.group(1))).decode()
-          for mm in re.finditer(r'function\s+(qfRole\w*)\s*\(',t):
-            p=mm.start(); print('\n===== ',mm.group(1),' @ ',p,' =====\n',t[p:min(len(t),p+10000)])
+          for mm in re.finditer(r'function\s+([A-Za-z0-9_$]*(?:role|character|card)[A-Za-z0-9_$]*)\s*\(',t,re.I): print(mm.group(1),mm.start())
+          for key in ['getrole','roleId','RoleId','character','角色简介','生日：','左右滑动切换角色','点击立绘查看原图']:
+            print('\nKEY',key)
+            for mm in list(re.finditer(re.escape(key),t,re.I))[:10]:
+              p=mm.start(); print('POS',p,'\n',t[max(0,p-1500):min(len(t),p+5000)])
           PY
