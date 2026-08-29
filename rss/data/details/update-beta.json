@@ -1,24 +1,24 @@
 {
   "kind": "rss",
-  "title": "🔄 更新仓库订阅源",
-  "summary": "重新导入当前唯一仓库定义并覆盖现有订阅；Beta15 起使用阅读原生 clearOld 机制清理历史文章。",
+  "title": "🔄 更新订阅源",
+  "summary": "重新导入当前唯一订阅定义并覆盖现有订阅；UI Beta16 新增小说分类并调整分类顺序。",
   "badges": [
     "RSS",
-    "UI Beta 15",
-    "原生旧文章清理"
+    "UI Beta 16",
+    "类型分类"
   ],
   "sections": [
     {
-      "title": "本次为什么需要更新",
-      "text": "此前仓库的 ruleNextPage 为空，阅读刷新时不会执行 rssArticleDao.clearOld，所以 Beta3/Beta10/Beta11 等历史文章会一直残留在本地。"
+      "title": "本次更新",
+      "text": "新增小说分类，位置在首页和漫画之间；起点官方生态与起点增强已归入小说分类。"
     },
     {
-      "title": "Beta15 的修复",
-      "text": "ruleNextPage 改为非空但返回空值：不产生真实第二页，却会让阅读在刷新后删除当前分类中更旧的数据库记录。"
+      "title": "分类顺序",
+      "text": "首页 → 小说 → 漫画 → 正式版 → 测试版 → 订阅 → 批量 → 帮助。原“仓库订阅”改名为“订阅”，并移动到批量前。"
     },
     {
       "title": "以后怎么维护",
-      "text": "首页、漫画、仓库订阅、正式版、测试版、批量和帮助的分类 URL 固定，不再添加 ?ui=N、?reset=N 或其它版本参数。"
+      "text": "新增书源按类型进入对应目录：小说进小说、漫画进漫画、订阅源进订阅；类型目录与 Stable / Beta 状态目录并行维护。分类 URL 继续保持固定。"
     }
   ],
   "rssUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository-beta.json"
