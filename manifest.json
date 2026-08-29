@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-29T09:55:00+08:00",
+  "updatedAt": "2026-08-29T10:05:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -80,31 +80,31 @@
       "name": "🌈 起点增强 · Beta",
       "category": "novel",
       "channel": "beta",
-      "version": "1.1.0-beta24",
-      "versionCode": 11024,
-      "updatedAt": "2026-08-29T09:55:00+08:00",
+      "version": "1.1.0-beta25",
+      "versionCode": 11025,
+      "updatedAt": "2026-08-29T10:05:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11024",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11025",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "角色卡 beta24：默认角色档案，页签改为纯 HTML/CSS 原生切换，修复真机点击星耀守护不响应。",
+      "summary": "角色卡 beta25：修复档案区 touch preventDefault 吞掉页签点击的根因，页签触摸改为原生让行。",
       "tags": [
         "起点",
         "测试版",
         "角色卡",
         "角色档案",
         "星耀守护",
-        "纯CSS页签",
-        "高清立绘",
+        "触摸修复",
+        "WebView兼容",
         "官方数据"
       ],
       "changelog": [
-        "角色卡默认显示角色档案",
-        "角色档案/星耀守护改为 radio + label + CSS 切换，完全移除 onclick 依赖",
-        "星耀守护无数据仍作为独立数据问题保留，不伪造数值",
-        "保留高清立绘、左右切换、原图查看和 88% BottomSheet",
-        "书友圈、正文、目录、评论、Provider 与其它域冻结"
+        "定位并修复 .info 自定义 touchstart/touchmove/touchend 对页签触摸执行 preventDefault 的根因",
+        "页签区域触摸完全让行，保留 radio + label + CSS 原生切换",
+        "移除旧 bindTabs JavaScript 点击绑定，避免与新页签状态互相干扰",
+        "默认仍显示角色档案；星耀数据缺失继续作为独立数据链问题处理",
+        "高清立绘、多角色切换、原图查看、88% BottomSheet 及其它域冻结"
       ],
-      "sha256": "0db8c496d16faa57751880107b70cb66747d254a9f8cb5ec52c52439fe315aae"
+      "sha256": "04e82309e0dafac196e34326002d8fdcf39eeaaad28470016200be1aa53edb7d"
     },
     {
       "id": "picacg",

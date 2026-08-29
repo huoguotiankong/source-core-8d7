@@ -1,3 +1,12 @@
+## 2026-08-29 · 🌈 起点增强 1.1.0-beta25
+
+- 通道：Beta / 测试版，等待真机确认；Stable 1.1.0 不变。
+- 根因：角色卡 `.info` 自定义滚动层在 touchstart/touchmove/touchend 全阶段统一 `preventDefault()`，导致页签无论 onclick 还是 label/radio 都无法形成有效点击。
+- 修复：触摸起点属于 `.tabs` 时完全跳过自定义手势接管；普通档案滚动与左右切角色仍沿用原手势逻辑。
+- 清理：移除旧 `bindTabs()` JavaScript 页签绑定，保留 radio + label + CSS 状态切换；默认角色档案。
+- 数据：星耀守护暂无数据仍作为独立数据链问题，本版不处理数据源。
+- 冻结：高清立绘、多角色切换、原图查看、88% BottomSheet、书友圈、正文、目录、评论、Provider 与其它域。
+
 ## 2026-08-29 · 🌈 起点增强 1.1.0-beta24
 
 - 通道：Beta / 测试版，等待真机确认；Stable 1.1.0 不变。
