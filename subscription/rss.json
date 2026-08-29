@@ -1,23 +1,23 @@
 {
   "schemaVersion": 1,
   "type": "rss",
-  "name": "仓库订阅",
-  "updatedAt": "2026-08-26T21:43:57+08:00",
+  "name": "订阅",
+  "updatedAt": "2026-08-29T16:50:00+08:00",
   "items": [
     {
       "id": "reader-repository",
       "name": "🌈 阅读书源仓库",
-      "summary": "唯一当前仓库订阅入口；Beta15 启用阅读原生旧文章清理机制，刷新分类时删除历史残留。",
+      "summary": "唯一当前订阅入口；UI Beta16 新增小说分类，起点系归入小说，并将订阅分类移至批量前。",
       "icon": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/assets/reader-repo-icon.png",
       "channel": "current",
       "meta": "当前",
-      "version": "0.4.1-beta15",
-      "updatedAt": "2026-08-26",
+      "version": "0.4.1-beta16",
+      "updatedAt": "2026-08-29",
       "tags": [
         "订阅源",
-        "仓库",
         "唯一入口",
-        "旧文章清理"
+        "小说分类",
+        "类型目录"
       ],
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository-beta.json",
       "importUrl": "legado://import/rssSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/reader-source-repository-beta.json",
