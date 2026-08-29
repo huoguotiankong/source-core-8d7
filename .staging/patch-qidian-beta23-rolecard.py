@@ -11,7 +11,9 @@ b=m.group(2); b+='='*((4-len(b)%4)%4)
 role=gzip.decompress(base64.b64decode(b)).decode('utf-8')
 
 old_tabs='<div class="tabs"><button class="tabBtn on" data-tab="star">星耀守护</button><button class="tabBtn" data-tab="profile">角色档案</button></div>'
-new_tabs='<div class="tabs"><button class="tabBtn on" data-tab="profile" onclick="event&&event.preventDefault();var box=this.parentNode.parentNode,bs=box.querySelectorAll(\'.tabBtn\'),ps=box.querySelectorAll(\'.tabPane\');for(var j=0;j<bs.length;j++)bs[j].classList.remove(\'on\');for(var j=0;j<ps.length;j++)ps[j].classList.remove(\'on\');this.classList.add(\'on\');var p=box.querySelector(\'.profilePane\');if(p)p.classList.add(\'on\');return false;">角色档案</button><button class="tabBtn" data-tab="star" onclick="event&&event.preventDefault();var box=this.parentNode.parentNode,bs=box.querySelectorAll(\'.tabBtn\'),ps=box.querySelectorAll(\'.tabPane\');for(var j=0;j<bs.length;j++)bs[j].classList.remove(\'on\');for(var j=0;j<ps.length;j++)ps[j].classList.remove(\'on\');this.classList.add(\'on\');var p=box.querySelector(\'.starPane\');if(p)p.classList.add(\'on\');return false;">星耀守护</button></div>'
+profile_handler='event&&event.preventDefault();var box=this.parentNode.parentNode,bs=box.querySelectorAll(&quot;.tabBtn&quot;),ps=box.querySelectorAll(&quot;.tabPane&quot;);for(var j=0;j<bs.length;j++)bs[j].classList.remove(&quot;on&quot;);for(var j=0;j<ps.length;j++)ps[j].classList.remove(&quot;on&quot;);this.classList.add(&quot;on&quot;);var p=box.querySelector(&quot;.profilePane&quot;);if(p)p.classList.add(&quot;on&quot;);return false;'
+star_handler='event&&event.preventDefault();var box=this.parentNode.parentNode,bs=box.querySelectorAll(&quot;.tabBtn&quot;),ps=box.querySelectorAll(&quot;.tabPane&quot;);for(var j=0;j<bs.length;j++)bs[j].classList.remove(&quot;on&quot;);for(var j=0;j<ps.length;j++)ps[j].classList.remove(&quot;on&quot;);this.classList.add(&quot;on&quot;);var p=box.querySelector(&quot;.starPane&quot;);if(p)p.classList.add(&quot;on&quot;);return false;'
+new_tabs='<div class="tabs"><button class="tabBtn on" data-tab="profile" onclick="'+profile_handler+'">角色档案</button><button class="tabBtn" data-tab="star" onclick="'+star_handler+'">星耀守护</button></div>'
 assert old_tabs in role,'beta22 tabs not found'
 role=role.replace(old_tabs,new_tabs,1)
 old_star='<div class="tabPane starPane on">'
@@ -19,8 +21,6 @@ old_profile='<div class="tabPane profilePane">'
 assert old_star in role and old_profile in role
 role=role.replace(old_star,'<div class="tabPane starPane">',1)
 role=role.replace(old_profile,'<div class="tabPane profilePane on">',1)
-
-# Keep star as a secondary optional page; make empty-state wording compact and non-dominant.
 role=role.replace('该角色当前未返回可用的官方星耀数据','官方暂未返回该角色的星耀守护数据',1)
 role=role.replace('角色档案 · 起点官方数据','角色档案 · 起点官方数据 · B23',1)
 
