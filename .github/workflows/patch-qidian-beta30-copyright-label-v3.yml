@@ -1,0 +1,50 @@
+name: patch-qidian-beta30-copyright-label-v3
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta30-copyright-label-v3.trigger']
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Patch
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,hashlib
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json'); arr=json.loads(p.read_text()); assert isinstance(arr,list) and len(arr)==1; s=arr[0]
+          lib=s['jsLib']; marker='var QF_MOD38_PACK='; a=lib.index(marker)+len(marker); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b]); hits=[]
+          for k,v in pack.items():
+            if not isinstance(v,str) or not v.startswith('gz:'): continue
+            try: code=gzip.decompress(base64.b64decode(v[3:])).decode()
+            except: continue
+            if '上架' in code:
+              hits.append((k,code.count('上架'))); code=code.replace('上架','首发'); pack[k]='gz:'+base64.b64encode(gzip.compress(code.encode(),9)).decode()
+          assert hits, 'no 上架 in packed modules'; print(hits)
+          s['jsLib']=lib[:a]+json.dumps(pack,ensure_ascii=False,separators=(',',':'))+lib[b:]
+          s['bookSourceComment']='v1.1.0-beta30：版权信息页日期标签由“上架”修正为“首发”；当前字段实际对应作品首发时间，不再误称上架时间。角色卡保持 beta29 性能回退，其它域冻结。'
+          p.write_text(json.dumps(arr,ensure_ascii=False,indent=2)+'\n'); sha=hashlib.sha256(p.read_bytes()).hexdigest()
+          mpath=Path('manifest.json'); m=json.loads(mpath.read_text()); m['updatedAt']='2026-08-29T14:00:00+08:00'
+          for x in m['sources']:
+            if x.get('id')=='qidian-next-beta': x.update(version='1.1.0-beta30',versionCode=11030,updatedAt='2026-08-29T14:00:00+08:00',sourceUrl='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11030',summary='版权信息页 beta30：日期标签由“上架”修正为“首发”。',sha256=sha)
+          mpath.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
+          sp=Path('subscription/beta.json'); sub=json.loads(sp.read_text()); sub['updatedAt']=sub['generatedAt']='2026-08-29T14:00:00+08:00'
+          for x in sub['items']:
+            if x.get('id')=='qidian-next-beta': x.update(version='1.1.0-beta30',updatedAt='2026-08-29',summary='版权信息页 beta30：日期标签由“上架”修正为“首发”。',sourceUrl='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11030',backupUrl='https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11030',importUrl='legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11030',tags=['起点','测试版','版权信息','首发时间','语义修正'],changelog=['版权信息页日期标签“上架”改为“首发”','不再把首发时间误称为上架时间','角色卡保持 beta29 性能回退','其它域冻结'])
+          sp.write_text(json.dumps(sub,ensure_ascii=False,indent=2)+'\n')
+          bp=Path('bundles/all-beta.json'); bundle=json.loads(bp.read_text())
+          def walk(o):
+            if isinstance(o,dict):
+              if o.get('bookSourceUrl')==s.get('bookSourceUrl') and 'bookSourceName' in o: o.clear(); o.update(s); return
+              for v in list(o.values()): walk(v)
+            elif isinstance(o,list):
+              for v in o: walk(v)
+          walk(bundle); bp.write_text(json.dumps(bundle,ensure_ascii=False,indent=2)+'\n')
+          rp=Path('docs/RELEASE_LOG.md'); rp.write_text('## 2026-08-29 · 🌈 起点增强 1.1.0-beta30\n\n- 通道：Beta / 测试版；Stable 不变。\n- 版权信息页：日期标签“上架”改为“首发”，与当前实际数据语义一致。\n- 不新增上架时间请求，避免展示错误数据。\n- 角色卡保持 beta29 性能回退；其它域冻结。\n\n'+rp.read_text())
+          PY
+          git config user.name 'github-actions[bot]'; git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
+          git commit -m 'release(qidian): publish beta30 copyright first-publish label'
+          git push origin HEAD:main
