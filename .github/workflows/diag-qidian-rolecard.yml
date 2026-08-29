@@ -14,16 +14,14 @@ jobs:
           python - <<'PY'
           import json,re,base64,gzip
           d=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8'));s=d[0] if isinstance(d,list) else d;js=s['jsLib']
-          ms=list(re.finditer(r'gz:([A-Za-z0-9+/=]{40,})',js))
-          print('GZ_COUNT',len(ms))
-          for n,m in enumerate(ms):
-            pre=js[max(0,m.start()-80):m.start()]
-            try:t=gzip.decompress(base64.b64decode(m.group(1))).decode()
-            except Exception as e:
-              print('BAD',n,repr(pre),e);continue
-            hits=[x for x in ['qfRoleHtmlV33','qfRoleModelV4','qfOpenRoleDataV33','qfRoleImageV33'] if x in t]
-            if not hits:continue
-            print('PAYLOAD',n,'PRE',repr(pre),'LEN',len(t),'HITS',hits)
+          for name in ['role','circle']:
+            m=re.search(r'\\?"'+name+r'\\?"\s*:\s*\\?"gz:([A-Za-z0-9+/=]+)',js)
+            print('MATCH',name,bool(m))
+            if not m:continue
+            b=m.group(1);b += '='*((4-len(b)%4)%4)
+            try:t=gzip.decompress(base64.b64decode(b)).decode()
+            except Exception as e:print('DECODE_ERR',name,e,len(b));continue
+            print('MODULE',name,'LEN',len(t),'ROLEHTML',t.find('function qfRoleHtmlV33('),'ROLEMODEL',t.find('function qfRoleModelV4('))
             for fn in ['qfRoleModelV4','qfRoleHtmlV33']:
               p=t.find('function '+fn+'(')
               if p<0:continue
