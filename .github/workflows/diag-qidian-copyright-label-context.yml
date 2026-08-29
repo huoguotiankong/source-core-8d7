@@ -1,0 +1,20 @@
+name: diag-qidian-copyright-label-context
+on:
+  push:
+    paths: ['.staging/diag-qidian-copyright-label-context.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - run: |
+          python3 - <<'PY'
+          import json
+          s=json.load(open('sources/novel/qidian-next/qidian-next-beta.json'))[0]
+          lib=s['jsLib']; pos=0; n=0
+          while True:
+            i=lib.find('上架',pos)
+            if i<0: break
+            n+=1; print('OCC',n,'INDEX',i); print(lib[max(0,i-1000):i+1500].replace('\n',' ')); print('\n---\n'); pos=i+2
+          PY
