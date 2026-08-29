@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-28T23:53:00+08:00",
+  "updatedAt": "2026-08-29T09:30:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -38,29 +38,31 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "书友圈 beta21：下一页恢复已验证参数；帖子正文清理尾部投票 JSON。",
+      "summary": "角色卡 beta22：官方高清立绘 + 星耀守护/角色档案双页签，基础资料与星耀字段仅展示官方实值。",
       "icon": "",
       "channel": "beta",
-      "version": "1.1.0-beta21",
-      "updatedAt": "2026-08-28",
+      "version": "1.1.0-beta22",
+      "updatedAt": "2026-08-29",
       "tags": [
         "起点",
         "测试版",
-        "书友圈",
-        "连续分页",
-        "帖子正文",
-        "投票清理",
-        "Beta20基线"
+        "角色卡",
+        "星耀守护",
+        "角色档案",
+        "高清立绘",
+        "官方数据",
+        "多角色切换"
       ],
       "changelog": [
-        "“全部”分页恢复历史真机成功参数，不再用错误 postCategoryId 组合",
-        "正文尾部 Options/VoteId/VoteType 投票对象精确清理",
-        "查看详情、多图、评论/楼中楼保持 beta20 原样",
-        "其它域冻结"
+        "角色卡重构为“星耀守护 / 角色档案”双页签，减少立绘独占首屏空间",
+        "保留官方高清立绘、左右角色切换、页码提示、点击立绘查看原图及 88% BottomSheet",
+        "档案页新增性别、生日、星座、年龄、身份、阵营等官方字段的按需展示，并保留官方角色简介与标签",
+        "星耀页新增守护排名、星耀值、等级、守护人数与官方进度字段；接口无数据时明确显示暂无，不猜造数值",
+        "书友圈第二页、正文、目录、评论、Provider 与其它域冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11021",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11021",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11021",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11022",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11022",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11022",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
     },
     {
@@ -95,5 +97,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-08-28T23:53:00+08:00"
+  "generatedAt": "2026-08-29T09:30:00+08:00"
 }
