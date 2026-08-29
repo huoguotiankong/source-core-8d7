@@ -208,7 +208,8 @@ Unless the user explicitly requests local-only delivery, every newly created or 
 
 - Unconfirmed versions go directly to Beta/Test; do not wait for a separate “publish” instruction.
 - Real-device-confirmed versions may be promoted to Stable only under the existing Stable rules.
-- Keep status catalogs (Stable/Beta) and type catalogs in parallel. Current long-lived type catalogs include `subscription/comic.json` and `subscription/rss.json`.
+- Keep status catalogs (Stable/Beta) and type catalogs in parallel. Current long-lived type catalogs include `subscription/novel.json`, `subscription/comic.json` and `subscription/rss.json`.
+- Every newly published source must also be upserted into its matching type catalog. Novel sources go to `novel`, comic sources go to `comic`, and RSS/subscription sources go to `rss`. A logical source appears only once in a type catalog, using its current active channel entry.
 - A local downloadable JSON may still be delivered for convenience, but it does not replace repository publication.
 - Publication must upsert existing catalogs and rebuild the relevant bundle without dropping unrelated sources.
 

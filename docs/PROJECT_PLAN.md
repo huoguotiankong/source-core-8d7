@@ -79,6 +79,8 @@ The repository UI should combine native Legado browsing with lightweight HTML de
 - Native top categories and native article list for speed and familiar interaction.
 - HTML detail page for source metadata, status, version, tags, changelog and import buttons.
 - Stable / Beta are clearly separated.
+- Type browsing is maintained in parallel: novel sources use `subscription/novel.json`, comic sources use `subscription/comic.json`, and subscription/RSS sources use `subscription/rss.json`.
+- Current top-level order is：首页 → 小说 → 漫画 → 正式版 → 测试版 → 订阅 → 批量 → 帮助。
 - Batch import is a separate category.
 - GitHub Raw is primary distribution; jsDelivr can be used as a manual fallback line.
 - Avoid turning the whole RSS repository into a heavy remote webpage.
