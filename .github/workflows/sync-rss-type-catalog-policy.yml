@@ -1,0 +1,44 @@
+name: sync-rss-type-catalog-policy
+on:
+  push:
+    paths:
+      - '.staging/sync-rss-type-catalog-policy.trigger'
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Update project docs
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('docs/DEVELOPMENT_RULES.md')
+          s=p.read_text(encoding='utf-8')
+          old='- Keep status catalogs (Stable/Beta) and type catalogs in parallel. Current long-lived type catalogs include `subscription/comic.json` and `subscription/rss.json`.'
+          new='- Keep status catalogs (Stable/Beta) and type catalogs in parallel. Current long-lived type catalogs include `subscription/novel.json`, `subscription/comic.json` and `subscription/rss.json`.\n- Every newly published source must also be upserted into its matching type catalog. Novel sources go to `novel`, comic sources go to `comic`, and RSS/subscription sources go to `rss`. A logical source appears only once in a type catalog, using its current active channel entry.'
+          if old not in s: raise SystemExit('development rule anchor missing')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+
+          p=Path('docs/PROJECT_PLAN.md')
+          s=p.read_text(encoding='utf-8')
+          old='- Stable / Beta are clearly separated.\n- Batch import is a separate category.'
+          new='- Stable / Beta are clearly separated.\n- Type browsing is maintained in parallel: novel sources use `subscription/novel.json`, comic sources use `subscription/comic.json`, and subscription/RSS sources use `subscription/rss.json`.\n- Current top-level order is：首页 → 小说 → 漫画 → 正式版 → 测试版 → 订阅 → 批量 → 帮助。\n- Batch import is a separate category.'
+          if old not in s: raise SystemExit('project plan anchor missing')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+
+          p=Path('docs/RELEASE_LOG.md')
+          s=p.read_text(encoding='utf-8')
+          entry='''## 2026-08-29 · 阅读书源仓库 UI 0.4.1-beta16\n\n- 通道：RSS UI Beta；当前订阅 identity 不变。\n- 新增 `📚 小说` 类型分类，位置固定在首页与漫画之间。\n- 新建 `subscription/novel.json`，当前收录起点官方生态与起点增强当前活动版本。\n- 原 `📰 仓库订阅` 改名为 `📰 订阅`，并移动到 `📦 批量` 前。\n- 后续发布规则：书源除 Stable/Beta 状态目录外，还必须同步对应类型目录；同一逻辑书源在类型目录中只保留当前活动版本。\n- 当前分类顺序：首页 → 小说 → 漫画 → 正式版 → 测试版 → 订阅 → 批量 → 帮助。\n\n'''
+          p.write_text(entry+s,encoding='utf-8')
+          PY
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/DEVELOPMENT_RULES.md docs/PROJECT_PLAN.md docs/RELEASE_LOG.md
+          git commit -m 'docs: define rss type catalog classification policy'
+          git push origin main
