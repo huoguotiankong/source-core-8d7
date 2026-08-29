@@ -1,0 +1,41 @@
+name: diag-qidian-role-history
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.staging/diag-qidian-role-history.trigger']
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Scan historical role modules
+        run: |
+          python - <<'PY'
+          import subprocess,json,re,base64,gzip
+          path='sources/novel/qidian-next/qidian-next-beta.json'
+          commits=subprocess.check_output(['git','log','--format=%H','--',path],text=True).splitlines()
+          keys=['relationship','star','guard','荣耀','星耀','守护','rank','level','RoleId','roleId']
+          print('COMMITS',len(commits))
+          seen=0
+          for sha in commits[:180]:
+              try: raw=subprocess.check_output(['git','show',f'{sha}:{path}'],stderr=subprocess.DEVNULL)
+              except: continue
+              try:
+                  d=json.loads(raw); s=d[0] if isinstance(d,list) else d; js=s.get('jsLib','')
+                  m=re.search(r'\\?"role\\?"\s*:\s*\\?"gz:([A-Za-z0-9+/=]+)',js)
+                  if not m: continue
+                  b=m.group(1); b+='='*((4-len(b)%4)%4); t=gzip.decompress(base64.b64decode(b)).decode('utf-8','ignore')
+              except: continue
+              low=t.lower(); hits=[k for k in keys if k.lower() in low]
+              if any(k in hits for k in ['relationship','荣耀','星耀','守护']) or ('rank' in hits and 'level' in hits):
+                  print('\n###',sha,'###',hits)
+                  for pat in ['relationship','星耀','守护','rank','level']:
+                      p=low.find(pat.lower())
+                      if p>=0: print(t[max(0,p-1000):p+2500])
+                  seen+=1
+                  if seen>=20: break
+          print('MATCHED',seen)
+          PY
