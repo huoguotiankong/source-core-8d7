@@ -1,0 +1,101 @@
+name: patch-qidian-beta31-copyright-cache-sync
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta31-copyright-cache-sync.trigger']
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Patch copyright cache path and release metadata
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,hashlib,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(p.read_text()); assert isinstance(arr,list) and len(arr)==1; s=arr[0]
+          lib=s['jsLib']
+          marker='var QF_MOD38_PACK='; a=lib.index(marker)+len(marker); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a)
+          pack=json.loads(lib[a:b]); assert 'copyright' in pack
+          exports_marker='var QF_MOD38_EXPORTS='; ea=b+len(';\nvar QF_MOD38_EXPORTS='); eb=lib.index(';\nvar QF_MOD38_DEPS=',ea)
+          exports=json.loads(lib[ea:eb]); assert 'copyright' in exports
+          deps_marker='var QF_MOD38_DEPS='; da=eb+len(';\nvar QF_MOD38_DEPS='); db=lib.index(';\nvar QF_MOD38_CACHE=',da)
+          deps=json.loads(lib[da:db])
+          # Clone current copyright module under a fresh key to bypass any in-memory lazy-module cache.
+          cv=pack['copyright']
+          code=gzip.decompress(base64.b64decode(cv[3:])).decode() if isinstance(cv,str) and cv.startswith('gz:') else str(cv)
+          code=code.replace('上架','首发')
+          pack['copyright_b31']='gz:'+base64.b64encode(gzip.compress(code.encode(),9)).decode()
+          exports['copyright_b31']=list(exports['copyright'])
+          if 'copyright' in deps: deps['copyright_b31']=list(deps['copyright'])
+          # Rebuild module registries.
+          lib=lib[:a]+json.dumps(pack,ensure_ascii=False,separators=(',',':'))+';\nvar QF_MOD38_EXPORTS='+json.dumps(exports,ensure_ascii=False,separators=(',',':'))+';\nvar QF_MOD38_DEPS='+json.dumps(deps,ensure_ascii=False,separators=(',',':'))+lib[db:]
+          # Redirect every active capability route to fresh module key.
+          route_hits=lib.count('module:"copyright"')
+          assert route_hits>=3, route_hits
+          lib=lib.replace('module:"copyright"','module:"copyright_b31"')
+          # Bump synthetic copyright chapter revision so Legado does not reuse cached chapter content.
+          rev_hits=lib.count('qfCv=2967')
+          assert rev_hits>=1, rev_hits
+          lib=lib.replace('qfCv=2967','qfCv=3101')
+          # Migrate old cached copyright row URLs whenever qfTocEnsureIndexV311 walks cached TOC rows.
+          old="""        var x=list[i]||{};\n        if(x.Vo||x.N==='版权信息'||!x.C)continue;\n        var u=String(x.C||'');"""
+          new="""        var x=list[i]||{};\n        if(x.N==='版权信息'&&x.C){\n            var cu=String(x.C||''),nu=cu;\n            if(/[?&]qfType=copyright/i.test(cu)){\n                if(/[?&]qfCv=\\d+/i.test(cu))nu=cu.replace(/([?&]qfCv=)\\d+/i,'$13101');\n                else nu=cu+(cu.indexOf('?')>=0?'&':'?')+'qfCv=3101';\n                if(nu!==cu){x.C=nu;changed++;}\n            }\n            continue;\n        }\n        if(x.Vo||!x.C)continue;\n        var u=String(x.C||'');"""
+          assert old in lib
+          lib=lib.replace(old,new,1)
+          s['jsLib']=lib
+          s['bookSourceComment']='v1.1.0-beta31：版权信息页缓存链修复。版权日期明确显示“首发”；版权懒模块切换为 copyright_b31，并将版权目录项 qfCv 升至 3101，同时迁移旧目录缓存中的版权 URL，避免阅读继续复用旧“上架”页面缓存。订阅详情卡同步机制一并补齐。其它域冻结。'
+          p.write_text(json.dumps(arr,ensure_ascii=False,indent=2)+'\n')
+          sha=hashlib.sha256(p.read_bytes()).hexdigest()
+          # Manifest
+          mp=Path('manifest.json'); m=json.loads(mp.read_text()); m['updatedAt']='2026-08-29T16:35:00+08:00'
+          for x in m.get('sources',[]):
+            if x.get('id')=='qidian-next-beta':
+              x.update(version='1.1.0-beta31',versionCode=11031,updatedAt='2026-08-29T16:35:00+08:00',sourceUrl='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',summary='版权信息页 beta31：强制刷新版权模块/目录缓存，日期标签统一为“首发”；订阅详情同步补齐。',sha256=sha)
+              x['tags']=['起点','测试版','版权信息','首发时间','缓存刷新','订阅同步']
+              x['changelog']=['版权页日期标签统一为“首发”','版权模块换键 copyright_b31，绕过旧模块内存缓存','版权目录项 qfCv 升至 3101，并迁移旧目录缓存 URL','订阅详情卡纳入发布同步','其它域冻结']
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
+          # Subscription
+          sp=Path('subscription/beta.json'); sub=json.loads(sp.read_text()); sub['updatedAt']=sub['generatedAt']='2026-08-29T16:35:00+08:00'
+          for x in sub.get('items',[]):
+            if x.get('id')=='qidian-next-beta':
+              x.update(version='1.1.0-beta31',updatedAt='2026-08-29',summary='版权信息页 beta31：强制刷新版权模块/目录缓存，日期标签统一为“首发”；订阅详情同步补齐。',sourceUrl='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',backupUrl='https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',importUrl='legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031')
+              x['tags']=['起点','测试版','版权信息','首发时间','缓存刷新','订阅同步']
+              x['changelog']=['版权页日期标签统一为“首发”','版权模块换键 copyright_b31，绕过旧模块内存缓存','版权目录项 qfCv 升至 3101，并迁移旧目录缓存 URL','订阅详情卡纳入发布同步','其它域冻结']
+          sp.write_text(json.dumps(sub,ensure_ascii=False,indent=2)+'\n')
+          # Bundle
+          bp=Path('bundles/all-beta.json'); bundle=json.loads(bp.read_text())
+          def walk(o):
+            if isinstance(o,dict):
+              if o.get('bookSourceUrl')==s.get('bookSourceUrl') and 'bookSourceName' in o:
+                o.clear(); o.update(s); return
+              for v in list(o.values()): walk(v)
+            elif isinstance(o,list):
+              for v in o: walk(v)
+          walk(bundle); bp.write_text(json.dumps(bundle,ensure_ascii=False,indent=2)+'\n')
+          # Release log
+          rp=Path('docs/RELEASE_LOG.md')
+          rp.write_text('## 2026-08-29 · 🌈 起点增强 1.1.0-beta31\n\n- 通道：Beta / 测试版；Stable 不变。\n- 版权页：日期语义固定为“首发”，版权 lazy module 换键为 `copyright_b31`。\n- 缓存：版权目录项 `qfCv` 从 2967 升到 3101，并在目录缓存迁移阶段重写旧版权 URL，避免旧章节内容缓存继续显示“上架”。\n- 订阅：补齐 `rss/data/details/beta/qidian-next.json` 发布同步，并加入共享同步脚本，后续发布必须一并刷新详情卡。\n- 冻结：角色卡保持 beta29 性能回退；书友圈、正文、目录主体、评论、Provider 与其它域不改。\n\n'+rp.read_text())
+          PY
+          python3 tools/sync_qidian_next_beta_detail.py
+      - name: Validate and publish
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64
+          arr=json.load(open('sources/novel/qidian-next/qidian-next-beta.json')); s=arr[0]; lib=s['jsLib']
+          assert '1.1.0-beta31' in s['bookSourceComment']
+          assert 'module:"copyright_b31"' in lib and 'qfCv=3101' in lib
+          a=lib.index('var QF_MOD38_PACK=')+len('var QF_MOD38_PACK='); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b]); assert 'copyright_b31' in pack
+          code=gzip.decompress(base64.b64decode(pack['copyright_b31'][3:])).decode(); assert '上架' not in code and '首发' in code
+          q=[x for x in json.load(open('manifest.json'))['sources'] if x.get('id')=='qidian-next-beta'][0]; assert q['versionCode']==11031
+          q=[x for x in json.load(open('subscription/beta.json'))['items'] if x.get('id')=='qidian-next-beta'][0]; assert q['version']=='1.1.0-beta31'
+          d=json.load(open('rss/data/details/beta/qidian-next.json')); assert 'beta31' in (d.get('summary','')+' '.join(d.get('badges',[])))
+          json.load(open('bundles/all-beta.json'))
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md
+          git commit -m 'release(qidian): publish beta31 copyright cache and subscription sync'
+          git push origin HEAD:main
