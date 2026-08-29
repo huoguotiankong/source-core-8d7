@@ -1,0 +1,36 @@
+name: diag-qidian-copyright-dispatch
+on:
+  push:
+    paths: ['.staging/diag-qidian-copyright-dispatch.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          s=json.load(open('sources/novel/qidian-next/qidian-next-beta.json'))[0]; lib=s['jsLib']
+          for kw in ['copyright','Copyright','版权信息','qfCopyright','license']:
+            print('\n===',kw,'===')
+            pos=0; n=0
+            while True:
+              i=lib.find(kw,pos)
+              if i<0: break
+              n+=1
+              if n<=15: print('CTX',n,lib[max(0,i-450):i+700].replace('\n',' '))
+              pos=i+len(kw)
+            print('count',n)
+          marker='var QF_MOD38_PACK='; a=lib.index(marker)+len(marker); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+          print('\n=== modules mentioning copyright/license/版权 ===')
+          for k,v in pack.items():
+            if not isinstance(v,str) or not v.startswith('gz:'): continue
+            try: code=gzip.decompress(base64.b64decode(v[3:])).decode()
+            except: continue
+            if any(x in code for x in ['版权信息','qfCopyright','Copyright','licenseInfo','copyright']):
+              print('MODULE',k,'len',len(code),'上架',code.count('上架'),'首发',code.count('首发'))
+              for kw in ['版权信息','qfCopyright','首发']:
+                i=code.find(kw)
+                if i>=0: print(' ',kw,code[max(0,i-300):i+900].replace('\n',' '))
+          PY
