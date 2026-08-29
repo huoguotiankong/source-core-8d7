@@ -1,0 +1,62 @@
+name: patch-qidian-beta31-copyright-cache-sync-v4
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta31-copyright-cache-sync-v4.trigger']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Publish beta31
+        run: |
+          python3 - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          sp=Path('sources/novel/qidian-next/qidian-next-beta.json'); doc=json.loads(sp.read_text()); src=doc[0]; js=src['jsLib']
+          # Beta30 source already changed the copyright renderer semantics. Beta31 changes the synthetic chapter identity
+          # so Legado cannot keep serving the old locally cached copyright HTML.
+          n=js.count('qfCv=2967'); assert n>=1,n; js=js.replace('qfCv=2967','qfCv=3101')
+          old='function qfTocLoadV70(raw,baseUrl){     return qfCatalogLoad.call(this,raw,baseUrl); }'; assert old in js
+          new='''function qfTocLoadV70(raw,baseUrl){ var out=qfCatalogLoad.call(this,raw,baseUrl); try{var a=Array.isArray(out)?out:[];for(var i=0;i<a.length;i++){var x=a[i]||{};if(String(x.N||'')!=='版权信息'||!x.C)continue;var u=String(x.C||'');if(!/[?&]qfType=copyright/i.test(u))continue;if(/[?&]qfCv=\\d+/i.test(u))u=u.replace(/([?&]qfCv=)\\d+/i,'$1'+'3101');else u=u+(u.indexOf('?')>=0?'&':'?')+'qfCv=3101';x.C=u;}}catch(_cv31){} return out; }'''
+          js=js.replace(old,new,1)
+          src['jsLib']=js
+          src['bookSourceComment']='v1.1.0-beta31：版权信息页缓存链修复。Beta30 已修正版权页日期语义，本版将版权虚拟章节 qfCv 升至 3101，并在目录返回层自动迁移旧版权 URL，强制绕过阅读已缓存的旧“上架”页面；同时补齐订阅详情卡自动同步，避免订阅页继续显示 beta16。其它域冻结。'
+          sp.write_text(json.dumps(doc,ensure_ascii=False,separators=(',',':'))); sha=hashlib.sha256(sp.read_bytes()).hexdigest()
+          summary='版权信息页 beta31：刷新版权虚拟章节缓存，确保显示“首发”；订阅详情卡同步修复。'
+          changes=['版权虚拟章节 qfCv 升至 3101，绕过旧页面缓存','目录返回层自动迁移旧版权 URL，无需手工清缓存','订阅详情卡同步修复，不再停留 beta16','其它域冻结']
+          mp=Path('manifest.json'); m=json.loads(mp.read_text()); m['updatedAt']='2026-08-29T16:50:00+08:00'
+          for x in m['sources']:
+              if x.get('id')=='qidian-next-beta': x.update(version='1.1.0-beta31',versionCode=11031,updatedAt='2026-08-29T16:50:00+08:00',sourceUrl='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',summary=summary,sha256=sha,tags=['起点','测试版','版权信息','首发时间','缓存刷新','订阅同步'],changelog=changes)
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
+          bp=Path('subscription/beta.json'); sub=json.loads(bp.read_text()); sub['updatedAt']=sub['generatedAt']='2026-08-29T16:50:00+08:00'
+          for x in sub['items']:
+              if x.get('id')=='qidian-next-beta': x.update(version='1.1.0-beta31',updatedAt='2026-08-29',summary=summary,sourceUrl='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',backupUrl='https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',importUrl='legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031',tags=['起点','测试版','版权信息','首发时间','缓存刷新','订阅同步'],changelog=changes)
+          bp.write_text(json.dumps(sub,ensure_ascii=False,indent=2)+'\n')
+          bunp=Path('bundles/all-beta.json'); bun=json.loads(bunp.read_text()); cnt=[0]
+          def rb(o):
+              if isinstance(o,list):
+                  for i,v in enumerate(o):
+                      if isinstance(v,dict) and v.get('bookSourceUrl')==src.get('bookSourceUrl') and '起点增强' in str(v.get('bookSourceName','')):o[i]=src;cnt[0]+=1
+                      else:rb(v)
+              elif isinstance(o,dict):
+                  for k,v in list(o.items()):
+                      if isinstance(v,dict) and v.get('bookSourceUrl')==src.get('bookSourceUrl') and '起点增强' in str(v.get('bookSourceName','')):o[k]=src;cnt[0]+=1
+                      else:rb(v)
+          rb(bun); assert cnt[0]>=1; bunp.write_text(json.dumps(bun,ensure_ascii=False,separators=(',',':')))
+          rp=Path('docs/RELEASE_LOG.md'); rp.write_text('## 2026-08-29 · 🌈 起点增强 1.1.0-beta31\n\n- 通道：Beta / 测试版；Stable 不变。\n- 版权页：Beta30 已修正显示语义；本版将版权虚拟章节 `qfCv` 从 2967 升至 3101，并在目录返回层迁移旧 URL，强制绕过阅读旧章节缓存。\n- 订阅：详情卡改由 `tools/sync_qidian_next_beta_detail.py` 从 Beta 订阅元数据同步，修复长期停留 beta16。\n- 其它域冻结。\n\n'+rp.read_text())
+          PY
+          python3 tools/sync_qidian_next_beta_detail.py
+          python3 - <<'PY'
+          import json
+          s=json.load(open('sources/novel/qidian-next/qidian-next-beta.json'))[0]; assert 'beta31' in s['bookSourceComment']; assert 'qfCv=3101' in s['jsLib']; assert 'qfCv=2967' not in s['jsLib']
+          d=json.load(open('rss/data/details/beta/qidian-next.json')); assert '1.1.0-beta31' in d['badges']; assert 'beta16' not in json.dumps(d,ensure_ascii=False)
+          q=next(x for x in json.load(open('subscription/beta.json'))['items'] if x.get('id')=='qidian-next-beta'); assert q['version']=='1.1.0-beta31'
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md
+          git commit -m 'release(qidian): publish beta31 copyright cache and subscription sync'
+          git push origin main
