@@ -1,0 +1,42 @@
+name: patch-qidian-beta28-role-diag
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.staging/patch-qidian-beta28-role-diag.trigger']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch beta28
+        run: python .staging/patch-qidian-beta28-role-diag-preserve.py
+      - name: Validate role
+        run: |
+          python - <<'PY'
+          import json,re,base64,gzip
+          d=json.load(open('sources/novel/qidian-next/qidian-next-beta.json')); s=d[0] if isinstance(d,list) else d; js=s['jsLib']
+          m=re.search(r'\\?"role\\?"\s*:\s*\\?"gz:([A-Za-z0-9+/=]+)',js); assert m
+          b=m.group(1); b+='='*((4-len(b)%4)%4); t=gzip.decompress(base64.b64decode(b)).decode()
+          assert 'rel._diag' in t and 'Relationship诊断' in t and 'B28' in t
+          open('/tmp/role.js','w').write(t)
+          PY
+          node --check /tmp/role.js
+          git diff --check
+      - name: Sync metadata
+        run: python .staging/sync-qidian-beta28.py
+      - name: Publish
+        run: |
+          python -m json.tool sources/novel/qidian-next/qidian-next-beta.json >/dev/null
+          python -m json.tool manifest.json >/dev/null
+          python -m json.tool subscription/beta.json >/dev/null
+          python -m json.tool bundles/all-beta.json >/dev/null
+          git diff --check
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
+          git commit -m 'release(qidian): publish beta28 relationship diagnostics'
+          git push origin main
