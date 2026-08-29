@@ -1,1 +1,1 @@
-2026-08-29 rolecard ui strings 6
+2026-08-29 focused rolecard diagnostics 7
