@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Inspect role gestures
+      - name: Inspect role request helpers
         run: |
           python - <<'PY'
           import json,re,base64,gzip
@@ -20,12 +20,11 @@ jobs:
           b=m.group(1);b+='='*((4-len(b)%4)%4);t=gzip.decompress(base64.b64decode(b)).decode()
           open('/tmp/qidian-role.js','w',encoding='utf-8').write(t)
           print('ROLE_BYTES',len(t.encode('utf-8')))
-          for key in ['touchstart','touchmove','touchend','preventDefault','addEventListener','roleImg','viewport','tabs','tabRadio','pointer-events']:
+          for key in ['function qfRoleFetchOfficial2940','function qfRoleAjax','qfRoleRequest','QDSign','QDInfo','tripleDES','druidv6','v3/bookdetail/lookfor','function qfRoleData','function qfRoleMetaB22']:
               print('\n###',key,'###')
-              hits=list(re.finditer(re.escape(key),t,re.I))
-              print('HITS',len(hits))
-              for mm in hits[:12]:
-                  p=mm.start();print(t[max(0,p-900):min(len(t),p+1800)])
+              hits=list(re.finditer(re.escape(key),t,re.I));print('HITS',len(hits))
+              for mm in hits[:8]:
+                  p=mm.start();print(t[max(0,p-1400):min(len(t),p+5000)])
           PY
       - name: Syntax check
         run: node --check /tmp/qidian-role.js
