@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-08-29T13:50:00+08:00",
+  "updatedAt": "2026-08-29T14:00:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -38,31 +38,27 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "角色卡 beta29：完整回退到 beta25 角色模块，移除 Relationship 扫描，恢复首次打开性能。",
+      "summary": "版权信息页 beta30：日期标签由“上架”修正为“首发”。",
       "icon": "",
       "channel": "beta",
-      "version": "1.1.0-beta29",
+      "version": "1.1.0-beta30",
       "updatedAt": "2026-08-29",
       "tags": [
         "起点",
         "测试版",
-        "角色卡",
-        "性能回退",
-        "角色档案",
-        "页签修复",
-        "高清立绘",
-        "官方数据"
+        "版权信息",
+        "首发时间",
+        "语义修正"
       ],
       "changelog": [
-        "角色模块完整恢复 beta25 已真机确认基线",
-        "保留角色档案默认页、页签切换、触摸让行、高清立绘、多角色滑动、原图查看和88% BottomSheet",
-        "彻底移除 beta26-beta28 Relationship 页面/脚本/API 扫描及诊断，恢复首次打开速度",
-        "星耀守护暂不主动联网探测，待找到明确稳定官方接口后再单独接入",
-        "书友圈、正文、目录、评论、Provider 与其它域保持当前状态不变"
+        "版权信息页日期标签“上架”改为“首发”",
+        "不再把首发时间误称为上架时间",
+        "角色卡保持 beta29 性能回退",
+        "其它域冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11029",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11029",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11029",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11030",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11030",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11030",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
     },
     {
@@ -97,5 +93,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-08-29T13:50:00+08:00"
+  "generatedAt": "2026-08-29T14:00:00+08:00"
 }
