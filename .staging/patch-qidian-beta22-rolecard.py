@@ -1,0 +1,112 @@
+import json,re,base64,gzip,hashlib
+
+PATH='sources/novel/qidian-next/qidian-next-beta.json'
+data=json.load(open(PATH,encoding='utf-8'))
+src=data[0] if isinstance(data,list) else data
+js=src['jsLib']
+m=re.search(r'(\\?"role\\?"\s*:\s*\\?"gz:)([A-Za-z0-9+/=]+)',js)
+assert m,'role payload not found'
+b=m.group(2);b+='='*((4-len(b)%4)%4)
+role=gzip.decompress(base64.b64decode(b)).decode('utf-8')
+original=role
+
+HELPER=r'''function qfRoleMetaB22(raw){
+    var profile={gender:"",birthday:"",constellation:"",age:"",identity:"",faction:""};
+    var star={rank:"",value:"",level:"",guardians:"",current:0,next:0,percent:-1};
+    if(!raw||typeof raw!=="object")return {profile:profile,star:star};
+    var seen=[];
+    function clean(v){
+        if(v===undefined||v===null)return "";
+        if(typeof v==="number"){if(!isFinite(v))return "";return String(v);}
+        if(typeof v==="boolean")return v?"是":"否";
+        if(typeof v!=="string")return "";
+        var s=qfRolePlainB61(v);return s&&s!=="0"?s:"";
+    }
+    function primitive(o,names){
+        if(!o||typeof o!=="object"||Array.isArray(o))return "";
+        var map={};for(var k in o)if(Object.prototype.hasOwnProperty.call(o,k))map[String(k).toLowerCase()]=k;
+        for(var i=0;i<names.length;i++){
+            var rk=map[String(names[i]).toLowerCase()];if(rk===undefined)continue;
+            var x=o[rk];if(x!==null&&typeof x!=="object"){var s=clean(x);if(s)return s;}
+        }
+        return "";
+    }
+    function num(o,names){var s=primitive(o,names);if(!s)return 0;var n=Number(String(s).replace(/,/g,""));return isFinite(n)?n:0;}
+    function walk(o,d){
+        if(!o||typeof o!=="object"||d>5||seen.indexOf(o)>=0)return;seen.push(o);
+        if(!profile.gender){var g=primitive(o,["GenderName","SexName","Gender","Sex"]);if(g&&!/^\d+$/.test(g))profile.gender=g;}
+        if(!profile.birthday)profile.birthday=primitive(o,["Birthday","BirthDay","BirthDate","DateOfBirth"]);
+        if(!profile.constellation)profile.constellation=primitive(o,["Constellation","StarSign","Zodiac"]);
+        if(!profile.age){var a=primitive(o,["Age"]);if(a&&!/^0$/.test(a))profile.age=a;}
+        if(!profile.identity)profile.identity=primitive(o,["IdentityName","RoleIdentity","Occupation","Career","Profession"]);
+        if(!profile.faction)profile.faction=primitive(o,["FactionName","CampName","OrganizationName","ForceName"]);
+        if(!star.rank)star.rank=primitive(o,["GuardianRank","GuardRank","RankNo","Rank","Ranking","SupportRank"]);
+        if(!star.value)star.value=primitive(o,["StarValue","StarLightValue","GloryValue","SupportValue","RelationshipValue","RelationValue"]);
+        if(!star.level)star.level=primitive(o,["StarLevelName","LevelName","RelationshipLevelName","RelationLevelName","GuardianLevelName"]);
+        if(!star.guardians)star.guardians=primitive(o,["GuardianCount","GuardCount","SupporterCount","FansCount"]);
+        if(!star.current)star.current=num(o,["CurrentValue","CurrentExp","CurrentScore","CurrentStarValue","CurValue"]);
+        if(!star.next)star.next=num(o,["NextValue","NextExp","NextScore","NextStarValue","UpgradeValue","TargetValue"]);
+        if(Array.isArray(o)){for(var i=0;i<o.length&&i<30;i++)walk(o[i],d+1);return;}
+        for(var k in o)if(Object.prototype.hasOwnProperty.call(o,k)){var x=o[k];if(x&&typeof x==="object")walk(x,d+1);}
+    }
+    walk(raw,0);
+    if(star.current>0&&star.next>star.current)star.percent=Math.max(0,Math.min(100,Math.round(star.current*100/star.next)));
+    return {profile:profile,star:star};
+}
+
+'''
+marker='function qfRoleBookName2940(root,bookObj){'
+assert marker in role
+role=role.replace(marker,HELPER+marker,1)
+
+RENDERER=r'''function qfRoleHtml2940(root,bid,bookObj,roles){
+    var bookName=qfRoleBookName2940(root,bookObj),cover="https://bookcover.yuewen.com/qdbimg/349573/"+encodeURIComponent(String(bid))+"/600",cards="";
+    function v(x){return qfRoleEsc2940(String(x==null?"":x));}
+    function nice(x){var n=Number(x);return isFinite(n)&&n>0?qfRolePrettyNum2943(n):v(x);}
+    for(var i=0;i<roles.length;i++){
+        var r=roles[i]||{},meta=(r.profile||r.star)?{profile:r.profile||{},star:r.star||{}}:qfRoleMetaB22(r.raw||{}),p=meta.profile||{},s=meta.star||{},tags="",rows="";
+        for(var k=0;k<(r.tags||[]).length;k++){var t=r.tags[k]||{};tags+='<span class="roleTag">'+v(t.name)+(t.likes>0?'<b> · '+v(qfRolePrettyNum2943(t.likes))+'</b>':'')+'</span>';}
+        function row(label,val){if(val)rows+='<div class="kv"><span>'+label+'</span><b>'+v(val)+'</b></div>';}
+        row('性别',p.gender);row('生日',p.birthday);row('星座',p.constellation);row('年龄',p.age);row('身份',p.identity);row('阵营',p.faction);
+        var hasStar=!!(s.rank||s.value||s.level||s.guardians||s.current||s.next),prog=(Number(s.percent)>=0)?('<div class="progress"><i style="width:'+Math.max(0,Math.min(100,Number(s.percent)))+'%"></i></div><div class="progressText">'+(s.current?nice(s.current):'')+(s.next?' / '+nice(s.next):'')+'</div>'):'',img=v(r.image||cover),imgAttr=i===0?('src="'+img+'" loading="eager" fetchpriority="high"'):('src="'+v(cover)+'" data-src="'+img+'" loading="lazy" fetchpriority="low"'),desc=String(r.desc||'');
+        if(desc==='角色太过神秘还没有简介')desc='';
+        cards+='<section class="slide'+(i===0?' active':'')+'"><article class="card" data-bg="'+img+'" data-roleid="'+v(r.id||'')+'">'+
+        '<div class="photo"><img class="roleImg" '+imgAttr+' data-fallback="'+v(cover)+'" decoding="async" referrerpolicy="no-referrer"><div class="photoShade"></div><div class="heroMeta"><div class="heroLine"><div class="roleName">'+v(r.name)+'</div>'+(r.position?'<span class="position">'+v(r.position)+'</span>':'')+(r.likes>0?'<span class="likes">♥ '+v(qfRolePrettyNum2943(r.likes))+'</span>':'')+'</div><div class="heroSub">角色档案 · 起点官方数据</div></div></div>'+
+        '<div class="info"><div class="tabs"><button class="tabBtn on" data-tab="star">星耀守护</button><button class="tabBtn" data-tab="profile">角色档案</button></div>'+
+        '<div class="tabPane starPane on"><div class="stats"><div><span>守护排名</span><b>'+v(s.rank||'—')+'</b></div><div><span>星耀值</span><b>'+v(s.value||'—')+'</b></div><div><span>等级</span><b>'+v(s.level||'—')+'</b></div></div>'+prog+(s.guardians?'<div class="guardians">已有 <b>'+v(s.guardians)+'</b> 位读者守护</div>':'')+(!hasStar?'<div class="officialEmpty">该角色当前未返回可用的官方星耀数据</div>':'')+'<div class="ruleTitle">星耀互动</div><div class="ruleGrid"><span>♡ 比心</span><span>♢ 送礼</span><span>🏷 标签</span><span>✦ 大事记</span></div><div class="ruleHint">互动入口仅作角色卡信息分区；数值只展示官方接口实际返回的数据。</div></div>'+
+        '<div class="tabPane profilePane">'+(rows?'<div class="profileGrid">'+rows+'</div>':'')+(desc?'<div class="sectionTitle">角色简介</div><div class="desc">'+v(desc)+'</div>':'<div class="officialEmpty">官方暂未提供角色简介</div>')+(tags?'<div class="sectionTitle tagTitle">角色标签</div><div class="roleTags">'+tags+'</div>':'')+(r.id?'<div class="roleId">Role ID · '+v(r.id)+'</div>':'')+'</div></div></article></section>';
+    }
+    if(!cards)cards='<section class="slide active"><div class="empty"><div class="emptyIcon">✦</div><div class="emptyTitle">暂无角色资料</div><div class="emptyText">起点官方接口暂未返回该书角色卡</div></div></section>';
+    return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>角色卡</title><style>'+ 
+    '*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#08090d;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}.top{height:68px;padding:10px 16px 7px;background:linear-gradient(180deg,#151821,#0b0d12);border-bottom:1px solid rgba(255,255,255,.06)}.topLine{display:flex;align-items:center;justify-content:space-between}.pageTitle{font-size:18px;font-weight:760}.roleCount{font-size:11px;color:#d6b66b}.book{margin-top:2px;font-size:11px;color:rgba(255,255,255,.58);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hint{margin-top:2px;font-size:9px;color:rgba(255,255,255,.32)}.viewport{position:absolute;left:0;right:0;top:68px;bottom:0;overflow:hidden}.slide{position:absolute;inset:0;display:none;padding:8px 10px 10px}.slide.active{display:block}.card{height:100%;overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:22px;background:linear-gradient(180deg,#171a22,#101218);box-shadow:0 14px 34px rgba(0,0,0,.28)}.photo{position:relative;height:43%;min-height:210px;overflow:hidden;background:radial-gradient(circle at 50% 15%,#2b2f3b,#111319 70%)}.roleImg{width:100%;height:100%;object-fit:contain;object-position:center top;opacity:0;transition:opacity .2s}.roleImg.loaded{opacity:1}.photoShade{position:absolute;inset:0;background:linear-gradient(180deg,transparent 48%,rgba(10,11,15,.18) 66%,rgba(10,11,15,.96) 100%);pointer-events:none}.heroMeta{position:absolute;left:17px;right:15px;bottom:12px}.heroLine{display:flex;align-items:center;gap:7px;min-width:0}.roleName{font-size:25px;font-weight:830;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 12px rgba(0,0,0,.5)}.position,.likes{flex:0 0 auto;padding:4px 7px;border-radius:9px;font-size:10px}.position{background:rgba(236,199,111,.16);border:1px solid rgba(236,199,111,.28);color:#f0d18a}.likes{background:rgba(226,83,107,.13);color:#f4a2b0}.heroSub{margin-top:3px;font-size:9px;color:rgba(255,255,255,.44)}.info{height:57%;overflow-y:auto;overscroll-behavior:contain;padding:0 14px 26px;scrollbar-width:none}.info::-webkit-scrollbar{display:none}.tabs{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px 0 9px;background:linear-gradient(180deg,#111319 80%,rgba(17,19,25,0))}.tabBtn{height:35px;border:0;border-radius:12px;background:#1b1e27;color:rgba(255,255,255,.52);font-size:12px;font-weight:700}.tabBtn.on{background:linear-gradient(135deg,#40351e,#282116);color:#f2d38b;box-shadow:inset 0 0 0 1px rgba(231,193,104,.25)}.tabPane{display:none}.tabPane.on{display:block}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.stats>div{padding:12px 7px 11px;text-align:center;border-radius:14px;background:linear-gradient(180deg,#1d2029,#181a21);border:1px solid rgba(255,255,255,.055)}.stats span{display:block;font-size:9px;color:rgba(255,255,255,.38)}.stats b{display:block;margin-top:5px;font-size:16px;color:#f2d38b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.progress{height:6px;margin-top:13px;border-radius:6px;background:#222630;overflow:hidden}.progress i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#9c762f,#f0d48d)}.progressText{margin-top:4px;text-align:right;font-size:9px;color:rgba(255,255,255,.34)}.guardians{margin-top:10px;padding:10px 12px;border-radius:12px;background:#171a21;font-size:11px;color:rgba(255,255,255,.58)}.guardians b{color:#f0d18a}.officialEmpty{margin-top:10px;padding:13px;border-radius:12px;background:#161920;color:rgba(255,255,255,.38);font-size:11px;line-height:1.6}.ruleTitle,.sectionTitle{margin:15px 0 8px;font-size:12px;font-weight:760;color:#e8e9ed}.ruleGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.ruleGrid span{padding:9px 4px;text-align:center;border-radius:11px;background:#1a1d25;color:#d9c48f;font-size:10px;border:1px solid rgba(255,255,255,.045)}.ruleHint{margin-top:7px;font-size:9px;line-height:1.55;color:rgba(255,255,255,.28)}.profileGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.kv{padding:9px 10px;border-radius:11px;background:#181b23;min-width:0}.kv span{display:block;font-size:9px;color:rgba(255,255,255,.34)}.kv b{display:block;margin-top:3px;font-size:12px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.desc{font-size:12px;line-height:1.72;color:rgba(255,255,255,.72);white-space:pre-wrap}.roleTags{display:flex;flex-wrap:wrap;gap:6px}.roleTag{padding:5px 8px;border-radius:9px;font-size:10px;color:#f6d57b;background:linear-gradient(135deg,rgba(168,119,27,.28),rgba(97,67,19,.15));border:1px solid rgba(225,182,72,.28)}.roleTag b{font-weight:620;color:#ffe7a7}.roleId{margin-top:15px;padding-bottom:12px;font-size:9px;letter-spacing:.05em;color:rgba(255,255,255,.18)}.pager{position:absolute;right:14px;top:44%;transform:translateY(-50%);z-index:28;display:flex;flex-direction:column;align-items:center;gap:6px}.dot{display:block;width:7px;height:7px;border:0;padding:0;border-radius:8px;background:rgba(255,255,255,.28);transition:.2s}.dot.on{height:18px;background:#f3d28c}.counter{position:absolute;right:19px;bottom:9px;z-index:24;font-size:9px;color:rgba(255,255,255,.34);pointer-events:none}.scrollTip{position:absolute;left:50%;bottom:9px;z-index:25;transform:translateX(-50%);font-size:9px;color:rgba(255,255,255,.28);pointer-events:none;transition:opacity .2s}.modal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.96)}.modal.show{display:flex}.modal img{max-width:96vw;max-height:94vh;object-fit:contain}.close{position:absolute;right:14px;top:7px;z-index:2;padding:10px;font-size:36px;line-height:1;color:#fff}.empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px}.emptyIcon{font-size:44px;color:#d3ae58}.emptyTitle{margin-top:14px;font-size:20px;font-weight:800}.emptyText{margin-top:7px;font-size:12px;color:#777}'+
+    '</style></head><body><div class="top"><div class="topLine"><div class="pageTitle">角色卡</div><div class="roleCount">'+v(roles.length)+' 位角色</div></div><div class="book">'+v(bookName)+'</div><div class="hint">左右滑动切换角色 · 档案区上下滑动 · 点击立绘查看原图</div></div><div id="vp" class="viewport">'+cards+'</div><div id="pager" class="pager"></div><div id="scrollTip" class="scrollTip">上下滑动查看完整档案</div><div id="counter" class="counter"></div><div id="modal" class="modal"><div id="close" class="close">×</div><img id="full"></div>'+
+    '<script>(function(){var ss=[].slice.call(document.querySelectorAll(".slide")),i=0,p=document.getElementById("pager"),vp=document.getElementById("vp"),m=document.getElementById("modal"),fi=document.getElementById("full"),ct=document.getElementById("counter");function ensureImg(n){var s=ss[n];if(!s)return;var im=s.querySelector(".roleImg");if(!im)return;if(!im.__qfLife){im.__qfLife=1;im.onload=function(){im.classList.add("loaded")};im.onerror=function(){var fb=im.getAttribute("data-fallback");if(fb&&im.src!==fb){im.src=fb;return}im.classList.add("loaded")};if(im.complete&&im.naturalWidth)im.classList.add("loaded")}var u=im.getAttribute("data-src");if(u){im.removeAttribute("data-src");im.src=u}}function bindTabs(s){if(!s)return;var bs=s.querySelectorAll(".tabBtn"),ps=s.querySelectorAll(".tabPane");for(var a=0;a<bs.length;a++){if(bs[a].__qfTab)continue;bs[a].__qfTab=1;bs[a].onclick=function(e){e.stopPropagation();var tab=this.getAttribute("data-tab");for(var b=0;b<bs.length;b++)bs[b].classList.toggle("on",bs[b]===this);for(var q=0;q<ps.length;q++)ps[q].classList.toggle("on",ps[q].classList.contains(tab+"Pane"));};}}function paint(){for(var k=0;k<ss.length;k++)ss[k].classList.toggle("active",k===i);ensureImg(i);bindTabs(ss[i]);if(ss.length>1){ensureImg((i+1)%ss.length);ensureImg((i-1+ss.length)%ss.length)}if(p){var h="";for(var q=0;q<ss.length;q++)h+="<i class=\\"dot "+(q===i?"on":"")+"\\" data-i=\\""+q+"\\"></i>";p.innerHTML=h}if(ct)ct.textContent=ss.length>1?(i+1)+" / "+ss.length:"";var inf=ss[i]&&ss[i].querySelector(".info"),tip=document.getElementById("scrollTip");if(inf){inf.scrollTop=0;setTimeout(function(){if(tip)tip.style.opacity=(inf.scrollHeight>inf.clientHeight+8)?"1":"0"},45)}else if(tip)tip.style.opacity="0"}function go(n){if(!ss.length)return;i=(n+ss.length)%ss.length;paint()}function lock(){try{if(window.java&&typeof window.java.upConfig==="function")window.java.upConfig(JSON.stringify({state:3,skipCollapsed:true,isDraggable:false,isDraggableOnNestedScroll:false,scrollNoDraggable:true}))}catch(e){}}function bindInfo(){var ins=document.querySelectorAll(".info");for(var n=0;n<ins.length;n++){(function(inf){if(inf.__qfBound)return;inf.__qfBound=1;var sx=0,sy=0,ss0=0,dx=0,dy=0,axis="";inf.addEventListener("touchstart",function(e){lock();var t=e.touches[0];sx=t.clientX;sy=t.clientY;ss0=inf.scrollTop;dx=0;dy=0;axis="";if(e.cancelable)e.preventDefault();e.stopPropagation()},{passive:false});inf.addEventListener("touchmove",function(e){var t=e.touches[0];dx=t.clientX-sx;dy=t.clientY-sy;var ax=Math.abs(dx),ay=Math.abs(dy);if(!axis&&(ax>6||ay>6))axis=(ax>ay*1.22)?"x":"y";if(axis!=="x"){var max=Math.max(0,inf.scrollHeight-inf.clientHeight),next=ss0-dy;if(next<0)next=0;if(next>max)next=max;inf.scrollTop=next}if(e.cancelable)e.preventDefault();e.stopPropagation()},{passive:false});inf.addEventListener("touchend",function(e){if(axis==="x"&&Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)*1.22)go(i+(dx<0?1:-1));if(e.cancelable)e.preventDefault();e.stopPropagation();axis=""},{passive:false})})(ins[n])}}bindInfo();var x0=0,y0=0,t0=0,startInfo=false,moved=false;vp.addEventListener("touchstart",function(e){lock();var t=e.touches[0];x0=t.clientX;y0=t.clientY;t0=Date.now();moved=false;startInfo=!!(e.target&&e.target.closest&&e.target.closest(".info"))},{passive:true});vp.addEventListener("touchmove",function(e){var t=e.touches[0];if(Math.abs(t.clientX-x0)>8||Math.abs(t.clientY-y0)>8)moved=true},{passive:true});vp.addEventListener("touchend",function(e){var t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;if(startInfo)return;if(Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)*1.35&&Date.now()-t0<1200){go(i+(dx<0?1:-1));return}var c=ss[i]&&ss[i].querySelector(".card");if(c&&!moved&&Math.abs(dx)<13&&Math.abs(dy)<13){var u=c.getAttribute("data-bg");if(u){fi.src=u;m.classList.add("show")}}},{passive:true});if(p)p.onclick=function(e){var t=e.target&&e.target.closest?e.target.closest("[data-i]"):null;if(!t)return;var n=Number(t.getAttribute("data-i"));if(isFinite(n))go(n)};document.getElementById("close").onclick=function(){m.classList.remove("show");fi.src=""};m.onclick=function(e){if(e.target===m){m.classList.remove("show");fi.src=""}};paint()})();</script></body></html>';
+}
+'''
+start=role.index('function qfRoleHtml2940(')
+end=role.index('\nfunction qfRoleData(',start)
+role=role[:start]+RENDERER+role[end:]
+
+old="canonical.push({id:String(r.id||''),name:String(r.name||''),position:String(r.position||''),desc:String(r.description!==undefined?r.description:(r.desc||'')),likes:Number(r.likes||0)||0,image:String(r.image||''),tags:Array.isArray(r.tags)?r.tags:[]});"
+new="var rm=qfRoleMetaB22(r.raw||{});canonical.push({id:String(r.id||''),name:String(r.name||''),position:String(r.position||''),desc:String(r.description!==undefined?r.description:(r.desc||'')),likes:Number(r.likes||0)||0,image:String(r.image||''),tags:Array.isArray(r.tags)?r.tags:[],profile:rm.profile,star:rm.star});"
+assert old in role
+role=role.replace(old,new,1)
+old2="viewRoles.push({id:String(r.id||''),name:String(r.name||''),position:String(r.position||''),desc:String(r.description!==undefined?r.description:(r.desc||'')),likes:Number(r.likes||0)||0,image:String(r.image||''),tags:Array.isArray(r.tags)?r.tags:[]});"
+new2="viewRoles.push({id:String(r.id||''),name:String(r.name||''),position:String(r.position||''),desc:String(r.description!==undefined?r.description:(r.desc||'')),likes:Number(r.likes||0)||0,image:String(r.image||''),tags:Array.isArray(r.tags)?r.tags:[],profile:r.profile||{},star:r.star||{}});"
+assert old2 in role
+role=role.replace(old2,new2,1)
+
+assert role!=original
+assert 'v3/bookdetail/lookfor' in role
+assert 'heightPercentage:0.88' in role
+for x in ['星耀守护','角色档案','比心','送礼','大事记','qfRoleMetaB22','m.classList.add("show")']:
+    assert x in role,x
+packed=base64.b64encode(gzip.compress(role.encode('utf-8'),compresslevel=9,mtime=0)).decode()
+js=js[:m.start(2)]+packed+js[m.end(2):]
+src['jsLib']=js
+src['bookSourceComment']='v1.1.0-beta22：角色卡单域重构。保留起点官方高清立绘、左右切换、原图查看与88%半屏；新增“星耀守护/角色档案”双页签、官方基础资料、角色标签、星耀统计卡与进度展示。所有资料仅展示官方接口实际返回字段，无数据时明确显示暂无；书友圈第二页、正文、目录、评论、Provider 等其它域冻结。'
+with open(PATH,'w',encoding='utf-8') as f:json.dump(data,f,ensure_ascii=False,indent=2)
+chk=json.load(open(PATH,encoding='utf-8'));ss=chk[0] if isinstance(chk,list) else chk
+mm=re.search(r'(\\?"role\\?"\s*:\s*\\?"gz:)([A-Za-z0-9+/=]+)',ss['jsLib']);bb=mm.group(2);bb+='='*((4-len(bb)%4)%4);rr=gzip.decompress(base64.b64decode(bb)).decode('utf-8')
+assert 'function qfRoleMetaB22' in rr and '星耀守护' in rr and 'heightPercentage:0.88' in rr
+print('beta22 role bytes',len(rr.encode()),'sha256',hashlib.sha256(rr.encode()).hexdigest())
