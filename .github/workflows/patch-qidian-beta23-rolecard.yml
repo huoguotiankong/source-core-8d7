@@ -1,0 +1,47 @@
+name: patch-qidian-beta23-rolecard
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.staging/patch-qidian-beta23-rolecard.trigger'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch beta23 rolecard
+        run: python .staging/patch-qidian-beta23-rolecard.py
+      - name: Validate role module
+        run: |
+          python - <<'PY'
+          import json,re,base64,gzip
+          d=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8')); s=d[0] if isinstance(d,list) else d; js=s['jsLib']
+          m=re.search(r'\\?"role\\?"\s*:\s*\\?"gz:([A-Za-z0-9+/=]+)',js); assert m
+          b=m.group(1); b+='='*((4-len(b)%4)%4); t=gzip.decompress(base64.b64decode(b)).decode('utf-8')
+          assert 'data-tab="profile" onclick=' in t
+          assert '<div class="tabPane profilePane on">' in t
+          assert '<div class="tabPane starPane">' in t
+          assert '角色档案 · 起点官方数据 · B23' in t
+          open('/tmp/qidian-role-beta23.js','w',encoding='utf-8').write(t)
+          PY
+          node --check /tmp/qidian-role-beta23.js
+          git diff --check
+      - name: Sync metadata
+        run: python .staging/sync-qidian-beta23.py
+      - name: Validate and publish
+        run: |
+          python -m json.tool sources/novel/qidian-next/qidian-next-beta.json >/dev/null
+          python -m json.tool manifest.json >/dev/null
+          python -m json.tool subscription/beta.json >/dev/null
+          python -m json.tool bundles/all-beta.json >/dev/null
+          git diff --check
+          git diff --stat
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
+          git commit -m "release(qidian): publish beta23 rolecard interaction fix"
+          git push origin main
