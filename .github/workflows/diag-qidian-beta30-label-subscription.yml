@@ -1,0 +1,60 @@
+name: diag-qidian-beta30-label-subscription
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta30-label-subscription.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Diagnose
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re,os
+          from pathlib import Path
+          print('=== repo beta16 text hits ===')
+          for p in Path('.').rglob('*'):
+            if not p.is_file() or '.git/' in str(p): continue
+            try: t=p.read_text(errors='ignore')
+            except: continue
+            if 'beta16' in t or '恢复帖子“查看详情”点击' in t:
+              print(p)
+              for line in t.splitlines():
+                if 'beta16' in line or '恢复帖子' in line: print(' ',line[:500])
+          print('=== qidian beta source label contexts ===')
+          arr=json.load(open('sources/novel/qidian-next/qidian-next-beta.json')); s=arr[0]
+          print('comment=',s.get('bookSourceComment'))
+          for field in ['jsLib','ruleBookInfo','ruleExplore','ruleSearch','ruleToc','ruleContent']:
+            v=s.get(field)
+            if isinstance(v,str):
+              for kw in ['上架','首发']:
+                if kw in v:
+                  print('FIELD',field,kw,'count',v.count(kw))
+                  i=v.find(kw); print(v[max(0,i-300):i+500])
+          lib=s.get('jsLib','')
+          marker='var QF_MOD38_PACK='
+          if marker in lib:
+            a=lib.index(marker)+len(marker); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+            for k,v in pack.items():
+              if not isinstance(v,str) or not v.startswith('gz:'): continue
+              try: code=gzip.decompress(base64.b64decode(v[3:])).decode()
+              except: continue
+              if '上架' in code or '首发' in code:
+                print('MODULE',k,'上架',code.count('上架'),'首发',code.count('首发'))
+                for kw in ['上架','首发']:
+                  pos=0
+                  while True:
+                    i=code.find(kw,pos)
+                    if i<0: break
+                    print('CTX',k,kw,code[max(0,i-350):i+700].replace('\n',' '))
+                    pos=i+len(kw)
+          print('=== subscription / site-ish files ===')
+          for p in Path('.').rglob('*'):
+            if not p.is_file() or '.git/' in str(p): continue
+            if p.suffix.lower() not in ['.json','.html','.htm','.js','.md','.txt','.yml','.yaml']: continue
+            try:t=p.read_text(errors='ignore')
+            except:continue
+            if ('qidian-next-beta' in t or '起点增强' in t) and ('beta16' in t or 'beta30' in t):
+              print('META',p,'beta16=',t.count('beta16'),'beta30=',t.count('beta30'))
+          PY
