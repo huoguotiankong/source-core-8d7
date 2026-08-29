@@ -1,1 +1,1 @@
-2026-08-29 beta24 role gesture diagnostic 14
+2026-08-29 beta25 role request helper diagnostic 15
