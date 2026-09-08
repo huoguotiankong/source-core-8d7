@@ -1,0 +1,39 @@
+name: diag-qidian-provider-mods
+on:
+  push:
+    paths: ['.staging/diag-qidian-provider-mods.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Dump selected modules
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json'); a=json.loads(p.read_text()); s=a[0] if isinstance(a,list) else a
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; x=lib.index(mk)+len(mk); y=lib.index(';\nvar QF_MOD38_EXPORTS=',x); pack=json.loads(lib[x:y])
+          def dec(v):
+            if isinstance(v,str) and v.startswith('gz:'):
+              r=v[3:]; r+='='*((4-len(r)%4)%4); return gzip.decompress(base64.b64decode(r)).decode()
+            return v if isinstance(v,str) else ''
+          for k in ['limited_qw','limited_sm','limited_qt','limited_tr','provider_common','provider_runtime']:
+            Path('.staging/mod-'+k+'.txt').write_text(dec(pack[k]))
+          # exact registry/deps top-level
+          z=lib.index('var QF_MOD38_EXPORTS='); w=lib.index('function qfModuleEnsureV38',z) if 'function qfModuleEnsureV38' in lib[z:] else min(len(lib),z+25000)
+          Path('.staging/provider-registry.txt').write_text(lib[z:w])
+          # all snippets around provider labels/functions from main jsLib excluding pack huge payload by replacing it
+          slim=lib[:x]+'{}'+lib[y:]
+          out=[]
+          for pat in ['情无','晴天','神魔','同人','限免源','Provider','qfMultiContentV423','qfRoute','优选','兜底']:
+            for m in list(re.finditer(re.escape(pat),slim,re.I))[:25]: out.append('\n### '+pat+' @'+str(m.start())+'\n'+slim[max(0,m.start()-900):m.start()+1800])
+          Path('.staging/provider-main-snips.txt').write_text('\n'.join(out))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/mod-limited_qw.txt .staging/mod-limited_sm.txt .staging/mod-limited_qt.txt .staging/mod-limited_tr.txt .staging/mod-provider_common.txt .staging/mod-provider_runtime.txt .staging/provider-registry.txt .staging/provider-main-snips.txt
+          git commit -m 'chore: dump qidian provider modules'
+          git push origin HEAD:main
