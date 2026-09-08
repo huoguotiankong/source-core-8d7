@@ -1,0 +1,1255 @@
+function login() {
+    var page="main";
+    try{page=String(source.get("qf_ui_page")||"main");}catch(e0){}
+    /* alpha49：附件情无源依赖阅读顶部“✓/登录”触发 login()。
+       之前聚合源这里为空，用户填写账号密码后点顶部确认实际上什么也没保存。 */
+    if(page==="qw")return qfQwNativeLoginV52();
+    return true;
+}
+
+function qfMsgV30(s){try{java.longToast(String(s));}catch(e0){try{java.toast(String(s));}catch(e1){}}}
+function qfStrV30(v){try{return new Packages.java.lang.String(String(v));}catch(e){return String(v);}}
+
+/* v3.0-alpha2：多页面登录设置。只用 upLoginData 做增量写入，避免二级页覆盖其它页面设置。 */
+function qfLoginSave(key) {
+    try {
+        var value = "";
+        try { value = result && result[key] != null ? String(result[key]) : ""; } catch(e0) {}
+        if (!value) { try { value = String(Map(key) || ""); } catch(e1) {} }
+        if (!value) return java.toast("未读取到设置：" + key);
+        var map = new Packages.java.util.HashMap();
+        map.put(key, value);
+        java.upLoginData(map);
+        try{qfSettingsMarkCustom(key);}catch(_pc){}
+        java.toast("已保存 · " + key);
+    } catch(e) { qfMsgV30("保存失败：" + e); }
+}
+
+
+/* v4.1.0-alpha8 · Settings Profile actions
+ * 写入使用一次 HashMap + 一次 loginInfo 镜像，确保预设切换是原子操作。
+ * 预设不修改正文源/账号/服务器评论源/弹窗外观。 */
+function qfSettingsManagedKey(key){
+    try{return typeof QF_SettingsProfile!=="undefined"&&QF_SettingsProfile.isManaged&&QF_SettingsProfile.isManaged(String(key||""));}catch(_e){}
+    return ["起点段评","热评显示","本章说","作家说","兜底段评智能对齐"].indexOf(String(key||""))>=0;
+}
+function qfSettingsWriteBatch(values){
+    values=values||{};
+    var hm=null;try{hm=new Packages.java.util.HashMap();}catch(_e0){}
+    var old={};try{old=JSON.parse(String(source.getLoginInfo()||"{}"))||{};}catch(_e1){old={};}
+    for(var k in values)if(Object.prototype.hasOwnProperty.call(values,k)){
+        var v=String(values[k]==null?"":values[k]);
+        if(hm)try{hm.put(String(k),v);}catch(_p){}
+        old[String(k)]=v;
+    }
+    try{if(hm)java.upLoginData(hm);}catch(_u){}
+    try{source.putLoginInfo(JSON.stringify(old));}catch(_l){}
+    return true;
+}
+function qfSettingsMarkCustom(key){
+    key=String(key||"");if(!qfSettingsManagedKey(key))return false;
+    qfSettingsWriteBatch({"体验模式":"自定义"});
+    return true;
+}
+function qfSettingsPresetApply(name){
+    name=String(name||"");
+    if(name==="自定义"){qfSettingsWriteBatch({"体验模式":"自定义"});try{java.toast("已切换 · 自定义（保留当前高级设置）");java.reLoginView();}catch(_e){}return true;}
+    var p=null;try{p=QF_SettingsProfile.preset(name);}catch(_p0){p=null;}
+    if(!p){
+        var all={
+          "极速":{"起点段评":"🔳","热评显示":"🔳","本章说":"🔳","作家说":"🔳","兜底段评智能对齐":"🔳"},
+          "均衡":{"起点段评":"✅","热评显示":"🔳","本章说":"✅","作家说":"✅","兜底段评智能对齐":"✅"},
+          "完整":{"起点段评":"✅","热评显示":"✅","本章说":"✅","作家说":"✅","兜底段评智能对齐":"✅"}
+        };p=all[name]||null;
+    }
+    if(!p)return java.toast("未知体验模式："+name);
+    var values={};for(var k in p)if(Object.prototype.hasOwnProperty.call(p,k))values[k]=p[k];values["体验模式"]=name;
+    qfSettingsWriteBatch(values);
+    try{java.toast("已应用体验模式 · "+name);java.reLoginView();}catch(_e2){}
+    return true;
+}
+function qfSettingsPresetChange(){
+    var v=qfActionValueV308("体验模式");
+    if(["极速","均衡","完整","自定义"].indexOf(v)<0)return java.toast("未读取到体验模式");
+    return qfSettingsPresetApply(v);
+}
+
+
+/* alpha8：正文源类别/具体源选择即时刷新。
+ * loginUi 的 chars 在界面创建时已经固定，单纯 upLoginData 不会重建第二个下拉框；
+ * 因此类别变化后立即持久化 + reLoginView，并用 source 临时镜像保证重建时马上读到新类别。 */
+function qfActionValueV308(key){
+    var v="";
+    try{if(typeof result!=="undefined"&&result&&result[key]!=null)v=String(result[key]);}catch(_r){}
+    if(!v){try{v=String(Map(key)||"");}catch(_m){}}
+    return v;
+}
+function qfMergeLoginValueV308(key,value){
+    value=String(value==null?"":value);
+    try{var m=new Packages.java.util.HashMap();m.put(String(key),value);java.upLoginData(m);}catch(_u){}
+    try{
+        var old={};try{old=JSON.parse(String(source.getLoginInfo()||"{}"))||{};}catch(_p0){old={};}
+        old[String(key)]=value;source.putLoginInfo(JSON.stringify(old));
+    }catch(_p1){}
+}
+function qfSourceTierChangeV308(){
+    var v=qfActionValueV308("正文源类别");
+    if(v!=="限免源"&&v!=="优选源"&&v!=="兜底源"&&v!=="STV源"&&v!=="全源智能")return java.toast("未读取到正文源类别");
+    qfMergeLoginValueV308("正文源类别",v);
+    try{source.put("qf_ui_tier_v308",v);}catch(_s){}
+    try{java.reLoginView();}catch(_v){}
+}
+function qfSourcePickChangeV308(key){
+    key=String(key||"");var v=qfActionValueV308(key);
+    if(!key||!v)return java.toast("未读取到具体正文源");
+    qfMergeLoginValueV308(key,v);
+    try{java.reLoginView();}catch(_v){}
+}
+
+/* v3.1 beta2：可扩展排序操作。allow 由当前设置页清单传入，避免 loginUrl 为每个新源维护排列组合。 */
+function qfOrderAllowDecodeV310(encoded){
+    try{
+        var a=JSON.parse(decodeURIComponent(String(encoded||""))),out=[];
+        if(a instanceof Array){for(var i=0;i<a.length;i++){var x=String(a[i]||"");if(x)out.push(x);}return out;}
+    }catch(_e){}
+    return [];
+}
+function qfOrderSavedV310(key,allow){
+    var raw="";try{var m=source.getLoginInfoMap?source.getLoginInfoMap():null;raw=String(m&&(m.get?m.get(key):m[key])||"");}catch(_e0){}
+    if(!raw){try{var o=JSON.parse(String(source.getLoginInfo()||"{}"))||{};raw=String(o[key]||"");}catch(_e1){}}
+    var a=String(raw||allow.join("→")).split(/[→>＞]/),out=[];
+    for(var i=0;i<a.length;i++){var x=String(a[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+function qfOrderKeyV310(group){return String(group||"")==="全源智能"?"全源智能顺序":String(group||"")+"顺序";}
+function qfOrderMoveV310(group,item,dir,encodedAllow){
+    var allow=qfOrderAllowDecodeV310(encodedAllow),key=qfOrderKeyV310(group),a=qfOrderSavedV310(key,allow),n=String(item||""),i=a.indexOf(n),d=Number(dir||0),j=i+d;
+    if(i<0||j<0||j>=a.length)return;
+    var t=a[i];a[i]=a[j];a[j]=t;
+    qfMergeLoginValueV308(key,a.join("→"));
+    try{java.reLoginView();}catch(_v){}
+}
+function qfOrderResetV310(group,encodedAllow){
+    var allow=qfOrderAllowDecodeV310(encodedAllow),key=qfOrderKeyV310(group);
+    qfMergeLoginValueV308(key,allow.join("→"));
+    try{java.reLoginView();}catch(_v){}
+    try{java.toast("已恢复默认顺序");}catch(_t){}
+}
+
+function qfOpenUiPageV30(page){
+    var st=[];
+    try{st=JSON.parse(String(source.get('qf_ui_stack')||'[]'));}catch(e0){st=[];}
+    if(!(st instanceof Array))st=[];
+    if(!st.length){var cur='main';try{cur=String(source.get('qf_ui_page')||'main');}catch(e1){}if(cur&&cur!='main')st=[cur];}
+    st.push(String(page||'main'));
+    try{source.put('qf_ui_stack',JSON.stringify(st));source.put('qf_ui_page',String(page||'main'));}catch(e2){}
+    try{java.reLoginView();}catch(e3){}
+}
+function qfBackUiPageV30(){
+    var st=[];
+    try{st=JSON.parse(String(source.get('qf_ui_stack')||'[]'));}catch(e0){st=[];}
+    if(!(st instanceof Array))st=[];
+    if(st.length)st.pop();
+    var page=st.length?String(st[st.length-1]||'main'):'main';
+    try{source.put('qf_ui_stack',JSON.stringify(st));source.put('qf_ui_page',page);}catch(e1){}
+    try{java.reLoginView();}catch(e2){}
+}
+
+
+/* ============================================================
+ * 情无登录 · alpha52
+ * 完全采用用户附件「📖起点中文」的登录方式：
+ * 1. email/password POST 站点根目录 /auth.php?action=login
+ * 2. 保存 Set-Cookie + request_token 到 source.loginHeader/loginInfo
+ * 3. 使用 /qd/auth.php?action=me 验证
+ * 网页登录同样直接复刻附件 webLogin，只增加自定义域名。
+ * ============================================================ */
+function qfQwNativeNormBaseV52(v){
+    var s=String(v||"").trim();
+    if(!s)return "";
+    if(!/^https?:\/\//i.test(s))s="http://"+s;
+    s=s.replace(/[?#].*$/g,"").replace(/\/+$/g,"");
+    var m=s.match(/^(https?:\/\/[^\/]+)(\/.*)?$/i);
+    if(!m)return s;
+    var host=m[1],path=String(m[2]||"");
+    var q=path.match(/^(.*?\/qd)(?:\/.*)?$/i);
+    if(q)return host+q[1];
+    if(!path||path==="/")return host+"/qd";
+    return s;
+}
+function qfQwNativeBaseV52(){
+    var d="http://103.236.85.8:7878/qd",x="";
+    try{
+        var m=source.getLoginInfoMap?source.getLoginInfoMap():null;
+        var v=m&&(m.get?m.get("情无接口地址"):m["情无接口地址"]);
+        if(v!=null&&String(v).trim())x=qfQwNativeNormBaseV52(v);
+    }catch(e0){}
+    if(!x){try{x=qfQwNativeNormBaseV52(source.get("qf_qw_base")||"");}catch(e1){}}
+    return x||d;
+}
+function qfQwNativeRootV52(){
+    var b=qfQwNativeBaseV52();
+    return /\/qd$/i.test(b)?b.replace(/\/qd$/i,""):b.replace(/\/+$/,"");
+}
+function qfQwNativeMsgV52(v){
+    try{java.toast(new Packages.java.lang.String(String(v)));}catch(e0){try{java.toast(String(v));}catch(e1){}}
+}
+function qfQwNativeHeadersV52(){
+    var b=qfQwNativeBaseV52();
+    return {
+        "User-Agent":"Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36",
+        "Accept":"application/json,text/plain,*/*",
+        "Referer":b+"/ranking.html"
+    };
+}
+function qfQwNativeCollectCookieV52(res){
+    var parts=[];
+    try{
+        var all=res.headers(new Packages.java.lang.String("Set-Cookie"));
+        if(all){
+            for(var i=0;i<all.size();i++){
+                var first=String(all.get(i)).split(";")[0];
+                if(first)parts.push(first);
+            }
+        }
+    }catch(e0){}
+    return parts.join("; ");
+}
+function qfQwNativeSaveSessionV52(email,password,ck,token,keys){
+    ck=String(ck||"");token=String(token||"");
+    try{if(ck)source.put("qf_qw_cookie_v317",ck);}catch(e0){}
+    try{if(token)source.put("qf_qw_token_v317",token);}catch(e1){}
+    try{if(keys!==undefined&&keys!==null&&!isNaN(Number(keys)))source.put("qf_qw_keys_v317",String(Number(keys)));}catch(e2){}
+    /* beta17.1：再镜像到登录数据 Map。Provider 在阅读线程即使拿不到全局 source 自由变量，
+       也能通过 this.source.getLoginInfoMap() 读取同一份 Cookie/Token。 */
+    try{
+        var bm=new Packages.java.util.HashMap();
+        if(ck)bm.put("情无会话Cookie",ck);
+        if(token)bm.put("情无会话令牌",token);
+        if(keys!==undefined&&keys!==null&&!isNaN(Number(keys)))bm.put("情无共享凭据",String(Number(keys)));
+        java.upLoginData(bm);
+    }catch(_bridge){}
+    var lh={};try{lh=JSON.parse(String(source.getLoginHeader()||"{}"))||{};}catch(e3){lh={};}
+    lh.Accept="application/json";if(ck)lh.Cookie=ck;if(token)lh["X-Content-Token"]=token;
+    source.putLoginHeader(new Packages.java.lang.String(JSON.stringify(lh)));
+    var info={};try{info=JSON.parse(String(source.getLoginInfo()||"{}"))||{};}catch(e4){info={};}
+    if(email!==undefined&&email!==null)info.email=String(email||"").trim();
+    if(password!==undefined&&password!==null&&String(password)!=="")info.password=String(password);
+    if(token)info.request_token=token;
+    source.putLoginInfo(new Packages.java.lang.String(JSON.stringify(info)));
+}
+function qfQwNativeVipVerifiedV101(token){
+    var mark="",base=qfQwNativeBaseV52();token=String(token||"");
+    try{mark=String(source.get("qf_qw_vip_verified_v101")||"");}catch(e0){}
+    return !!token&&mark.indexOf(base+"|"+token+"|")===0;
+}
+function qfQwNativeSessionLabelV101(n,token,prefix){
+    var x=String(prefix||"情无账号会话已建立"),tk=String(token||"");
+    if(n>=0)x+=" · 共享凭据 "+String(n)+" 个";
+    if(!tk)return x+" · VIP正文未获取令牌";
+    if(Number(n)===0)return x+" · VIP正文不可用";
+    return x+(qfQwNativeVipVerifiedV101(tk)?" · VIP正文已验证":" · VIP正文待首次验证");
+}
+function qfQwNativeLoginV52(){
+    var info={};try{info=JSON.parse(String(source.getLoginInfo()||"{}"))||{};}catch(e0){info={};}
+    try{if(typeof result!=="undefined"&&result){if(result.email!=null&&String(result.email).trim())info.email=String(result.email).trim();if(result.password!=null&&String(result.password))info.password=String(result.password);}}catch(e1){}
+    if(!info.email||!info.password){qfQwNativeMsgV52("请输入邮箱和密码");return false;}
+    qfQwNativeMsgV52("正在登录情无…");
+    var root=qfQwNativeRootV52(),qd=qfQwNativeBaseV52();
+    /* 完全按附件 loginWith：登录请求只带 Content-Type + Accept。 */
+    var body=new Packages.java.lang.String(JSON.stringify({email:String(info.email).trim(),password:String(info.password)}));
+    var h={"Content-Type":"application/json","Accept":"application/json"},res;
+    try{res=java.post(new Packages.java.lang.String(root+"/auth.php?action=login"),body,h,15000);}catch(e2){qfQwNativeMsgV52("登录请求超时或网络异常："+e2);return false;}
+    var data;try{data=JSON.parse(String(res.body()||""));}catch(e3){qfQwNativeMsgV52("登录响应不是有效 JSON");return false;}
+    if(!data.user){qfQwNativeMsgV52(data.detail||data.message||"登录失败");return false;}
+    var ck=qfQwNativeCollectCookieV52(res),token=String(data.request_token||""),n=-1;
+    if(!ck)try{ck=String(cookie.getCookie(new Packages.java.lang.String(qd+"/"))||cookie.getCookie(new Packages.java.lang.String(root+"/"))||"");}catch(_ck){}
+    try{n=data.user&&data.user.keys?Number(data.user.keys.length):-1;}catch(_n){}
+    qfQwNativeSaveSessionV52(info.email,info.password,ck,token,n);
+
+    qfQwNativeMsgV52("已保存会话，正在验证…");
+    var hh={"Accept":"application/json"};if(ck)hh.Cookie=ck;if(token)hh["X-Content-Token"]=token;
+    var check=null;try{var me=java.get(new Packages.java.lang.String(qd+"/auth.php?action=me"),hh,15000);check=JSON.parse(String(me.body()||""));}catch(e4){qfQwNativeMsgV52("登录已返回成功，但会话验证失败："+e4);return false;}
+    if(!check.user&&!token&&!check.request_token){qfQwNativeMsgV52("会话验证失败");return false;}
+    if(check.request_token)token=String(check.request_token);
+    try{if(check.user&&check.user.keys)n=Number(check.user.keys.length);}catch(_n2){}
+    qfQwNativeSaveSessionV52(info.email,info.password,ck,token,n);
+    qfQwNativeMsgV52(qfQwNativeSessionLabelV101(n,token,"情无账号会话已建立"));
+    try{java.refreshContent();}catch(_r){}try{java.reLoginView();}catch(_v){}
+    return true;
+}
+function qfQwNativeWebLoginV52(){
+    qfQwNativeMsgV52("正在打开情无网页登录页…");
+    var base=qfQwNativeBaseV52();
+    try{java.startBrowserAwait(new Packages.java.lang.String(base+"/"),"情无登录");}catch(e0){qfQwNativeMsgV52("打开登录页失败："+e0);return;}
+    var ck="";try{ck=String(cookie.getCookie(new Packages.java.lang.String(base+"/"))||"");}catch(e1){}
+    var hh={"Accept":"application/json"};if(ck)hh.Cookie=ck;
+    var obj=null;try{var me=java.get(new Packages.java.lang.String(base+"/auth.php?action=me"),hh,15000);obj=JSON.parse(String(me.body()||""));}catch(e2){qfQwNativeMsgV52("登录检测请求失败："+e2);return;}
+    var token=obj&&obj.request_token?String(obj.request_token):"",user=obj&&obj.user,n=-1;
+    try{if(user&&user.keys)n=Number(user.keys.length);}catch(_n){}
+    if(!user&&!token){qfQwNativeMsgV52("未检测到登录状态，请在网页中完成登录后再返回");return;}
+    var old={};try{old=JSON.parse(String(source.getLoginInfo()||"{}"))||{};}catch(_o){}
+    qfQwNativeSaveSessionV52(old.email||"",old.password||"",ck,token,n);
+    qfQwNativeMsgV52(qfQwNativeSessionLabelV101(n,token,"情无网页登录会话已建立"));
+    try{java.refreshContent();}catch(_r){}try{java.reLoginView();}catch(_v){}
+}
+function qfQwNativeSaveBaseV52(){
+    var v="";
+    try{if(typeof result!=="undefined"&&result&&result["情无接口地址"]!=null)v=String(result["情无接口地址"]);}catch(e0){}
+    if(!v){try{v=String(Map("情无接口地址")||"");}catch(e1){}}
+    var b=qfQwNativeNormBaseV52(v);
+    if(!b){qfQwNativeMsgV52("请输入有效域名或接口地址");return;}
+    try{source.put("qf_qw_base",b);}catch(e2){}
+    try{source.remove("qf_qw_comment_base");source.remove("qf_qw_cookie_v317");source.remove("qf_qw_token_v317");source.remove("qf_qw_keys_v317");source.remove("qf_qw_vip_verified_v101");}catch(e3){}
+    try{
+        var m=new Packages.java.util.HashMap();
+        m.put("情无接口地址",b);
+        java.upLoginData(m);
+    }catch(e4){}
+    qfQwNativeMsgV52("已保存："+b+"；接口变更后请重新登录情无");
+    try{java.reLoginView();}catch(_v){}
+}
+function qfQwNativeResetBaseV52(){
+    var b="http://103.236.85.8:7878/qd";
+    try{source.put("qf_qw_base",b);}catch(e0){}
+    try{source.remove("qf_qw_comment_base");source.remove("qf_qw_cookie_v317");source.remove("qf_qw_token_v317");source.remove("qf_qw_keys_v317");source.remove("qf_qw_vip_verified_v101");}catch(e1){}
+    try{
+        var m=new Packages.java.util.HashMap();
+        m.put("情无接口地址",b);
+        java.upLoginData(m);
+    }catch(e2){}
+    qfQwNativeMsgV52("已恢复默认域名；请重新登录情无");
+    try{java.reLoginView();}catch(_v){}
+}
+
+function qfQwNativeCheckV317(){
+    var base=qfQwNativeBaseV52(),lh={};try{lh=JSON.parse(String(source.getLoginHeader()||"{}"))||{};}catch(e0){}
+    var ck="",tk="";try{ck=String(source.get("qf_qw_cookie_v317")||lh.Cookie||cookie.getCookie(base+"/")||"");}catch(e1){}
+    try{tk=String(source.get("qf_qw_token_v317")||lh["X-Content-Token"]||"");}catch(e2){}
+    var h={Accept:"application/json"};if(ck)h.Cookie=ck;if(tk)h["X-Content-Token"]=tk;
+    var o=null;try{var r=java.get(new Packages.java.lang.String(base+"/auth.php?action=me"),h,12000);o=JSON.parse(String(r.body()||""));}catch(e3){qfQwNativeMsgV52("检测失败："+e3);return false;}
+    if(!o.user&&!o.request_token){qfQwNativeMsgV52("当前情无会话无效，请重新登录");return false;}
+    if(o.request_token)tk=String(o.request_token);var n=-1;try{if(o.user&&o.user.keys)n=Number(o.user.keys.length);}catch(_n){}
+    var old={};try{old=JSON.parse(String(source.getLoginInfo()||"{}"))||{};}catch(_o){}
+    qfQwNativeSaveSessionV52(old.email||"",old.password||"",ck,tk,n);
+    qfQwNativeMsgV52(qfQwNativeSessionLabelV101(n,tk,"情无账号会话有效"));try{java.reLoginView();}catch(_v){}return true;
+}
+function qfQwNativeLogoutV317(){
+    try{source.remove("qf_qw_cookie_v317");source.remove("qf_qw_token_v317");source.remove("qf_qw_keys_v317");source.remove("qf_qw_vip_verified_v101");}catch(e0){}
+    try{var bm=new Packages.java.util.HashMap();bm.put("情无会话Cookie","");bm.put("情无会话令牌","");bm.put("情无共享凭据","");java.upLoginData(bm);}catch(_b){}
+    try{var lh=JSON.parse(String(source.getLoginHeader()||"{}"))||{};delete lh.Cookie;delete lh["X-Content-Token"];source.putLoginHeader(JSON.stringify(lh));}catch(e1){}
+    try{var li=JSON.parse(String(source.getLoginInfo()||"{}"))||{};delete li.request_token;source.putLoginInfo(JSON.stringify(li));}catch(e2){}
+    qfQwNativeMsgV52("已清除情无会话（邮箱/密码保留）");try{java.reLoginView();}catch(_v){}
+}
+function qfQwNativeHelpV52(){
+    qfQwNativeMsgV52("情无账号登录与 VIP 正文可用性是两层状态：登录/检测成功只代表账号会话和 request_token 有效；只有实际成功获取一次 VIP 正文后才标记为“VIP正文已验证”。情无正文会显式使用独立 UA/Referer/Cookie/Token；仅遇到明确认证错误时自动续签一次。");
+}
+
+function qfSmHelpV30(){
+    qfMsgV30(
+        "神魔限免源\n\n"+
+        "默认入口：https://shenmobook.top\n"+
+        "登录：使用神魔后台账号/邮箱 + 密码，生成独立 admin_session。\n"+
+        "正文：使用神魔后台归一化 detail → toc → chapter 链路，按起点 BookId / ChapterId / 章节名匹配。\n\n"+
+        "“进入神魔后台设置”会打开神魔用户中心；域名、共享账号、独享、设备等复杂设置继续由服务方后台维护，本书源不重复复制整套后台代码。"
+    );
+}
+function qfSmLoginV30(){
+    var ctx=qfSmCtxV30();
+    var acc=qfSmTrimV30(qfSmInputV30("神魔账号或邮箱"));
+    var pw=qfSmInputV30("神魔密码");
+    qfSmSaveCredsV30(acc,pw);
+    if(!acc||!pw){java.toast("请填写神魔账号/邮箱和密码");return false;}
+
+    var base=qfSmChosenBaseV30.call(ctx,false)||qfSmBootV30();
+    var body="username="+encodeURIComponent(acc)+
+        "&password="+encodeURIComponent(pw)+
+        "&device_id="+encodeURIComponent(qfSmDeviceIdV30.call(ctx));
+
+    /* 明确重新登录时先退出旧会话，避免设备名额被旧 session 占用。 */
+    try{java.ajax(base+"/user/auth/logout,{\"method\":\"POST\"}",10000);}catch(e0){}
+
+    var opt='{"method":"POST","headers":{"Content-Type":"application/x-www-form-urlencoded"},"body":'+JSON.stringify(body)+'}';
+    var raw="";
+    try{raw=String(java.ajax(base+"/user/auth/login,"+opt,18000)||"");}catch(e1){raw="";}
+    if(!raw||raw.charAt(0)!=="{"){
+        try{
+            var rp=java.post(base+"/user/auth/login",body,{"Content-Type":"application/x-www-form-urlencoded"});
+            if(rp)raw=String(rp.body()||"");
+        }catch(e2){}
+    }
+
+    var j=null;
+    try{j=JSON.parse(raw);}catch(e3){}
+    if(j&&j.code===0){
+        try{
+            source.put("qf_sm_logged","1");
+            source.put("qf_sm_auth",base);
+            source.put("qf_sm_base",base);
+            source.put("qf_sm_base_ts","0");
+        }catch(e4){}
+        /* 登录后让服务端域名偏好接管，并把 session 镜像到当前域。 */
+        var now=base;
+        try{now=qfSmChosenBaseV30.call(ctx,true)||base;}catch(e5){}
+        try{source.put("qf_sm_base",now);source.put("qf_sm_base_ts",String(Date.now()));}catch(e6){}
+        try{java.reLoginView();}catch(e7){}
+        java.toast("神魔登录成功："+String((j.user&&(j.user.username||j.user.nickname))||acc));
+        return true;
+    }
+
+    try{source.put("qf_sm_logged","0");}catch(e8){}
+    qfMsgV30("神魔登录失败："+String((j&&(j.message||j.detail))||"服务器返回异常"));
+    return false;
+}
+function qfSmCheckV30(){
+    var ctx=qfSmCtxV30(),base="";
+    try{base=qfSmChosenBaseV30.call(ctx,true);}catch(e0){base=qfSmBootV30();}
+    try{
+        var st=JSON.parse(String(java.ajax(base+"/user/auth/status",15000)||""));
+        if(st&&st.loggedIn){
+            try{source.put("qf_sm_logged","1");source.put("qf_sm_base",base);}catch(e1){}
+            var lines=["神魔登录有效","接口："+base];
+            try{
+                var d=JSON.parse(String(java.ajax(base+"/user/api/dashboard",15000)||""));
+                if(d&&d.user)lines.push("账号："+String(d.user.nickname||d.user.username||""));
+                var q=(d&&d.quota)||{};
+                if(q.daily_limit!=null)lines.push("日限："+q.daily_used+"/"+q.daily_limit);
+                if(q.active_sessions!=null)lines.push("设备："+q.active_sessions+"/"+q.max_sessions);
+            }catch(e2){}
+            qfMsgV30(lines.join("\n"));
+            try{java.reLoginView();}catch(e3){}
+            return true;
+        }
+    }catch(e4){}
+    try{source.put("qf_sm_logged","0");}catch(e5){}
+    try{java.reLoginView();}catch(e6){}
+    java.toast("神魔当前未登录或会话已失效");
+    return false;
+}
+function qfSmSyncDomainV30(){
+    var ctx=qfSmCtxV30(),b="";
+    try{b=qfSmChosenBaseV30.call(ctx,true);}catch(e0){b=qfSmBootV30();}
+    try{source.put("qf_sm_base",b);source.put("qf_sm_base_ts",String(Date.now()));}catch(e1){}
+    try{java.reLoginView();}catch(e2){}
+    java.toast("神魔当前接口："+b);
+    return b;
+}
+function qfSmOpenBackendV30(){
+    var ctx=qfSmCtxV30(),u="";
+    try{u=qfSmBrowserUrlV30.call(ctx,"/user");}catch(e0){u=qfSmBootV30()+"/user";}
+    try{
+        if(java.startBrowserAwait)java.startBrowserAwait(qfStrV30(u),qfStrV30("神魔后台设置"));
+        else java.startBrowser(qfStrV30(u),qfStrV30("神魔后台设置"));
+    }catch(e1){qfMsgV30("打开神魔后台失败："+String(e1));return;}
+    /* 后台若切换了域名，返回阅读立即同步。 */
+    try{qfSmSyncDomainV30();}catch(e2){}
+}
+function qfSmLogoutV30(){
+    var ctx=qfSmCtxV30(),ds=[];
+    try{ds=qfSmCandidatesV30.call(ctx);}catch(e0){ds=[qfSmBootV30()];}
+    for(var i=0;i<ds.length;i++){
+        try{java.ajax(ds[i]+"/user/auth/logout,{\"method\":\"POST\"}",8000);}catch(e1){}
+        try{cookie.removeCookie(ds[i]);}catch(e2){}
+        try{
+            var cm=Packages.android.webkit.CookieManager.getInstance();
+            cm.setCookie(ds[i],"admin_session=; Max-Age=0; path=/");
+        }catch(e3){}
+    }
+    try{source.put("qf_sm_logged","0");}catch(e4){}
+    try{java.reLoginView();}catch(e5){}
+    java.toast("已清除神魔登录会话（账号与后台域名设置保留）");
+}
+
+
+
+
+/* ===== v3.0.0-alpha28：晴天限免账号 / 后台 ===== */
+function qfQtInputV328(name){
+    var v='';try{if(result&&result[name]!=null)v=String(result[name]);}catch(e0){}
+    if(!v)try{v=String(Map(name)||'');}catch(e1){}
+    if(!v)try{var m=source.getLoginInfoMap?source.getLoginInfoMap():null,x=m&&(m.get?m.get(name):m[name]);if(x!=null)v=String(x);}catch(e2){}
+    return v;
+}
+function qfQtSaveLoginV328(key,dt){
+    try{source.put('qf_qt_key',String(key||''));source.put('qf_qt_dttoken',String(dt||''));source.put('qf_qt_logged',(key&&dt)?'1':'0');}catch(e0){}
+    try{var m=new Packages.java.util.HashMap();m.put('晴天密钥',String(key||''));m.put('晴天口令',String(dt||''));java.upLoginData(m);}catch(e1){}
+    try{var b=qfQtBaseV328.call({source:source,java:java,cookie:cookie,cache:(typeof cache!=='undefined'?cache:null)});cookie.setCookie(b,'key='+String(key||'')+'; dttoken='+String(dt||'')+';');}catch(e2){}
+}
+function qfQtHelpV328(){qfMsgV30('晴天限免源\n\n参考附件“🔅起点”。\n默认接口：https://sb.shazi.tk\n登录：密钥 + 口令。\n正文：服务端 /chapter/vip；服务器段评：/api/comments + /comments；本章说：/chapter/chapterEndComments + /chapterComments。\n\n“进入晴天后台设置”打开服务方 /login 页面，返回后可同步网页 Cookie。');}
+function qfQtLoginV328(){
+    var key=String(qfQtInputV328('晴天密钥')||'').trim(),dt=String(qfQtInputV328('晴天口令')||'').trim();
+    if(!key||!dt){java.toast('请填写晴天密钥和口令');return false;}
+    var ctx={source:source,java:java,cookie:cookie,cache:(typeof cache!=='undefined'?cache:null)},b=qfQtBaseV328.call(ctx),opt={method:'POST',body:{key:key,dttoken:dt}},raw='';
+    try{raw=String(java.ajax(b+'/source/api/verify,'+JSON.stringify(opt))||'');}catch(e0){}
+    var r={};try{r=JSON.parse(raw);}catch(e1){}
+    if(r&&Number(r.code)===0&&(!r.user||!r.user.dttoken||String(r.user.dttoken)===dt)){
+        qfQtSaveLoginV328(key,dt);try{java.reLoginView();}catch(e2){}java.toast('晴天登录成功'+(r.user&&r.user.nickname?'：'+r.user.nickname:''));return true;
+    }
+    qfMsgV30('晴天登录失败：'+String((r&&(r.message||r.detail))||'服务器返回异常'));return false;
+}
+function qfQtCheckV328(){
+    var ctx={source:source,java:java,cookie:cookie,cache:(typeof cache!=='undefined'?cache:null)},c=qfQtCredV328.call(ctx);if(!c.key||!c.dttoken){java.toast('晴天未登录');return false;}
+    var b=qfQtBaseV328.call(ctx),opt={method:'POST',body:{key:c.key,dttoken:c.dttoken}},raw='';try{raw=String(java.ajax(b+'/source/api/verify,'+JSON.stringify(opt))||'');}catch(e0){}
+    var r={};try{r=JSON.parse(raw);}catch(e1){}
+    if(r&&Number(r.code)===0){try{source.put('qf_qt_logged','1');}catch(e2){}qfMsgV30('晴天登录有效\n接口：'+b+(r.user&&r.user.nickname?'\n账号：'+r.user.nickname:''));try{java.reLoginView();}catch(e3){}return true;}
+    try{source.put('qf_qt_logged','0');}catch(e4){}java.toast('晴天登录无效或已失效');try{java.reLoginView();}catch(e5){}return false;
+}
+function qfQtCookieValV328(k){
+    var ctx={source:source,java:java,cookie:cookie,cache:(typeof cache!=='undefined'?cache:null)},b=qfQtBaseV328.call(ctx),ck='';try{ck=String(cookie.getCookie(b)||java.getCookie(b)||'');}catch(e0){}
+    var m=ck.match(new RegExp('(?:^|;\\s*)'+k+'=([^;]+)'));return m?decodeURIComponent(String(m[1]||'')):'';
+}
+function qfQtOpenBackendV328(){
+    var ctx={source:source,java:java,cookie:cookie,cache:(typeof cache!=='undefined'?cache:null)},b=qfQtBaseV328.call(ctx),u=b+'/login';
+    try{if(java.startBrowserAwait)java.startBrowserAwait(qfStrV30(u),qfStrV30('晴天后台设置'));else java.startBrowser(qfStrV30(u),qfStrV30('晴天后台设置'));}catch(e0){qfMsgV30('打开晴天后台失败：'+e0);return;}
+    var key=qfQtCookieValV328('key'),dt=qfQtCookieValV328('dttoken');if(key&&dt){qfQtSaveLoginV328(key,dt);java.toast('已同步晴天网页登录状态');try{java.reLoginView();}catch(e1){}}
+}
+function qfQtSaveBaseV328(){
+    var b=qfQtNormBaseV328(qfQtInputV328('晴天接口地址'));if(!b){java.toast('晴天接口地址不能为空');return;}
+    try{source.put('qf_qt_base',b);var m=new Packages.java.util.HashMap();m.put('晴天接口地址',b);java.upLoginData(m);}catch(e0){}
+    try{java.reLoginView();}catch(e1){}java.toast('晴天地址已保存');
+}
+function qfQtResetBaseV328(){try{source.put('qf_qt_base','https://sb.shazi.tk');var m=new Packages.java.util.HashMap();m.put('晴天接口地址','https://sb.shazi.tk');java.upLoginData(m);}catch(e0){}try{java.reLoginView();}catch(e1){}java.toast('已恢复晴天默认地址');}
+function qfQtLogoutV328(){
+    var ctx={source:source,java:java,cookie:cookie,cache:(typeof cache!=='undefined'?cache:null)},b=qfQtBaseV328.call(ctx);try{source.put('qf_qt_key','');source.put('qf_qt_dttoken','');source.put('qf_qt_logged','0');cookie.removeCookie(b);}catch(e0){}qfQtSaveLoginV328('','');try{java.reLoginView();}catch(e1){}java.toast('已清除晴天登录会话（接口地址保留）');
+}
+
+/* ===== v3.1 beta1：正文源与全源智能说明 ===== */
+
+/* alpha10.2.1：同人限免源 UI 鉴权。共享 Token 严格读取 source.getVariable()。 */
+function qfTrUiTokenV102(){
+    var v="",o=null;
+    try{v=String(source&&source.getVariable?source.getVariable():"").trim();}catch(e){v="";}
+    if(v&&v.charAt(0)==="{"){
+        try{o=JSON.parse(v);}catch(_p){o=null;}
+        if(o&&typeof o==="object"&&Object.prototype.hasOwnProperty.call(o,"qfV21Search"))return "";
+    }
+    return v;
+}
+function qfTrUiRequestV102(path,data){
+    var token=qfTrUiTokenV102();
+    if(!token)throw new Error("请先在“编辑书源 → 设置源变量”填写共享Token");
+    data=data||{};var q=[];
+    for(var k in data)if(Object.prototype.hasOwnProperty.call(data,k)&&data[k]!==null&&data[k]!==undefined&&String(data[k])!=="")q.push(encodeURIComponent(k)+"="+encodeURIComponent(String(data[k])));
+    var url="https://qd.aadcn.cn"+String(path||"")+(q.length?"?"+q.join("&"):"");
+    var opt={method:"GET",headers:{authorization:"Bearer "+token,"Accept":"application/json"},timeout:9000};
+    var raw=String(java.ajax(url+","+JSON.stringify(opt))||""),o={};
+    try{o=JSON.parse(raw);}catch(e0){throw new Error("服务器返回无法解析");}
+    if(o&&o.msg&&String(o.msg)!=="success")throw new Error(String(o.msg)+(o.code!==undefined?"（code "+o.code+"）":""));
+    return o;
+}
+function qfTrCheckV102(){
+    try{
+        var token=qfTrUiTokenV102();
+        if(!token){java.longToast("\n❌ 未设置同人共享Token\n请在编辑书源 → 设置源变量中填写");return false;}
+        var o=qfTrUiRequestV102("/user/test",{}),d=o&&o.data!==undefined?o.data:null,msg="";
+        try{msg=d&&d.msg?String(d.msg):String(o.msg||"success");}catch(_e){msg="success";}
+        java.longToast("\n✅ 同人共享Token验证成功\n"+msg);
+        return true;
+    }catch(e){java.longToast("\n❌ 同人共享Token验证失败\n"+String(e&&e.message||e));return false;}
+}
+function qfTrOpenConsoleV102(){
+    var token=qfTrUiTokenV102();
+    if(!token){java.longToast("\n❌ 请先在编辑书源 → 设置源变量中填写共享Token");return;}
+    try{java.startBrowser("https://qd.aadcn.cn/console/login?token="+encodeURIComponent(token),"同人小说网后台");}
+    catch(e){try{java.openUrl("https://qd.aadcn.cn/console/login?token="+encodeURIComponent(token));}catch(_e){}}
+}
+function qfTrHelpV102(){
+    java.longToast("\n🍋 同人限免源\n\n鉴权：共享Token（源变量）\n正文：qd.aadcn.cn /novel/chap\n\nToken 不保存在账号/密码设置中。请在书源编辑页点击“设置源变量”填写。");
+}
+
+function qfLoginHelpV307(){
+    qfMsgV30(
+        "起点正文融合 3.1 · 智能正文路由\n\n"+
+        "【原三类模式】\n限免源 / 优选源 / 兜底源仍然完全隔离。启动哪一类，VIP正文就只调用这一类，不会因为升级而偷偷跨类。\n\n"+
+        "【全源智能】\n这是新增的可选模式。首次按“全源智能顺序”逐类寻找正文；某类/某源成功后，会记住这本书最近成功的类别和 Provider，后续章节优先直达它。只有当前类别全部失败时才继续下一类。\n\n"+
+        "【具体正文源】\n限免/优选/兜底模式选择具体源：只调用它；选择自动：只在本类按排序切换。STV源是独立手动类别，可选择 STV·自动 或 STV·qidian，不进入全源智能。全源智能固定为自动。\n\n"+
+        "【书籍变量】\n9=全源智能；\n1=限免自动，11=情无，12=神魔，13=晴天，14=同人；\n2=优选自动，21=七猫，22=书旗，23=QQ浏览器；\n3=兜底自动，31=猫眼，32=得奇，33=69书吧。\n书籍变量优先级高于登录页全局设置。\n\n"+
+        "【段评】\n段评仍跟随最终实际命中的正文 Provider：选择服务器时，评论详情与正文 Provider 解耦：自动优先跟随情无/神魔/晴天正文；其它正文默认晴天服务器评论，不再落回起点本地。"
+    );
+}
+function qfBookVarHelpV307(){
+    qfMsgV30(
+        "书籍变量代码\n\n"+
+        "9  全源智能·自动跨类\n\n"+
+        "1  限免源·自动\n11 情无\n12 神魔\n13 晴天\n\n"+
+        "2  优选源·自动\n21 七猫\n22 书旗\n23 QQ浏览器\n\n"+
+        "3  兜底源·自动\n31 猫眼\n32 得奇\n33 69书吧\n34 速读谷\n35 万相\n\n"+
+        "40 STV·自动\n41 STV·qidian\n\n"+
+        "4x 是独立 STV 正文域，只在当前书籍变量主动设置时启用；不会进入限免/优选/兜底或 9=全源智能。1 / 2 / 3 仍只在对应类别内部自动；9 才允许跨常规类别。"
+    );
+}
+
+/* ============================================================
+ * v4.2.1-alpha2-loginfix3
+ * 纯静态 loginUi + startBrowserAwait 多级设置页
+ * 动态 @js: loginUi 在当前 Legado 环境不可用，因此只把 JS 放在按钮 action / loginUrl。
+ * ============================================================ */
+
+function qfMGet423(key,def){
+    key=String(key||"");var v="";
+    try{
+        var m=source.getLoginInfoMap?source.getLoginInfoMap():null;
+        v=String(m&&(m.get?m.get(key):m[key])||"");
+    }catch(_e0){}
+    if(!v){
+        try{
+            var o=JSON.parse(String(source.getLoginInfo()||"{}"))||{};
+            v=String(o[key]||"");
+        }catch(_e1){}
+    }
+    return v||String(def==null?"":def);
+}
+function qfMSet423(key,val,silent){
+    key=String(key||"");val=String(val==null?"":val);
+    try{
+        qfMergeLoginValueV308(key,val);
+    }catch(_e0){
+        try{
+            var hm=new Packages.java.util.HashMap();
+            hm.put(key,val);
+            java.upLoginData(hm);
+        }catch(_e1){}
+    }
+    if(!silent){try{java.toast(key+" → "+val);}catch(_e2){}}
+    return val;
+}
+function qfMEsc423(v){
+    return String(v==null?"":v)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function qfMSpan423(id,val){
+    return '<span id="'+id+'" style="display:none">'+qfMEsc423(val)+'</span>';
+}
+function qfMRead423(body,id){
+    try{
+        var r=new RegExp('id=["\\\']'+id+'["\\\'][^>]*>([^<]*)<\\/span>','i');
+        var m=String(body||"").match(r);
+        return m?String(m[1]||"").trim():"";
+    }catch(_e){return "";}
+}
+function qfMOpen423(title,inner,script){
+    var css=
+      '*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}'+
+      ':root{color-scheme:light dark;--bg:#f4f6fb;--card:#fff;--text:#202532;--muted:#747d90;--line:#e4e8f0;--p1:#596cff;--p2:#965cff}'+
+      '@media(prefers-color-scheme:dark){:root{--bg:#10131a;--card:#191e27;--text:#edf2f8;--muted:#9ba5b7;--line:#2b3340}}'+
+      'body{margin:0;padding:16px;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}'+
+      '.hero{padding:18px;border-radius:18px;color:#fff;background:linear-gradient(135deg,var(--p1),var(--p2));margin-bottom:14px}'+
+      '.hero h2{margin:0 0 6px;font-size:20px}.hero p{margin:0;font-size:12px;opacity:.9;line-height:1.55}'+
+      '.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}'+
+      '.row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}'+
+      '.lab{flex:1;min-width:0}.lab b{display:block;font-size:14px}.lab small{display:block;color:var(--muted);font-size:11px;margin-top:3px;line-height:1.4}'+
+      'select,input[type=text],input[type=password]{width:46%;min-width:130px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text)}'+
+      '.sw{width:48px;height:28px;position:relative}.sw input{display:none}.track{position:absolute;inset:0;background:#aeb6c6;border-radius:99px;transition:.2s}.track:after{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;background:white;border-radius:50%;transition:.2s}.sw input:checked+.track{background:var(--p1)}.sw input:checked+.track:after{transform:translateX(20px)}'+
+      '.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.act{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text);font-weight:700;text-align:center}.act.primary{color:#fff;border:0;background:linear-gradient(135deg,var(--p1),var(--p2))}'+
+      '.tip{font-size:11px;color:var(--muted);line-height:1.6;margin-top:8px}';
+    var html='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><style>'+css+'</style></head><body>'+
+      '<div class="hero"><h2>'+qfMEsc423(title)+'</h2><p>修改后点击阅读页面右上角 ✓ 返回，设置会自动保存。</p></div>'+
+      inner+
+      '<script>'+script+'</script></body></html>';
+    try{
+        return java.startBrowserAwait('data:text/html;base64,'+java.base64Encode(html),title,false).body();
+    }catch(e){
+        try{java.longToast("打开设置页失败："+String(e));}catch(_e){}
+        return "";
+    }
+}
+function qfMSelect423(label,key,opts,def,desc){
+    var cur=qfMGet423(key,def),h='<div class="row"><div class="lab"><b>'+qfMEsc423(label)+'</b><small>'+qfMEsc423(desc||"")+'</small></div><select id="'+key.replace(/[^A-Za-z0-9]/g,"_")+'">';
+    for(var i=0;i<opts.length;i++)h+='<option value="'+qfMEsc423(opts[i])+'"'+(String(opts[i])===cur?' selected':'')+'>'+qfMEsc423(opts[i])+'</option>';
+    return h+'</select></div>';
+}
+function qfMToggle423(label,key,def,desc){
+    var cur=qfMGet423(key,def)==="✅",id=key.replace(/[^A-Za-z0-9]/g,"_");
+    return '<div class="row"><div class="lab"><b>'+qfMEsc423(label)+'</b><small>'+qfMEsc423(desc||"")+'</small></div><label class="sw"><input id="'+id+'" type="checkbox" '+(cur?'checked':'')+'><span class="track"></span></label></div>';
+}
+function qfMInput423(label,key,type,def,desc){
+    var id=key.replace(/[^A-Za-z0-9]/g,"_"),cur=qfMGet423(key,def||"");
+    return '<div class="row"><div class="lab"><b>'+qfMEsc423(label)+'</b><small>'+qfMEsc423(desc||"")+'</small></div><input id="'+id+'" type="'+(type||"text")+'" value="'+qfMEsc423(cur)+'"></div>';
+}
+function qfMScript423(selectKeys,toggleKeys,inputKeys){
+    var js='function sync(){';
+    for(var i=0;i<selectKeys.length;i++){
+        var k=selectKeys[i],id=k.replace(/[^A-Za-z0-9]/g,"_");
+        js+='document.getElementById("v_'+i+'").textContent=document.getElementById("'+id+'").value;';
+    }
+    var base=selectKeys.length;
+    for(var j=0;j<toggleKeys.length;j++){
+        var k2=toggleKeys[j],id2=k2.replace(/[^A-Za-z0-9]/g,"_");
+        js+='document.getElementById("v_'+(base+j)+'").textContent=document.getElementById("'+id2+'").checked?"✅":"🔳";';
+    }
+    base+=toggleKeys.length;
+    for(var n=0;n<inputKeys.length;n++){
+        var k3=inputKeys[n],id3=k3.replace(/[^A-Za-z0-9]/g,"_");
+        js+='document.getElementById("v_'+(base+n)+'").textContent=document.getElementById("'+id3+'").value;';
+    }
+    js+='}document.addEventListener("change",sync);document.addEventListener("input",sync);sync();';
+    return js;
+}
+function qfMSave423(body,keys){
+    for(var i=0;i<keys.length;i++){
+        var v=qfMRead423(body,'v_'+i);
+        if(v!=="")qfMSet423(keys[i],v,true);
+    }
+    try{java.toast("设置已保存");}catch(_e){}
+}
+
+function qfMultiModeV423(){
+    var keys=['体验模式'];
+    var inner='<div class="card">'+qfMSelect423('体验模式','体验模式',['极速','均衡','完整','自定义'],'均衡','预设会影响评论、显示和性能取舍。')+'</div>'+qfMSpan423('v_0',qfMGet423('体验模式','均衡'));
+    var body=qfMOpen423('⚡ 体验模式',inner,qfMScript423(keys,[],[]));
+    if(!body)return;
+    var mode=qfMRead423(body,'v_0');
+    if(mode){try{qfSettingsPresetApply(mode);}catch(_e){qfMSet423('体验模式',mode,false);}}
+}
+
+function qfMultiContentV423(){
+    var sk=['正文源类别','限免源选择','优选源选择','兜底源选择','STV源选择','全源智能选择'];
+    var ik=['STV API密钥'];
+    var inner='<div class="card">'+
+      qfMSelect423('启动源类别','正文源类别',['限免源','优选源','兜底源','STV源','全源智能'],'限免源','决定付费章节正文的首选路由。')+
+      qfMSelect423('限免源','限免源选择',['自动','情无','神魔','晴天','同人'],'自动','限免类别的具体 Provider。')+
+      qfMSelect423('优选源','优选源选择',['自动','七猫','书旗','QQ浏览器','得间','酷我'],'自动','优选类别的具体 Provider。')+
+      qfMSelect423('兜底源','兜底源选择',['自动','猫眼','得奇','69书吧','速读谷','万相'],'自动','兜底类别的具体 Provider。')+
+      qfMSelect423('STV 模式','STV源选择',['STV·自动','STV·qidian'],'STV·自动','仅主动选择 STV 时启用。')+
+      qfMSelect423('全源智能','全源智能选择',['自动'],'自动','保持自动即可。')+
+      qfMInput423('STV API密钥','STV API密钥','password','','可选；没有密钥可以留空。')+
+      '</div>';
+    var all=sk.concat(ik);
+    for(var i=0;i<all.length;i++)inner+=qfMSpan423('v_'+i,qfMGet423(all[i],i==0?'限免源':(all[i]=='STV源选择'?'STV·自动':'自动')));
+    var body=qfMOpen423('📚 正文与 Provider',inner,qfMScript423(sk,[],ik));
+    if(body)qfMSave423(body,all);
+}
+
+function qfMultiReviewV423(){
+    var sk=['段评来源','服务器评论源','兜底段评对齐锚点数'];
+    var tk=['起点段评','热评显示','本章说','作家说','兜底段评智能对齐'];
+    var inner='<div class="card">'+
+      qfMSelect423('段评来源','段评来源',['本地','服务器'],'本地','本地或服务器评论链。')+
+      qfMSelect423('服务器评论源','服务器评论源',['自动','神魔','情无','晴天'],'自动','服务器模式的评论来源。')+
+      qfMToggle423('起点段评','起点段评','✅','正文段落评论气泡。')+
+      qfMToggle423('热评显示','热评显示','✅','章节热评卡片。')+
+      qfMToggle423('本章说','本章说','✅','章节末尾评论。')+
+      qfMToggle423('作者说','作家说','✅','作者说内容。')+
+      qfMToggle423('兜底段评智能对齐','兜底段评智能对齐','✅','兜底正文与官方段评的锚点匹配。')+
+      qfMSelect423('对齐锚点数','兜底段评对齐锚点数',['4','6','8'],'6','锚点越多越严格。')+
+      '</div>';
+    var all=sk.concat(tk);
+    for(var i=0;i<all.length;i++)inner+=qfMSpan423('v_'+i,qfMGet423(all[i],tk.indexOf(all[i])>=0?'✅':(all[i]=='兜底段评对齐锚点数'?'6':'自动')));
+    var body=qfMOpen423('💬 评论与显示',inner,qfMScript423(sk,tk,[]));
+    if(body){
+        qfMSave423(body,all);
+        try{for(var j=0;j<tk.length;j++)qfSettingsMarkCustom(tk[j]);}catch(_e){}
+    }
+}
+
+function qfMultiDisplayV423(){
+    var sk=['段评弹窗高度','段评圆角弧度'];
+    var tk=['正文来源标记','智能切源提示','69验证时弹窗','开发者诊断'];
+    var inner='<div class="card">'+
+      qfMSelect423('段评弹窗高度','段评弹窗高度',['70','75','80','85','90'],'80','半屏评论页面高度。')+
+      qfMSelect423('段评圆角','段评圆角弧度',['12','16','20','24','28','32'],'24','半屏页面圆角。')+
+      qfMToggle423('正文来源标记','正文来源标记','🔳','正文底部显示 Provider 来源。')+
+      qfMToggle423('智能切源提示','智能切源提示','✅','自动切源时弹出提示。')+
+      qfMToggle423('69验证弹窗','69验证时弹窗','🔳','69书吧需要验证时提醒。')+
+      qfMToggle423('开发者诊断','开发者诊断','🔳','开启深度诊断采集。')+
+      '</div>';
+    var all=sk.concat(tk);
+    for(var i=0;i<all.length;i++)inner+=qfMSpan423('v_'+i,qfMGet423(all[i],tk.indexOf(all[i])>=0?'🔳':(all[i]=='段评弹窗高度'?'80':'24')));
+    var body=qfMOpen423('🎨 界面与提示',inner,qfMScript423(sk,tk,[]));
+    if(body)qfMSave423(body,all);
+}
+
+function qfMultiAccountsV423(){
+    var ik=['email','password','情无接口地址','神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址'];
+    var inner=
+      '<div class="card"><div class="lab"><b>🌙 情无</b><small>填写后选择下方动作，再点右上角 ✓。</small></div>'+
+      qfMInput423('邮箱','email','text','','QQ邮箱')+
+      qfMInput423('密码','password','password','','情无密码')+
+      qfMInput423('接口地址','情无接口地址','text','http://103.236.85.8:7878/qd','可自定义')+
+      '<div class="grid"><button class="act primary" onclick="act(\'qw-login\')">登录</button><button class="act" onclick="act(\'qw-check\')">检测</button><button class="act" onclick="act(\'qw-web\')">网页登录</button><button class="act" onclick="act(\'qw-logout\')">退出</button></div></div>'+
+      '<div class="card"><div class="lab"><b>⚔️ 神魔</b></div>'+
+      qfMInput423('账号或邮箱','神魔账号或邮箱','text','','')+
+      qfMInput423('密码','神魔密码','password','','')+
+      '<div class="grid"><button class="act primary" onclick="act(\'sm-login\')">登录</button><button class="act" onclick="act(\'sm-check\')">检测</button><button class="act" onclick="act(\'sm-backend\')">后台</button><button class="act" onclick="act(\'sm-logout\')">退出</button></div></div>'+
+      '<div class="card"><div class="lab"><b>☀️ 晴天</b></div>'+
+      qfMInput423('密钥','晴天密钥','password','','')+
+      qfMInput423('口令','晴天口令','password','','')+
+      qfMInput423('接口地址','晴天接口地址','text','https://sb.shazi.tk','')+
+      '<div class="grid"><button class="act primary" onclick="act(\'qt-login\')">登录</button><button class="act" onclick="act(\'qt-check\')">检测</button><button class="act" onclick="act(\'qt-backend\')">后台</button><button class="act" onclick="act(\'qt-logout\')">退出</button></div></div>'+
+      '<div class="card"><div class="lab"><b>🍋 同人</b></div><div class="grid"><button class="act primary" onclick="act(\'tr-check\')">检测共享Token</button><button class="act" onclick="act(\'tr-console\')">打开后台</button></div></div>';
+    for(var i=0;i<ik.length;i++)inner+=qfMSpan423('v_'+i,qfMGet423(ik[i],""));
+    inner+=qfMSpan423('action',"");
+    var js=qfMScript423([],[],ik)+
+      'function act(v){sync();document.getElementById("action").textContent=v;document.title="已选择："+v+"；请点右上角✓";}';
+    var body=qfMOpen423('🔐 Provider 账号',inner,js);
+    if(!body)return;
+    qfMSave423(body,ik);
+    var a=qfMRead423(body,'action');
+    try{
+        if(a==='qw-login')qfQwNativeLoginV52();
+        else if(a==='qw-check')qfQwNativeCheckV317();
+        else if(a==='qw-web')qfQwNativeWebLoginV52();
+        else if(a==='qw-logout')qfQwNativeLogoutV317();
+        else if(a==='sm-login')qfSmLoginV30();
+        else if(a==='sm-check')qfSmCheckV30();
+        else if(a==='sm-backend')qfSmOpenBackendV30();
+        else if(a==='sm-logout')qfSmLogoutV30();
+        else if(a==='qt-login')qfQtLoginV328();
+        else if(a==='qt-check')qfQtCheckV328();
+        else if(a==='qt-backend')qfQtOpenBackendV328();
+        else if(a==='qt-logout')qfQtLogoutV328();
+        else if(a==='tr-check')qfTrCheckV102();
+        else if(a==='tr-console')qfTrOpenConsoleV102();
+    }catch(e){try{java.longToast("账号操作失败："+String(e));}catch(_e){}}
+}
+
+function qfMultiDiagV423(){
+    var inner='<div class="card"><div class="grid">'+
+      '<button class="act primary" onclick="act(\'overview\')">Runtime 概览</button>'+
+      '<button class="act" onclick="act(\'performance\')">性能摘要</button>'+
+      '<button class="act" onclick="act(\'performance-deep\')">深度追踪</button>'+
+      '<button class="act" onclick="act(\'copy\')">复制脱敏诊断</button>'+
+      '<button class="act" onclick="act(\'reset\')">清空诊断</button>'+
+      '</div><div class="tip">选择操作后点击右上角 ✓。</div></div>'+qfMSpan423('action',"");
+    var body=qfMOpen423('🩺 诊断工具',inner,'function act(v){document.getElementById("action").textContent=v;document.title=v+"；请点右上角✓";}');
+    if(!body)return;
+    var a=qfMRead423(body,'action');
+    try{
+        if(a==='copy')qfRuntimeDiagCopy();
+        else if(a==='reset')qfRuntimeDiagReset();
+        else if(a)qfRuntimeDiagShow(a);
+    }catch(e){try{java.longToast(String(e));}catch(_e){}}
+}
+
+function qfMultiSummaryV423(){
+    var ks=[
+      ['体验模式','均衡'],['正文源类别','限免源'],
+      ['限免源选择','自动'],['优选源选择','自动'],['兜底源选择','自动'],['STV源选择','STV·自动'],
+      ['段评来源','本地'],['服务器评论源','自动'],
+      ['起点段评','✅'],['热评显示','✅'],['本章说','✅'],['作家说','✅'],
+      ['正文来源标记','🔳'],['段评弹窗高度','80'],['段评圆角弧度','24'],
+      ['智能切源提示','✅'],['69验证时弹窗','🔳'],['开发者诊断','🔳']
+    ],out=['起点官方生态 · 当前设置'];
+    for(var i=0;i<ks.length;i++)out.push(ks[i][0]+'： '+qfMGet423(ks[i][0],ks[i][1]));
+    try{qfMsgV30(out.join('\n'));}catch(_e){try{java.longToast(out.join('\n'));}catch(_e2){}}
+}
+
+/* qidian-next v0.1.1-beta2 · Multi-level settings compatibility fixes */
+function qfMIdV011(key){
+    var s=String(key==null?'':key),o='qf';
+    for(var i=0;i<s.length;i++)o+='_'+s.charCodeAt(i).toString(16);
+    return o;
+}
+qfMSelect423=function(label,key,opts,def,desc){
+    var cur=qfMGet423(key,def),id=qfMIdV011(key),h='<div class="row"><div class="lab"><b>'+qfMEsc423(label)+'</b><small>'+qfMEsc423(desc||'')+'</small></div><select id="'+id+'">';
+    for(var i=0;i<opts.length;i++)h+='<option value="'+qfMEsc423(opts[i])+'"'+(String(opts[i])===cur?' selected':'')+'>'+qfMEsc423(opts[i])+'</option>';
+    return h+'</select></div>';
+};
+qfMToggle423=function(label,key,def,desc){
+    var cur=qfMGet423(key,def)==='✅',id=qfMIdV011(key);
+    return '<div class="row"><div class="lab"><b>'+qfMEsc423(label)+'</b><small>'+qfMEsc423(desc||'')+'</small></div><label class="sw"><input id="'+id+'" type="checkbox" '+(cur?'checked':'')+'><span class="track"></span></label></div>';
+};
+qfMInput423=function(label,key,type,def,desc){
+    var id=qfMIdV011(key),cur=qfMGet423(key,def||'');
+    return '<div class="row"><div class="lab"><b>'+qfMEsc423(label)+'</b><small>'+qfMEsc423(desc||'')+'</small></div><input id="'+id+'" type="'+(type||'text')+'" value="'+qfMEsc423(cur)+'"></div>';
+};
+qfMScript423=function(selectKeys,toggleKeys,inputKeys){
+    var js='function fid(k){var s=String(k==null?"":k),o="qf";for(var z=0;z<s.length;z++)o+="_"+s.charCodeAt(z).toString(16);return o;}function sync(){';
+    for(var i=0;i<selectKeys.length;i++)js+='document.getElementById("v_'+i+'").textContent=document.getElementById("'+qfMIdV011(selectKeys[i])+'").value;';
+    var base=selectKeys.length;
+    for(var j=0;j<toggleKeys.length;j++)js+='document.getElementById("v_'+(base+j)+'").textContent=document.getElementById("'+qfMIdV011(toggleKeys[j])+'").checked?"✅":"🔳";';
+    base+=toggleKeys.length;
+    for(var n=0;n<inputKeys.length;n++)js+='document.getElementById("v_'+(base+n)+'").textContent=document.getElementById("'+qfMIdV011(inputKeys[n])+'").value;';
+    js+='}document.addEventListener("change",sync);document.addEventListener("input",sync);sync();';
+    return js;
+};
+function qfNextTakeActionV011(){
+    var a='';try{a=String(source.get('qf_next_action_v011')||'');source.remove('qf_next_action_v011');}catch(_e){}
+    return a;
+}
+function qfNextAccountRunV011(a){
+    try{
+        if(a==='qw-login')return qfQwNativeLoginV52();
+        if(a==='qw-check')return qfQwNativeCheckV317();
+        if(a==='qw-web')return qfQwNativeWebLoginV52();
+        if(a==='qw-logout')return qfQwNativeLogoutV317();
+        if(a==='sm-login')return qfSmLoginV30();
+        if(a==='sm-check')return qfSmCheckV30();
+        if(a==='sm-backend')return qfSmOpenBackendV30();
+        if(a==='sm-logout')return qfSmLogoutV30();
+        if(a==='qt-login')return qfQtLoginV328();
+        if(a==='qt-check')return qfQtCheckV328();
+        if(a==='qt-backend')return qfQtOpenBackendV328();
+        if(a==='qt-logout')return qfQtLogoutV328();
+        if(a==='tr-check')return qfTrCheckV102();
+        if(a==='tr-console')return qfTrOpenConsoleV102();
+        if(a==='save-only'){try{java.toast('账号设置已保存');}catch(_t){}return true;}
+    }catch(e){try{java.longToast('账号操作失败：'+String(e));}catch(_e){}}
+}
+qfMultiAccountsV423=function(){
+    try{source.remove('qf_next_action_v011');}catch(_e){}
+    var ik=['email','password','情无接口地址','神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址'];
+    var inner=
+      '<div class="card"><div class="lab"><b>🌙 情无</b><small>填写后点动作按钮；看到提示后点右上角 ✓ 返回执行。</small></div>'+qfMInput423('邮箱','email','text','','QQ邮箱')+qfMInput423('密码','password','password','','情无密码')+qfMInput423('接口地址','情无接口地址','text','http://103.236.85.8:7878/qd','可自定义')+'<div class="grid"><button class="act primary" onclick="fire(\'qw-login\')">登录</button><button class="act" onclick="fire(\'qw-check\')">检测</button><button class="act" onclick="fire(\'qw-web\')">网页登录</button><button class="act" onclick="fire(\'qw-logout\')">退出</button></div></div>'+ 
+      '<div class="card"><div class="lab"><b>⚔️ 神魔</b></div>'+qfMInput423('账号或邮箱','神魔账号或邮箱','text','','')+qfMInput423('密码','神魔密码','password','','')+'<div class="grid"><button class="act primary" onclick="fire(\'sm-login\')">登录</button><button class="act" onclick="fire(\'sm-check\')">检测</button><button class="act" onclick="fire(\'sm-backend\')">后台</button><button class="act" onclick="fire(\'sm-logout\')">退出</button></div></div>'+ 
+      '<div class="card"><div class="lab"><b>☀️ 晴天</b></div>'+qfMInput423('密钥','晴天密钥','password','','')+qfMInput423('口令','晴天口令','password','','')+qfMInput423('接口地址','晴天接口地址','text','https://sb.shazi.tk','')+'<div class="grid"><button class="act primary" onclick="fire(\'qt-login\')">登录</button><button class="act" onclick="fire(\'qt-check\')">检测</button><button class="act" onclick="fire(\'qt-backend\')">后台</button><button class="act" onclick="fire(\'qt-logout\')">退出</button></div></div>'+ 
+      '<div class="card"><div class="lab"><b>🍋 同人</b></div><div class="grid"><button class="act primary" onclick="fire(\'tr-check\')">检测共享Token</button><button class="act" onclick="fire(\'tr-console\')">打开后台</button></div></div>'+ 
+      '<div class="card"><button class="act primary" style="width:100%" onclick="fire(\'save-only\')">💾 只保存账号设置</button><div class="tip">动作会先把当前输入写入阅读登录信息，再在返回后执行。</div></div>';
+    var js=qfMScript423([],[],ik)+'function fire(a){sync();var q=[],ks='+JSON.stringify(ik)+';for(var i=0;i<ks.length;i++){var el=document.getElementById(fid(ks[i]));if(el)q.push(encodeURIComponent(ks[i])+"="+encodeURIComponent(el.value||""));}document.title="已选择："+a+"；请点右上角✓";location.href="qfnext://account?action="+encodeURIComponent(a)+"&"+q.join("&");}';
+    qfMOpen423('🔐 Provider 账号',inner,js);
+    var a=qfNextTakeActionV011();if(a)qfNextAccountRunV011(a);
+};
+qfMultiDiagV423=function(){
+    try{source.remove('qf_next_action_v011');}catch(_e){}
+    var inner='<div class="card"><div class="grid"><button class="act primary" onclick="fire(\'overview\')">Runtime 概览</button><button class="act" onclick="fire(\'performance\')">性能摘要</button><button class="act" onclick="fire(\'performance-deep\')">深度追踪</button><button class="act" onclick="fire(\'copy\')">复制脱敏诊断</button><button class="act" onclick="fire(\'reset\')">清空诊断</button></div><div class="tip">点击动作后看到提示，再点右上角 ✓ 返回执行。</div></div>';
+    qfMOpen423('🩺 诊断工具',inner,'function fire(a){document.title="已选择："+a+"；请点右上角✓";location.href="qfnext://diag?action="+encodeURIComponent(a);}');
+    var a=qfNextTakeActionV011();
+    try{if(a==='copy')qfRuntimeDiagCopy();else if(a==='reset')qfRuntimeDiagReset();else if(a)qfRuntimeDiagShow(a);}catch(e){try{java.longToast('诊断操作失败：'+String(e));}catch(_e){}}
+};
+
+/* qidian-next v0.1.2-beta3 · action return without custom scheme */
+qfMultiAccountsV423=function(){
+    var sk=['账号操作'];
+    var ik=['email','password','情无接口地址','神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址'];
+    var actionOpts=['不执行','情无·登录','情无·检测','情无·网页登录','情无·退出','神魔·登录','神魔·检测','神魔·后台','神魔·退出','晴天·登录','晴天·检测','晴天·后台','晴天·退出','同人·检测Token','同人·打开后台'];
+    var inner=
+      '<div class="card">'+
+      qfMSelect423('执行动作','账号操作',actionOpts,'不执行','修改账号后选择一个动作，再点阅读右上角 ✓ 返回；返回后立即执行。')+
+      '<div class="tip">兼容当前阅读版本：不再使用网页按钮触发书源 JS，也不会跳转其它应用。</div></div>'+
+      '<div class="card"><div class="lab"><b>🌙 情无</b></div>'+qfMInput423('邮箱','email','text','','QQ邮箱')+qfMInput423('密码','password','password','','情无密码')+qfMInput423('接口地址','情无接口地址','text','http://103.236.85.8:7878/qd','可自定义')+'</div>'+
+      '<div class="card"><div class="lab"><b>⚔️ 神魔</b></div>'+qfMInput423('账号或邮箱','神魔账号或邮箱','text','','')+qfMInput423('密码','神魔密码','password','','')+'</div>'+
+      '<div class="card"><div class="lab"><b>☀️ 晴天</b></div>'+qfMInput423('密钥','晴天密钥','password','','')+qfMInput423('口令','晴天口令','password','','')+qfMInput423('接口地址','晴天接口地址','text','https://sb.shazi.tk','')+'</div>'+
+      '<div class="card"><div class="lab"><b>🍋 同人</b><small>共享 Token 仍在“设置源变量”中维护。</small></div></div>';
+    var all=sk.concat(ik);
+    for(var i=0;i<all.length;i++)inner+=qfMSpan423('v_'+i,qfMGet423(all[i],i===0?'不执行':''));
+    var body=qfMOpen423('🔐 Provider 账号',inner,qfMScript423(sk,[],ik));
+    if(!body)return;
+    qfMSave423(body,all);
+    var a=qfMRead423(body,'v_0');
+    qfMSet423('账号操作','不执行',true);
+    try{
+        if(a==='情无·登录')qfQwNativeLoginV52();
+        else if(a==='情无·检测')qfQwNativeCheckV317();
+        else if(a==='情无·网页登录')qfQwNativeWebLoginV52();
+        else if(a==='情无·退出')qfQwNativeLogoutV317();
+        else if(a==='神魔·登录')qfSmLoginV30();
+        else if(a==='神魔·检测')qfSmCheckV30();
+        else if(a==='神魔·后台')qfSmOpenBackendV30();
+        else if(a==='神魔·退出')qfSmLogoutV30();
+        else if(a==='晴天·登录')qfQtLoginV328();
+        else if(a==='晴天·检测')qfQtCheckV328();
+        else if(a==='晴天·后台')qfQtOpenBackendV328();
+        else if(a==='晴天·退出')qfQtLogoutV328();
+        else if(a==='同人·检测Token')qfTrCheckV102();
+        else if(a==='同人·打开后台')qfTrOpenConsoleV102();
+        else try{java.toast('账号设置已保存');}catch(_t){}
+    }catch(e){try{java.longToast('账号操作失败：'+String(e));}catch(_e){}}
+};
+
+qfMultiDiagV423=function(){
+    var sk=['诊断操作'];
+    var opts=['不执行','Runtime 概览','性能摘要','深度追踪','复制脱敏诊断','清空诊断'];
+    var inner='<div class="card">'+
+      qfMSelect423('执行诊断','诊断操作',opts,'不执行','选择后点阅读右上角 ✓ 返回，返回后立即执行。')+
+      '<div class="tip">本页不再使用 qfnext:// 或任何外部应用跳转。</div></div>';
+    inner+=qfMSpan423('v_0',qfMGet423('诊断操作','不执行'));
+    var body=qfMOpen423('🩺 诊断工具',inner,qfMScript423(sk,[],[]));
+    if(!body)return;
+    var a=qfMRead423(body,'v_0');
+    qfMSet423('诊断操作','不执行',true);
+    try{
+        if(a==='Runtime 概览')qfRuntimeDiagShow('overview');
+        else if(a==='性能摘要')qfRuntimeDiagShow('performance');
+        else if(a==='深度追踪')qfRuntimeDiagShow('performance-deep');
+        else if(a==='复制脱敏诊断')qfRuntimeDiagCopy();
+        else if(a==='清空诊断')qfRuntimeDiagReset();
+        else try{java.toast('未选择诊断动作');}catch(_t){}
+    }catch(e){try{java.longToast('诊断操作失败：'+String(e));}catch(_e){}}
+};
+
+/* qidian-next v0.1.3-beta4 · compact account/diagnostics UI */
+function qfNextAccountExecV013(provider,action){
+    provider=String(provider||'');action=String(action||'');
+    if(!action || action==='不执行')return;
+    try{
+        if(provider==='情无'){
+            if(action==='登录')return qfQwNativeLoginV52();
+            if(action==='检测')return qfQwNativeCheckV317();
+            if(action==='网页登录')return qfQwNativeWebLoginV52();
+            if(action==='退出')return qfQwNativeLogoutV317();
+        }
+        if(provider==='神魔'){
+            if(action==='登录')return qfSmLoginV30();
+            if(action==='检测')return qfSmCheckV30();
+            if(action==='后台')return qfSmOpenBackendV30();
+            if(action==='退出')return qfSmLogoutV30();
+        }
+        if(provider==='晴天'){
+            if(action==='登录')return qfQtLoginV328();
+            if(action==='检测')return qfQtCheckV328();
+            if(action==='后台')return qfQtOpenBackendV328();
+            if(action==='退出')return qfQtLogoutV328();
+        }
+        if(provider==='同人'){
+            if(action==='检测')return qfTrCheckV102();
+            if(action==='后台')return qfTrOpenConsoleV102();
+        }
+        try{java.toast(provider+' 不支持「'+action+'」');}catch(_t){}
+    }catch(e){try{java.longToast('账号操作失败：'+String(e));}catch(_e){}}
+}
+qfMultiAccountsV423=function(){
+    var sk=['账号管理Provider','账号管理动作'];
+    var ik=['email','password','情无接口地址','神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址'];
+    var provider=qfMGet423('账号管理Provider','情无');
+    var inner='<div class="card">'+
+      qfMSelect423('Provider','账号管理Provider',['情无','神魔','晴天','同人'],provider,'一次只管理一个 Provider，页面会自动切换对应账号字段。')+
+      '</div>'+
+      '<div id="pv_qw" class="card"><div class="lab"><b>🌙 情无</b><small>邮箱 / 密码 / 接口地址</small></div>'+qfMInput423('邮箱','email','text','','QQ邮箱')+qfMInput423('密码','password','password','','情无密码')+qfMInput423('接口地址','情无接口地址','text','http://103.236.85.8:7878/qd','可自定义')+'</div>'+
+      '<div id="pv_sm" class="card"><div class="lab"><b>⚔️ 神魔</b><small>账号或邮箱 / 密码</small></div>'+qfMInput423('账号或邮箱','神魔账号或邮箱','text','','')+qfMInput423('密码','神魔密码','password','','')+'</div>'+
+      '<div id="pv_qt" class="card"><div class="lab"><b>☀️ 晴天</b><small>密钥 / 口令 / 接口地址</small></div>'+qfMInput423('密钥','晴天密钥','password','','')+qfMInput423('口令','晴天口令','password','','')+qfMInput423('接口地址','晴天接口地址','text','https://sb.shazi.tk','')+'</div>'+
+      '<div id="pv_tr" class="card"><div class="lab"><b>🍋 同人</b><small>共享 Token 由书源内部维护，无需填写账号。</small></div><div class="tip">可执行：检测、后台。</div></div>'+
+      '<div class="card">'+qfMSelect423('执行动作','账号管理动作',['不执行','登录','检测','网页登录','后台','退出'],'不执行','选好动作后点击阅读右上角 ✓；返回后立即执行。单纯保存账号时保持“不执行”。')+'</div>';
+    var all=sk.concat(ik);
+    for(var i=0;i<all.length;i++)inner+=qfMSpan423('v_'+i,qfMGet423(all[i],all[i]==='账号管理Provider'?provider:(all[i]==='账号管理动作'?'不执行':'')));
+    var pid=qfMIdV011('账号管理Provider');
+    var js=qfMScript423(sk,[],ik)+
+      'function showPv(){var p=document.getElementById("'+pid+'").value;var map={"情无":"pv_qw","神魔":"pv_sm","晴天":"pv_qt","同人":"pv_tr"};["pv_qw","pv_sm","pv_qt","pv_tr"].forEach(function(x){document.getElementById(x).style.display=(x===map[p]?"block":"none");});sync();}document.getElementById("'+pid+'").addEventListener("change",showPv);showPv();';
+    var body=qfMOpen423('🔐 Provider 账号',inner,js);
+    if(!body)return;
+    qfMSave423(body,all);
+    var p=qfMRead423(body,'v_0')||provider;
+    var a=qfMRead423(body,'v_1')||'不执行';
+    qfMSet423('账号管理Provider',p,true);
+    qfMSet423('账号管理动作','不执行',true);
+    if(a!=='不执行')qfNextAccountExecV013(p,a);
+};
+qfMultiDiagV423=function(){
+    var key='诊断动作';
+    var inner='<div class="card">'+qfMSelect423('诊断动作',key,['不执行','Runtime 概览','性能摘要','深度追踪','复制脱敏诊断','清空诊断'],'不执行','选择后点击阅读右上角 ✓，返回后立即执行。')+'</div>'+
+      '<div class="card"><div class="tip">常规排查优先使用 Runtime 概览；性能问题再用性能摘要/深度追踪。</div></div>'+qfMSpan423('v_0','不执行');
+    var body=qfMOpen423('🩺 诊断工具',inner,qfMScript423([key],[],[]));
+    if(!body)return;
+    var a=qfMRead423(body,'v_0')||'不执行';
+    qfMSet423(key,'不执行',true);
+    try{
+        if(a==='Runtime 概览')qfRuntimeDiagShow('overview');
+        else if(a==='性能摘要')qfRuntimeDiagShow('performance');
+        else if(a==='深度追踪')qfRuntimeDiagShow('performance-deep');
+        else if(a==='复制脱敏诊断')qfRuntimeDiagCopy();
+        else if(a==='清空诊断')qfRuntimeDiagReset();
+    }catch(e){try{java.longToast('诊断操作失败：'+String(e));}catch(_e){}}
+};
+
+/* qidian-next v0.1.4-beta5 · restore Shenmo account dependencies */
+function qfSmCtxV30(){return {source:source,java:java,cookie:cookie,cache:(typeof cache!=="undefined"?cache:null)};}
+function qfSmInputV30(name){
+    var v="";
+    try{if(typeof result!=="undefined"&&result&&result[name]!=null)v=String(result[name]);}catch(e0){}
+    if(v)return v;
+    try{v=String(Map(name)||"");}catch(e1){}
+    if(v)return v;
+    try{
+        var m=source.getLoginInfoMap?source.getLoginInfoMap():null;
+        var x=m&&(m.get?m.get(name):m[name]);
+        if(x!=null)v=String(x);
+    }catch(e2){}
+    if(v)return v;
+    try{
+        var j=JSON.parse(String(source.getLoginInfo()||"{}"))||{};
+        if(j[name]!=null)v=String(j[name]);
+    }catch(e3){}
+    return v;
+}
+function qfSmTrimV30(v){return String(v==null?"":v).replace(/^[\s\u3000]+|[\s\u3000]+$/g,"");}
+function qfSmSaveCredsV30(acc,pw){
+    try{
+        var m=new Packages.java.util.HashMap();
+        if(acc!=null)m.put("神魔账号或邮箱",String(acc));
+        if(pw!=null)m.put("神魔密码",String(pw));
+        java.upLoginData(m);
+    }catch(e0){}
+}
+function qfNextActionsV014(provider){
+    provider=String(provider||'情无');
+    if(provider==='情无')return ['不执行','登录','检测','网页登录','退出'];
+    if(provider==='神魔')return ['不执行','登录','检测','后台','退出'];
+    if(provider==='晴天')return ['不执行','登录','检测','后台','退出'];
+    if(provider==='同人')return ['不执行','检测','后台'];
+    return ['不执行'];
+}
+qfMultiAccountsV423=function(){
+    var sk=['账号管理Provider','账号管理动作'];
+    var ik=['email','password','情无接口地址','神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址'];
+    var provider=qfMGet423('账号管理Provider','情无');
+    if(['情无','神魔','晴天','同人'].indexOf(provider)<0)provider='情无';
+    var actions=qfNextActionsV014(provider);
+    var savedAction=qfMGet423('账号管理动作','不执行');
+    if(actions.indexOf(savedAction)<0)savedAction='不执行';
+    var inner='<div class="card">'+
+      qfMSelect423('Provider','账号管理Provider',['情无','神魔','晴天','同人'],provider,'一次只管理一个 Provider；切换后只显示对应账号字段。')+
+      qfMSelect423('执行动作','账号管理动作',actions,savedAction,'选好动作后点右上角 ✓ 返回执行；只保存账号时保持“不执行”。')+
+      '</div>'+
+      '<div class="card" id="qf_card_qw"><div class="lab"><b>🌙 情无</b><small>邮箱 / 密码 / 接口地址</small></div>'+qfMInput423('邮箱','email','text','','QQ邮箱')+qfMInput423('密码','password','password','','情无密码')+qfMInput423('接口地址','情无接口地址','text','http://103.236.85.8:7878/qd','可自定义')+'</div>'+
+      '<div class="card" id="qf_card_sm"><div class="lab"><b>⚔️ 神魔</b><small>账号或邮箱 / 密码</small></div>'+qfMInput423('账号或邮箱','神魔账号或邮箱','text','','')+qfMInput423('密码','神魔密码','password','','')+'</div>'+
+      '<div class="card" id="qf_card_qt"><div class="lab"><b>☀️ 晴天</b><small>密钥 / 口令 / 接口地址</small></div>'+qfMInput423('密钥','晴天密钥','password','','')+qfMInput423('口令','晴天口令','password','','')+qfMInput423('接口地址','晴天接口地址','text','https://sb.shazi.tk','')+'</div>'+
+      '<div class="card" id="qf_card_tr"><div class="lab"><b>🍋 同人</b><small>使用共享 Token；无需填写账号字段。</small></div></div>';
+    var all=sk.concat(ik);
+    for(var i=0;i<all.length;i++)inner+=qfMSpan423('v_'+i,qfMGet423(all[i],all[i]==='账号管理Provider'?provider:(all[i]==='账号管理动作'?'不执行':'')));
+    var pId=qfMIdV011('账号管理Provider'),aId=qfMIdV011('账号管理动作');
+    var js=qfMScript423(sk,[],ik)+
+      'var __pid='+JSON.stringify(pId)+',__aid='+JSON.stringify(aId)+';'+
+      'var __am={"情无":["不执行","登录","检测","网页登录","退出"],"神魔":["不执行","登录","检测","后台","退出"],"晴天":["不执行","登录","检测","后台","退出"],"同人":["不执行","检测","后台"]};'+
+      'function __refresh(reset){var p=document.getElementById(__pid).value||"情无";var ids={"情无":"qf_card_qw","神魔":"qf_card_sm","晴天":"qf_card_qt","同人":"qf_card_tr"};for(var k in ids){var c=document.getElementById(ids[k]);if(c)c.style.display=(k===p?"block":"none");}var a=document.getElementById(__aid),old=a.value,arr=__am[p]||["不执行"];a.innerHTML="";for(var i=0;i<arr.length;i++){var o=document.createElement("option");o.value=arr[i];o.textContent=arr[i];a.appendChild(o);}a.value=(!reset&&arr.indexOf(old)>=0)?old:"不执行";sync();}'+
+      'document.getElementById(__pid).addEventListener("change",function(){__refresh(true);});__refresh(false);';
+    var body=qfMOpen423('🔐 Provider 账号',inner,js);
+    if(!body)return;
+    qfMSave423(body,all);
+    provider=qfMRead423(body,'v_0')||'情无';
+    var action=qfMRead423(body,'v_1')||'不执行';
+    qfMSet423('账号管理Provider',provider,true);
+    qfMSet423('账号管理动作','不执行',true);
+    if(action!=='不执行')qfNextAccountExecV013(provider,action);
+};
+
+/* qidian-next v0.1.5-beta6 · secondary settings UX phase 1 */
+function qfUxEscV015(v){
+    return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function qfUxDecodeV015(v){
+    return String(v==null?'':v).replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
+}
+function qfUxSpanV015(id,val){return '<span id="'+id+'" style="display:none">'+qfUxEscV015(val)+'</span>';}
+function qfUxReadV015(body,id){
+    try{
+        var r=new RegExp('id=["\\\']'+id+'["\\\'][^>]*>([^<]*)<\\/span>','i');
+        var m=String(body||'').match(r);
+        return m?qfUxDecodeV015(String(m[1]||'')):null;
+    }catch(_e){return null;}
+}
+function qfUxSaveV015(body,map){
+    for(var i=0;i<map.length;i++){
+        var v=qfUxReadV015(body,map[i][0]);
+        if(v!==null)qfMSet423(map[i][1],v,true);
+    }
+}
+function qfUxOpenV015(title,icon,tag,desc,inner,script){
+    var css=
+      '*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}'+
+      ':root{color-scheme:light dark;--bg:#f5f6fa;--card:#ffffff;--card2:#f8f9fc;--text:#1f2430;--muted:#788196;--line:#e7e9f1;--primary:#665cff;--primary2:#8b5cff;--soft:#eeecff;--ok:#25a86b;--warn:#d08a18;--danger:#d84f5f;--shadow:0 8px 28px rgba(38,43,65,.06)}'+
+      '@media(prefers-color-scheme:dark){:root{--bg:#0f1218;--card:#181d26;--card2:#202632;--text:#edf1f7;--muted:#99a3b7;--line:#2a3240;--soft:#282443;--shadow:none}}'+
+      'html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}'+
+      'body{padding:14px 14px calc(24px + env(safe-area-inset-bottom))}'+
+      '.hero{position:relative;overflow:hidden;padding:16px 17px;border-radius:20px;background:linear-gradient(135deg,#5865ff,#8b55f7);color:#fff;box-shadow:var(--shadow);margin-bottom:12px}'+
+      '.hero:after{content:"";position:absolute;width:120px;height:120px;border-radius:50%;right:-40px;top:-60px;background:rgba(255,255,255,.12)}'+
+      '.heroTop{display:flex;align-items:center;gap:10px}.heroIcon{font-size:25px}.hero h1{margin:0;font-size:20px;letter-spacing:.2px}.heroTag{margin-left:auto;font-size:11px;padding:5px 9px;border-radius:99px;background:rgba(255,255,255,.18)}'+
+      '.hero p{margin:8px 0 0;font-size:12px;line-height:1.55;opacity:.92}'+
+      '.section{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin:0 0 11px;box-shadow:var(--shadow)}'+
+      '.sectionHead{display:flex;align-items:flex-start;gap:10px;margin-bottom:11px}.sectionHead h3{margin:0;font-size:15px}.sectionHead p{margin:4px 0 0;color:var(--muted);font-size:11px;line-height:1.45}.miniBadge{margin-left:auto;white-space:nowrap;color:var(--primary);background:var(--soft);padding:5px 9px;border-radius:99px;font-size:11px;font-weight:700}'+
+      '.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.tabs button,.chips button{border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:11px;min-height:38px;padding:8px 6px;font-size:13px;font-weight:650}.tabs button.on,.chips button.on{border-color:transparent;background:linear-gradient(135deg,#665cff,#9159f3);color:#fff;box-shadow:0 6px 16px rgba(102,92,255,.18)}'+
+      '.chips{display:flex;flex-wrap:wrap;gap:8px}.chips button{min-width:calc(33.333% - 6px);flex:1 0 auto;padding:9px 10px}'+
+      '.field{margin:10px 0}.field:first-child{margin-top:0}.field label{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;margin-bottom:6px}.field small{font-size:10px;color:var(--muted);font-weight:500}'+
+      '.field input{width:100%;border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:12px;padding:11px 12px;font-size:14px;outline:none}.field input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(102,92,255,.09)}'+
+      '.actionGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.actionGrid button,.tool{border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:13px;padding:12px 10px;font-size:13px;font-weight:700}.actionGrid button.on,.tool.on{border-color:transparent;background:linear-gradient(135deg,#665cff,#9159f3);color:#fff}.actionGrid button.danger{color:var(--danger)}.actionGrid button.danger.on{color:#fff;background:linear-gradient(135deg,#d84f5f,#b73f6b)}'+
+      '.state{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--soft);font-size:12px;color:var(--muted)}.state b{color:var(--primary)}'+
+      '.route{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.routeStep{padding:7px 10px;border-radius:10px;background:var(--soft);color:var(--primary);font-size:12px;font-weight:750}.arrow{color:var(--muted)}'+
+      '.toolGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.tool{text-align:left;min-height:76px}.tool b{display:block;font-size:14px}.tool span{display:block;color:var(--muted);font-size:10px;font-weight:500;line-height:1.4;margin-top:5px}.tool.on span{color:rgba(255,255,255,.82)}'+
+      'details{border-top:1px solid var(--line);margin-top:11px;padding-top:10px}summary{font-size:12px;color:var(--muted);font-weight:700;cursor:pointer;padding:4px 0 8px}'+
+      '.tip{padding:11px 13px;margin-top:4px;border-radius:14px;background:var(--card);border:1px dashed var(--line);color:var(--muted);font-size:11px;line-height:1.55}.tip b{color:var(--text)}'+
+      '.hide{display:none!important}';
+    var html='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><style>'+css+'</style></head><body>'+
+      '<div class="hero"><div class="heroTop"><span class="heroIcon">'+qfUxEscV015(icon)+'</span><h1>'+qfUxEscV015(title)+'</h1><span class="heroTag">'+qfUxEscV015(tag)+'</span></div><p>'+qfUxEscV015(desc)+'</p></div>'+
+      inner+'<div class="tip"><b>保存方式：</b>设置完成后点击阅读页面右上角 ✓ 返回。普通设置会自动保存；若选择了登录/诊断动作，会在返回后执行。</div>'+
+      '<script>'+script+'</script></body></html>';
+    try{return java.startBrowserAwait('data:text/html;base64,'+java.base64Encode(html),title,false).body();}
+    catch(e){try{java.longToast('打开设置页失败：'+String(e));}catch(_e){}return '';}
+}
+function qfUxFieldV015(id,label,val,type,hint){
+    return '<div class="field"><label>'+qfUxEscV015(label)+'<small>'+qfUxEscV015(hint||'')+'</small></label><input id="'+id+'" type="'+(type||'text')+'" value="'+qfUxEscV015(val||'')+'"></div>';
+}
+
+qfMultiContentV423=function(){
+    var tier=qfMGet423('正文源类别','限免源');
+    if(['限免源','优选源','兜底源','STV源','全源智能'].indexOf(tier)<0)tier='限免源';
+    var vals={
+      '限免源':qfMGet423('限免源选择','自动'),
+      '优选源':qfMGet423('优选源选择','自动'),
+      '兜底源':qfMGet423('兜底源选择','自动'),
+      'STV源':qfMGet423('STV源选择','STV·自动'),
+      '全源智能':qfMGet423('全源智能选择','自动')
+    };
+    var stvKey=qfMGet423('STV API密钥','');
+    var inner=''+
+      '<div class="section"><div class="sectionHead"><div><h3>正文路线</h3><p>先选择策略类别，再选择该类别下的具体 Provider。</p></div><span class="miniBadge" id="tierBadge">'+qfUxEscV015(tier)+'</span></div><div class="chips" id="tierBox"></div></div>'+
+      '<div class="section"><div class="sectionHead"><div><h3>Provider</h3><p>这里只显示当前策略可用的正文来源。</p></div></div><div class="chips" id="providerBox"></div><div class="state"><div class="route"><span class="routeStep" id="routeTier"></span><span class="arrow">→</span><span class="routeStep" id="routeProvider"></span></div></div></div>'+
+      '<div class="section" id="stvCard"><div class="sectionHead"><div><h3>STV 专区</h3><p>仅在主动选择 STV 路线时生效，不参与其它自动类别。</p></div><span class="miniBadge">4x</span></div>'+qfUxFieldV015('stv_key','API 密钥',stvKey,'password','可选；没有可留空')+'</div>'+
+      qfUxSpanV015('ux_tier',tier)+qfUxSpanV015('ux_limited',vals['限免源'])+qfUxSpanV015('ux_preferred',vals['优选源'])+qfUxSpanV015('ux_fallback',vals['兜底源'])+qfUxSpanV015('ux_stv',vals['STV源'])+qfUxSpanV015('ux_all',vals['全源智能'])+qfUxSpanV015('ux_stvkey',stvKey);
+    var js='var tier='+JSON.stringify(tier)+',vals='+JSON.stringify(vals)+';'+
+      'var tiers=["限免源","优选源","兜底源","STV源","全源智能"],pmap={"限免源":["自动","情无","神魔","晴天","同人"],"优选源":["自动","七猫","书旗","QQ浏览器","得间","酷我"],"兜底源":["自动","猫眼","得奇","69书吧","速读谷","万相"],"STV源":["STV·自动","STV·qidian"],"全源智能":["自动"]};'+
+      'function sync(){document.getElementById("ux_tier").textContent=tier;document.getElementById("ux_limited").textContent=vals["限免源"]||"自动";document.getElementById("ux_preferred").textContent=vals["优选源"]||"自动";document.getElementById("ux_fallback").textContent=vals["兜底源"]||"自动";document.getElementById("ux_stv").textContent=vals["STV源"]||"STV·自动";document.getElementById("ux_all").textContent=vals["全源智能"]||"自动";document.getElementById("ux_stvkey").textContent=document.getElementById("stv_key").value;document.getElementById("tierBadge").textContent=tier;document.getElementById("routeTier").textContent=tier;document.getElementById("routeProvider").textContent=vals[tier]||"自动";}'+
+      'function renderTiers(){var b=document.getElementById("tierBox");b.innerHTML="";tiers.forEach(function(t){var x=document.createElement("button");x.type="button";x.textContent=t;x.className=t===tier?"on":"";x.onclick=function(){tier=t;renderTiers();renderProviders();sync();};b.appendChild(x);});}'+
+      'function renderProviders(){var b=document.getElementById("providerBox"),arr=pmap[tier]||["自动"];b.innerHTML="";if(arr.indexOf(vals[tier])<0)vals[tier]=arr[0];arr.forEach(function(v){var x=document.createElement("button");x.type="button";x.textContent=v;x.className=v===vals[tier]?"on":"";x.onclick=function(){vals[tier]=v;renderProviders();sync();};b.appendChild(x);});document.getElementById("stvCard").className=tier==="STV源"?"section":"section hide";}'+
+      'document.getElementById("stv_key").addEventListener("input",sync);renderTiers();renderProviders();sync();';
+    var body=qfUxOpenV015('正文设置','📚','路由中心','把正文策略和 Provider 放在同一个页面里，当前路线会实时显示。',inner,js);
+    if(!body)return;
+    var map=[['ux_tier','正文源类别'],['ux_limited','限免源选择'],['ux_preferred','优选源选择'],['ux_fallback','兜底源选择'],['ux_stv','STV源选择'],['ux_all','全源智能选择'],['ux_stvkey','STV API密钥']];
+    qfUxSaveV015(body,map);
+};
+
+qfMultiAccountsV423=function(){
+    var provider=qfMGet423('账号管理Provider','情无');
+    if(['情无','神魔','晴天','同人'].indexOf(provider)<0)provider='情无';
+    var qwe=qfMGet423('email',''),qwp=qfMGet423('password',''),qwb=qfMGet423('情无接口地址','http://103.236.85.8:7878/qd');
+    var sma=qfMGet423('神魔账号或邮箱',''),smp=qfMGet423('神魔密码','');
+    var qtk=qfMGet423('晴天密钥',''),qtp=qfMGet423('晴天口令',''),qtb=qfMGet423('晴天接口地址','https://sb.shazi.tk');
+    var inner=''+
+      '<div class="section"><div class="sectionHead"><div><h3>Provider</h3><p>切换后只展示当前 Provider 的账号字段和可用动作。</p></div><span class="miniBadge" id="providerBadge">'+qfUxEscV015(provider)+'</span></div><div class="tabs" id="providerTabs"></div></div>'+
+      '<div class="section providerCard" data-p="情无"><div class="sectionHead"><div><h3>🌙 情无账号</h3><p>邮箱、密码和接口地址。</p></div></div>'+qfUxFieldV015('qw_email','邮箱',qwe,'text','QQ 邮箱')+qfUxFieldV015('qw_password','密码',qwp,'password','情无密码')+qfUxFieldV015('qw_base','接口地址',qwb,'text','可自定义')+'</div>'+
+      '<div class="section providerCard" data-p="神魔"><div class="sectionHead"><div><h3>⚔️ 神魔账号</h3><p>账号/邮箱和密码；支持后台管理。</p></div></div>'+qfUxFieldV015('sm_account','账号或邮箱',sma,'text','神魔后台账号')+qfUxFieldV015('sm_password','密码',smp,'password','神魔密码')+'</div>'+
+      '<div class="section providerCard" data-p="晴天"><div class="sectionHead"><div><h3>☀️ 晴天账号</h3><p>密钥、口令和接口地址。</p></div></div>'+qfUxFieldV015('qt_key','密钥',qtk,'password','')+qfUxFieldV015('qt_pass','口令',qtp,'password','')+qfUxFieldV015('qt_base','接口地址',qtb,'text','默认 https://sb.shazi.tk')+'</div>'+
+      '<div class="section providerCard" data-p="同人"><div class="sectionHead"><div><h3>🍋 同人</h3><p>使用共享 Token，无需填写账号字段。</p></div><span class="miniBadge">共享</span></div><div class="state">可直接进行 Token 检测或打开后台。</div></div>'+
+      '<div class="section"><div class="sectionHead"><div><h3>执行动作</h3><p>点击只是选择待执行动作；真正执行发生在点右上角 ✓ 返回后。</p></div></div><div class="actionGrid" id="actionGrid"></div><div class="state">当前待执行：<b id="actionText">仅保存</b></div></div>'+
+      qfUxSpanV015('ux_provider',provider)+qfUxSpanV015('ux_action','不执行')+qfUxSpanV015('ux_qwe',qwe)+qfUxSpanV015('ux_qwp',qwp)+qfUxSpanV015('ux_qwb',qwb)+qfUxSpanV015('ux_sma',sma)+qfUxSpanV015('ux_smp',smp)+qfUxSpanV015('ux_qtk',qtk)+qfUxSpanV015('ux_qtp',qtp)+qfUxSpanV015('ux_qtb',qtb);
+    var js='var provider='+JSON.stringify(provider)+',action="不执行";'+
+      'var providers=["情无","神魔","晴天","同人"],acts={"情无":["不执行","登录","检测","网页登录","退出"],"神魔":["不执行","登录","检测","后台","退出"],"晴天":["不执行","登录","检测","后台","退出"],"同人":["不执行","检测","后台"]};'+
+      'function sync(){document.getElementById("ux_provider").textContent=provider;document.getElementById("ux_action").textContent=action;document.getElementById("ux_qwe").textContent=document.getElementById("qw_email").value;document.getElementById("ux_qwp").textContent=document.getElementById("qw_password").value;document.getElementById("ux_qwb").textContent=document.getElementById("qw_base").value;document.getElementById("ux_sma").textContent=document.getElementById("sm_account").value;document.getElementById("ux_smp").textContent=document.getElementById("sm_password").value;document.getElementById("ux_qtk").textContent=document.getElementById("qt_key").value;document.getElementById("ux_qtp").textContent=document.getElementById("qt_pass").value;document.getElementById("ux_qtb").textContent=document.getElementById("qt_base").value;document.getElementById("providerBadge").textContent=provider;document.getElementById("actionText").textContent=action==="不执行"?"仅保存":action;}'+
+      'function renderProviders(){var b=document.getElementById("providerTabs");b.innerHTML="";providers.forEach(function(p){var x=document.createElement("button");x.type="button";x.textContent=p;x.className=p===provider?"on":"";x.onclick=function(){provider=p;action="不执行";renderProviders();renderCards();renderActions();sync();};b.appendChild(x);});}'+
+      'function renderCards(){Array.prototype.forEach.call(document.querySelectorAll(".providerCard"),function(c){c.className=c.getAttribute("data-p")===provider?"section providerCard":"section providerCard hide";});}'+
+      'function renderActions(){var b=document.getElementById("actionGrid"),arr=acts[provider]||["不执行"];b.innerHTML="";arr.forEach(function(a){var x=document.createElement("button");x.type="button";x.textContent=a==="不执行"?"仅保存":a;x.className=(a===action?"on ":"")+(a==="退出"?"danger":"");x.onclick=function(){action=a;renderActions();sync();};b.appendChild(x);});}'+
+      'Array.prototype.forEach.call(document.querySelectorAll("input"),function(x){x.addEventListener("input",sync);});renderProviders();renderCards();renderActions();sync();';
+    var body=qfUxOpenV015('账号管理','🔐','Provider','一次只管理一个 Provider，字段、动作和状态都聚合在同一页。',inner,js);
+    if(!body)return;
+    var map=[['ux_provider','账号管理Provider'],['ux_qwe','email'],['ux_qwp','password'],['ux_qwb','情无接口地址'],['ux_sma','神魔账号或邮箱'],['ux_smp','神魔密码'],['ux_qtk','晴天密钥'],['ux_qtp','晴天口令'],['ux_qtb','晴天接口地址']];
+    qfUxSaveV015(body,map);
+    provider=qfUxReadV015(body,'ux_provider')||provider;
+    var action=qfUxReadV015(body,'ux_action')||'不执行';
+    qfMSet423('账号管理动作','不执行',true);
+    if(action!=='不执行')qfNextAccountExecV013(provider,action);
+};
+
+qfMultiDiagV423=function(){
+    var inner=''+
+      '<div class="section"><div class="sectionHead"><div><h3>常用诊断</h3><p>优先用这三项定位大多数问题。</p></div><span class="miniBadge">推荐</span></div><div class="toolGrid">'+
+      '<button class="tool" data-a="Runtime 概览"><b>🩺 Runtime 概览</b><span>查看当前运行环境、关键状态和最近摘要。</span></button>'+
+      '<button class="tool" data-a="性能摘要"><b>⏱ 性能摘要</b><span>快速查看章节、Provider 与评论相关性能信息。</span></button>'+
+      '<button class="tool" data-a="复制脱敏诊断"><b>📋 复制脱敏诊断</b><span>复制可用于反馈的问题信息，不包含敏感凭据。</span></button>'+
+      '</div><details><summary>高级诊断 ▾</summary><div class="toolGrid">'+
+      '<button class="tool" data-a="深度追踪"><b>🔬 深度追踪</b><span>用于复杂问题，信息更多、开销也更高。</span></button>'+
+      '<button class="tool" data-a="清空诊断"><b>🧹 清空诊断</b><span>清理已有运行诊断记录。</span></button>'+
+      '</div></details></div>'+
+      '<div class="section"><div class="sectionHead"><div><h3>待执行动作</h3><p>选中一个诊断项后，点击右上角 ✓ 返回执行。</p></div></div><div class="state">当前待执行：<b id="diagText">不执行</b></div><div class="actionGrid" style="margin-top:9px"><button id="diagCancel" type="button">取消待执行动作</button></div></div>'+qfUxSpanV015('ux_diag','不执行');
+    var js='var action="不执行";'+
+      'function sync(){document.getElementById("ux_diag").textContent=action;document.getElementById("diagText").textContent=action;Array.prototype.forEach.call(document.querySelectorAll(".tool"),function(x){x.className=x.getAttribute("data-a")===action?"tool on":"tool";});}'+
+      'Array.prototype.forEach.call(document.querySelectorAll(".tool"),function(x){x.onclick=function(){action=x.getAttribute("data-a");sync();};});document.getElementById("diagCancel").onclick=function(){action="不执行";sync();};sync();';
+    var body=qfUxOpenV015('诊断工具','🩺','排障','常用诊断优先展示，高级工具默认收起，避免页面像开发面板。',inner,js);
+    if(!body)return;
+    var a=qfUxReadV015(body,'ux_diag')||'不执行';
+    try{
+        if(a==='Runtime 概览')qfRuntimeDiagShow('overview');
+        else if(a==='性能摘要')qfRuntimeDiagShow('performance');
+        else if(a==='深度追踪')qfRuntimeDiagShow('performance-deep');
+        else if(a==='复制脱敏诊断')qfRuntimeDiagCopy();
+        else if(a==='清空诊断')qfRuntimeDiagReset();
+    }catch(e){try{java.longToast('诊断操作失败：'+String(e));}catch(_e){}}
+};
