@@ -1,0 +1,36 @@
+name: diag-qidian-beta32-final-account-structure
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta32-final-account-structure.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Extract compact final account structure
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          a=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text()); s=a[0] if isinstance(a,list) else a
+          lu=s.get('loginUrl','')
+          pos=lu.rfind('qfMultiAccountsV423=function')
+          end=lu.find('\nqfMultiDiagV423=',pos)
+          if end<0: end=min(len(lu),pos+30000)
+          block=lu[pos:end]
+          out=['POS='+str(pos),'LEN='+str(len(block)),block]
+          # latest account exec helper
+          for pat in ['function qfNextAccountExecV013','function qfUxAccountExecV015','qfNextAccountExecV013=function','qfUxAccountExecV015=function']:
+            p=lu.rfind(pat)
+            if p>=0:
+              e=lu.find('\n}',p)
+              out.append('\nHELPER '+pat+' @'+str(p)+'\n'+lu[p:p+7000])
+          Path('.staging/qidian-beta32-final-account-structure.txt').write_text('\n'.join(out))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-beta32-final-account-structure.txt
+          git commit -m 'chore: dump compact beta32 account structure'
+          git push origin main
