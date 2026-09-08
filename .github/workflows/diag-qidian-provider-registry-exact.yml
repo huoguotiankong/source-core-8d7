@@ -1,0 +1,35 @@
+name: diag-qidian-provider-registry-exact
+on:
+  push:
+    paths: ['.staging/diag-qidian-provider-registry-exact.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Extract exact registry and settings
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json'); a=json.loads(p.read_text()); s=a[0] if isinstance(a,list) else a
+          lib=s['jsLib']
+          # hide packed blob for manageable scans
+          mk='var QF_MOD38_PACK='; x=lib.index(mk)+len(mk); y=lib.index(';\nvar QF_MOD38_EXPORTS=',x); slim=lib[:x]+'{}'+lib[y:]
+          out=[]
+          for pat in ['var QF_PROVIDER83','QF_PROVIDER83=','function qfProviderContent','function qfPaid','function qfMultiContent','限免源顺序','正文源顺序','情无","晴天','情无\",\"晴天','限免源','同人']:
+            for m in re.finditer(pat,slim):
+              out.append('\n### '+pat+' @'+str(m.start())+'\n'+slim[max(0,m.start()-1800):m.start()+5200])
+          for fld in ['loginUi','loginUrl','ruleContent']:
+            txt=str(s.get(fld,''))
+            for pat in ['限免','情无','晴天','神魔','同人','正文源','优选','兜底']:
+              for m in re.finditer(pat,txt): out.append('\n### FIELD '+fld+' '+pat+' @'+str(m.start())+'\n'+txt[max(0,m.start()-1800):m.start()+5200])
+          Path('.staging/provider-registry-exact.txt').write_text('\n'.join(out)[:160000])
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/provider-registry-exact.txt
+          git commit -m 'chore: dump exact qidian provider registry'
+          git push origin HEAD:main
