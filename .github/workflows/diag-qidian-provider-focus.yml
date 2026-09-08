@@ -1,0 +1,38 @@
+name: diag-qidian-provider-focus
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-provider-focus.trigger'
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Inspect provider modules
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(p.read_text()); s=arr[0] if isinstance(arr,list) else arr
+          lib=s['jsLib']
+          marker='var QF_MOD38_PACK='
+          a=lib.index(marker)+len(marker); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a)
+          pack=json.loads(lib[a:b])
+          print('COMMENT',s.get('bookSourceComment','')[:220])
+          print('MODULES',list(pack.keys()))
+          terms=['情无','晴天','神魔','优选','兜底','Provider','provider','正文设置','qfMultiContentV423','content.php','STV']
+          for k,v in pack.items():
+              if not isinstance(v,str) or not v.startswith('gz:'): continue
+              try: code=gzip.decompress(base64.b64decode(v[3:])).decode()
+              except Exception: continue
+              found=[t for t in terms if t in code]
+              if not found: continue
+              print('\n### MODULE',k,'len',len(code),'found',found)
+              for t in found:
+                  for m in list(re.finditer(re.escape(t),code))[:5]:
+                      st=max(0,m.start()-600); en=min(len(code),m.end()+1000)
+                      print('\n--',t,'--\n',code[st:en].replace('\n','\\n'))
+          PY
