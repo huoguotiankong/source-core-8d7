@@ -1,0 +1,34 @@
+name: diag-qidian-route-maps
+on:
+  push:
+    paths: ['.staging/diag-qidian-route-maps.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Extract route mappings
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          a=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text()); s=a[0] if isinstance(a,list) else a
+          txt=s['jsLib']; mk='var QF_MOD38_PACK='; x=txt.index(mk); y=txt.index(';\nvar QF_MOD38_EXPORTS=',x); txt=txt[:x]+'var QF_MOD38_PACK={}'+txt[y:]
+          lines=[]
+          patterns=[r'14\s*[:=].{0,80}同人',r'["\']14["\']\s*[:=].{0,80}同人',r'同人.{0,80}["\']?14["\']?',r'11.{0,160}12.{0,160}13.{0,160}14',r'限免源.{0,300}同人',r'tier.{0,300}限免源']
+          for pat in patterns:
+            for m in re.finditer(pat,txt,re.S): lines.append('\n### '+pat+' @'+str(m.start())+'\n'+txt[max(0,m.start()-2200):m.end()+4200])
+          # functions containing source variable parsing and route/pick
+          for fm in re.finditer(r'function\s+([A-Za-z0-9_$]+)\s*\([^)]*\)\s*\{',txt):
+            name=fm.group(1); st=fm.start(); frag=txt[st:st+10000]
+            if ('getVariable' in frag or 'bookVar' in name or 'Route' in name or 'route' in name.lower()) and any(z in frag for z in ['限免','情无','同人','STV']):
+              lines.append('\n### FUNC '+name+'\n'+frag)
+          Path('.staging/qidian-route-maps.txt').write_text('\n'.join(lines)[:180000])
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-route-maps.txt
+          git commit -m 'chore: dump qidian route maps'
+          git push origin HEAD:main
