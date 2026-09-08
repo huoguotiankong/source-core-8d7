@@ -1,0 +1,50 @@
+name: diag-qidian-x-integration
+on:
+  push:
+    paths: ['.staging/diag-qidian-x-integration.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Extract focused snippets
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json'); a=json.loads(p.read_text()); s=a[0] if isinstance(a,list) else a
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; x=lib.index(mk)+len(mk); y=lib.index(';\nvar QF_MOD38_EXPORTS=',x); pack=json.loads(lib[x:y])
+          def decv(v):
+            if not isinstance(v,str): return ''
+            if v.startswith('gz:'):
+              raw=v[3:]; raw += '='*((4-len(raw)%4)%4)
+              return gzip.decompress(base64.b64decode(raw)).decode()
+            return v
+          out=[]
+          out.append('VERSION '+s.get('bookSourceComment','')[:300])
+          out.append('PACK_KEYS '+','.join(pack.keys()))
+          for k,v in pack.items():
+            code=decv(v)
+            if any(t in code for t in ['limited_qw','limited_sm','limited_tr','limited_qt','qfMultiContentV423','qfRoute','Provider','限免源','情无','晴天','神魔']):
+              for pat in ['limited_qw','limited_sm','limited_tr','qfMultiContentV423','qfProvider','限免源','情无','晴天','神魔','同人','优选','兜底','自动']:
+                for m in list(re.finditer(re.escape(pat),code,re.I))[:8]:
+                  out.append('\n### MOD '+k+' PAT '+pat+' @'+str(m.start())+'\n'+code[max(0,m.start()-1200):m.start()+2800])
+          # top-level jsLib around pack registries / exports / deps
+          for pat in ['QF_MOD38_EXPORTS','QF_MOD38_DEPS','limited_qw','limited_sm','limited_tr']:
+            for m in list(re.finditer(re.escape(pat),lib,re.I))[:10]:
+              out.append('\n### TOP '+pat+' @'+str(m.start())+'\n'+lib[max(0,m.start()-1200):m.start()+2500])
+          # login ui / source config strings
+          for fld in ['loginUi','loginUrl','ruleContent','ruleToc']:
+            txt=json.dumps(s.get(fld,''),ensure_ascii=False)
+            for pat in ['限免','情无','晴天','神魔','同人','优选','兜底','Provider','书籍变量']:
+              for m in list(re.finditer(re.escape(pat),txt,re.I))[:10]:
+                out.append('\n### FIELD '+fld+' '+pat+' @'+str(m.start())+'\n'+txt[max(0,m.start()-1500):m.start()+3500])
+          Path('.staging/qidian-x-integration.txt').write_text('\n'.join(out)[:180000])
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-x-integration.txt
+          git commit -m 'chore: dump qidian x integration points'
+          git push origin HEAD:main
