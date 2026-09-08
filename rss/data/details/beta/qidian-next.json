@@ -1,16 +1,24 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "版权信息页 beta31：刷新版权虚拟章节缓存，确保显示“首发”；订阅详情卡同步修复。",
+  "summary": "Beta32：新增 X-QD 独立限免 Provider，接入 X 限免正文与独立 Token 登录/检测。",
   "badges": [
     "Beta",
-    "1.1.0-beta31",
-    "版权信息"
+    "1.1.0-beta32",
+    "X 限免源"
   ],
   "sections": [
     {
       "title": "本版更新",
-      "text": "版权虚拟章节 qfCv 升至 3101，绕过旧页面缓存；订阅详情卡改为随 Beta 发布元数据同步；其它域冻结"
+      "text": "新增 X-QD 独立限免 Provider；X 仅负责限免正文，支持网页登录获取 Token、Token 检测和手工密钥。限免自动路由会把 X 追加到现有 Provider 队列末尾。"
+    },
+    {
+      "title": "使用方式",
+      "text": "正文设置 → 限免源可选择 X；账号管理 → X 可网页登录或填写 X 密钥。书籍变量 15 可固定使用 X。"
+    },
+    {
+      "title": "隔离范围",
+      "text": "X 不接管评论、购买、AI、发现、目录；服务器评论仍按现有非绑定 Provider 规则处理。Stable 1.1.0 未修改。"
     },
     {
       "title": "版本状态",
@@ -21,7 +29,7 @@
       "text": "从本订阅页重新导入/更新即可覆盖现有 🌈 起点增强 · Beta。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11031",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11032",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11032",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11032"
 }

@@ -1,3 +1,10 @@
+## 2026-09-08 · Current Beta 1.1.0-beta32 — X-QD limited Provider
+
+- Stable remains 1.1.0.
+- Added isolated X-QD limited-content Provider (`limited_x`) using only X `content.php` + independent Token auth.
+- X is selectable in limited-provider settings, appended to auto routing, and mapped to book variable `15`.
+- X does not take over review/purchase/AI/discovery/catalog domains. Awaiting real-device verification.
+
 ## 2026-08-26 · Current Beta 1.1.0-beta16 — Circle detail click hotfix
 
 - Stable remains 1.1.0.

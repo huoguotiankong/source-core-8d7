@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-08-29T17:00:00+08:00",
+  "updatedAt": "2026-09-08T15:45:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -80,27 +80,31 @@
       "name": "🌈 起点增强 · Beta",
       "category": "novel",
       "channel": "beta",
-      "version": "1.1.0-beta31",
-      "versionCode": 11031,
-      "updatedAt": "2026-08-29T17:00:00+08:00",
+      "version": "1.1.0-beta32",
+      "versionCode": 11032,
+      "updatedAt": "2026-09-08T15:45:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11031",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11032",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "版权信息页 beta31：刷新版权虚拟章节缓存，确保显示“首发”；订阅详情卡同步修复。",
+      "summary": "Beta32：新增 X-QD 独立限免 Provider，接入 X 限免正文与独立 Token 登录/检测。",
       "tags": [
         "起点",
         "测试版",
-        "版权信息",
-        "首发时间",
-        "缓存刷新",
-        "订阅同步"
+        "限免源",
+        "X-QD",
+        "X",
+        "Provider",
+        "Token",
+        "正文路由"
       ],
       "changelog": [
-        "版权虚拟章节 qfCv 升至 3101，绕过旧页面缓存",
-        "订阅详情卡改为随 Beta 发布元数据同步",
-        "其它域冻结"
+        "新增独立 X 限免 Provider，不复用情无/神魔/晴天/同人账号链",
+        "X 正文仅调用 api-x.shrtxs.cn/qidth/content.php，未命中时按现有 Router 继续切源",
+        "账号管理新增 X 网页登录、Token 检测与手工密钥输入",
+        "限免源选择与自动顺序新增 X；书籍变量 15 固定 X",
+        "评论、购买、AI、发现、目录以及其它 Provider 域保持不变"
       ],
-      "sha256": "6a480d081d3b64f09ead4f13875c525651a0201c0b473410ca7b11ce363ffd21"
+      "sha256": "804abdc389eed7f07655a59d2c15c2717d661e41428df4303219e1cb5ea64e68"
     },
     {
       "id": "picacg",
