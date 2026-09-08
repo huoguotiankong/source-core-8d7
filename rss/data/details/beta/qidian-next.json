@@ -1,35 +1,35 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta32：新增 X-QD 独立限免 Provider，接入 X 限免正文与独立 Token 登录/检测。",
+  "summary": "Beta33：修复 X-QD 在最终账号管理/正文设置页面未显示的问题。",
   "badges": [
     "Beta",
-    "1.1.0-beta32",
-    "X 限免源"
+    "1.1.0-beta33",
+    "X UI 修复"
   ],
   "sections": [
     {
       "title": "本版更新",
-      "text": "新增 X-QD 独立限免 Provider；X 仅负责限免正文，支持网页登录获取 Token、Token 检测和手工密钥。限免自动路由会把 X 追加到现有 Provider 队列末尾。"
+      "text": "修复 Beta32 实际运行的精美账号管理/正文设置 UI 仍被旧四 Provider 配置覆盖的问题。"
     },
     {
-      "title": "使用方式",
-      "text": "正文设置 → 限免源可选择 X；账号管理 → X 可网页登录或填写 X 密钥。书籍变量 15 可固定使用 X。"
+      "title": "X 账号管理",
+      "text": "现在 Provider 标签包含 X；可网页登录自动获取 Token、检测 Token、清除 Token，也可直接填写 X 密钥。"
     },
     {
-      "title": "隔离范围",
-      "text": "X 不接管评论、购买、AI、发现、目录；服务器评论仍按现有非绑定 Provider 规则处理。Stable 1.1.0 未修改。"
+      "title": "正文设置",
+      "text": "限免源 Provider 列表现在包含 X；书籍变量 15 仍可固定 X。"
     },
     {
       "title": "版本状态",
-      "text": "当前为 Beta / 测试通道，需真机确认后才会晋升正式版。"
+      "text": "当前为 Beta / 测试通道，Stable 1.1.0 未修改。"
     },
     {
       "title": "更新方式",
       "text": "从本订阅页重新导入/更新即可覆盖现有 🌈 起点增强 · Beta。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11032",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11032",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11032"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11033",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11033",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11033"
 }

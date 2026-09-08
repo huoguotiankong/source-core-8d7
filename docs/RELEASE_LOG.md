@@ -1,3 +1,10 @@
+## 2026-09-08 · 🌈 起点增强 1.1.0-beta33 — X 最终设置 UI 修复
+
+- Stable 继续保持 1.1.0。
+- Beta32 已接入 X Provider，但真机发现最终生效的 polished `qfMultiAccountsV423` / `qfMultiContentV423` 仍使用旧四 Provider 列表，导致 X 不显示。
+- Beta33 修复最终覆盖层：账号管理新增 X 标签页及网页登录/检测/清除/手工 Token；正文设置限免列表新增 X。
+- X 正文模块、Registry 与书籍变量 `15=X` 沿用 Beta32；其它业务域冻结。
+
 ## 2026-08-29 · 阅读书源仓库 UI 0.4.1-beta16
 
 ## 2026-09-08 · 🌈 起点增强 1.1.0-beta32
