@@ -1,0 +1,28 @@
+name: diag-qidian-beta32-account-final
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta32-account-final.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Dump final account UI tail
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          a=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text()); s=a[0] if isinstance(a,list) else a
+          lu=s.get('loginUrl','')
+          hits=[m.start() for m in re.finditer(re.escape('qfMultiAccountsV423=function'),lu)]
+          pos=hits[-1]
+          out='LAST='+str(pos)+'\n'+lu[max(0,pos-9000):pos+36000]
+          Path('.staging/qidian-beta32-account-final.txt').write_text(out)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-beta32-account-final.txt
+          git commit -m 'chore: dump beta32 final account UI'
+          git push origin main
