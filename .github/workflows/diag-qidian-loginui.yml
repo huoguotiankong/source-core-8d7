@@ -1,0 +1,25 @@
+name: diag-qidian-loginui
+on:
+  push:
+    paths: ['.staging/diag-qidian-loginui.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Dump login fields
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json'); a=json.loads(p.read_text()); s=a[0] if isinstance(a,list) else a
+          Path('.staging/qidian-loginUi.txt').write_text(str(s.get('loginUi','')))
+          Path('.staging/qidian-loginUrl.txt').write_text(str(s.get('loginUrl','')))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-loginUi.txt .staging/qidian-loginUrl.txt
+          git commit -m 'chore: dump qidian login ui'
+          git push origin HEAD:main
