@@ -1,0 +1,183 @@
+/* alpha78：Provider 自动模式健康状态/熔断运行时。固定源模式不加载本模块。 */
+/* alpha69：自动模式 Provider 健康记忆 / 轻量熔断。
+ * 目标：一本书已经确认某源无书/无目录时，不再每章重复请求；
+ *      某源连续多个“不同章节”失败时短暂降级；一次成功立即解除。
+ * 固定源模式永远不熔断，便于手动测试与强制使用。
+ */
+function qfProviderHealthLoad(){
+    var raw="{}";try{raw=qfBookVarV09.call(this,"qf_provider_health_v69","{}")||"{}";}catch(_e){}
+    var o={};try{o=JSON.parse(String(raw))||{};}catch(_j){o={};}
+    if(!o||typeof o!=="object"||Array.isArray(o))o={};
+    var now=Date.now(),dirty=false;
+    for(var k in o)if(Object.prototype.hasOwnProperty.call(o,k)){
+        var x=o[k]||{},last=Math.max(Number(x.lastFail||0),Number(x.lastOk||0),Number(x.until||0));
+        /* 48 小时无人触碰的旧记录直接清掉，避免书籍变量长期膨胀。 */
+        if(last&&now-last>48*60*60*1000){delete o[k];dirty=true;}
+    }
+    if(dirty){try{qfPutBookVarV09.call(this,"qf_provider_health_v69",JSON.stringify(o));}catch(_p){}}
+    return o;
+}
+function qfProviderHealthSave(o){
+    try{qfPutBookVarV09.call(this,"qf_provider_health_v69",JSON.stringify(o||{}));}catch(_e){}
+}
+function qfProviderHardFail(msg){
+    var s=String(msg||"");
+    /* 只把“整本书级别”失败判为硬失败；单章找不到不能误伤整本书。 */
+    return /(?:未找到|找不到|不存在|无此|没有).*?(?:书籍|本书)|(?:书籍|本书).*?(?:未找到|找不到|不存在|匹配失败)|目录\s*0\s*章|目录(?:为空|获取失败.*(?:空|0章))|book\s*(?:not\s*found|missing)/i.test(s);
+}
+/* beta20：失败类型只影响自动模式冷却时长；固定源永远不经过本模块。 */
+function qfProviderFailClass(msg){
+    var s=String(msg||"");
+    if(qfProviderHardFail(s))return "book";
+    if(/未登录|重新登录|登录会话|request[_ -]?token|token[^\n]{0,20}(?:失效|过期|无效)|令牌|凭据|unauthor|\b401\b/i.test(s))return "auth";
+    if(/Cloudflare|验证码|人机验证|风控|限频|请求频繁|频繁访问|too\s*many|rate\s*limit|\b429\b|forbidden|\b403\b/i.test(s))return "rate";
+    if(/未匹配章节|章节[^\n]{0,20}(?:未找到|不存在|匹配失败)|正文为空|正文过短|正文解密失败|锚点校验失败/i.test(s))return "chapter";
+    if(/timeout|超时|connection|网络|socket|502|503|504|temporar/i.test(s))return "transient";
+    return "other";
+}
+function qfProviderMarkFail(provider,meta,msg,state,deferSave){
+    provider=String(provider||"");if(!provider)return false;
+    var o=(state&&typeof state==="object"&&!Array.isArray(state))?state:qfProviderHealthLoad.call(this);
+    var x=o[provider]||{},now=Date.now(),cid=String(meta&&meta.chapterId||""),kind=qfProviderFailClass(msg),hard=kind==="book";
+    var same=cid&&String(x.lastFailCid||"")===cid;
+    if(!same)x.fails=Math.min(9,Number(x.fails||0)+1);
+    x.lastFail=now;x.lastFailCid=cid;x.lastErr=String(msg||"").slice(0,180);x.failType=kind;
+    if(hard){x.hard=1;x.until=now+6*60*60*1000;}
+    else if(kind==="auth"){x.hard=0;x.until=now+30*60*1000;}
+    else if(kind==="rate"){x.hard=0;x.until=now+60*60*1000;}
+    else{
+        x.hard=0;
+        /* 单章/瞬时失败仍允许下一章恢复；连续不同章节失败才冷却。 */
+        var n=Number(x.fails||0);
+        if(n>=3)x.until=now+60*60*1000;else if(n>=2)x.until=now+20*60*1000;else x.until=0;
+    }
+    o[provider]=x;if(!deferSave)qfProviderHealthSave.call(this,o);return true;
+}
+function qfProviderMarkSuccess(provider,state,deferSave){
+    provider=String(provider||"");if(!provider)return false;
+    var o=(state&&typeof state==="object"&&!Array.isArray(state))?state:qfProviderHealthLoad.call(this);
+    if(o[provider]){
+        delete o[provider];
+        if(!deferSave)qfProviderHealthSave.call(this,o);
+        return true;
+    }
+    return false;
+}
+function qfProviderCooling(provider,state){
+    var o=(state&&typeof state==="object"&&!Array.isArray(state))?state:qfProviderHealthLoad.call(this);
+    var x=o[String(provider||"")]||{},now=Date.now(),until=Number(x.until||0);
+    return until>now?{cool:true,until:until,hard:!!x.hard,fails:Number(x.fails||0),err:String(x.lastErr||"")}:{cool:false};
+}
+function qfProviderAutoOrder(route,order,state){
+    if(!route||route.pick!=="自动")return order||[];
+    var src=order||[],active=[],cool=[];
+    for(var i=0;i<src.length;i++){
+        var h=qfProviderCooling.call(this,src[i],state);
+        if(h.cool)cool.push({name:src[i],until:h.until});else active.push(src[i]);
+    }
+    /* 至少保留一次兜底尝试：如果所有源都在冷却，不让 Router 直接“无源可用”。 */
+    if(!active.length&&cool.length){
+        cool.sort(function(a,b){return Number(a.until||0)-Number(b.until||0);});
+        active.push(cool[0].name);
+    }
+    return active;
+}
+
+/* ============================================================
+ * v3.3.0-beta8：全源智能 2.0 · 单本书 Provider 学习
+ * - 仅“全源智能”子路由启用；固定源和原三类自动模式行为保持不变。
+ * - 成功/失败按“本书 + Provider”记录，重复刷新同一章节不重复计数。
+ * - 最近成功、连续成功提升优先级；最近失败、连续失败降低优先级。
+ * - 失败影响会随时间衰减，24h 后基本回到用户自定义排序，允许自动恢复。
+ * - 用户自定义排序永远作为同分时的最终顺序，不会被学习永久覆盖。
+ * ============================================================ */
+function qfProviderLearnLoad(){
+    var raw="{}";try{raw=qfBookVarV09.call(this,"qf_provider_learn_v320","{}")||"{}";}catch(_e){}
+    var o={};try{o=JSON.parse(String(raw))||{};}catch(_j){o={};}
+    if(!o||typeof o!=="object"||Array.isArray(o))o={};
+    var now=Date.now(),dirty=false;
+    for(var k in o)if(Object.prototype.hasOwnProperty.call(o,k)){
+        var x=o[k]||{},touch=Math.max(Number(x.touch||0),Number(x.lastOk||0),Number(x.lastFail||0));
+        if(touch&&now-touch>14*24*60*60*1000){delete o[k];dirty=true;continue;}
+        if(Number(x.lastFail||0)&&now-Number(x.lastFail||0)>24*60*60*1000&&Number(x.streakFail||0)){x.streakFail=0;dirty=true;}
+        if(Number(x.lastOk||0)&&now-Number(x.lastOk||0)>72*60*60*1000&&Number(x.streakOk||0)){x.streakOk=0;dirty=true;}
+    }
+    if(dirty){try{qfPutBookVarV09.call(this,"qf_provider_learn_v320",JSON.stringify(o));}catch(_p){}}
+    return o;
+}
+function qfProviderLearnSave(o){
+    try{qfPutBookVarV09.call(this,"qf_provider_learn_v320",JSON.stringify(o||{}));}catch(_e){}
+}
+function qfProviderLearnMark(provider,meta,ok,state,deferSave){
+    provider=String(provider||"");if(!provider)return false;
+    var o=(state&&typeof state==="object"&&!Array.isArray(state))?state:qfProviderLearnLoad.call(this);
+    var x=o[provider]||{},now=Date.now(),cid=String(meta&&meta.chapterId||""),changed=false;
+    if(ok){
+        if(!cid||String(x.lastOkCid||"")!==cid){
+            x.ok=Math.min(80,Number(x.ok||0)+1);
+            x.fail=Math.max(0,Number(x.fail||0)-1);
+            x.streakOk=Math.min(20,Number(x.streakOk||0)+1);
+            x.streakFail=0;x.lastOkCid=cid;changed=true;
+        }
+        x.lastOk=now;x.lastResult="ok";
+    }else{
+        if(!cid||String(x.lastFailCid||"")!==cid){
+            x.fail=Math.min(80,Number(x.fail||0)+1);
+            x.streakFail=Math.min(20,Number(x.streakFail||0)+1);
+            x.streakOk=0;x.lastFailCid=cid;changed=true;
+        }
+        x.lastFail=now;x.lastResult="fail";
+    }
+    x.touch=now;o[provider]=x;
+    if(changed&&!deferSave)qfProviderLearnSave.call(this,o);
+    return changed;
+}
+function qfProviderLearnScore(provider,state){
+    var o=(state&&typeof state==="object"&&!Array.isArray(state))?state:{},x=o[String(provider||"")];
+    if(!x)return 0;
+    var now=Date.now(),ok=Number(x.ok||0),fail=Number(x.fail||0),lastOk=Number(x.lastOk||0),lastFail=Number(x.lastFail||0);
+    var newest=Math.max(lastOk,lastFail,Number(x.touch||0));
+    if(newest&&now-newest>7*24*60*60*1000)return 0;
+    var failAge=lastFail?now-lastFail:1e18,okAge=lastOk?now-lastOk:1e18;
+    var ff=failAge<60*60*1000?1:(failAge<6*60*60*1000?0.60:(failAge<24*60*60*1000?0.25:0.05));
+    var of=okAge<24*60*60*1000?1:(okAge<72*60*60*1000?0.70:0.45);
+    if(lastFail&&failAge>24*60*60*1000&&!lastOk)return 0; /* 失败源次日恢复为中性，重新服从用户排序。 */
+    var oe=ok*of,fe=fail*ff,ratio=(oe+1)/(oe+fe+2),score=(ratio-0.5)*44;
+    score+=Math.min(6,Number(x.streakOk||0))*4.5;
+    if(failAge<24*60*60*1000)score-=Math.min(4,Number(x.streakFail||0))*8;
+    if(okAge<30*60*1000)score+=10;else if(okAge<6*60*60*1000)score+=7;else if(okAge<24*60*60*1000)score+=4;else if(okAge<72*60*60*1000)score+=2;
+    if(failAge<20*60*1000)score-=8;else if(failAge<60*60*1000)score-=5;else if(failAge<6*60*60*1000)score-=2;
+    if(score>60)score=60;if(score<-60)score=-60;
+    return Math.round(score*10)/10;
+}
+function qfProviderLearnOrder(route,order,state){
+    var src=Array.isArray(order)?order.slice():[];
+    if(!route||!route.smartChild||src.length<2)return src;
+    var a=[];
+    for(var i=0;i<src.length;i++)a.push({name:src[i],idx:i,score:qfProviderLearnScore.call(this,src[i],state)});
+    a.sort(function(x,y){var d=Number(y.score||0)-Number(x.score||0);return Math.abs(d)>=0.01?d:Number(x.idx||0)-Number(y.idx||0);});
+    var out=[];for(var j=0;j<a.length;j++)out.push(a[j].name);
+    return out;
+}
+function qfProviderLearnBrief(order,state){
+    var a=[],src=Array.isArray(order)?order:[];
+    for(var i=0;i<src.length;i++){var p=src[i],s=qfProviderLearnScore.call(this,p,state);a.push(p+"("+(s>=0?"+":"")+s+")");}
+    return a.join(" → ");
+}
+
+
+/* v4.1 alpha6.1 compatibility ABI: old provider state names delegate only. */
+function qfProviderHealthLoadV69(){return qfProviderHealthLoad.call(this);}
+function qfProviderHealthSaveV69(o){return qfProviderHealthSave.call(this,o);}
+function qfProviderHardFailV69(msg){return qfProviderHardFail.call(this,msg);}
+function qfProviderFailClassV350(msg){return qfProviderFailClass.call(this,msg);}
+function qfProviderMarkFailV69(provider,meta,msg,state,deferSave){return qfProviderMarkFail.call(this,provider,meta,msg,state,deferSave);}
+function qfProviderMarkSuccessV69(provider,state,deferSave){return qfProviderMarkSuccess.call(this,provider,state,deferSave);}
+function qfProviderCoolingV69(provider,state){return qfProviderCooling.call(this,provider,state);}
+function qfAutoOrderV69(route,order,state){return qfProviderAutoOrder.call(this,route,order,state);}
+function qfProviderLearnLoadV320(){return qfProviderLearnLoad.call(this);}
+function qfProviderLearnSaveV320(o){return qfProviderLearnSave.call(this,o);}
+function qfProviderLearnMarkV320(provider,meta,ok,state,deferSave){return qfProviderLearnMark.call(this,provider,meta,ok,state,deferSave);}
+function qfProviderLearnScoreV320(provider,state){return qfProviderLearnScore.call(this,provider,state);}
+function qfProviderLearnOrderV320(route,order,state){return qfProviderLearnOrder.call(this,route,order,state);}
+function qfProviderLearnBriefV320(order,state){return qfProviderLearnBrief.call(this,order,state);}

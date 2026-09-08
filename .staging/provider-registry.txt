@@ -1,0 +1,1069 @@
+var QF_MOD38_EXPORTS={"review":["qfTextKeepMediaV323","qdDecorateContentV26","qdChapterTalkCardV20"],"review_align":["qdV26FetchQuote","qdV26Norm","qdV26Dice","qdV26Window","qdV26FindAnchor","qdV26BuildAlignMap","qdV54VerifyBody"],"official":["qdMobileFreeExtractV282","qdOfficialFreeV10"],"match":["qfV284BookFields","qfV284NormAuthor","qfV284BookTitleRel","qfV284AuthorRel","qfBookScoreV10","qfPickBookV10","qfV284ChapterBody","qfBestChapterV10"],"limited_qw":["qfLimSetErrV30","qfLimGetErrV30","qfQwNormBaseV44","qfQwBaseV44","qfQwRootsV44","qfQwHeadersV44","qfQwAcquireTokenV44","qfQwContentV44"],"limited_sm":["qfLimSetErrV30","qfLimGetErrV30","qfSmParseJsonV30","qfSmExtractContentV30","qfSmNearKeyV313","qfSmNearGetV313","qfSmNearPutV313","qfSmTocKeyV30","qfSmTocMapV30","qfSmResolveChapterV30","qfSmContentV30"],"limited_qt":["qfLimSetErrV30","qfLimGetErrV30","qfQtParseV330","qfQtCatalogRowsV330","qfQtCatalogPackV330","qfQtWarmDetailV330","qfQtOfficialCatalogV330","qfQtCatalogV330","qfQtCatalogFindV331","qfQtExtractContentV330","qfQtContentV330"],"fallback_my":["myRequestV23","mySearchBooksV23","myLoadTocV23","qfMyPickBookV43","qfMyPickChapterV43","qfMaoyanContentV43"],"fallback_dq":["dqAjaxV44","dqSearchBooksV44","dqLoadTocV44","qfDqPickBookV44","qfDqPickChapterV44","qfDeqiContentV44"],"fallback_69":["s69HeadersV23","s69IsCfV23","s69AjaxV23","s69MaybeVerifyV23","s69SearchBooksV23","s69FindTocUrlV23","s69LoadTocV23","s69ContentByUrlV23","qf69ContentV23"],"egg":["qfEggData","qfEggRender","qfEggAbsV324","qfEggGoodImageV324","qfEggPushImageV325","qfEggHintV325","qfEggLooksV324","qfEggNodeHasHintV325","qfEggCollectV324","qfEggFromRawV324","qfEggWebProbeV325","qfLocalEggContentV324","qfEggArchiveJsonV326","qfEggArchiveApiV326","qfEggArchiveFindParentV326","qfEggArchiveFallbackV326","qfEggArchiveExactV327","qfEggOfficialAppV57","qfEggContentV326","qfEggDataV430","qfEggRenderV430"],"role":["qfRoleData","qfRoleView","qfRoleEsc2940","qfRoleArr2940","qfRoleNormImg2940","qfRoleParse2940","qfRoleFetchOfficial2940","qfRoleBestImg2940","qfRoleTags2940","qfRoleNum2943","qfRolePrettyNum2943","qfRoleNormalize2940","qfRoleBookName2940","qfRoleHtml2940","qfRoleDataV420","qfRoleViewV420","qfOpenRoleCardV20"],"circle":["qfCircleData","qfCircleView","qfCircleCleanResult2964","qfCircleExtractScript2965","qfCircleExtract2965","qfCircleFindRealUrl2965","qfCircleEsc2964","qfCircleBookName2964","qfCircleHtml2964","qfCircleApiJson2970","qfCircleApiKeys2970","qfCircleApiCode2970","qfCircleApiMsg2970","qfCircleFindIds2970","qfCirclePostText2970","qfCirclePostUser2970","qfCirclePostImage2970","qfCircleVideoInfo2975","qfCircleExtractPosts2970","qfCircleApiSummary2970","qfCircleCategoryMeta2984","qfCircleApiCall2970","qfCircleApiHtml2970","qfCircleApiProbe2970","qfCircleDataV430","qfCircleViewV430","qfOpenQidianCircleV2961"],"copyright":["qfCopyrightData","qfCopyrightRender","qfCopyrightDataV420","qfCopyrightRenderV420","qdCopyrightV2929","qdCopyrightV2928","qdCopyrightV17"],"review_sunny":["qdDecorateSunnyNativeV335"],"review_local_ui":["getBuiltInCommentHtmlV21"],"review_server_ui":["qfServerCommentHtmlV315"],"preferred_sq":["qfShuqiContentV44","qfSqPickBookV44","qfSqPickChapterV44"],"preferred_qq":["qfQQContentV50"],"qidian_app":["qfAppArrV57","qfAppValV57","qfAppJsonV57","qfAppCodeV57","qfAppMsgV57","qfAppHeadersV57","qfAppDeviceIdV67","qfAppSignedSpecV67","qfAppGetBytesV67","qfAppDecryptContentV67","qfAppFreeRichContentV67","qfAppFreeTextV74","qfAppRequestV57","qfAppProbeV57","qfAppBookDetailV57","qfAppBookInfoV530","qfAppCatalogFetchV57","qfAppMidpageFetchV57","qfAppLicenseFetchV57","qfAppFreeContentV60","qfAppImageUaV64","qfAppMidpageWidgetsV64","qfAppAuthorSayV402","qfAppAuthorSayMetaV404","qfAppAuthorCommentsInfoV406"],"preferred_qm":["qfQimaoContentV10"],"provider_runtime":["qfProviderHealthLoad","qfProviderHealthSave","qfProviderMarkFail","qfProviderMarkSuccess","qfProviderCooling","qfProviderAutoOrder","qfProviderLearnLoad","qfProviderLearnSave","qfProviderLearnMark","qfProviderLearnScore","qfProviderLearnOrder","qfProviderLearnBrief","qfProviderHealthLoadV69","qfProviderHealthSaveV69","qfProviderMarkFailV69","qfProviderMarkSuccessV69","qfAutoOrderV69","qfProviderLearnLoadV320","qfProviderLearnSaveV320","qfProviderLearnMarkV320","qfProviderLearnScoreV320","qfProviderLearnOrderV320","qfProviderLearnBriefV320"],"fallback_common":["qfV23Abs","qfV23HtmlToText","qfV23CleanProviderText","qfV23Doc","qfV23CacheListGet","qfV23CacheListPut"],"provider_common":["qfCacheGetFreshV56","qfCachePutFreshV56","qfChapterHintTryV56","qfChapterHintPutV56","qfNameVariantsV10","qfChapterWindowTryV310","qfChapterWindowPutV310"],"review_common":["qdBubbleDataV20","qdQtAuthorSayCardV332"],"review_server_core":["qfQwCommentApiV315","qfSmCommentApiV315","qfServerNormV315","qfServerDataV319","qfQtAuthorSayV332","qfQtShowAuthorV332","qfServerAuthorSayV315","qfServerSummaryV315","qfServerCommentPackV315","qfServerChapterPackV315","qfShowServerCommentV315"],"preferred_dj":["qfDejianContentV521"],"fallback_sdg":["qfSuduguContentV525"],"preferred_kw":["qfKuwoContentV526"],"fallback_wx":["qfWanxiangContentV527"],"limited_tr":["qfTrSetErrV102","qfTrGetErrV102","qfTrTokenV102","qfTrBaseV102","qfTrRequestV102","qfTrContentV102"]};
+var QF_MOD38_CACHE={};
+var QF_MOD38_FN_CACHE={};
+var QF_MOD38_LOADING={};
+/* alpha80：依赖归属到模块本身。Provider 只负责选择正文源，不再承担内部工具依赖。 */
+var QF_MOD38_DEPS={"fallback_my":["fallback_common","provider_common"],"fallback_dq":["fallback_common","provider_common"],"fallback_69":["fallback_common","provider_common","match"],"preferred_qm":["match","provider_common"],"preferred_sq":["provider_common"],"preferred_qq":["provider_common"],"match":["provider_common"],"review":["review_common"],"review_sunny":["review_common"],"preferred_dj":["provider_common","match"],"fallback_sdg":["fallback_common","provider_common","match"],"preferred_kw":["provider_common","match"],"fallback_wx":["fallback_common","provider_common","match"]};
+
+
+/* ============================================================
+ * v3.0.0-alpha85 · Architecture Freeze
+ * Module Lifecycle + Diagnostics
+ *
+ * 这是最后一轮架构层改造：
+ * - 保留 alpha84 的跨线程首次并发等待；
+ * - 为 lazy module 建立 cold/loading/ready/error 生命周期状态；
+ * - 保留一份极小的 module manifest，模块加载后即使释放 PACK/EXPORTS/DEPS，
+ *   仍可用于 Registry 自检和故障诊断；
+ * - Provider / Comment capability 统一经过轻量诊断调用器；
+ * - “开发者诊断”默认关闭，关闭时不记录逐调用事件、不做 source 持久化；
+ * - 诊断只观察，不改变 Provider、评论、网络请求和 fallback 行为。
+ * ============================================================ */
+
+/* v3.1.0-beta4 功能阶段：章节小窗口直达缓存。
+ * 架构仍冻结在 alpha85.1；本轮只优化 Provider 顺序翻章热路径。 */
+var QF_ARCH85="3.0.0-alpha85.1";
+var QF_MOD85_MANIFEST={};
+var QF_MOD85_STATE={};
+var QF_DIAG85_EVENTS=[];
+var QF_DIAG85_MAX=48;
+var QF_DIAG85_LAST_FLUSH=0;
+(function(){
+    try{
+        for(var mk in QF_MOD38_EXPORTS){
+            if(!Object.prototype.hasOwnProperty.call(QF_MOD38_EXPORTS,mk))continue;
+            var ex=QF_MOD38_EXPORTS[mk]||[],dp=QF_MOD38_DEPS[mk]||[];
+            QF_MOD85_MANIFEST[mk]={
+                exports:Array.isArray(ex)?ex.slice():[],
+                deps:Array.isArray(dp)?dp.slice():[],
+                packedLength:String(QF_MOD38_PACK[mk]||"").length
+            };
+        }
+    }catch(_manifest85){}
+})();
+var QF_DIAG85_ENABLE_CACHE={ts:0,value:false};
+function qfDiagEnabledV85(){
+    /* alpha9：Provider 热路径会多次触发诊断 hook；关闭诊断时不应每个 hook 都重新读取登录配置。
+       2 秒短缓存只影响开发者开关生效延迟，不缓存任何业务数据。 */
+    var now=Date.now();
+    try{if(QF_DIAG85_ENABLE_CACHE.ts&&now-Number(QF_DIAG85_ENABLE_CACHE.ts)<2000)return !!QF_DIAG85_ENABLE_CACHE.value;}catch(_c){}
+    var v=false;try{v=qfToggle.call(this,"开发者诊断",false);}catch(e){v=false;}
+    QF_DIAG85_ENABLE_CACHE={ts:now,value:!!v};return !!v;
+}
+function qfDiagShortV85(v,n){
+    var s=String(v==null?"":v).replace(/[\r\n]+/g," ").trim(),m=Number(n||180)||180;
+    return s.length>m?s.substring(0,m)+"…":s;
+}
+function qfModuleStateV85(name){
+    name=String(name||"");
+    var x=QF_MOD85_STATE[name];
+    if(!x){
+        x={name:name,state:QF_MOD38_CACHE[name]?"ready":"cold",loads:0,waits:0,errors:0,lastMs:0,totalMs:0,lastError:"",lastTs:0,owner:""};
+        QF_MOD85_STATE[name]=x;
+    }
+    return x;
+}
+function qfModuleWaitMarkV85(name){
+    try{var x=qfModuleStateV85(name);x.waits=Number(x.waits||0)+1;x.lastTs=Date.now();}catch(_e){}
+}
+function qfModuleLoadStartV85(name,owner){
+    try{
+        var x=qfModuleStateV85(name);x.state="loading";x.owner=String(owner||"");x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfModuleLoadDoneV85(name,ms){
+    try{
+        var x=qfModuleStateV85(name);x.state="ready";x.owner="";x.loads=Number(x.loads||0)+1;x.lastMs=Number(ms||0);x.totalMs=Number(x.totalMs||0)+Number(ms||0);x.lastError="";x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfModuleLoadFailV85(name,ms,err){
+    try{
+        var x=qfModuleStateV85(name);x.state="error";x.owner="";x.errors=Number(x.errors||0)+1;x.lastMs=Number(ms||0);x.totalMs=Number(x.totalMs||0)+Number(ms||0);x.lastError=qfDiagShortV85(err&&err.message?err.message:err,220);x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfDiagEventV85(area,name,cap,ok,ms,detail){
+    return QF_Diagnostic.event(this,area,name,cap,ok,ms,detail,ok===false?"error":"info");
+}
+function qfDiagInvokeV85(ctx,area,name,cap,fn,args){
+    return QF_Diagnostic.invoke(ctx,area,name,cap,fn,args);
+}
+function qfDiagRegistryCheckV85(){
+    var issues=[],pc=0,cc=0;
+    function check(mod,entry,label){
+        mod=String(mod||"");entry=String(entry||"");
+        if(!mod||!entry){issues.push(label+"：module/entry 为空");return;}
+        var m=QF_MOD85_MANIFEST[mod];
+        if(!m){issues.push(label+"：模块不存在 "+mod);return;}
+        if(m.exports.indexOf(entry)<0)issues.push(label+"：export 缺失 "+mod+"."+entry);
+    }
+    try{
+        for(var pn in QF_PROVIDER83){
+            if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,pn))continue;
+            var ps=QF_PROVIDER83[pn]||{},caps=ps.capabilities||{};
+            try{var pv1=qfProviderV1ValidateV520(pn,ps);if(!pv1.ok)issues.push("正文 "+pn+"/ProviderV1："+pv1.issues.join("；"));}catch(_pv1){}
+            for(var pk in caps){
+                if(!Object.prototype.hasOwnProperty.call(caps,pk))continue;
+                var pcfg=caps[pk];if(typeof pcfg==="string")pcfg={entry:pcfg};pcfg=pcfg||{};
+                check(pcfg.module||ps.module,pcfg.entry,"正文 "+pn+"/"+pk);pc++;
+            }
+        }
+    }catch(e0){issues.push("Provider Registry 自检异常："+qfDiagShortV85(e0,120));}
+    try{
+        for(var cn in QF_COMMENT84){
+            if(!Object.prototype.hasOwnProperty.call(QF_COMMENT84,cn))continue;
+            var cs=QF_COMMENT84[cn]||{},ccaps=cs.capabilities||{};
+            for(var ck in ccaps){
+                if(!Object.prototype.hasOwnProperty.call(ccaps,ck))continue;
+                var cfg=ccaps[ck];if(cfg===true){cc++;continue;}if(typeof cfg==="string")cfg={entry:cfg};cfg=cfg||{};
+                if(!cfg.local)check(cfg.module||cs.module,cfg.entry,"评论 "+cn+"/"+ck);cc++;
+            }
+        }
+    }catch(e1){issues.push("Comment Registry 自检异常："+qfDiagShortV85(e1,120));}
+    return {ok:issues.length===0,issues:issues,providerCaps:pc,commentCaps:cc};
+}
+function qfDiagSnapshotV85(extra){
+    var mods=[],ready=0,cold=0,loading=0,error=0,waits=0;
+    try{
+        for(var n in QF_MOD85_MANIFEST){
+            if(!Object.prototype.hasOwnProperty.call(QF_MOD85_MANIFEST,n))continue;
+            var st=qfModuleStateV85(n),state=String(st.state||"cold");
+            if(QF_MOD38_CACHE[n]&&state!=="error")state="ready";
+            if(state==="ready")ready++;else if(state==="loading")loading++;else if(state==="error")error++;else cold++;
+            waits+=Number(st.waits||0);
+            if(state!=="cold"||Number(st.waits||0)>0||Number(st.errors||0)>0){
+                mods.push({name:n,state:state,loads:Number(st.loads||0),waits:Number(st.waits||0),errors:Number(st.errors||0),lastMs:Number(st.lastMs||0),lastError:String(st.lastError||"")});
+            }
+        }
+    }catch(_m){}
+    var offReq={};try{if(typeof qfOfficialClientSummary==='function')offReq=qfOfficialClientSummary.call(this);}catch(_or){}
+    var chapterPerf={};try{if(typeof qfChapterPerfSummaryV510==='function')chapterPerf=qfChapterPerfSummaryV510(this);}catch(_cp){}
+    return {arch:QF_ARCH85,ts:Date.now(),modules:{total:Object.keys(QF_MOD85_MANIFEST).length,ready:ready,cold:cold,loading:loading,error:error,waits:waits,active:mods},officialRequests:offReq,chapterPerf:chapterPerf,events:QF_DIAG85_EVENTS.slice(-24),extra:extra||{}};
+}
+function qfDiagFlushV85(extra){
+    if(!qfDiagEnabledV85.call(this))return;
+    try{
+        var s=qfSource(this);if(!s||!s.put)return;
+        var snap=qfDiagSnapshotV85(extra);
+        s.put("qf_diag85_last",JSON.stringify(snap));QF_DIAG85_LAST_FLUSH=Date.now();
+    }catch(_e){}
+}
+function qfDiagStoredV85(){
+    try{
+        var s=qfSource(this),raw=s&&s.get?String(s.get("qf_diag85_last")||""):"";
+        if(raw)return JSON.parse(raw);
+    }catch(_e){}
+    return null;
+}
+function qfDiagTextV85(){
+    var snap=qfDiagSnapshotV85.call(this);
+    if((!snap.events||!snap.events.length)&&snap.modules.ready===0){var old=qfDiagStoredV85.call(this);if(old)snap=old;}
+    var reg=qfDiagRegistryCheckV85(),m=snap.modules||{},out=[];
+    out.push("架构："+String(snap.arch||QF_ARCH85));
+    out.push("Registry："+(reg.ok?"正常":"异常")+"（正文能力 "+reg.providerCaps+" / 评论能力 "+reg.commentCaps+"）");
+    out.push("模块：ready "+Number(m.ready||0)+" / cold "+Number(m.cold||0)+" / loading "+Number(m.loading||0)+" / error "+Number(m.error||0)+" / waits "+Number(m.waits||0));
+    var oq=snap.officialRequests||{};
+    if(Number(oq.calls||0)>0){
+        out.push("官方请求：calls "+Number(oq.calls||0)+" / network "+Number(oq.network||0)+" / micro-hit "+Number(oq.cacheHits||0)+" / error "+Number(oq.errors||0));
+        var oe=Array.isArray(oq.endpoints)?oq.endpoints:[];
+        for(var oi=0;oi<Math.min(oe.length,4);oi++){var ox=oe[oi]||{};if(Number(ox.errors||0)>0)out.push("! "+String(ox.endpoint||'')+" errors="+Number(ox.errors||0)+(ox.lastError?" · "+ox.lastError:""));}
+    }
+    var cp=snap.chapterPerf||{},cl=cp.last||null;
+    if(cl){
+        var cst=Array.isArray(cl.stages)?cl.stages:[],cs=[];
+        for(var ci=0;ci<cst.length;ci++)cs.push(String(cst[ci].name||'')+' '+Number(cst[ci].ms||0)+'ms');
+        out.push("章节性能：total "+Number(cl.total||0)+"ms"+(cl.provider?" · "+cl.provider:"")+(cp.count?" · avg "+Number(cp.avg||0)+"ms":""));
+        if(cs.length)out.push("阶段："+cs.join(" → "));
+    }
+    if(!reg.ok){for(var ri=0;ri<Math.min(reg.issues.length,6);ri++)out.push("! "+reg.issues[ri]);}
+    try{
+        var cr=QF_CatalogReport&&QF_CatalogReport.load?QF_CatalogReport.load(this):null;
+        if(cr){
+            var co=cr.output||{};out.push("目录："+Number(co.chapters||0)+"章 / 时间"+Number(co.time||0)+" / 字数"+Number(co.words||0)+" · "+String(co.source||""));
+            var cst=Array.isArray(cr.stages)?cr.stages:[];
+            for(var csi=0;csi<cst.length;csi++){var cx=cst[csi]||{};if(cx.ok===false||Number(cx.time||0)>0)out.push((cx.ok===false?"! ":"· ")+String(cx.name||"")+" "+Number(cx.chapters||0)+"章/time="+Number(cx.time||0)+(cx.code?" code="+cx.code:""));}
+        }
+    }catch(_catalogDiag){}
+    var ev=snap.events||[];
+    if(ev.length){
+        out.push("\n最近调用：");
+        for(var i=Math.max(0,ev.length-12);i<ev.length;i++){
+            var x=ev[i]||{};out.push((x.ok===false?"✕ ":"✓ ")+x.area+" "+x.name+(x.cap?"."+x.cap:"")+" "+Number(x.ms||0)+"ms"+(x.detail?" · "+x.detail:""));
+        }
+    }
+    var ac=(m.active||[]),bad=[];
+    for(var ai=0;ai<ac.length;ai++)if(ac[ai].state==="error"||ac[ai].waits>0)bad.push(ac[ai]);
+    if(bad.length){
+        out.push("\n模块异常/等待：");
+        for(var bi=0;bi<Math.min(bad.length,8);bi++){var b=bad[bi];out.push(b.name+" ["+b.state+"] waits="+b.waits+" errors="+b.errors+(b.lastError?" · "+b.lastError:""));}
+    }
+    return out.join("\n");
+}
+function qfDiagShowV85(){
+    var t=qfDiagTextV85.call(this),j=qfJava(this);
+    try{if(j&&j.longToast){j.longToast(t);return;}}catch(_e0){}
+    try{if(j&&j.toast)j.toast(t);}catch(_e1){}
+}
+function qfDiagResetV85(){
+    QF_DIAG85_EVENTS=[];QF_DIAG85_LAST_FLUSH=0;
+    try{QF_CHAPTER_PERF510={items:[],last:null,max:8};}catch(_cp){}
+    try{if(typeof qfOfficialClientReset==='function')qfOfficialClientReset.call(this);}catch(_or0){}
+    try{var s=qfSource(this);if(s&&s.put){s.put("qf_diag85_last","");s.put(QF_CHAPTER_PERF_LAST_KEY,"");}}catch(_e){}
+    try{var j=qfJava(this);if(j&&j.toast)j.toast("alpha85 诊断记录已清空");}catch(_j){}
+}
+
+
+/* ============================================================
+ * v4.1.0-alpha3 · Runtime Governance / Observable Runtime
+ *
+ * 本层只治理“观察、错误、指标、配置元数据”，不改变正文/评论/目录的业务优先级：
+ * - QF_Error：统一错误分类 + 面向用户的简短消息
+ * - QF_Metrics：缓存命中/未命中/淘汰 + 有界耗时样本
+ * - QF_ConfigRegistry：设置键/默认值/类型/分类集中登记（敏感项不进入报告）
+ * - QF_RuntimeGovernance：聚合 Catalog/Official/Review/Provider/Module/Cache/Perf
+ * - 系统诊断页直接展示健康状态，并可一键复制脱敏诊断报告
+ * ============================================================ */
+
+/* ============================================================
+ * v4.1.0-alpha7.5 · Egg Media Report
+ * 彩蛋正文只记录链路状态/数量，不持久化图片 URL 与响应正文。
+ * ============================================================ */
+var QF_EggReport=(function(){
+    var KEY="qf_egg_report_v75";
+    function src(ctx){try{return qfSource(ctx);}catch(_e){try{return ctx&&ctx.source?ctx.source:source;}catch(_x){return null;}}}
+    function load(ctx){try{var s=src(ctx),v=s&&s.get?String(s.get(KEY)||""):"";return v?JSON.parse(v):null;}catch(_e){return null;}}
+    function save(ctx,r){try{var s=src(ctx);if(s&&s.put)s.put(KEY,JSON.stringify(r||{}));}catch(_e){}return r;}
+    function merge(ctx,patch){var r=load(ctx)||{version:String(QF_BUILD_VERSION||"4.1.0-alpha7.5"),ts:Date.now(),pageinfo:{},expanded:{},safegetcontent:{},output:{},errors:[]};patch=patch||{};for(var k in patch)if(Object.prototype.hasOwnProperty.call(patch,k)){if(patch[k]&&typeof patch[k]==="object"&&!Array.isArray(patch[k])){r[k]=r[k]&&typeof r[k]==="object"?r[k]:{};for(var q in patch[k])if(Object.prototype.hasOwnProperty.call(patch[k],q))r[k][q]=patch[k][q];}else r[k]=patch[k];}r.version=String(QF_BUILD_VERSION||"4.1.0-alpha7.5");r.ts=Date.now();return save(ctx,r);}
+    function clear(ctx){try{var s=src(ctx);if(s&&s.put)s.put(KEY,"");}catch(_e){}return true;}
+    function text(ctx){var r=load(ctx),a=[];a.push("彩蛋 EggReport · "+String(r&&r.version||QF_BUILD_VERSION||""));if(!r){a.push("暂无彩蛋运行记录");return a.join("\n");}a.push("bookId="+String(r.bookId||"")+" chapterId="+String(r.chapterId||"")+(r.title?" · "+String(r.title):""));if(r.path)a.push("path="+String(r.path));var p=r.pageinfo||{},x=r.expanded||{},sf=r.safegetcontent||{},o=r.output||{};a.push("pageinfo：raw="+Number(p.raw||0)+" / items="+Number(p.items||0)+(p.code?" / code="+String(p.code):"")+(p.message?" · "+QF_Diagnostic.redact(p.message):""));a.push("deep-chain："+(x.used?"USED":"SKIP")+" / pageIds="+Number(x.pageIds||0)+" / responses="+Number(x.responses||0)+" / raw="+Number(x.raw||0)+" / items="+Number(x.items||0));if(sf.tried)a.push("safegetcontent："+(sf.ok?"HIT":"MISS")+" / blocks="+Number(sf.blocks||0)+" / images="+Number(sf.images||0)+(sf.message?" · "+QF_Diagnostic.redact(sf.message):""));a.push("OUTPUT：images="+Number(o.images||0)+(o.source?" / source="+String(o.source):""));var er=Array.isArray(r.errors)?r.errors:[];for(var i=0;i<Math.min(er.length,5);i++)a.push("! "+QF_Diagnostic.redact(er[i]));return a.join("\n");}
+    return {load:load,save:save,merge:merge,clear:clear,text:text};
+})();
+
+
+/* alpha10.2：构建期生成的完整 lazy-module 依赖审计快照。 */
+var QF_DEPENDENCY_AUDIT={"version":"4.1.0-alpha10.2.1","modules":31,"gzipModules":29,"rawModules":2,"mainVFunctions":273,"directModuleUsedV":75,"manifestProtectedV":19,"unresolvedV":0,"policy":"AUDIT_ONLY_NO_DELETE","previousRegression":{"deletedCount":41,"provedModuleRefs":["qdPrimeReviewV350","qfEscJsV13","qfFlattenChapterV10","qfImageJavaV14","qfPrimeAuthorSayV38","qfQtBrowserUrlV328","qfQtNativeMetaV328"],"unknownDynamic":["qfAdjacentProviderTakeV510","qfAdjacentProviderWarmV510","qfCacheMemTouchV55","qfChineseNumV10","qfCommentRegisterV400","qfContentEntryV38","qfDiagResetV85","qfDiagShowV85","qfOfficialCirclePostV430","qfOfficialDescribeV410","qfOfficialHasV400","qfOfficialMapCircleSetV430","qfOfficialMapCopyrightV420","qfOfficialMapEggSetV430","qfOfficialMapRoleSetV420","qfOfficialModelRegisterV410","qfOfficialModelV410","qfOfficialRequestCachePutV440","qfOfficialRequestKeyV440","qfOfficialRequestMeasureV440","qfOfficialRequestNormPathV440","qfOfficialRequestPolicyV440","qfOfficialRequestResultV440","qfOfficialRequestStatV440","qfOfficialViewRegisterV410","qfOfficialViewV410","qfProviderHotClearV350","qfProviderHotReadV350","qfProviderHotSetV350","qfProviderHotValidV360","qfProviderStickyHintV355","qfProviderV1DescribeV520","qfRememberProviderV38","qfReviewNetStateV510"]},"moduleSummary":[{"name":"circle","packed":"gzip","bytes":162815,"exports":27,"deps":[],"mainVRefs":1},{"name":"copyright","packed":"gzip","bytes":11939,"exports":7,"deps":[],"mainVRefs":4},{"name":"egg","packed":"gzip","bytes":37492,"exports":21,"deps":[],"mainVRefs":5},{"name":"fallback_69","packed":"gzip","bytes":7370,"exports":9,"deps":["fallback_common","provider_common","match"],"mainVRefs":4},{"name":"fallback_common","packed":"gzip","bytes":2726,"exports":6,"deps":[],"mainVRefs":0},{"name":"fallback_dq","packed":"gzip","bytes":10241,"exports":6,"deps":["fallback_common","provider_common"],"mainVRefs":3},{"name":"fallback_my","packed":"gzip","bytes":8282,"exports":6,"deps":["fallback_common","provider_common"],"mainVRefs":3},{"name":"fallback_sdg","packed":"gzip","bytes":13138,"exports":1,"deps":["fallback_common","provider_common","match"],"mainVRefs":4},{"name":"fallback_wx","packed":"gzip","bytes":14571,"exports":1,"deps":["fallback_common","provider_common","match"],"mainVRefs":4},{"name":"limited_qt","packed":"gzip","bytes":18501,"exports":11,"deps":[],"mainVRefs":8},{"name":"limited_qw","packed":"gzip","bytes":11867,"exports":8,"deps":[],"mainVRefs":1},{"name":"limited_sm","packed":"gzip","bytes":9078,"exports":11,"deps":[],"mainVRefs":5},{"name":"limited_tr","packed":"gzip","bytes":3613,"exports":6,"deps":[],"mainVRefs":1},{"name":"match","packed":"gzip","bytes":4592,"exports":8,"deps":["provider_common"],"mainVRefs":5},{"name":"official","packed":"raw","bytes":4307,"exports":2,"deps":[],"mainVRefs":5},{"name":"preferred_dj","packed":"gzip","bytes":10288,"exports":1,"deps":["provider_common","match"],"mainVRefs":5},{"name":"preferred_kw","packed":"gzip","bytes":8382,"exports":1,"deps":["provider_common","match"],"mainVRefs":5},{"name":"preferred_qm","packed":"gzip","bytes":12916,"exports":1,"deps":["match","provider_common"],"mainVRefs":6},{"name":"preferred_qq","packed":"gzip","bytes":11020,"exports":1,"deps":["provider_common"],"mainVRefs":3},{"name":"preferred_sq","packed":"gzip","bytes":18323,"exports":3,"deps":["provider_common"],"mainVRefs":3},{"name":"provider_common","packed":"raw","bytes":9013,"exports":7,"deps":[],"mainVRefs":5},{"name":"provider_runtime","packed":"gzip","bytes":11260,"exports":23,"deps":[],"mainVRefs":2},{"name":"qidian_app","packed":"gzip","bytes":61613,"exports":25,"deps":[],"mainVRefs":2},{"name":"review","packed":"gzip","bytes":42534,"exports":3,"deps":["review_common"],"mainVRefs":31},{"name":"review_align","packed":"gzip","bytes":9345,"exports":7,"deps":[],"mainVRefs":2},{"name":"review_common","packed":"gzip","bytes":6915,"exports":2,"deps":[],"mainVRefs":8},{"name":"review_local_ui","packed":"gzip","bytes":244456,"exports":1,"deps":[],"mainVRefs":1},{"name":"review_server_core","packed":"gzip","bytes":37944,"exports":11,"deps":[],"mainVRefs":26},{"name":"review_server_ui","packed":"gzip","bytes":32879,"exports":1,"deps":[],"mainVRefs":0},{"name":"review_sunny","packed":"gzip","bytes":4875,"exports":1,"deps":["review_common"],"mainVRefs":11},{"name":"role","packed":"gzip","bytes":34951,"exports":17,"deps":[],"mainVRefs":1}],"moduleRefs":{"qdAuthorSayV20":["review","review_sunny"],"qdExtractOfficialContentV10":["official"],"qdFetchChapterCommentsV22":["review","review_sunny"],"qdFetchOfficialCommentsV20":["review","review_align"],"qdFetchParagraphHotV402":["review"],"qdNormalizeCommentV13":["review","review_server_core"],"qdPrimeParagraphHotV450":["review"],"qdPrimeReviewV350":["review"],"qdReviewSummaryV11":["review"],"qdReviewSummaryV22":["review","review_align","review_server_core"],"qdReviewSummaryV292":["review"],"qdWebViewFreeV10":["official"],"qfAjaxJavaV20":["qidian_app"],"qfAjaxTextV20":["egg","limited_qt"],"qfAuthorSayRealV327":["qidian_app","review","review_common","review_server_core"],"qfBestChapterV10":["fallback_69","fallback_sdg","fallback_wx","preferred_dj","preferred_kw","preferred_qm"],"qfBookVarV09":["copyright","provider_runtime","review","review_common"],"qfBubbleItemsUsableV353":["review"],"qfCacheKeyV56":["preferred_dj","preferred_kw","preferred_qm","preferred_qq"],"qfCallableV13":["review","review_server_core","review_sunny"],"qfChapterBodyV56":["provider_common"],"qfChapterHintLoadV78":["provider_common"],"qfChapterHintPersistV78":["provider_common"],"qfChapterHintTouchV56":["provider_common"],"qfChapterNoV10":["fallback_dq","fallback_my","fallback_sdg","fallback_wx","limited_qt","match","preferred_sq","provider_common"],"qfCommentCallV83":["review","review_sunny"],"qfCommentHtmlV2987":["review_server_core"],"qfCommentIsServerV83":["review"],"qfCommentPolicyV83":["review"],"qfCommentRouteSetV315":["review"],"qfEmojiV13":["review","review_server_core"],"qfEscJsV13":["review","review_common","review_sunny"],"qfEscV13":["review","review_common"],"qfFlattenChapterV10":["preferred_qm"],"qfImageJavaV14":["review","review_common"],"qfModuleEnsureV38":["fallback_69","fallback_dq","fallback_my","fallback_sdg","fallback_wx","match","preferred_dj","preferred_kw","preferred_qm","preferred_qq","preferred_sq","review","review_sunny"],"qfModuleFnV38":["review","review_server_core","review_sunny"],"qfOfficialCallV400":["copyright","egg"],"qfOpenAuthorSayV314":["review","review_common"],"qfPickBookV10":["fallback_69","preferred_dj","preferred_kw","preferred_qm"],"qfPrimeAuthorSayV38":["review","review_sunny"],"qfPutBookVarV09":["provider_runtime"],"qfQtBaseV328":["limited_qt"],"qfQtBrowserUrlV328":["review_server_core","review_sunny"],"qfQtCredV328":["limited_qt","review_server_core"],"qfQtNativeMetaV328":["review_server_core"],"qfQtRequestV328":["limited_qt","review_server_core"],"qfQtShowAuthorV332":["limited_qt","review_common"],"qfQueryV09":["copyright","egg"],"qfQwCommentApiV315":["review"],"qfRuntimeCacheV13":["limited_qt","limited_qw","limited_sm","limited_tr","review","review_server_core","review_sunny"],"qfRuntimeJavaV13":["egg","review_server_core"],"qfServerCommentPackV315":["review"],"qfServerNormV315":["review"],"qfSmChosenBaseV30":["limited_sm","review_server_core"],"qfSmMirrorV30":["limited_sm"],"qfSmNormBaseV30":["limited_sm"],"qfSmSessV30":["review_server_core"],"qfTextKeepMediaLiteV38":["egg"],"qfTimeValueV13":["review_server_core"],"qfValidContentV10":["fallback_69","fallback_dq","fallback_my","fallback_sdg","fallback_wx","limited_qt","limited_sm","official","preferred_dj","preferred_kw","preferred_qm","preferred_qq","preferred_sq"],"showCmtV20":["review","review_common","review_sunny"]},"unresolved":[]};
+var QF_DependencyAudit=(function(){
+    function summary(){
+        var a=QF_DEPENDENCY_AUDIT||{};
+        return {
+            version:String(a.version||""),
+            policy:String(a.policy||"AUDIT_ONLY_NO_DELETE"),
+            modules:Number(a.modules||0),
+            gzipModules:Number(a.gzipModules||0),
+            rawModules:Number(a.rawModules||0),
+            mainVFunctions:Number(a.mainVFunctions||0),
+            directModuleUsedV:Number(a.directModuleUsedV||0),
+            manifestProtectedV:Number(a.manifestProtectedV||0),
+            unresolvedV:Number(a.unresolvedV||0)
+        };
+    }
+    function text(){
+        var a=QF_DEPENDENCY_AUDIT||{},s=summary(),out=[];
+        out.push("Lazy Module Dependency Audit · "+String(s.version||""));
+        out.push("policy="+String(s.policy||""));
+        out.push("modules="+s.modules+" (gzip "+s.gzipModules+" / raw "+s.rawModules+")");
+        out.push("main Vxx="+s.mainVFunctions+" / module-used="+s.directModuleUsedV+" / manifest-protected="+s.manifestProtectedV+" / unresolved="+s.unresolvedV);
+        var pr=a.previousRegression||{},proved=Array.isArray(pr.provedModuleRefs)?pr.provedModuleRefs:[],unk=Array.isArray(pr.unknownDynamic)?pr.unknownDynamic:[];
+        out.push("alpha10 回归复盘：误删 "+Number(pr.deletedCount||0)+" 个；其中 "+proved.length+" 个已由解压模块直接证明仍有引用，"+unk.length+" 个属于动态/隐式依赖未知区。");
+        if(proved.length)out.push("已证明模块依赖："+proved.slice(0,16).join(" / ")+(proved.length>16?" …":""));
+        out.push("结论：本版不删除代码；UNRESOLVED ≠ DEAD。只有完成动态 ABI 白名单、模块 export/deps 校验并分批真机回归后才允许删除。");
+        var ms=Array.isArray(a.moduleSummary)?a.moduleSummary:[];out.push("");
+        out.push("模块摘要：");
+        for(var i=0;i<ms.length;i++){
+            var m=ms[i]||{};
+            out.push("· "+String(m.name||"")+" · "+String(m.packed||"")+" · "+Number(m.bytes||0)+"B · exports "+Number(m.exports||0)+" · deps "+((m.deps||[]).length)+" · mainVRefs "+Number(m.mainVRefs||0));
+        }
+        return out.join("\n");
+    }
+    function refs(name){
+        try{var m=(QF_DEPENDENCY_AUDIT.moduleRefs||{})[String(name||"")];return Array.isArray(m)?m.slice():[];}catch(_e){return [];}
+    }
+    return {summary:summary,text:text,refs:refs};
+})();
+
+
+var QF_PROXY_AUDIT={"version":"4.2.0","policy":"FINAL_CURRENT_DEFINITIONS_NO_DELETE","modules":31,"historicalProxyCount":86,"removedCanaryCount":11,"proxyCount":75,"classes":{"SAFE-MIGRATE":43,"ABI-PROTECTED":1,"MODULE-PROTECTED":27,"UNKNOWN":4},"types":{"SERVICE-PROXY":34,"MODULE-DISPATCH":3,"LEGACY-ALIAS":38},"safeMigratePreview":[],"removedCompleted":["qfArgusOuterSpecV350","qfOfficialReviewApiV402","qfOfficialReviewRawV400","qfOfficialReviewSpecV400","qfPaidV38","qfProviderContentV38","qfReviewMetaGetV470","qfReviewMetaPutV470","qfReviewNetCanTryV510","qfReviewNetMarkV510","qfServerCommentProviderV315"],"proxies":[{"name":"getBuiltInCommentHtmlV21","type":"MODULE-DISPATCH","target":"review_local_ui.getBuiltInCommentHtmlV21","class":"MODULE-PROTECTED"},{"name":"qdAuthorSayPayloadV404","type":"LEGACY-ALIAS","target":"qfReviewAuthor","class":"SAFE-MIGRATE"},{"name":"qdCopyrightV17","type":"LEGACY-ALIAS","target":"qfCopyrightPage","class":"MODULE-PROTECTED"},{"name":"qdFetchChapterCommentsV22","type":"LEGACY-ALIAS","target":"qfReviewChapter","class":"MODULE-PROTECTED"},{"name":"qdFetchOfficialCommentsV20","type":"LEGACY-ALIAS","target":"qfReviewParagraph","class":"MODULE-PROTECTED"},{"name":"qdFetchParagraphHotV402","type":"LEGACY-ALIAS","target":"qfReviewHot","class":"MODULE-PROTECTED"},{"name":"qdParseReviewSummaryV350","type":"SERVICE-PROXY","target":"QF_ReviewNormalizer.summary","class":"SAFE-MIGRATE"},{"name":"qdReviewResponseOkV351","type":"SERVICE-PROXY","target":"QF_ReviewNormalizer.responseOk","class":"SAFE-MIGRATE"},{"name":"qdReviewSummaryV11","type":"LEGACY-ALIAS","target":"qfReviewSummary","class":"MODULE-PROTECTED"},{"name":"qdReviewSummaryV22","type":"LEGACY-ALIAS","target":"qfReviewSummary","class":"MODULE-PROTECTED"},{"name":"qdReviewSummaryV292","type":"LEGACY-ALIAS","target":"qfReviewSummary","class":"MODULE-PROTECTED"},{"name":"qdReviewSummaryV293","type":"LEGACY-ALIAS","target":"qfReviewSummary","class":"SAFE-MIGRATE"},{"name":"qfAdjacentProviderTakeV510","type":"LEGACY-ALIAS","target":"qfAdjacentProviderTake","class":"SAFE-MIGRATE"},{"name":"qfAdjacentProviderWarmV510","type":"LEGACY-ALIAS","target":"qfAdjacentProviderWarm","class":"SAFE-MIGRATE"},{"name":"qfBestChapterV10","type":"SERVICE-PROXY","target":"QF_ChapterMatcher.best","class":"MODULE-PROTECTED"},{"name":"qfBookInfoOpenCircleV373","type":"LEGACY-ALIAS","target":"qfOpenQidianCircleV2961","class":"ABI-PROTECTED"},{"name":"qfCacheDropV55","type":"SERVICE-PROXY","target":"QF_CacheManager.remove","class":"SAFE-MIGRATE"},{"name":"qfCacheKeyV56","type":"SERVICE-PROXY","target":"QF_CacheManager.key","class":"MODULE-PROTECTED"},{"name":"qfCacheMemTouchV55","type":"SERVICE-PROXY","target":"QF_CacheManager._touch","class":"SAFE-MIGRATE"},{"name":"qfChapterNoV10","type":"SERVICE-PROXY","target":"QF_ChapterMatcher.chapterNo","class":"MODULE-PROTECTED"},{"name":"qfChapterPerfSummaryV510","type":"SERVICE-PROXY","target":"QF_Service","class":"SAFE-MIGRATE"},{"name":"qfChineseNumV10","type":"SERVICE-PROXY","target":"QF_ChapterMatcher.chineseNumber","class":"SAFE-MIGRATE"},{"name":"qfCleanChapterTextV10","type":"SERVICE-PROXY","target":"QF_ContentCleaner.clean","class":"SAFE-MIGRATE"},{"name":"qfCommentCapFnV83","type":"MODULE-DISPATCH","target":"lazy-module","class":"SAFE-MIGRATE"},{"name":"qfCommentRouteL1PutV470","type":"SERVICE-PROXY","target":"QF_Service","class":"SAFE-MIGRATE"},{"name":"qfDiagEnabledV85","type":"SERVICE-PROXY","target":"QF_Service","class":"SAFE-MIGRATE"},{"name":"qfDiagEventV85","type":"SERVICE-PROXY","target":"QF_Diagnostic.event","class":"SAFE-MIGRATE"},{"name":"qfDiagInvokeV85","type":"SERVICE-PROXY","target":"QF_Diagnostic.invoke","class":"SAFE-MIGRATE"},{"name":"qfFirstV13","type":"SERVICE-PROXY","target":"QF_Field.pick","class":"SAFE-MIGRATE"},{"name":"qfFlattenChapterV10","type":"SERVICE-PROXY","target":"QF_ChapterMatcher.flatten","class":"MODULE-PROTECTED"},{"name":"qfOfficialCallV400","type":"SERVICE-PROXY","target":"QF_Service","class":"MODULE-PROTECTED"},{"name":"qfOfficialCapabilityV400","type":"SERVICE-PROXY","target":"QF_Service","class":"SAFE-MIGRATE"},{"name":"qfOfficialDispatchV400","type":"SERVICE-PROXY","target":"QF_Service","class":"SAFE-MIGRATE"},{"name":"qfOfficialMapContentV410","type":"SERVICE-PROXY","target":"QF_Service","class":"SAFE-MIGRATE"},{"name":"qfOfficialMapRichContentV410","type":"SERVICE-PROXY","target":"QF_Service","class":"SAFE-MIGRATE"},{"name":"qfOfficialRegisterV400","type":"SERVICE-PROXY","target":"QF_Service","class":"UNKNOWN"},{"name":"qfOfficialRequestCanonV440","type":"SERVICE-PROXY","target":"QF_OfficialClient.canon","class":"UNKNOWN"},{"name":"qfOfficialRequestKeyV440","type":"SERVICE-PROXY","target":"QF_OfficialClient.key","class":"SAFE-MIGRATE"},{"name":"qfOfficialRequestNormPathV440","type":"SERVICE-PROXY","target":"QF_OfficialClient.normPath","class":"SAFE-MIGRATE"},{"name":"qfOfficialRequestPolicyV440","type":"SERVICE-PROXY","target":"QF_OfficialClient.policy","class":"SAFE-MIGRATE"},{"name":"qfOfficialRequestResetV440","type":"LEGACY-ALIAS","target":"qfOfficialClientReset","class":"SAFE-MIGRATE"},{"name":"qfOfficialRequestResultV440","type":"SERVICE-PROXY","target":"QF_OfficialClient.classify","class":"SAFE-MIGRATE"},{"name":"qfOfficialRequestRunV440","type":"SERVICE-PROXY","target":"QF_OfficialClient.run","class":"SAFE-MIGRATE"},{"name":"qfOfficialRequestStatV440","type":"SERVICE-PROXY","target":"QF_Service","class":"SAFE-MIGRATE"},{"name":"qfOfficialRequestSummaryV440","type":"LEGACY-ALIAS","target":"qfOfficialClientSummary","class":"SAFE-MIGRATE"},{"name":"qfOfficialReviewDeviceV400","type":"SERVICE-PROXY","target":"QF_OfficialClient.deviceId","class":"UNKNOWN"},{"name":"qfOpenQidianCircleV2961","type":"LEGACY-ALIAS","target":"qfOpenQidianCircle","class":"MODULE-PROTECTED"},{"name":"qfOpenRoleCardV20","type":"LEGACY-ALIAS","target":"qfOpenRoleCard","class":"MODULE-PROTECTED"},{"name":"qfPaidSmartV86","type":"SERVICE-PROXY","target":"QF_ProviderRuntime.smart","class":"SAFE-MIGRATE"},{"name":"qfProviderHotClearV350","type":"LEGACY-ALIAS","target":"qfProviderHotClear","class":"SAFE-MIGRATE"},{"name":"qfProviderHotKeyV350","type":"LEGACY-ALIAS","target":"qfProviderHotKey","class":"UNKNOWN"},{"name":"qfProviderHotReadV350","type":"LEGACY-ALIAS","target":"qfProviderHotRead","class":"SAFE-MIGRATE"},{"name":"qfProviderHotSetV350","type":"LEGACY-ALIAS","target":"qfProviderHotSet","class":"SAFE-MIGRATE"},{"name":"qfProviderHotTryV350","type":"LEGACY-ALIAS","target":"qfProviderHotTry","class":"SAFE-MIGRATE"},{"name":"qfProviderHotValidV360","type":"LEGACY-ALIAS","target":"qfProviderHotValid","class":"SAFE-MIGRATE"},{"name":"qfProviderStickyHintV355","type":"LEGACY-ALIAS","target":"qfProviderStickyHint","class":"SAFE-MIGRATE"},{"name":"qfProviderStickyTryV355","type":"LEGACY-ALIAS","target":"qfProviderStickyTry","class":"SAFE-MIGRATE"},{"name":"qfQtAuthorSayV332","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","class":"MODULE-PROTECTED"},{"name":"qfQtNativeMetaV328","type":"LEGACY-ALIAS","target":"qfServerChapterMetaGetV316","class":"MODULE-PROTECTED"},{"name":"qfQtShowAuthorV332","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","class":"MODULE-PROTECTED"},{"name":"qfQwCommentApiV315","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","class":"MODULE-PROTECTED"},{"name":"qfRememberProviderV38","type":"LEGACY-ALIAS","target":"qfProviderRemember","class":"SAFE-MIGRATE"},{"name":"qfReviewNetJsonOkV510","type":"SERVICE-PROXY","target":"QF_ReviewNetwork.jsonOk","class":"SAFE-MIGRATE"},{"name":"qfReviewNetStateV510","type":"SERVICE-PROXY","target":"QF_ReviewNetwork.state","class":"SAFE-MIGRATE"},{"name":"qfReviewNetSummaryV510","type":"LEGACY-ALIAS","target":"qfReviewNetworkSummary","class":"SAFE-MIGRATE"},{"name":"qfServerChapterPackV315","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","class":"MODULE-PROTECTED"},{"name":"qfServerCommentPackV315","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","class":"MODULE-PROTECTED"},{"name":"qfServerCoreFnV82","type":"MODULE-DISPATCH","target":"lazy-module","class":"SAFE-MIGRATE"},{"name":"qfServerDataV319","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","class":"MODULE-PROTECTED"},{"name":"qfServerNormV315","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","class":"MODULE-PROTECTED"},{"name":"qfServerSummaryV315","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","class":"MODULE-PROTECTED"},{"name":"qfShowServerCommentV315","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","class":"MODULE-PROTECTED"},{"name":"qfSmCommentApiV315","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","class":"MODULE-PROTECTED"},{"name":"qfTocLoadV70","type":"LEGACY-ALIAS","target":"qfCatalogLoad","class":"SAFE-MIGRATE"},{"name":"qfValidContentV10","type":"SERVICE-PROXY","target":"QF_ContentCleaner.valid","class":"MODULE-PROTECTED"}]};
+var QF_ProxyAudit=(function(){
+    function summary(){
+        var a=QF_PROXY_AUDIT||{},c=a.classes||{},t=a.types||{};
+        return {
+            version:String(a.version||""),
+            policy:String(a.policy||"FINAL_CURRENT_DEFINITIONS_NO_DELETE"),
+            historical:Number(a.historicalProxyCount||a.proxyCount||0),
+            removed:Number(a.removedCanaryCount||0),
+            proxyCount:Number(a.proxyCount||0),
+            safe:Number(c["SAFE-MIGRATE"]||0),
+            abi:Number(c["ABI-PROTECTED"]||0),
+            module:Number(c["MODULE-PROTECTED"]||0),
+            unknown:Number(c["UNKNOWN"]||0),
+            service:Number(t["SERVICE-PROXY"]||0),
+            moduleDispatch:Number(t["MODULE-DISPATCH"]||0),
+            alias:Number(t["LEGACY-ALIAS"]||0)
+        };
+    }
+    function text(){
+        var a=QF_PROXY_AUDIT||{},s=summary(),out=[];
+        out.push("Compatibility Proxy Audit · "+String(s.version||""));
+        out.push("policy="+String(s.policy||""));
+        out.push("historical="+s.historical+" / removed="+s.removed+" / current="+s.proxyCount);
+        out.push("current classes：SAFE-MIGRATE "+s.safe+" / ABI "+s.abi+" / MODULE "+s.module+" / UNKNOWN "+s.unknown);
+        out.push("types：SERVICE "+s.service+" / MODULE-DISPATCH "+s.moduleDispatch+" / LEGACY-ALIAS "+s.alias);
+        out.push("规则：代理删除阶段已关闭。SAFE-MIGRATE 仅保留历史分类，不再自动进入删除队列；MODULE/ABI/UNKNOWN 继续保护。");
+        out.push("Canary 完成：11 个已迁移零命中代理已真删除；Compatibility Registry 继续保留历史/ABI 元数据。");
+        var p=Array.isArray(a.safeMigratePreview)?a.safeMigratePreview:[];
+        if(p.length){
+            out.push("");
+            out.push("下一批低风险迁移候选（最多20）：");
+            for(var i=0;i<p.length;i++){
+                var x=p[i]||{};
+                out.push("· "+String(x.name||"")+" → "+String(x.target||"")+" · "+String(x.type||"")+" · mainRefs "+Number(x.mainRefs||0));
+            }
+        }
+        return out.join("\n");
+    }
+    return {summary:summary,text:text};
+})();
+
+
+var QF_PROXY_MIGRATION={"version":"4.2.0","policy":"MIGRATION_COMPLETE_11_REMOVED","batch":6,"targets":[{"proxy":"qfPaidV38","target":"QF_ProviderRuntime.route","migrated":1},{"proxy":"qfProviderContentV38","target":"QF_ProviderExecutor.content","migrated":3},{"proxy":"qfOfficialReviewApiV402","target":"QF_ReviewApi.request","migrated":2},{"proxy":"qfOfficialReviewRawV400","target":"QF_ReviewApi.rich","migrated":1},{"proxy":"qfReviewMetaGetV470","target":"QF_ReviewCache.get","migrated":2},{"proxy":"qfReviewMetaPutV470","target":"QF_ReviewCache.put","migrated":4},{"proxy":"qfReviewNetCanTryV510","target":"QF_ReviewNetwork.canTry","migrated":3},{"proxy":"qfReviewNetMarkV510","target":"QF_ReviewNetwork.mark","migrated":10},{"proxy":"qfArgusOuterSpecV350","target":"QF_OfficialClient.argusSpec","migrated":1},{"proxy":"qfOfficialReviewSpecV400","target":"QF_OfficialClient.reviewSpec","migrated":1},{"proxy":"qfServerCommentProviderV315","target":"qfCommentServerPickV313","migrated":1}],"removedCanary":["qfPaidV38","qfProviderContentV38","qfReviewMetaGetV470","qfReviewMetaPutV470","qfServerCommentProviderV315","qfReviewNetCanTryV510","qfReviewNetMarkV510","qfOfficialReviewApiV402","qfOfficialReviewRawV400","qfArgusOuterSpecV350","qfOfficialReviewSpecV400"],"completed":true,"completedIn":"4.1.0-alpha10.9.7"};
+var QF_ProxyMigration=(function(){
+    function summary(){
+        var a=QF_PROXY_MIGRATION||{},t=Array.isArray(a.targets)?a.targets:[],calls=0;
+        for(var i=0;i<t.length;i++)calls+=Number(t[i]&&t[i].migrated||0);
+        return {version:String(a.version||""),batch:Number(a.batch||0),targets:t.length,calls:calls,policy:String(a.policy||"")};
+    }
+    function text(){
+        var a=QF_PROXY_MIGRATION||{},s=summary(),out=[];
+        out.push("Safe Proxy Migration · "+String(s.version||""));
+        out.push("policy="+String(s.policy||"")+" / batch="+s.batch+" / targets="+s.targets+" / migratedCalls="+s.calls+" / status=COMPLETE");
+        var t=Array.isArray(a.targets)?a.targets:[];
+        for(var i=0;i<t.length;i++){
+            var x=t[i]||{};
+            var rm=Array.isArray(a.removedCanary)?a.removedCanary:[],isRemoved=rm.indexOf(String(x.proxy||""))>=0;
+            out.push("✓ "+String(x.proxy||"")+" → "+String(x.target||"")+" · calls "+Number(x.migrated||0)+" · proxy "+(isRemoved?"REMOVED-CANARY":"KEEP"));
+        }
+        out.push("原则：迁移历史与 Compatibility Registry 保留；11 个已迁移零命中代理已按 6 个小批次全部完成 Canary 真删除；不删除其它 Compatibility 代理。");
+        return out.join("\n");
+    }
+    return {summary:summary,text:text};
+})();
+
+var QF_PROXY_REAUDIT={"version":"4.2.0","policy":"FINAL_REAUDIT_NO_DELETE","sourceBaseline":"4.1.0-alpha10.9.7","modules":31,"historicalProxyCount":86,"removedCanaryCount":11,"proxyCount":75,"activityCounts":{"mainActive":13,"moduleActive":8,"overlap":3,"uniqueActive":18,"zeroAll":57,"mainOnly":10,"moduleOnly":5},"statusCounts":{"MAIN-ACTIVE":13,"MODULE-ACTIVE":5,"TOP-ACTIVE":0,"MIGRATED-ZERO-CALL":0,"STATIC-ZERO-CALL":52,"ABI-PROTECTED":1,"UNKNOWN":4},"zeroCallLegacyClasses":{"SAFE-MIGRATE":34,"MODULE-PROTECTED":18,"ABI-PROTECTED":1,"UNKNOWN":4},"migratedZero":[],"removedCompleted":["qfArgusOuterSpecV350","qfOfficialReviewApiV402","qfOfficialReviewRawV400","qfOfficialReviewSpecV400","qfPaidV38","qfProviderContentV38","qfReviewMetaGetV470","qfReviewMetaPutV470","qfReviewNetCanTryV510","qfReviewNetMarkV510","qfServerCommentProviderV315"],"activeMain":[{"name":"getBuiltInCommentHtmlV21","calls":1,"legacyClass":"MODULE-PROTECTED"},{"name":"qdParseReviewSummaryV350","calls":1,"legacyClass":"SAFE-MIGRATE"},{"name":"qdReviewResponseOkV351","calls":1,"legacyClass":"SAFE-MIGRATE"},{"name":"qfCacheKeyV56","calls":2,"legacyClass":"MODULE-PROTECTED"},{"name":"qfChapterNoV10","calls":2,"legacyClass":"MODULE-PROTECTED"},{"name":"qfChapterPerfSummaryV510","calls":1,"legacyClass":"SAFE-MIGRATE"},{"name":"qfCleanChapterTextV10","calls":5,"legacyClass":"SAFE-MIGRATE"},{"name":"qfCommentRouteL1PutV470","calls":3,"legacyClass":"SAFE-MIGRATE"},{"name":"qfDiagInvokeV85","calls":4,"legacyClass":"SAFE-MIGRATE"},{"name":"qfFirstV13","calls":41,"legacyClass":"SAFE-MIGRATE"},{"name":"qfOfficialCapabilityV400","calls":6,"legacyClass":"SAFE-MIGRATE"},{"name":"qfReviewNetJsonOkV510","calls":1,"legacyClass":"SAFE-MIGRATE"},{"name":"qfValidContentV10","calls":9,"legacyClass":"MODULE-PROTECTED"}],"activeModules":[{"name":"qfBestChapterV10","calls":7,"modules":{"fallback_69":1,"preferred_qm":2,"preferred_dj":1,"fallback_sdg":1,"preferred_kw":1,"fallback_wx":1},"legacyClass":"MODULE-PROTECTED"},{"name":"qfCacheKeyV56","calls":6,"modules":{"preferred_qq":2,"preferred_qm":1,"preferred_dj":2,"preferred_kw":1},"legacyClass":"MODULE-PROTECTED"},{"name":"qfChapterNoV10","calls":19,"modules":{"match":2,"limited_qt":2,"fallback_my":2,"fallback_dq":2,"preferred_sq":2,"provider_common":4,"fallback_sdg":3,"fallback_wx":2},"legacyClass":"MODULE-PROTECTED"},{"name":"qfFlattenChapterV10","calls":1,"modules":{"preferred_qm":1},"legacyClass":"MODULE-PROTECTED"},{"name":"qfQtShowAuthorV332","calls":2,"modules":{"limited_qt":1,"review_common":1},"legacyClass":"MODULE-PROTECTED"},{"name":"qfServerDataV319","calls":4,"modules":{"review_server_core":4},"legacyClass":"MODULE-PROTECTED"},{"name":"qfServerNormV315","calls":4,"modules":{"review":1,"review_server_core":3},"legacyClass":"MODULE-PROTECTED"},{"name":"qfValidContentV10","calls":17,"modules":{"official":4,"limited_sm":1,"limited_qt":1,"fallback_my":1,"fallback_dq":1,"fallback_69":1,"preferred_sq":1,"preferred_qq":1,"preferred_qm":1,"preferred_dj":2,"fallback_sdg":1,"preferred_kw":1,"fallback_wx":1},"legacyClass":"MODULE-PROTECTED"}],"records":[{"name":"getBuiltInCommentHtmlV21","type":"MODULE-DISPATCH","target":"review_local_ui.getBuiltInCommentHtmlV21","legacyClass":"MODULE-PROTECTED","status":"MAIN-ACTIVE","mainCalls":1,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"review_local_ui":1}},{"name":"qdAuthorSayPayloadV404","type":"LEGACY-ALIAS","target":"qfReviewAuthor","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdCopyrightV17","type":"LEGACY-ALIAS","target":"qfCopyrightPage","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"copyright":1}},{"name":"qdFetchChapterCommentsV22","type":"LEGACY-ALIAS","target":"qfReviewChapter","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdFetchOfficialCommentsV20","type":"LEGACY-ALIAS","target":"qfReviewParagraph","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdFetchParagraphHotV402","type":"LEGACY-ALIAS","target":"qfReviewHot","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdParseReviewSummaryV350","type":"SERVICE-PROXY","target":"QF_ReviewNormalizer.summary","legacyClass":"SAFE-MIGRATE","status":"MAIN-ACTIVE","mainCalls":1,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdReviewResponseOkV351","type":"SERVICE-PROXY","target":"QF_ReviewNormalizer.responseOk","legacyClass":"SAFE-MIGRATE","status":"MAIN-ACTIVE","mainCalls":1,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdReviewSummaryV11","type":"LEGACY-ALIAS","target":"qfReviewSummary","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdReviewSummaryV22","type":"LEGACY-ALIAS","target":"qfReviewSummary","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdReviewSummaryV292","type":"LEGACY-ALIAS","target":"qfReviewSummary","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdReviewSummaryV293","type":"LEGACY-ALIAS","target":"qfReviewSummary","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfAdjacentProviderTakeV510","type":"LEGACY-ALIAS","target":"qfAdjacentProviderTake","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfAdjacentProviderWarmV510","type":"LEGACY-ALIAS","target":"qfAdjacentProviderWarm","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfBestChapterV10","type":"SERVICE-PROXY","target":"QF_ChapterMatcher.best","legacyClass":"MODULE-PROTECTED","status":"MODULE-ACTIVE","mainCalls":0,"topCalls":0,"moduleCalls":7,"modules":{"fallback_69":1,"preferred_qm":2,"preferred_dj":1,"fallback_sdg":1,"preferred_kw":1,"fallback_wx":1},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"match":1}},{"name":"qfBookInfoOpenCircleV373","type":"LEGACY-ALIAS","target":"qfOpenQidianCircleV2961","legacyClass":"ABI-PROTECTED","status":"ABI-PROTECTED","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfCacheDropV55","type":"SERVICE-PROXY","target":"QF_CacheManager.remove","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfCacheKeyV56","type":"SERVICE-PROXY","target":"QF_CacheManager.key","legacyClass":"MODULE-PROTECTED","status":"MAIN-ACTIVE","mainCalls":2,"topCalls":0,"moduleCalls":6,"modules":{"preferred_qq":2,"preferred_qm":1,"preferred_dj":2,"preferred_kw":1},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfCacheMemTouchV55","type":"SERVICE-PROXY","target":"QF_CacheManager._touch","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfChapterNoV10","type":"SERVICE-PROXY","target":"QF_ChapterMatcher.chapterNo","legacyClass":"MODULE-PROTECTED","status":"MAIN-ACTIVE","mainCalls":2,"topCalls":0,"moduleCalls":19,"modules":{"match":2,"limited_qt":2,"fallback_my":2,"fallback_dq":2,"preferred_sq":2,"provider_common":4,"fallback_sdg":3,"fallback_wx":2},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfChapterPerfSummaryV510","type":"SERVICE-PROXY","target":"QF_Service","legacyClass":"SAFE-MIGRATE","status":"MAIN-ACTIVE","mainCalls":1,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfChineseNumV10","type":"SERVICE-PROXY","target":"QF_ChapterMatcher.chineseNumber","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfCleanChapterTextV10","type":"SERVICE-PROXY","target":"QF_ContentCleaner.clean","legacyClass":"SAFE-MIGRATE","status":"MAIN-ACTIVE","mainCalls":5,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfCommentCapFnV83","type":"MODULE-DISPATCH","target":"lazy-module","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfCommentRouteL1PutV470","type":"SERVICE-PROXY","target":"QF_Service","legacyClass":"SAFE-MIGRATE","status":"MAIN-ACTIVE","mainCalls":3,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfDiagEnabledV85","type":"SERVICE-PROXY","target":"QF_Service","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfDiagEventV85","type":"SERVICE-PROXY","target":"QF_Diagnostic.event","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfDiagInvokeV85","type":"SERVICE-PROXY","target":"QF_Diagnostic.invoke","legacyClass":"SAFE-MIGRATE","status":"MAIN-ACTIVE","mainCalls":4,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfFirstV13","type":"SERVICE-PROXY","target":"QF_Field.pick","legacyClass":"SAFE-MIGRATE","status":"MAIN-ACTIVE","mainCalls":41,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfFlattenChapterV10","type":"SERVICE-PROXY","target":"QF_ChapterMatcher.flatten","legacyClass":"MODULE-PROTECTED","status":"MODULE-ACTIVE","mainCalls":0,"topCalls":0,"moduleCalls":1,"modules":{"preferred_qm":1},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialCallV400","type":"SERVICE-PROXY","target":"QF_Service","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialCapabilityV400","type":"SERVICE-PROXY","target":"QF_Service","legacyClass":"SAFE-MIGRATE","status":"MAIN-ACTIVE","mainCalls":6,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialDispatchV400","type":"SERVICE-PROXY","target":"QF_Service","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialMapContentV410","type":"SERVICE-PROXY","target":"QF_Service","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialMapRichContentV410","type":"SERVICE-PROXY","target":"QF_Service","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialRegisterV400","type":"SERVICE-PROXY","target":"QF_Service","legacyClass":"UNKNOWN","status":"UNKNOWN","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialRequestCanonV440","type":"SERVICE-PROXY","target":"QF_OfficialClient.canon","legacyClass":"UNKNOWN","status":"UNKNOWN","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialRequestKeyV440","type":"SERVICE-PROXY","target":"QF_OfficialClient.key","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialRequestNormPathV440","type":"SERVICE-PROXY","target":"QF_OfficialClient.normPath","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialRequestPolicyV440","type":"SERVICE-PROXY","target":"QF_OfficialClient.policy","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialRequestResetV440","type":"LEGACY-ALIAS","target":"qfOfficialClientReset","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialRequestResultV440","type":"SERVICE-PROXY","target":"QF_OfficialClient.classify","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialRequestRunV440","type":"SERVICE-PROXY","target":"QF_OfficialClient.run","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialRequestStatV440","type":"SERVICE-PROXY","target":"QF_Service","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialRequestSummaryV440","type":"LEGACY-ALIAS","target":"qfOfficialClientSummary","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOfficialReviewDeviceV400","type":"SERVICE-PROXY","target":"QF_OfficialClient.deviceId","legacyClass":"UNKNOWN","status":"UNKNOWN","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfOpenQidianCircleV2961","type":"LEGACY-ALIAS","target":"qfOpenQidianCircle","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"circle":1}},{"name":"qfOpenRoleCardV20","type":"LEGACY-ALIAS","target":"qfOpenRoleCard","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"role":1}},{"name":"qfPaidSmartV86","type":"SERVICE-PROXY","target":"QF_ProviderRuntime.smart","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfProviderHotClearV350","type":"LEGACY-ALIAS","target":"qfProviderHotClear","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfProviderHotKeyV350","type":"LEGACY-ALIAS","target":"qfProviderHotKey","legacyClass":"UNKNOWN","status":"UNKNOWN","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfProviderHotReadV350","type":"LEGACY-ALIAS","target":"qfProviderHotRead","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfProviderHotSetV350","type":"LEGACY-ALIAS","target":"qfProviderHotSet","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfProviderHotTryV350","type":"LEGACY-ALIAS","target":"qfProviderHotTry","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfProviderHotValidV360","type":"LEGACY-ALIAS","target":"qfProviderHotValid","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfProviderStickyHintV355","type":"LEGACY-ALIAS","target":"qfProviderStickyHint","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfProviderStickyTryV355","type":"LEGACY-ALIAS","target":"qfProviderStickyTry","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfQtAuthorSayV332","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"review_server_core":1}},{"name":"qfQtNativeMetaV328","type":"LEGACY-ALIAS","target":"qfServerChapterMetaGetV316","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfQtShowAuthorV332","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","legacyClass":"MODULE-PROTECTED","status":"MODULE-ACTIVE","mainCalls":0,"topCalls":0,"moduleCalls":2,"modules":{"limited_qt":1,"review_common":1},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"review_server_core":1}},{"name":"qfQwCommentApiV315","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"review_server_core":1}},{"name":"qfRememberProviderV38","type":"LEGACY-ALIAS","target":"qfProviderRemember","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfReviewNetJsonOkV510","type":"SERVICE-PROXY","target":"QF_ReviewNetwork.jsonOk","legacyClass":"SAFE-MIGRATE","status":"MAIN-ACTIVE","mainCalls":1,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfReviewNetStateV510","type":"SERVICE-PROXY","target":"QF_ReviewNetwork.state","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfReviewNetSummaryV510","type":"LEGACY-ALIAS","target":"qfReviewNetworkSummary","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfServerChapterPackV315","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"review_server_core":1}},{"name":"qfServerCommentPackV315","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"review_server_core":1}},{"name":"qfServerCoreFnV82","type":"MODULE-DISPATCH","target":"lazy-module","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfServerDataV319","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","legacyClass":"MODULE-PROTECTED","status":"MODULE-ACTIVE","mainCalls":0,"topCalls":0,"moduleCalls":4,"modules":{"review_server_core":4},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"review_server_core":1}},{"name":"qfServerNormV315","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","legacyClass":"MODULE-PROTECTED","status":"MODULE-ACTIVE","mainCalls":0,"topCalls":0,"moduleCalls":4,"modules":{"review":1,"review_server_core":3},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"review_server_core":1}},{"name":"qfServerSummaryV315","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"review_server_core":1}},{"name":"qfShowServerCommentV315","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"review_server_core":1}},{"name":"qfSmCommentApiV315","type":"LEGACY-ALIAS","target":"qfServerCoreFnV82","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"review_server_core":1}},{"name":"qfTocLoadV70","type":"LEGACY-ALIAS","target":"qfCatalogLoad","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qfValidContentV10","type":"SERVICE-PROXY","target":"QF_ContentCleaner.valid","legacyClass":"MODULE-PROTECTED","status":"MAIN-ACTIVE","mainCalls":9,"topCalls":0,"moduleCalls":17,"modules":{"official":4,"limited_sm":1,"limited_qt":1,"fallback_my":1,"fallback_dq":1,"fallback_69":1,"preferred_sq":1,"preferred_qq":1,"preferred_qm":1,"preferred_dj":2,"fallback_sdg":1,"preferred_kw":1,"fallback_wx":1},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}}],"conclusion":{"deleteNow":0,"historical":86,"removed":11,"current":75,"migratedZero":0,"next":"STOP_PROXY_DELETION"}};
+var QF_ProxyReAudit=(function(){
+    function n(v){v=Number(v||0);return isFinite(v)?v:0;}
+    function summary(){
+        var a=QF_PROXY_REAUDIT||{},c=a.statusCounts||{};
+        var ac=a.activityCounts||{};
+        return {version:String(a.version||""),policy:String(a.policy||"FINAL_REAUDIT_NO_DELETE"),
+            historical:n(a.historicalProxyCount),removed:n(a.removedCanaryCount),
+            proxies:n(a.proxyCount),modules:n(a.modules),
+            mainRefs:n(ac.mainActive),moduleRefs:n(ac.moduleActive),overlap:n(ac.overlap),uniqueActive:n(ac.uniqueActive),zeroAll:n(ac.zeroAll),
+            activeMain:n(c["MAIN-ACTIVE"]),activeModule:n(c["MODULE-ACTIVE"]),activeTop:n(c["TOP-ACTIVE"]),
+            migratedZero:n(c["MIGRATED-ZERO-CALL"]),staticZero:n(c["STATIC-ZERO-CALL"]),
+            abi:n(c["ABI-PROTECTED"]),unknown:n(c["UNKNOWN"]),
+            deleteNow:n(a.conclusion&&a.conclusion.deleteNow)};
+    }
+    function text(){
+        var a=QF_PROXY_REAUDIT||{},s=summary(),out=[];
+        out.push("Final Proxy Re-Audit · "+String(s.version||""));
+        out.push("policy="+String(s.policy||"")+" / baseline="+String(a.sourceBaseline||""));
+        out.push("historical="+s.historical+" / removed="+s.removed+" / current="+s.proxies);
+        out.push("真实活动：main="+s.mainRefs+" / module="+s.moduleRefs+" / overlap="+s.overlap+" / unique="+s.uniqueActive+" / zero-all="+s.zeroAll);
+        out.push("独占状态：MAIN="+s.activeMain+" / MODULE="+s.activeModule+" / migrated-zero="+s.migratedZero+" / static-zero="+s.staticZero+" / ABI="+s.abi+" / unknown="+s.unknown);
+        var mz=Array.isArray(a.migratedZero)?a.migratedZero:[];
+        if(mz.length)out.push("已迁移且静态零调用："+mz.join(" / "));
+        else out.push("已迁移零调用代理：0（历史 11 个目标均已完成 Canary 真删除）");
+        var am=Array.isArray(a.activeMain)?a.activeMain:[];
+        if(am.length){out.push("主运行时仍有真实调用：");for(var i=0;i<am.length;i++){var x=am[i]||{};out.push("· "+String(x.name||"")+" · calls "+n(x.calls)+" · "+String(x.legacyClass||""));}}
+        var md=Array.isArray(a.activeModules)?a.activeModules:[];
+        if(md.length){out.push("Lazy Module 仍有直接调用：");for(var j=0;j<md.length;j++){var y=md[j]||{},mods=y.modules||{},seg=[];for(var k in mods)if(Object.prototype.hasOwnProperty.call(mods,k))seg.push(k+"("+n(mods[k])+")");out.push("· "+String(y.name||"")+" · calls "+n(y.calls)+" · "+seg.join(", "));}}
+        var z=a.zeroCallLegacyClasses||{};
+        out.push("零调用保护：SAFE-MIGRATE "+n(z["SAFE-MIGRATE"])+" / MODULE-PROTECTED "+n(z["MODULE-PROTECTED"])+" / ABI "+n(z["ABI-PROTECTED"])+" / UNKNOWN "+n(z["UNKNOWN"]));
+        out.push("结论：deleteNow="+s.deleteNow+" / next=STOP_PROXY_DELETION。剩余零调用代理继续保护，不再做批量删除。");
+        return out.join("\n");
+    }
+    return {summary:summary,text:text};
+})();
+
+var QF_PROXY_QUARANTINE={"version":"4.2.0","policy":"RETIRED_AFTER_CANARY_COMPLETE","batch":1,"targets":[],"deleteNow":0,"storeKey":"qf_proxy_quarantine_probe_a108_b1","retiredZero":[{"name":"qfPaidV38","hits":0,"removedIn":"4.1.0-alpha10.9"},{"name":"qfProviderContentV38","hits":0,"removedIn":"4.1.0-alpha10.9"},{"name":"qfReviewMetaGetV470","hits":0,"removedIn":"4.1.0-alpha10.9.3"},{"name":"qfReviewMetaPutV470","hits":0,"removedIn":"4.1.0-alpha10.9.3"},{"name":"qfServerCommentProviderV315","hits":0,"removedIn":"4.1.0-alpha10.9.4"}]};
+var QF_ProxyQuarantine=(function(){
+    var MEM={};
+    function n(v){v=Number(v||0);return isFinite(v)?v:0;}
+    function load(ctx){
+        var o={};
+        try{
+            var s=qfSource(ctx),raw=s&&s.get?s.get(QF_PROXY_QUARANTINE.storeKey):"";
+            if(raw)o=JSON.parse(String(raw))||{};
+        }catch(_l){o={};}
+        return o&&typeof o==="object"?o:{};
+    }
+    function save(ctx,o){
+        try{var s=qfSource(ctx);if(s&&s.put)s.put(QF_PROXY_QUARANTINE.storeKey,JSON.stringify(o||{}));}catch(_s){}
+    }
+    function hit(ctx,name){
+        name=String(name||"");if(!name)return;
+        try{
+            MEM[name]=n(MEM[name])+1;
+            var o=load(ctx),x=o[name]&&typeof o[name]==="object"?o[name]:{};
+            x.count=n(x.count)+1;x.lastTs=Date.now();
+            o[name]=x;o._lastName=name;o._lastTs=x.lastTs;save(ctx,o);
+        }catch(_h){}
+    }
+    function summary(ctx){
+        var o=load(ctx),ts=Array.isArray(QF_PROXY_QUARANTINE.targets)?QF_PROXY_QUARANTINE.targets:[],
+            total=0,hitTargets=0,items=[];
+        for(var i=0;i<ts.length;i++){
+            var t=ts[i]||{},name=String(t.name||""),x=o[name]&&typeof o[name]==="object"?o[name]:{},c=n(x.count);
+            total+=c;if(c>0)hitTargets++;
+            items.push({name:name,target:String(t.target||""),domain:String(t.domain||""),count:c,lastTs:n(x.lastTs)});
+        }
+        return {
+            version:String(QF_PROXY_QUARANTINE.version||""),policy:String(QF_PROXY_QUARANTINE.policy||""),
+            batch:n(QF_PROXY_QUARANTINE.batch),targets:items.length,totalHits:total,hitTargets:hitTargets,
+            zeroTargets:Math.max(0,items.length-hitTargets),deleteNow:n(QF_PROXY_QUARANTINE.deleteNow),
+            items:items,lastName:String(o._lastName||""),lastTs:n(o._lastTs)
+        };
+    }
+    function text(ctx){
+        var s=summary(ctx),a=[];
+        a.push("Proxy Quarantine Probe · "+s.version);
+        a.push("policy="+s.policy+" / batch="+s.batch+" / targets="+s.targets+" / totalHits="+s.totalHits+" / hitTargets="+s.hitTargets+" / zeroTargets="+s.zeroTargets);
+        var it=s.items||[];
+        for(var i=0;i<it.length;i++){
+            var x=it[i]||{};
+            a.push((n(x.count)>0?"! HIT ":"✓ ZERO ")+String(x.name||"")+" → "+String(x.target||"")+" · "+String(x.domain||"")+" · hits "+n(x.count));
+        }
+        a.push(s.targets===0?"结论：探针已退休；Canary 迁移删除阶段完成。":"结论：仅采集动态 ABI 证据。");
+        return a.join("\n");
+    }
+    function reset(ctx){
+        MEM={};
+        try{var s=qfSource(ctx);if(s&&s.put)s.put(QF_PROXY_QUARANTINE.storeKey,"");}catch(_r){}
+    }
+    return {hit:hit,summary:summary,text:text,reset:reset};
+})();
+
+var QF_PROXY_QUARANTINE_B2={"version":"4.2.0","policy":"RETIRED_AFTER_CANARY_COMPLETE","batch":2,"targets":[],"deleteNow":0,"storeKey":"qf_proxy_quarantine_probe_a1081_b2","retiredZero":[{"name":"qfReviewNetCanTryV510","hits":0,"removedIn":"4.1.0-alpha10.9.5"},{"name":"qfReviewNetMarkV510","hits":0,"removedIn":"4.1.0-alpha10.9.5"},{"name":"qfOfficialReviewApiV402","hits":0,"removedIn":"4.1.0-alpha10.9.6"},{"name":"qfOfficialReviewRawV400","hits":0,"removedIn":"4.1.0-alpha10.9.6"},{"name":"qfArgusOuterSpecV350","hits":0,"removedIn":"4.1.0-alpha10.9.7"},{"name":"qfOfficialReviewSpecV400","hits":0,"removedIn":"4.1.0-alpha10.9.7"}]};
+var QF_ProxyQuarantineB2=(function(){
+    function n(v){v=Number(v||0);return isFinite(v)?v:0;}
+    function load(ctx){
+        var o={};
+        try{
+            var s=qfSource(ctx),raw=s&&s.get?s.get(QF_PROXY_QUARANTINE_B2.storeKey):"";
+            if(raw)o=JSON.parse(String(raw))||{};
+        }catch(_l){o={};}
+        return o&&typeof o==="object"?o:{};
+    }
+    function save(ctx,o){
+        try{var s=qfSource(ctx);if(s&&s.put)s.put(QF_PROXY_QUARANTINE_B2.storeKey,JSON.stringify(o||{}));}catch(_s){}
+    }
+    function hit(ctx,name){
+        name=String(name||"");if(!name)return;
+        try{
+            var o=load(ctx),x=o[name]&&typeof o[name]==="object"?o[name]:{};
+            x.count=n(x.count)+1;x.lastTs=Date.now();
+            o[name]=x;o._lastName=name;o._lastTs=x.lastTs;save(ctx,o);
+        }catch(_h){}
+    }
+    function summary(ctx){
+        var o=load(ctx),ts=Array.isArray(QF_PROXY_QUARANTINE_B2.targets)?QF_PROXY_QUARANTINE_B2.targets:[],
+            total=0,hitTargets=0,items=[];
+        for(var i=0;i<ts.length;i++){
+            var t=ts[i]||{},name=String(t.name||""),x=o[name]&&typeof o[name]==="object"?o[name]:{},c=n(x.count);
+            total+=c;if(c>0)hitTargets++;
+            items.push({name:name,target:String(t.target||""),domain:String(t.domain||""),count:c,lastTs:n(x.lastTs)});
+        }
+        return {
+            version:String(QF_PROXY_QUARANTINE_B2.version||""),
+            policy:String(QF_PROXY_QUARANTINE_B2.policy||""),
+            batch:2,targets:items.length,totalHits:total,hitTargets:hitTargets,
+            zeroTargets:Math.max(0,items.length-hitTargets),deleteNow:n(QF_PROXY_QUARANTINE_B2.deleteNow),
+            items:items,lastName:String(o._lastName||""),lastTs:n(o._lastTs)
+        };
+    }
+    function text(ctx){
+        var s=summary(ctx),a=[];
+        a.push("Proxy Quarantine Probe · Batch 2 · "+s.version);
+        a.push("policy="+s.policy+" / targets="+s.targets+" / totalHits="+s.totalHits+" / hitTargets="+s.hitTargets+" / zeroTargets="+s.zeroTargets);
+        var it=s.items||[];
+        for(var i=0;i<it.length;i++){
+            var x=it[i]||{};
+            a.push((n(x.count)>0?"! HIT ":"✓ ZERO ")+String(x.name||"")+" → "+String(x.target||"")+" · "+String(x.domain||"")+" · hits "+n(x.count));
+        }
+        a.push(s.targets===0?"结论：Batch2 探针已退休；Canary 迁移删除阶段完成。":"结论：Batch2 仅采集评论链动态 ABI 证据。");
+        return a.join("\n");
+    }
+    function reset(ctx){
+        try{var s=qfSource(ctx);if(s&&s.put)s.put(QF_PROXY_QUARANTINE_B2.storeKey,"");}catch(_r){}
+    }
+    return {hit:hit,summary:summary,text:text,reset:reset};
+})();
+
+var QF_PROXY_REMOVAL_CANARY={"version":"4.2.0","policy":"COMPLETE_11_REMOVED_NO_MORE_DELETION","batch":6,"removed":[{"name":"qfPaidV38","target":"QF_ProviderRuntime.route","domain":"provider-route","staticMainCalls":0,"moduleCalls":0,"topCalls":0,"dynamicHits":0,"rollback":"restore exact proxy definition"},{"name":"qfProviderContentV38","target":"QF_ProviderExecutor.content","domain":"provider-content","staticMainCalls":0,"moduleCalls":0,"topCalls":0,"dynamicHits":0,"rollback":"restore exact proxy definition"},{"name":"qfReviewMetaGetV470","target":"QF_ReviewCache.get","domain":"review-cache","staticMainCalls":0,"moduleCalls":0,"topCalls":0,"dynamicHits":0,"rollback":"restore exact proxy definition"},{"name":"qfReviewMetaPutV470","target":"QF_ReviewCache.put","domain":"review-cache","staticMainCalls":0,"moduleCalls":0,"topCalls":0,"dynamicHits":0,"rollback":"restore exact proxy definition"},{"name":"qfServerCommentProviderV315","target":"qfCommentServerPickV313","domain":"comment-route","staticMainCalls":0,"moduleCalls":0,"topCalls":0,"dynamicHits":0,"rollback":"restore exact proxy definition"},{"name":"qfReviewNetCanTryV510","target":"QF_ReviewNetwork.canTry","domain":"review-network","staticMainCalls":0,"moduleCalls":0,"topCalls":0,"dynamicHits":0,"rollback":"restore exact proxy definition"},{"name":"qfReviewNetMarkV510","target":"QF_ReviewNetwork.mark","domain":"review-network","staticMainCalls":0,"moduleCalls":0,"topCalls":0,"dynamicHits":0,"rollback":"restore exact proxy definition"},{"name":"qfOfficialReviewApiV402","target":"QF_ReviewApi.request","domain":"review-api","staticMainCalls":0,"moduleCalls":0,"topCalls":0,"dynamicHits":0,"rollback":"restore exact proxy definition"},{"name":"qfOfficialReviewRawV400","target":"QF_ReviewApi.rich","domain":"review-api","staticMainCalls":0,"moduleCalls":0,"topCalls":0,"dynamicHits":0,"rollback":"restore exact proxy definition"},{"name":"qfArgusOuterSpecV350","target":"QF_OfficialClient.argusSpec","domain":"review-sign","staticMainCalls":0,"moduleCalls":0,"topCalls":0,"dynamicHits":0,"rollback":"restore exact proxy definition"},{"name":"qfOfficialReviewSpecV400","target":"QF_OfficialClient.reviewSpec","domain":"review-sign","staticMainCalls":0,"moduleCalls":0,"topCalls":0,"dynamicHits":0,"rollback":"restore exact proxy definition"}],"remainingMigratedZero":0,"deleteCount":11,"rollbackOn":["paid-content-regression","provider-route-regression","continuous-reading-regression","review-cache-regression","paragraph-review-regression","chapter-review-regression","server-comment-auto-route-regression","sunny-server-comment-regression","limited-server-comment-regression","review-cooldown-regression","review-retry-throttle-regression","review-failure-counter-regression","hot-review-regression","chapter-end-review-regression","author-say-review-regression","review-signature-construction-regression","reader-profile-request-regression","argus-compat-request-regression"],"stage":"COMPLETE","completedIn":"4.1.0-alpha10.9.7"};
+var QF_ProxyRemovalCanary=(function(){
+    function n(v){v=Number(v||0);return isFinite(v)?v:0;}
+    function summary(){
+        var a=QF_PROXY_REMOVAL_CANARY||{},r=Array.isArray(a.removed)?a.removed:[];
+        return {version:String(a.version||""),policy:String(a.policy||""),batch:n(a.batch),
+            removed:r.length,remaining:n(a.remainingMigratedZero),deleteCount:n(a.deleteCount)};
+    }
+    function text(){
+        var a=QF_PROXY_REMOVAL_CANARY||{},s=summary(),out=[];
+        out.push("Proxy Removal Canary · "+s.version);
+        out.push("policy="+s.policy+" / batch="+s.batch+" / removed="+s.removed+" / remainingMigratedZero="+s.remaining);
+        var r=Array.isArray(a.removed)?a.removed:[];
+        for(var i=0;i<r.length;i++){
+            var x=r[i]||{};
+            out.push("✂ "+String(x.name||"")+" → "+String(x.target||"")+" · "+String(x.domain||"")+
+                " · evidence main/module/top/dynamic="+n(x.staticMainCalls)+"/"+n(x.moduleCalls)+"/"+n(x.topCalls)+"/"+n(x.dynamicHits));
+        }
+        out.push("回滚原则：B1 Provider×2；B2 ReviewCache×2；B3 ServerComment×1；B4 ReviewNetwork×2；B5 ReviewAPI×2；B6 ReviewSign×2。任何相关回归只恢复对应批次精确定义。");
+        return out.join("\n");
+    }
+    return {summary:summary,text:text};
+})();
+
+var QF_RELEASE_FREEZE={
+    version:"4.2.0",
+    baseline:"4.2.0-rc1-runtime-proof",
+    state:"V4_2_STABLE",
+    policy:"STABLE_MAINTENANCE_ONLY",
+    businessDelta:0,
+    maintenance:"STABLE_PROMOTION",
+    catalog:"DUAL_SIMPLE_WEB_EXACT_PLUS_WARM_REVALIDATION_PROVEN",
+    detail:"NO_EXTERNAL_PROVIDER_PROBE",
+    review:"LOCAL_FULL_HYBRID_PREFERRED_SUMMARY_PROVEN",
+    freeContent:"APP_FIRST_WEB_FALLBACK_PROVEN",
+    provider:"REGISTRY14_LAZY_ROUTE_FROZEN",
+    domains:"FOUR_DOMAIN_CANONICAL_PROVEN_CIRCLE_OPEN_MODEL",
+    proxy:"CURRENT75_REMOVED11_STOP_DELETE",
+    modules:"31_NO_DELETE",
+    chapterHotPath:"FROZEN_ALPHA9_15",
+    diagnostics:"PRODUCTIONIZED_ALPHA11_1",
+    regression:"A_TO_J_RUNTIME_PASS",
+    rc:"RC1_RUNTIME_PASS",
+    knownDeferred:"AUTHOR_REPLY",
+    promotion:"STABLE",
+    rules:[
+        "BUSINESS_BEHAVIOR_ZERO_DELTA",
+        "STABLE_MAINTENANCE_ONLY",
+        "NO_ARCHITECTURE_CHANGE",
+        "NO_PROXY_DELETE",
+        "NO_MODULE_DELETE",
+        "NO_CROSS_DOMAIN_CHANGE",
+        "SINGLE_DOMAIN_RUNTIME_FIX_ONLY",
+        "AUTHOR_REPLY_DEFERRED_NON_BLOCKING",
+        "ROLLBACK_BASELINE_RC1"
+    ]
+};
+
+var QF_OfficialSeverity=(function(){
+    function n(v){v=Number(v||0);return isFinite(v)?v:0;}
+    function text(v){try{return String(v==null?"":v);}catch(_e){return "";}}
+    function reviewDebt(endpoint,lastError,lastCode){
+        var ep=text(endpoint).toLowerCase(),er=(text(lastError)+" "+text(lastCode)).toLowerCase();
+        var reviewPath=/v1\/chapterreview\/(?:getparagraphshotcomments|getchapterendreview)/.test(ep);
+        var reviewScope=/^(?:review-reader:|argus:)/.test(ep);
+        var sign=/auth\/sign|qdsign|qdinfo|signature|sign error|signature_error|验签|签名/.test(er);
+        return reviewPath&&reviewScope&&sign;
+    }
+    function eggFallbackOk(ctx){
+        try{
+            if(!ctx||typeof QF_EggReport==="undefined"||!QF_EggReport||typeof QF_EggReport.load!=="function")return false;
+            var r=QF_EggReport.load(ctx),o=r&&r.output||{},age=Date.now()-n(r&&r.ts);
+            return !!(r&&age>=0&&age<=10*60*1000&&n(o.images)>0&&text(o.source));
+        }catch(_e){return false;}
+    }
+    function optional(endpoint,lastError,catalogOk,eggOk){
+        var ep=text(endpoint).toLowerCase(),er=text(lastError).toLowerCase();
+        if(/freshman\/limitfreepopup/.test(ep)&&/-11205\b/.test(er))return "freshman-limitfree";
+        if(/bookshelf\/gethighlevelbookreadinfo/.test(ep)&&/-301\b/.test(er))return "highlevel-readinfo";
+        if(catalogOk&&/chapterlist\/chapterlist/.test(ep)&&/-1004\b/.test(er))return "catalog-v3-probe";
+        if(eggOk&&/midpage\/pageinfo/.test(ep)&&/-280015\b/.test(er))return "egg-pageinfo-fallback-success";
+        return "";
+    }
+    function classifyEndpoint(x,catalog,eggOk){
+        x=x||{};var errors=n(x.errors);if(errors<=0)return {level:"ok",count:0,reason:""};
+        var co=catalog&&catalog.output?catalog.output:{},catalogOk=n(co.chapters)>0;
+        if(reviewDebt(x.endpoint,x.lastError,x.lastCode))return {level:"debt",count:errors,reason:"official-review-sign"};
+        var op=optional(x.endpoint,x.lastError,catalogOk,!!eggOk);if(op)return {level:"optional",count:errors,reason:op};
+        return {level:"actionable",count:errors,reason:"unclassified"};
+    }
+    function summary(official,catalog,ctx){
+        official=official||{};var eps=Array.isArray(official.endpoints)?official.endpoints:[],
+            eggOk=eggFallbackOk(ctx),
+            out={raw:n(official.errors),actionable:0,debt:0,optional:0,classified:0,items:[],eggFallbackOk:eggOk};
+        for(var i=0;i<eps.length;i++){
+            var x=eps[i]||{},c=classifyEndpoint(x,catalog,eggOk),cnt=n(c.count);
+            if(cnt<=0)continue;
+            if(c.level==="actionable")out.actionable+=cnt;
+            else if(c.level==="debt")out.debt+=cnt;
+            else if(c.level==="optional")out.optional+=cnt;
+            out.classified+=cnt;
+            out.items.push({endpoint:text(x.endpoint),errors:cnt,level:c.level,reason:c.reason,lastError:text(x.lastError),lastCode:text(x.lastCode)});
+        }
+        /* summary endpoints 最多16项；若 raw 比已分类更多，剩余一律按 actionable，禁止静默吞错。 */
+        if(out.raw>out.classified)out.actionable+=(out.raw-out.classified);
+        return out;
+    }
+    function recordLevel(x,catalog,officialSeverity,ctx){
+        x=x||{};var area=text(x.area),name=text(x.name),cap=text(x.cap),detail=text(x.detail),code=text(x.code);
+        if(area!=="official-request")return "actionable";
+        var endpoint=name+":"+cap;
+        if(reviewDebt(endpoint,detail,code))return "debt";
+        if(/freshman\/limitfreepopup/i.test(cap)&&/-11205\b/.test(detail+" "+code))return "optional";
+        if(/bookshelf\/gethighlevelbookreadinfo/i.test(cap)&&/-301\b/.test(detail+" "+code))return "optional";
+
+        var co=catalog&&catalog.output?catalog.output:{},catalogOk=n(co.chapters)>0,
+            sev=officialSeverity||{},is1004=/-1004\b/.test((detail+" "+code).toLowerCase());
+        /* 优先使用完整 cap；匿名 app 记录只在 endpoint 汇总已证明“无 actionable 且存在 optional”时降级。 */
+        if(catalogOk&&is1004&&/chapterlist\/chapterlist/i.test(cap))return "optional";
+        if(catalogOk&&is1004&&/^app$/i.test(name)&&n(sev.actionable)===0&&n(sev.optional)>0)return "optional";
+        if(eggFallbackOk(ctx)&&/-280015\b/.test((detail+" "+code).toLowerCase())&&/midpage\/pageinfo/i.test(cap))return "optional";
+        return "actionable";
+    }
+    function tag(level){
+        return level==="debt"?"KNOWN-DEBT":(level==="optional"?"OPTIONAL":"ACTIONABLE");
+    }
+    return {summary:summary,classifyEndpoint:classifyEndpoint,recordLevel:recordLevel,tag:tag,eggFallbackOk:eggFallbackOk};
+})();
+
+var QF_RuntimeGovernance=(function(){
+    var VERSION=String(QF_BUILD_VERSION||"4.1.0-alpha7.5"),SCHEMA=1,STORE_KEY="qf_runtime_diag";
+    function safe(fn,def){try{var v=fn();return v===undefined||v===null?def:v;}catch(_e){return def;}}
+    function n(v){v=Number(v||0);return isFinite(v)?v:0;}
+    function pct(a,b){return b>0?Math.round((a/b)*100):0;}
+    function catalog(ctx){return safe(function(){return QF_CatalogReport.load(ctx);},null);}
+    function official(ctx){return safe(function(){return qfOfficialClientSummary.call(ctx);},{});}
+    function review(){return safe(function(){return qfReviewNetworkSummary();},[]);}
+    function legacy(ctx){return safe(function(){return qfDiagSnapshotV85.call(ctx);},{modules:{},chapterPerf:{},events:[]});}
+    function metrics(){return safe(function(){return QF_Metrics.snapshot();},{cache:{},perf:{}});}
+    function recentErrors(){
+        var a=safe(function(){return QF_Diagnostic.snapshot();},[]),seen={},out=[];
+        for(var i=Math.max(0,a.length-24);i<a.length;i++){
+            var x=a[i]||{},k=String(x.ts||0)+"|"+String(x.area||"")+"|"+String(x.code||"")+"|"+String(x.detail||"");
+            if(seen[k])continue;seen[k]=1;out.push(x);
+        }
+        return out;
+    }
+    function reviewHealth(rv){
+        rv=Array.isArray(rv)?rv:[];
+        var summaryGood=false,summarySeen=false,summaryActive=0,summaryCooling=0,criticalCooling=0,activeTotal=0;
+        for(var i=0;i<rv.length;i++){
+            var x=rv[i]||{},ep=String(x.endpoint||""),cd=n(x.cooldownMs),fails=n(x.fails),lastOk=n(x.lastOk),lastFail=n(x.lastFail);
+            if(/^summary:/.test(ep)){
+                summarySeen=true;
+                if(cd>0)summaryActive++;
+                if(cd<=0&&fails<=0&&lastOk>0&&lastOk>=lastFail)summaryGood=true;
+            }
+            if(cd>0)activeTotal++;
+        }
+        var singleSummaryDegraded=summaryActive===1;
+        for(var j=0;j<rv.length;j++){
+            var y=rv[j]||{},key=String(y.endpoint||""),cool=n(y.cooldownMs);
+            if(cool<=0)continue;
+            if(/^summary:/.test(key)&&(summaryGood||singleSummaryDegraded))summaryCooling++;
+            else criticalCooling++;
+        }
+        return {
+            activeTotal:activeTotal,
+            criticalCooling:criticalCooling,
+            summaryCooling:summaryCooling,
+            summaryActive:summaryActive,
+            summaryGood:summaryGood,
+            summarySeen:summarySeen,
+            singleSummaryDegraded:singleSummaryDegraded
+        };
+    }
+    function healthParts(ctx){
+        var cr=catalog(ctx),oq=official(ctx),rv=review(),lg=legacy(ctx),errs=recentErrors(),critical=[],warn=[],
+            os=safe(function(){return QF_OfficialSeverity.summary(oq,cr,ctx);},{raw:n(oq.errors),actionable:n(oq.errors),debt:0,optional:0});
+        var mo=lg.modules||{};
+        if(n(mo.error)>0)critical.push("模块错误 "+n(mo.error));
+        if(cr&&cr.output&&n(cr.output.chapters)<=0)critical.push("目录无输出");
+        if(cr&&Array.isArray(cr.errors)&&cr.errors.length>0)warn.push("目录诊断告警 "+cr.errors.length);
+        if(cr&&cr.output&&/LEGACY-EMERGENCY/i.test(String(cr.output.source||"")))warn.push("目录进入灾难兜底");
+        var rh=reviewHealth(rv);
+        if(n(rh.criticalCooling)>0)warn.push("评论核心接口冷却 "+n(rh.criticalCooling));
+        var now=Date.now(),fresh=0;
+        for(var e=0;e<errs.length;e++){
+            if(now-n(errs[e].ts)>=10*60*1000)continue;
+            if(safe(function(){return QF_OfficialSeverity.recordLevel(errs[e],cr,os,ctx);},"actionable")==="actionable")fresh++;
+        }
+        if(fresh>0)warn.push("最近可处理告警 "+fresh);
+        if(n(os.actionable)>0)warn.push("官方核心请求异常 "+n(os.actionable));
+        var od=safe(function(){return QF_OfficialDomainService.summary();},{ok:true});if(od&&od.ok===false)warn.push("官方域注册异常");
+        return {level:critical.length?"error":(warn.length?"warn":"ok"),critical:critical,warn:warn};
+    }
+    function snapshot(ctx){
+        var cr=catalog(ctx),oq=official(ctx),rv=review(),lg=legacy(ctx),mt=metrics(),hp=healthParts(ctx),cp=lg.chapterPerf||{};
+        var snap={
+            schema:SCHEMA,version:VERSION,ts:Date.now(),health:hp,
+            catalog:cr||null,official:oq||{},officialSeverity:safe(function(){return QF_OfficialSeverity.summary(oq,cr,ctx);},{raw:n(oq.errors),actionable:n(oq.errors),debt:0,optional:0}),reviewBackoff:rv||[],reviewNetworkAudit:safe(function(){return QF_ReviewNetwork.audit();},{}),cache:mt.cache||{},performance:mt.perf||{},
+            modules:lg.modules||{},chapterPerf:cp,provider:safe(function(){return QF_ProviderRuntime.summary(ctx);},{}),officialDomains:safe(function(){return QF_OfficialDomainService.summary();},{}),settingsProfile:safe(function(){return QF_SettingsProfile.summary(ctx);},{}),dependencyAudit:safe(function(){return QF_DependencyAudit.summary();},{}),proxyAudit:safe(function(){return QF_ProxyAudit.summary();},{}),proxyMigration:safe(function(){return QF_ProxyMigration.summary();},{}),proxyReAudit:safe(function(){return QF_ProxyReAudit.summary();},{}),proxyProbe:safe(function(){return QF_ProxyQuarantine.summary(ctx);},{}),proxyProbe2:safe(function(){return QF_ProxyQuarantineB2.summary(ctx);},{}),proxyRemoval:safe(function(){return QF_ProxyRemovalCanary.summary();},{}),reviewApiAudit:{status:"CLOSED",proven:true,legacyKvWrites:false},releaseFreeze:QF_RELEASE_FREEZE,errors:recentErrors(),config:QF_ConfigRegistry.publicSnapshot(ctx)
+        };
+        try{var s=qfSource(ctx);if(s&&s.put)s.put(STORE_KEY,JSON.stringify(snap));}catch(e){QF_Diagnostic.warn(ctx,"runtime","diagnostic","persist",e);}
+        return snap;
+    }
+    function cacheTotals(c){
+        var z={hit:0,l1:0,l2:0,miss:0,stale:0,set:0,remove:0,evict:0,domains:0};
+        c=c||{};for(var k in c)if(Object.prototype.hasOwnProperty.call(c,k)){var x=c[k]||{};z.domains++;for(var p in z)if(p!=="domains"&&Object.prototype.hasOwnProperty.call(z,p))z[p]+=n(x[p]);}return z;
+    }
+    function dashboard(ctx){
+        var s=snapshot(ctx),h=s.health||{},o=s.official||{},ct=cacheTotals(s.cache),cr=s.catalog&&s.catalog.output?s.catalog.output:null,cc=s.catalog&&s.catalog.completeness?s.catalog.completeness:{},rv=s.reviewBackoff||[],rh=reviewHealth(rv);
+        var os=s.officialSeverity||{},netCalls=n(o.calls),netHits=n(o.cacheHits),netErrors=n(o.errors),impactErrors=n(os.actionable),avg=n(o.network)>0?Math.round(n(o.totalMs)/n(o.network)):0;
+        var health=h.level==="error"?"✕ 需要排查":(h.level==="warn"?"⚠ 有告警":"✓ 运行正常");
+        var healthDetail=(h.critical||[]).concat(h.warn||[]).join(" · ")||"未发现当前运行异常";
+        var cat=cr?("📚 目录 · "+n(cr.chapters)+"章 / 时间"+n(cr.time)+" / 字数可选 "+n(cr.words)+"/"+n(cc.chapters||cr.chapters)+" · "+String(cr.source||"")):"📚 目录 · 尚无运行快照";
+        var network="🌐 网络 · calls "+netCalls+" / cache "+netHits+" / rawErr "+netErrors+" / impactErr "+impactErrors+" / debt "+n(os.debt)+" / optional "+n(os.optional)+(avg?" / avg "+avg+"ms":"");
+        var optionalProbeAudit="🔬 Detail Optional · highlevel retired / limitpopup retired · CLOSED";
+        var cache="🗃 缓存 · hit "+ct.hit+" / miss "+ct.miss+" / stale "+ct.stale+" / evict "+ct.evict;
+        var review="💬 评论网络 · "+(n(rh.criticalCooling)>0?(n(rh.criticalCooling)+" 个核心接口冷却"):"核心无冷却")+(n(rh.summaryCooling)>0?(" · summary镜像降级 "+n(rh.summaryCooling)):"");
+        var rna=s.reviewNetworkAudit||{},reviewAudit="🧪 ReviewNet直调 · canTry "+n(rna.canTryCalls)+" / mark "+n(rna.markCalls)+" / fail "+n(rna.failMarks)+" / blocked "+n(rna.blocked)+" / active "+n(rna.activeCooldown);
+        var sp=s.settingsProfile||{},settings="🎛 设置 · "+String(sp.mode||"自定义")+" · managed "+((sp.managed&&sp.managed.length)||0);
+        var pr=s.provider||{},rr=pr.route||{},pst=pr.state||{},provider="⚙️ Provider · "+String(rr.tier||"未选择")+" → "+String(rr.pick||"自动")+(pst.lastProvider?" · "+String(pst.lastProvider):"")+((pst.cooling&&pst.cooling.length)?" · 冷却"+pst.cooling.length:"")+" · Registry "+((pr.registry&&pr.registry.ok)?"OK":"WARN");
+        var od=s.officialDomains||{},domains="🏛 官方域 · Copyright / Role / Circle / Egg · "+(od.ok===false?"Registry WARN":"Registry OK");
+        var da=s.dependencyAudit||{},audit="🧭 依赖审计 · modules "+n(da.modules)+" / module-used Vxx "+n(da.directModuleUsedV)+" / unresolved "+n(da.unresolvedV)+" · NO DELETE";
+        var pa=s.proxyAudit||{},proxyAudit="🪢 代理审计 · current "+n(pa.proxyCount)+" / removed "+n(pa.removed)+" / safe "+n(pa.safe)+" / protected "+(n(pa.abi)+n(pa.module))+" / unknown "+n(pa.unknown)+" · FINAL";
+        var pm=s.proxyMigration||{},proxyMigration="🔁 代理迁移 · batch "+n(pm.batch)+" / targets "+n(pm.targets)+" / calls "+n(pm.calls)+" · COMPLETE";
+        var pra=s.proxyReAudit||{},proxyReAudit="🧪 最终代理复审 · current "+n(pra.proxies)+" / active "+n(pra.uniqueActive)+" / migrated-zero "+n(pra.migratedZero)+" / zero-all "+n(pra.zeroAll)+" · CLOSED";
+        var pp=s.proxyProbe||{},proxyProbe=n(pp.targets)>0?("🛰 代理探针 B1 · hits "+n(pp.totalHits)+" / hitTargets "+n(pp.hitTargets)+" / zeroTargets "+n(pp.zeroTargets)+" · KEEP"):"🛰 代理探针 B1 · targets 0 · RETIRED";
+        var pp2=s.proxyProbe2||{},proxyProbe2=n(pp2.targets)>0?("🛰 代理探针 B2 · hits "+n(pp2.totalHits)+" / hitTargets "+n(pp2.hitTargets)+" / zeroTargets "+n(pp2.zeroTargets)+" · KEEP"):"🛰 代理探针 B2 · targets 0 · RETIRED";
+        var pr=s.proxyRemoval||{},proxyRemoval="✂️ 代理删除 Canary · batch "+n(pr.batch)+" / removed "+n(pr.removed)+" / remaining "+n(pr.remaining)+" · COMPLETE";
+        var proxySummary="🧹 代理治理 · current "+n(pra.proxies)+" / removed "+n(pa.removed)+" / active "+n(pra.uniqueActive)+" / migrated-zero "+n(pra.migratedZero)+" · CLOSED";
+        var raa=s.reviewApiAudit||{},reviewApiAudit="🧪 Review API Direct · PROVEN / legacy KV audit retired · CLOSED";
+        var reviewSigning="🔐 Official Review · JSON semantic classification fixed · CLOSED";
+        var rf=s.releaseFreeze||{},releaseFreeze="✅ v4.2.0 Stable · 正式稳定版";
+        var mod=s.modules||{},modules="🧩 模块 · ready "+n(mod.ready)+" / cold "+n(mod.cold)+" / error "+n(mod.error)+" / waits "+n(mod.waits);
+        var er=s.errors||[],errors="🧯 最近异常 · "+er.length+" 条"+(er.length?(" · "+String(er[er.length-1].code||"INTERNAL_ERROR")):"");
+        return {health:health,healthDetail:healthDetail,catalog:cat,network:network,optionalProbeAudit:optionalProbeAudit,cache:cache,review:review,reviewAudit:reviewAudit,settings:settings,provider:provider,domains:domains,audit:audit,proxyAudit:proxyAudit,proxyMigration:proxyMigration,proxyReAudit:proxyReAudit,proxyProbe:proxyProbe,proxyProbe2:proxyProbe2,proxyRemoval:proxyRemoval,proxySummary:proxySummary,reviewApiAudit:reviewApiAudit,reviewSigning:reviewSigning,releaseFreeze:releaseFreeze,modules:modules,errors:errors};
+    }
+    function formatTime(ts){try{var d=new Date(Number(ts||0));return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)+" "+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)+":"+("0"+d.getSeconds()).slice(-2);}catch(_e){return String(ts||"");}}
+    function section(ctx,name){
+        name=String(name||"overview");var s=snapshot(ctx),a=[];
+        if(name==="catalog")return QF_CatalogReport&&QF_CatalogReport.text?QF_CatalogReport.text(ctx):"目录：暂无报告";
+        if(name==="egg")return QF_EggReport&&QF_EggReport.text?QF_EggReport.text(ctx):"彩蛋：暂无报告";
+        if(name==="network"){
+            var o=s.official||{},os=s.officialSeverity||{};a.push("网络 / Official Request");
+            a.push("calls="+n(o.calls)+" network="+n(o.network)+" cacheHit="+n(o.cacheHits)+" rawError="+n(o.errors)+" / impactError="+n(os.actionable)+" / knownDebt="+n(os.debt)+" / optional="+n(os.optional));
+            if(n(o.network)>0)a.push("avg="+Math.round(n(o.totalMs)/n(o.network))+"ms");
+            var ep=Array.isArray(o.endpoints)?o.endpoints:[];
+            for(var i=0;i<Math.min(ep.length,10);i++){
+                var x=ep[i]||{},sc=QF_OfficialSeverity.classifyEndpoint(x,s.catalog),lv=String(sc.level||"ok"),
+                    pre=lv==="actionable"?"! ACTION ": (lv==="debt"?"△ DEBT ": (lv==="optional"?"· OPTIONAL ":"· "));
+                a.push(pre+String(x.endpoint||"")+" calls="+n(x.calls)+" net="+n(x.network)+" hit="+n(x.cacheHits)+" err="+n(x.errors)+" last="+n(x.lastMs)+"ms"+(x.lastError?" · "+QF_Diagnostic.redact(x.lastError):""));
+            }
+            if(n(o.errors)>0&&n(os.actionable)===0)a.push("说明：rawError 保留所有原始失败；impactError=0 表示当前失败均已分类为非阻断项，不代表主链故障。");
+            if(n(os.debt)>0)a.push("说明：KNOWN-DEBT 为当前已知兼容债，保留原始失败计数但不再判定为运行故障。");
+            if(n(os.optional)>0)a.push("说明：OPTIONAL 为可选官方能力/探测失败；若 Egg 已由其它官方链路成功输出，midpage/pageinfo -280015 也归入非阻断降级，不影响当前正文/彩蛋结果。");
+            var rv=s.reviewBackoff||[],rh=reviewHealth(rv);for(var r=0;r<rv.length;r++){var y=rv[r]||{},epn=String(y.endpoint||""),show=n(y.cooldownMs)>0||n(y.fails)>0;if(!show)continue;var mirror=/^summary:/.test(epn)&&(rh.summaryGood||rh.singleSummaryDegraded); a.push((mirror?"· review mirror ":"! review ")+epn+" fails="+n(y.fails)+" cooldown="+n(y.cooldownMs)+"ms last="+n(y.lastMs)+"ms");}
+            if(n(rh.summaryCooling)>0)a.push("说明：summary 为 www/m/read 多镜像择优；单个镜像活动冷却不足以证明整组不可用，只记 DEGRADED；多个镜像同时冷却且无成功镜像时才升级告警。");
+            var ra=s.reviewNetworkAudit||{};a.push("ReviewNet Canary：canTry="+n(ra.canTryCalls)+" mark="+n(ra.markCalls)+" ok="+n(ra.okMarks)+" fail="+n(ra.failMarks)+" blocked="+n(ra.blocked)+" active(raw)="+n(ra.activeCooldown)+" maxCd="+n(ra.maxCooldownMs)+"ms");
+            if(ra.lastKey)a.push("ReviewNet last："+String(ra.lastKey)+" fails="+n(ra.lastFails)+" cooldown="+n(ra.lastCooldownMs)+"ms");
+            return a.join("\n");
+        }
+        if(name==="proxy-migration"){
+            return QF_ProxyMigration&&QF_ProxyMigration.text?QF_ProxyMigration.text():"代理迁移：暂无";
+        }
+        if(name==="proxy-reaudit"){
+            return QF_ProxyReAudit&&QF_ProxyReAudit.text?QF_ProxyReAudit.text():"代理复审：暂无";
+        }
+        if(name==="proxy-probe"){
+            return QF_ProxyQuarantine&&QF_ProxyQuarantine.text?QF_ProxyQuarantine.text(ctx):"代理探针：暂无";
+        }
+        if(name==="proxy-probe2"){
+            return QF_ProxyQuarantineB2&&QF_ProxyQuarantineB2.text?QF_ProxyQuarantineB2.text(ctx):"代理探针B2：暂无";
+        }
+        if(name==="proxy-removal"){
+            return QF_ProxyRemovalCanary&&QF_ProxyRemovalCanary.text?QF_ProxyRemovalCanary.text():"代理删除Canary：暂无";
+        }
+        if(name==="review-api-audit"){
+            return "Review API Direct Audit · "+VERSION+"\nstatus=PROVEN/CLOSED\nlegacy persistence=RETIRED\n结论：Batch5/Batch6 直达稳定入口已由历史真机跨Context证据证明；本版不再在 Review 热路径写 source KV。";
+        }
+        if(name==="review-signing"){
+            return "Official Review Closeout · "+VERSION+"\nstatus=FIXED/CLOSED\nfix=Review JSON-first semantic classification\nscope=getparagraphshotcomments|getchapterendreview\nevidence=reader合法空响应 + chapterendreview正数据parsed=6\nlegacy signing audit=RETIRED";
+        }
+        if(name==="stable-freeze"){
+            var f=QF_RELEASE_FREEZE||{};
+            return "Stable Freeze · "+VERSION+
+                "\nstate="+String(f.state||"")+
+                "\nbaseline="+String(f.baseline||"")+
+                "\npolicy="+String(f.policy||"")+
+                "\nbusinessDelta="+String(f.businessDelta)+
+                "\nCatalog="+String(f.catalog||"")+
+                "\nDetail="+String(f.detail||"")+
+                "\nReview="+String(f.review||"")+
+                "\nProvider="+String(f.provider||"")+
+                "\nProxy="+String(f.proxy||"")+
+                "\nModules="+String(f.modules||"")+
+                "\nMaintenance="+String(f.maintenance||"")+
+                "\nRollbackBaseline="+String(f.baseline||"")+
+                "\n规则：不再架构重构；不批量删代理；不跨多个主域同时改行为；真机复现后才修；回退基线以 manifest.baseline 为准。";
+        }
+        if(name==="maintenance-summary"){
+            var f=QF_RELEASE_FREEZE||{},m=s.modules||{},pr=s.provider||{},rg=pr.registry||{};
+            return "Maintenance Baseline · "+VERSION+
+                "\nstate="+String(f.state||"")+" / businessDelta="+String(f.businessDelta)+
+                "\nrollbackBaseline="+String(f.baseline||"")+
+                "\nCatalog="+String(f.catalog||"")+
+                "\nDetail="+String(f.detail||"")+
+                "\nReview="+String(f.review||"")+
+                "\nProvider=registry "+n(rg.count)+" / "+(rg.ok?"OK":"WARN")+
+                "\nProxy=current75 / removed11 / CLOSED"+
+                "\nModules=31 / ready "+n(m.ready)+" / cold "+n(m.cold)+" / error "+n(m.error)+
+                "\nNetwork=rawErr preserved / impactErr=actionable"+
+                "\nCatalogWords=optional coverage only / wordRequests=0\nCatalogWarm=changed probe -> dual-simple+web revalidate · PROVEN\nRecentSeverity=endpoint summary cross-check\nReviewIdentity=alpha1 PROVEN / row+payload PROVEN / paragraph+chapter PROVEN / author-reply DEFERRED\nReviewHealth=single-summary cooldown DEGRADED\nOfficialDomainBatch1=copyright:qf.copyright/1 / role:qf.role-set/1\nCopyrightDate=detail → catalog → getsimple(first-publish) · time/Time HOTFIX\nRoleSheet=88% / radius24 / layout-ratio frozen\nOfficialDomainBatch2=circle:qf.circle-set/1 / egg:qf.egg-set/1\nEggHealth=pageinfo -280015 OPTIONAL only when recent Egg output succeeds\nCircleCanonical=open-model / preserve legacy ABI + all extension keys\nChapterHotPath=review-plan LAZY-AFTER-CONTENT / restored after single-book false alarm\nChapterPerf=HOT_PATH_FROZEN / production summary by default / deep trace on demand\nHotStrategy=LOCAL-FULL + HYBRID · PROVEN\nReviewPrime=preferred summary + chapter-end · PROVEN\nFreeContent=APP safegetcontent FIRST → web fallback · PROVEN\nReviewEdge=全职高手 API→mapping→renderer→final-return PROVEN / CLOSED\nDiagnostics=default compact / performance-deep requires 开发者诊断\nRCPreflight=A-J runtime PASS / author-reply DEFERRED non-blocking"+
+                "\n回归/深度按需：rc-preflight | performance-deep | dependency | proxy | proxy-reaudit | review-api-audit | review-signing"+
+                "\n说明：默认复制诊断不再重复展开已完成阶段的历史大报告；所有 section 与审计对象仍保留。";
+        }
+        if(name==="proxy"){
+            return QF_ProxyAudit&&QF_ProxyAudit.text?QF_ProxyAudit.text():"代理审计：暂无";
+        }
+        if(name==="dependency"){
+            return QF_DependencyAudit&&QF_DependencyAudit.text?QF_DependencyAudit.text():"依赖审计：暂无";
+        }
+        if(name==="cache"){
+            a.push("缓存指标");var c=s.cache||{},has=false;for(var k in c)if(Object.prototype.hasOwnProperty.call(c,k)){has=true;var z=c[k]||{};a.push("· "+k+" hit="+n(z.hit)+"(L1 "+n(z.l1)+"/L2 "+n(z.l2)+") miss="+n(z.miss)+" stale="+n(z.stale)+" set="+n(z.set)+" evict="+n(z.evict));}if(!has)a.push("暂无本次运行缓存样本");return a.join("\n");
+        }
+        if(name==="performance"){
+            a.push("耗时分布（生产摘要）");
+            var p=s.performance||{},yes=false;
+            for(var pk in p)if(Object.prototype.hasOwnProperty.call(p,pk)){
+                yes=true;var q=p[pk]||{};
+                a.push("· "+pk+" n="+n(q.count)+" avg="+n(q.avg)+"ms p50="+n(q.p50)+"ms p95="+n(q.p95)+"ms max="+n(q.max)+"ms");
+            }
+            var cl=s.chapterPerf&&s.chapterPerf.last?s.chapterPerf.last:null;
+            if(cl){
+                var age=Math.max(0,Date.now()-n(cl.ts));
+                a.push("章节 last="+n(cl.total)+"ms"+(cl.provider?" · "+cl.provider:"")+" · age="+Math.round(age/1000)+"s"+(s.chapterPerf.persisted?" · persisted":""));
+                var cst=Array.isArray(cl.stages)?cl.stages:[];
+                if(cst.length){
+                    var csl=[];
+                    for(var csi=0;csi<cst.length;csi++){
+                        var csx=cst[csi]||{};
+                        csl.push(String(csx.name||"?")+"="+n(csx.ms)+"ms"+(csx.detail?("("+String(csx.detail)+")"):""));
+                    }
+                    a.push("章节阶段="+csl.join(" | "));
+                }
+                var rp=cl.reviewPlan&&typeof cl.reviewPlan==="object"?cl.reviewPlan:null,
+                    rm=rp?((rp.bubble?"B":"-")+(rp.hot?"H":"-")+(rp.talk?"T":"-")+(rp.author?"A":"-")):"----";
+                a.push("章节计划="+(cl.reviewPlanLoaded?"LAZY-AFTER-CONTENT":"NOT-LOADED")+" · flags="+rm+
+                    (rp&&rp.sourceMark?"+SM":"")+(rp&&rp.commentMode?(" · "+rp.commentMode):""));
+                var rd=Array.isArray(cl.officialDelta)?cl.officialDelta:[];
+                if(rd.length){
+                    var rr=[];
+                    for(var ri=0;ri<rd.length;ri++){
+                        var rx=rd[ri]||{};
+                        rr.push(String(rx.endpoint||"")+" +"+n(rx.calls)+"/net"+n(rx.network)+
+                            (n(rx.cacheHits)>0?("/hit"+n(rx.cacheHits)):"")+
+                            (n(rx.errors)>0?("/err"+n(rx.errors)):""));
+                    }
+                    a.push("章节请求="+rr.join(" | "));
+                }else a.push("章节请求=0");
+                var rad=cl.reviewAuditDelta&&typeof cl.reviewAuditDelta==="object"?cl.reviewAuditDelta:{};
+                if(n(rad.markCalls)>0||n(rad.canTryCalls)>0||n(rad.blocked)>0)
+                    a.push("章节ReviewNet=canTry+"+n(rad.canTryCalls)+" / mark+"+n(rad.markCalls)+" / ok+"+n(rad.okMarks)+" / fail+"+n(rad.failMarks)+" / blocked+"+n(rad.blocked));
+                try{var _rsp=qfReviewSummaryPrefGet(ctx);a.push("Summary首选="+(_rsp||"学习中"));}catch(_rspE){}
+                var hp=cl.hotPlan&&typeof cl.hotPlan==="object"?cl.hotPlan:null,
+                    hr=Array.isArray(cl.hotRendered)?cl.hotRendered:[];
+                if(hp){
+                    a.push("热评="+String(hp.mode||"")+" · candidates="+
+                        (Array.isArray(hp.candidates)?hp.candidates.length:0)+
+                        " · local="+(Array.isArray(hp.localReady)?hp.localReady.length:0)+
+                        " · prime="+(Array.isArray(hp.prime)?hp.prime.length:0)+
+                        " · rendered="+hr.length);
+                }
+                a.push("深度追踪="+(qfChapterDeepTraceOn()?"ON · performance-deep 可查看":"OFF · 开启开发者诊断后采集"));
+            }
+            if(!yes&&!cl)a.push("暂无耗时样本");
+            return a.join("\n");
+        }
+        if(name==="performance-deep"){
+            a.push("章节深度追踪（仅开发者诊断开启时采集完整细节）");var p=s.performance||{},yes=false;for(var pk in p)if(Object.prototype.hasOwnProperty.call(p,pk)){yes=true;var q=p[pk]||{};a.push("· "+pk+" n="+n(q.count)+" avg="+n(q.avg)+"ms p50="+n(q.p50)+"ms p95="+n(q.p95)+"ms max="+n(q.max)+"ms");}var cl=s.chapterPerf&&s.chapterPerf.last?s.chapterPerf.last:null;if(cl){var age=Math.max(0,Date.now()-n(cl.ts));a.push("章节 last="+n(cl.total)+"ms"+(cl.provider?" · "+cl.provider:"")+" · age="+Math.round(age/1000)+"s"+(s.chapterPerf.persisted?" · persisted":""));var cst=Array.isArray(cl.stages)?cl.stages:[];if(cst.length){var csl=[];for(var csi=0;csi<cst.length;csi++){var csx=cst[csi]||{};csl.push(String(csx.name||"?")+"="+n(csx.ms)+"ms"+(csx.detail?("("+String(csx.detail)+")"):""));}a.push("章节阶段="+csl.join(" | "));}var css=Array.isArray(cl.subStages)?cl.subStages:[];if(css.length){var cso=[],csd=[];for(var cssi=0;cssi<css.length;cssi++){var csy=css[cssi]||{},txt=String(csy.name||"?")+"="+n(csy.ms)+"ms"+(csy.detail?("("+String(csy.detail)+")"):"");if(/^official\./.test(String(csy.name||"")))cso.push(txt);else if(/^decorate\./.test(String(csy.name||"")))csd.push(txt);}if(cso.length)a.push("Official子阶段="+cso.join(" | "));if(csd.length)a.push("Decorate子阶段="+csd.join(" | "));}var re=Array.isArray(cl.reviewEdge)?cl.reviewEdge:[];if(re.length){var rel=[],retl=[];for(var rei=0;rei<re.length;rei++){var rx=re[rei]||{},rt=String(rx.stage||"?")+" src="+String(rx.source||"?")+" items="+n(rx.items)+" total="+n(rx.total)+" seg="+n(rx.segments)+" "+(rx.valid?"OK":"EMPTY")+(rx.detail?(" · "+String(rx.detail)):"");rel.push(rt);if(String(rx.stage||"")==="content-return")retl.push(rt);}a.push("ReviewEdge="+rel.join(" | "));if(retl.length)a.push("最终返回="+retl.join(" | "));}var rp=cl.reviewPlan&&typeof cl.reviewPlan==="object"?cl.reviewPlan:null,rm=rp?((rp.bubble?"B":"-")+(rp.hot?"H":"-")+(rp.talk?"T":"-")+(rp.author?"A":"-")):"----";a.push("章节计划="+(cl.reviewPlanLoaded?"LAZY-AFTER-CONTENT":"NOT-LOADED")+" · flags="+rm+(rp&&rp.sourceMark?"+SM":"")+(rp&&rp.commentMode?" · "+rp.commentMode:"")+(Array.isArray(cl.modulesLoaded)&&cl.modulesLoaded.length?" · modules+ "+cl.modulesLoaded.join(","):" · modules+ 0"));a.push("章节模块="+(Array.isArray(cl.modulesUsed)&&cl.modulesUsed.length?"use "+cl.modulesUsed.join(","):"use 0")+(Array.isArray(cl.moduleFns)&&cl.moduleFns.length?" · fn "+cl.moduleFns.join(","):""));var rd=Array.isArray(cl.officialDelta)?cl.officialDelta:[];if(rd.length){var rr=[];for(var ri=0;ri<rd.length;ri++){var rx=rd[ri]||{};rr.push(String(rx.endpoint||"")+" +"+n(rx.calls)+"/net"+n(rx.network)+(n(rx.cacheHits)>0?("/hit"+n(rx.cacheHits)):"")+(n(rx.errors)>0?("/err"+n(rx.errors)):""));}a.push("章节请求="+rr.join(" | "));}else a.push("章节请求=0");var rad=cl.reviewAuditDelta&&typeof cl.reviewAuditDelta==="object"?cl.reviewAuditDelta:{};if(n(rad.markCalls)>0||n(rad.canTryCalls)>0||n(rad.blocked)>0)a.push("章节ReviewNet=canTry+"+n(rad.canTryCalls)+" / mark+"+n(rad.markCalls)+" / ok+"+n(rad.okMarks)+" / fail+"+n(rad.failMarks)+" / blocked+"+n(rad.blocked));var rnt=Array.isArray(cl.reviewNetTrace)?cl.reviewNetTrace:[];if(rnt.length){var rnl=[];for(var rni=0;rni<rnt.length;rni++){var rn=rnt[rni]||{};if(String(rn.action||"")==="mark")rnl.push("#"+n(rn.seq)+" "+String(rn.key||"?")+" "+(rn.ok?"OK":"FAIL")+" "+n(rn.ms)+"ms"+(n(rn.cooldownMs)>0?(" cd="+n(rn.cooldownMs)):""));else if(rn.blocked)rnl.push("#"+n(rn.seq)+" "+String(rn.key||"?")+" BLOCK cd="+n(rn.cooldownMs));}if(rnl.length)a.push("章节ReviewNet明细="+rnl.join(" | "));}try{var _rsp=qfReviewSummaryPrefGet(ctx);a.push("Summary首选="+(_rsp||"学习中"));}catch(_rspE){}var hp=cl.hotPlan&&typeof cl.hotPlan==="object"?cl.hotPlan:null;if(hp){a.push("热评计划="+String(hp.mode||"")+" · candidates["+(Array.isArray(hp.candidates)?hp.candidates.join(","):"")+"] · local["+(Array.isArray(hp.localReady)?hp.localReady.join(","):"")+"] · prime["+(Array.isArray(hp.prime)?hp.prime.join(","):"")+"]");}var ht=Array.isArray(cl.hotTrace)?cl.hotTrace:[];if(ht.length){var hs=[];for(var hi=0;hi<ht.length;hi++){var hx=ht[hi]||{},state="FAIL";if(hx.blocked)state="BLOCK";else if(hx.cache==="hit")state="HIT";else if(hx.ok)state="OK";var line="#"+n(hx.seq)+" "+String(hx.stage||"")+" pid="+String(hx.pid||"?")+" "+String(hx.profile||"?")+" "+state;if(hx.detail)line+="/"+String(hx.detail);if(n(hx.rows)>0)line+=" rows="+n(hx.rows);if(n(hx.ms)>0)line+=" "+n(hx.ms)+"ms";hs.push(line);}a.push("章节热评="+hs.join(" | "));}var hr=Array.isArray(cl.hotRendered)?cl.hotRendered:[];if(hr.length){var hrr=[];for(var hj=0;hj<hr.length;hj++){var hz=hr[hj]||{};hrr.push("pid="+String(hz.pid||"?")+" rows="+n(hz.rows)+" like="+n(hz.like));}a.push("热评渲染="+hrr.join(" | "));}else if(hp&&hp.showHot){a.push("热评渲染=0");}}if(!yes&&!cl)a.push("暂无耗时样本");return a.join("\n");
+        }
+        if(name==="rc-preflight"){
+            var f=QF_RELEASE_FREEZE||{},m=s.modules||{},pr=s.provider||{},rg=pr.registry||{},
+                os=s.officialSeverity||{},od=s.officialDomains||{},
+                cl=s.chapterPerf&&s.chapterPerf.last?s.chapterPerf.last:null;
+            a.push("v4.2 Stable Regression · "+VERSION);
+            a.push("状态="+(n(os.actionable)===0&&n(m.error)===0&&(rg.ok!==false)&&(od.ok!==false)?"READY-FOR-REGRESSION":"HOLD"));
+            a.push("自动门禁：impactErr="+n(os.actionable)+" / moduleError="+n(m.error)+" / providerRegistry="+(rg.ok===false?"WARN":"OK")+" / officialDomains="+(od.ok===false?"WARN":"OK"));
+            a.push("冻结基线="+String(f.baseline||"")+" / businessDelta="+String(f.businessDelta));
+            if(cl)a.push("最近章节="+n(cl.total)+"ms · "+String(cl.provider||"?")+" · flags="+
+                ((cl.reviewPlan&&cl.reviewPlan.bubble)?"B":"-")+
+                ((cl.reviewPlan&&cl.reviewPlan.hot)?"H":"-")+
+                ((cl.reviewPlan&&cl.reviewPlan.talk)?"T":"-")+
+                ((cl.reviewPlan&&cl.reviewPlan.author)?"A":"-"));
+            a.push("");
+            a.push("最终回归矩阵（真机人工确认）");
+            a.push("□ A 普通免费章：正文 + 段评 + 热评 + 本章说 + 作者说");
+            a.push("□ B VIP章：Provider正文 + 段评/本章说对齐");
+            a.push("□ C 同人：源变量Token + 正文 + 官方评论附加");
+            a.push("□ D 评论：普通段评 / 楼中楼 / 配图 / 配音 / 身份标签");
+            a.push("□ E 开关：B/H/T/A 分别关闭后不产生对应附加内容");
+            a.push("□ F Official Domains：版权 / 角色卡 / 彩蛋 / 书友圈");
+            a.push("□ G Catalog：普通书 + 大目录书 + warm probe");
+            a.push("□ H Provider：限免 / 优选 / 兜底 至少各抽1个");
+            a.push("□ I 特殊书：全职高手类样本正文与评论正常");
+            a.push("□ J 诊断：默认摘要正常；开发者诊断开关可切换 deep trace");
+            a.push("");
+            a.push("结果：A-J 真机全部通过 · RC1 真机通过 · Stable 已晋升；作者说回复 DEFERRED 不阻塞。");
+            return a.join("\n");
+        }
+        if(name==="settings"){
+            var sp=s.settingsProfile||{},sv=sp.values||{};a.push("Settings Profile · "+String(QF_BUILD_VERSION||""));a.push("mode="+String(sp.mode||"自定义")+" / presets=极速|均衡|完整|自定义");
+            var sl=Array.isArray(sp.layers)?sp.layers:[];if(sl.length)a.push("layers="+sl.join(" | "));
+            var sk=Array.isArray(sp.managed)?sp.managed:[];for(var si=0;si<sk.length;si++){var sx=String(sk[si]||"");a.push("· "+sx+" = "+String(sv[sx]||""));}
+            a.push("范围：五层设置只整理入口，不删除高级项、不迁移配置；预设仍只管理评论/附加阅读负载开关。正文源、Provider 排序、账号、服务器评论源、弹窗外观和开发者诊断保持独立。高级修改受管项后自动进入“自定义”。");return a.join("\n");
+        }
+        if(name==="provider"){
+            var pr=s.provider||{},rr=pr.route||{},rg=pr.registry||{},st=pr.state||{};a.push("Provider Runtime · "+String(QF_BUILD_VERSION||""));
+            a.push("route="+String(rr.tier||"")+" / pick="+String(rr.pick||"自动")+(rr.fromBook?" / book-variable":""));
+            a.push("registry="+(rg.ok?"OK":"WARN")+" providers="+n(rg.count));var cm=pr.common||{};a.push("common="+((cm.matcher&&cm.cleaner)?"OK":"WARN")+" matcher="+(cm.matcher?"✓":"✕")+" cleaner="+(cm.cleaner?"✓":"✕"));
+            if(st.lastProvider)a.push("最近成功："+String(st.lastProvider)+(st.lastTier?" · "+String(st.lastTier):""));
+            if(st.hot&&st.hot.provider)a.push("热路由："+String(st.hot.provider)+" · hits="+n(st.hot.hits));
+            var cool=Array.isArray(st.cooling)?st.cooling:[];if(cool.length){a.push("冷却："+cool.length+" 个");for(var ci=0;ci<Math.min(cool.length,6);ci++){var c=cool[ci]||{};a.push("! "+String(c.provider||"")+" · "+n(c.mins)+"m · "+String(c.type||"other")+(c.error?" · "+QF_Diagnostic.redact(c.error):""));}}
+            var lr=Array.isArray(st.learning)?st.learning:[];if(lr.length){var seg=[];for(var li=0;li<Math.min(lr.length,6);li++){var lx=lr[li]||{};seg.push(String(lx.provider||"")+"("+(Number(lx.score||0)>=0?"+":"")+Number(lx.score||0)+")");}a.push("学习排序："+seg.join(" → "));}
+            var issues=Array.isArray(rg.issues)?rg.issues:[];for(var pi=0;pi<Math.min(issues.length,10);pi++)a.push("! "+String(issues[pi]));
+            a.push("原则：只在实际尝试某 Provider 时 lazy-load；状态由 ProviderState 管理；章节匹配/正文清洗/普通 HTTP 传输/结果错误结构统一走 Provider Common Layer。");return a.join("\n");
+        }
+                if(name==="domains"){
+            var od=s.officialDomains||{};a.push("Official Domains · "+String(QF_BUILD_VERSION||""));a.push("registry="+(od.ok===false?"WARN":"OK")+" domains="+n(od.count)+" lazy="+(od.lazy===false?"NO":"YES"));
+            var ds=Array.isArray(od.domains)?od.domains:[];for(var di=0;di<ds.length;di++){var dx=ds[di]||{};a.push((dx.ok?"✓ ":"✕ ")+String(dx.name||"")+" · "+String(dx.module||"")+" · data="+String(dx.data||"")+" · view="+String(dx.view||"")+(dx.schema?" · schema="+String(dx.schema):""));}
+            var is=Array.isArray(od.issues)?od.issues:[];for(var ii=0;ii<is.length;ii++)a.push("! "+String(is[ii]));
+            a.push("原则：Data Provider → Canonical Model → Renderer；Circle 采用开放扩展 Contract，只约束稳定核心字段并保留全部旧 ABI/扩展键；其它三域维持既有 Contract。");return a.join("\n");
+        }
+        if(name==="modules"){
+            var m=s.modules||{};a.push("模块 / Registry");a.push("ready="+n(m.ready)+" cold="+n(m.cold)+" loading="+n(m.loading)+" error="+n(m.error)+" waits="+n(m.waits));
+            var ac=Array.isArray(m.active)?m.active:[];for(var mi=0;mi<Math.min(ac.length,12);mi++){var mx=ac[mi]||{};if(mx.state==="error"||n(mx.waits)>0)a.push("! "+String(mx.name||"")+" ["+String(mx.state||"")+"] waits="+n(mx.waits)+" errors="+n(mx.errors)+(mx.lastError?" · "+QF_Diagnostic.redact(mx.lastError):""));}
+            var reg=safe(function(){return qfDiagRegistryCheckV85();},null);if(reg)a.push("Registry="+(reg.ok?"OK":"FAIL")+" providerCaps="+n(reg.providerCaps)+" commentCaps="+n(reg.commentCaps));return a.join("\n");
+        }
+        if(name==="errors"){
+            var e=s.errors||[],action=0,debt=0,opt=0;
+            for(var ec=0;ec<e.length;ec++){var el=QF_OfficialSeverity.recordLevel(e[ec],s.catalog,s.officialSeverity);if(el==="debt")debt++;else if(el==="optional")opt++;else action++;}
+            a.push("最近异常（已脱敏） · actionable="+action+" / knownDebt="+debt+" / optional="+opt);
+            if(!e.length)a.push("暂无异常记录");
+            for(var ei=Math.max(0,e.length-16);ei<e.length;ei++){
+                var ex=e[ei]||{},lvl=QF_OfficialSeverity.recordLevel(ex,s.catalog,s.officialSeverity),pre=lvl==="debt"?"△ ":(lvl==="optional"?"· ":"✕ ");
+                a.push(pre+formatTime(ex.ts)+" "+String(ex.area||"")+"/"+String(ex.name||"")+" ["+QF_OfficialSeverity.tag(lvl)+"/"+String(ex.code||QF_Error.classify(ex.detail))+"]"+(ex.detail?" · "+QF_Diagnostic.redact(ex.detail):""));
+            }
+            return a.join("\n");
+        }
+        if(name==="config"){
+            a.push("公开配置快照（账号/密码不会导出）");var cfg=s.config||{};for(var ck in cfg)if(Object.prototype.hasOwnProperty.call(cfg,ck))a.push("· "+ck+" = "+String(cfg[ck]));return a.join("\n");
+        }
+        var d=dashboard(ctx);a.push("Runtime Governance · "+VERSION);a.push(d.health+" · "+d.healthDetail);a.push(d.catalog);a.push(d.network);a.push(d.optionalProbeAudit);a.push(d.cache);a.push(d.review);a.push(d.reviewSigning);a.push(d.releaseFreeze);a.push(d.settings);a.push(d.provider);a.push(d.domains);a.push(d.audit);a.push(d.proxySummary);a.push(d.modules);a.push(d.errors);return a.join("\n");
+    }
+    function report(ctx){
+        var s=snapshot(ctx),a=[];a.push("Qidian Source Diagnostics");a.push("version="+VERSION+" schema="+SCHEMA);a.push("time="+formatTime(s.ts));a.push("");
+        a.push(section(ctx,"overview"));a.push("");
+        a.push(section(ctx,"stable-freeze"));a.push("");
+        a.push(section(ctx,"maintenance-summary"));a.push("");
+        a.push(section(ctx,"catalog"));a.push("");
+        a.push(section(ctx,"network"));a.push("");
+        a.push(section(ctx,"cache"));a.push("");
+        a.push(section(ctx,"performance"));a.push("");
+        a.push(section(ctx,"settings"));a.push("");
+        a.push(section(ctx,"provider"));a.push("");
+        a.push(section(ctx,"domains"));a.push("");
+        a.push(section(ctx,"egg"));a.push("");
+        a.push(section(ctx,"modules"));a.push("");
+        a.push(section(ctx,"errors"));a.push("");
+        a.push(section(ctx,"config"));
+        return QF_Diagnostic.redact(a.join("\n"));
+    }
+    function reset(ctx){
+        try{QF_Metrics.reset();}catch(_m){}try{QF_Diagnostic.clear();}catch(_d){}
+        try{QF_DIAG85_EVENTS=[];QF_DIAG85_LAST_FLUSH=0;}catch(_l){}
+        try{QF_CHAPTER_PERF510={items:[],last:null,max:8};}catch(_cp){}
+        try{if(typeof QF_OfficialClient!=="undefined"&&QF_OfficialClient.reset)QF_OfficialClient.reset(ctx);else if(typeof qfOfficialClientReset==="function")qfOfficialClientReset.call(ctx);}catch(_or){}
+        try{if(typeof QF_ReviewNetwork!=="undefined"&&QF_ReviewNetwork.clear)QF_ReviewNetwork.clear(ctx);}catch(_rr){}
+        try{if(QF_CatalogReport&&QF_CatalogReport.clear)QF_CatalogReport.clear(ctx);}catch(_cr){}
+        try{if(QF_EggReport&&QF_EggReport.clear)QF_EggReport.clear(ctx);}catch(_er){}try{if(QF_ProxyQuarantine&&QF_ProxyQuarantine.reset)QF_ProxyQuarantine.reset(ctx);}catch(_pq){}try{if(QF_ProxyQuarantineB2&&QF_ProxyQuarantineB2.reset)QF_ProxyQuarantineB2.reset(ctx);}catch(_pq2){}
+        try{var so=qfSource(ctx);if(so&&so.put){
+            var keys=["qf_diag85_last",STORE_KEY,"qf_runtime_diag_report","qf_official_client_metrics_v41","qf_review_net_metrics_v41","qf_egg_report_v75"];
+            for(var i=0;i<keys.length;i++)try{so.put(keys[i],"");}catch(_k){}
+        }}catch(_s){}
+        return true;
+    }
+    return {version:VERSION,schema:SCHEMA,snapshot:snapshot,dashboard:dashboard,section:section,report:report,reset:reset};
+})();
+
+function qfRuntimeDiagDashboard(){return QF_RuntimeGovernance.dashboard(this);}
+function qfRuntimeDiagShow(section){
+    var t=QF_RuntimeGovernance.section(this,section||"overview"),j=qfJava(this);
+    try{if(j&&j.longToast){j.longToast(String(t));return t;}}catch(_e0){}
+    try{if(j&&j.toast)j.toast(String(t));}catch(_e1){}return t;
+}
+function qfRuntimeDiagCopy(){
+    var t=QF_RuntimeGovernance.report(this),j=qfJava(this),ok=false;
+    try{if(j&&j.copyText){j.copyText(String(t));ok=true;}}catch(_c0){}
+    if(!ok){try{if(typeof java!=="undefined"&&java&&java.copyText){java.copyText(String(t));ok=true;}}catch(_c1){}}
+    if(!ok){
+        try{var s=qfSource(this);if(s&&s.put)s.put("qf_runtime_diag_report",String(t));}catch(_s){}
+        try{if(j&&j.longToast)j.longToast("当前运行环境未提供剪贴板接口，诊断报告已保存到 qf_runtime_diag_report。\n\n"+String(t));}catch(_t){}
+    }
+    return t;
+}
+function qfRuntimeDiagRefresh(){try{QF_RuntimeGovernance.snapshot(this);}catch(_s){}try{var j=qfJava(this);if(j&&j.reLoginView)j.reLoginView();}catch(_r){}return true;}
+function qfRuntimeDiagReset(){QF_RuntimeGovernance.reset(this);try{var j=qfJava(this);if(j&&j.toast)j.toast("运行时诊断已清空");if(j&&j.reLoginView)j.reLoginView();}catch(_e){}return true;}
+
+
+/* alpha41：大体积、低频模块使用 gzip+base64 保存。
+ * 书源初始化只解析压缩字符串；真正点击角色卡/书友圈/评论页等功能时才解压一次。
+ * 优选/限免等高频正文模块保持明文，避免首章额外解压开销。 */
+function qfModuleUnpackV41(v){
+    var s=String(v||"");
+    if(s.indexOf("gz:")!==0)return s;
+    try{
+        var b64=s.substring(3),bytes=null;
+        try{bytes=Packages.android.util.Base64.decode(b64,0);}catch(_a){
+            bytes=Packages.java.util.Base64.getDecoder().decode(b64);
+        }
+        var input=new Packages.java.io.ByteArrayInputStream(bytes);
+        var gz=new Packages.java.util.zip.GZIPInputStream(input);
+        var sc=new Packages.java.util.Scanner(gz,"UTF-8");
+        sc.useDelimiter("\\A");
+        var out=sc.hasNext()?String(sc.next()):"";
+        try{sc.close();}catch(_c){}
+        return out;
+    }catch(e){
+        throw new Error("模块解压失败："+String(e&&e.message||e));
+    }
+}
+
+/* alpha84：lazy module 首次加载并发保护。
+ * 旧版用单一 boolean LOADING：两个阅读任务同时首次命中同一 Provider 时，
+ * 后进入的任务会被误判为“模块循环依赖”；刷新后因模块已缓存又恢复。
+ * 现在记录加载线程：同线程再次进入才是真循环；不同线程短暂等待首载完成并复用缓存。 */
+function qfModuleThreadIdV84(){
+    try{return String(Packages.java.lang.Thread.currentThread().getId());}catch(e0){}
+    try{return String(java.lang.Thread.currentThread().getId());}catch(e1){}
+    return "js";
+}
+function qfModuleSleepV84(ms){
+    try{Packages.java.lang.Thread.sleep(Number(ms)||1);return;}catch(e0){}
+    try{java.lang.Thread.sleep(Number(ms)||1);return;}catch(e1){}
+    var until=Date.now()+(Number(ms)||1);while(Date.now()<until){}
+}
+function qfModuleWaitV84(name,owner){
+    var me=qfModuleThreadIdV84();
+    qfModuleWaitMarkV85(name);
+    if(String(owner||"")===me){
+        var ce=new Error("模块循环依赖："+name);qfDiagEventV85.call(this,"module",name,"cycle",false,0,ce.message);throw ce;
+    }
+    var end=Date.now()+2500;
+    while(Date.now()<end){
+        if(QF_MOD38_CACHE[name])return QF_MOD38_CACHE[name];
+        var cur=QF_MOD38_LOADING[name];
+        if(!cur)return null;
+        if(String(cur)===me){
+            var ce2=new Error("模块循环依赖："+name);qfDiagEventV85.call(this,"module",name,"cycle",false,0,ce2.message);throw ce2;
+        }
+        qfModuleSleepV84(8);
+    }
+    if(QF_MOD38_CACHE[name])return QF_MOD38_CACHE[name];
+    if(QF_MOD38_LOADING[name]){
+        var te=new Error("模块并发初始化超时："+name);qfDiagEventV85.call(this,"module",name,"wait",false,2500,te.message);throw te;
+    }
+    return null;
+}

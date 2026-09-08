@@ -1,0 +1,148 @@
+/* alpha81：Provider 共享但非全局必需的缓存/章节定位/搜书变体工具。 */
+function qfCacheGetFreshV56(key,ttl){
+    var v=qfCacheGet.call(this,key);
+    if(!v||typeof v!=="object")return null;
+    var ts=Number(v.ts||0),life=Number(ttl||0);
+    if(life>0&&(!ts||Date.now()-ts>life))return null;
+    return v;
+}
+
+function qfCachePutFreshV56(key,value){
+    var v=value&&typeof value==="object"?value:{value:value};
+    if(!Number(v.ts||0))v.ts=Date.now();
+    qfCachePut.call(this,key,v);
+    return v;
+}
+
+function qfChapterHintTryV56(provider,meta,list,nameKey,allowNoOffset){
+    list=qdList(list);var qi=Number(meta&&meta.index);if(!list.length||!isFinite(qi)||qi<0)return null;
+    var key=String(provider||"")+"|"+String(meta&&meta.bookId||""),h=QF_CH56_HINT[key];
+    if(h&&Number(h.ts||0)&&Date.now()-Number(h.ts||0)>7*24*60*60*1000){try{delete QF_CH56_HINT[key];}catch(_dh){}h=null;}
+    if(!h)h=qfChapterHintLoadV78.call(this,provider,meta);
+    if(!h||!isFinite(Number(h.offset)))return null;
+    var base=Math.round(qi+Number(h.offset)),ds=[0,-1,1,-2,2],tn=qfNormChapter(meta.title||""),tb=qfChapterBodyV56(meta.title||""),tno=qfChapterNoV10(meta.title||"");
+    for(var z=0;z<ds.length;z++){
+        var pi=base+ds[z];if(pi<0||pi>=list.length)continue;var x=list[pi]||{};
+        var title=String(x[nameKey]||x.title||x.chapterName||x.serialName||"");if(!title)continue;
+        var n=qfNormChapter(title),b=qfChapterBodyV56(title),no=qfChapterNoV10(title);
+        var titleExact=(n&&tn&&n===tn),bodyExact=(b&&tb&&b===tb);if(!titleExact&&!bodyExact)continue;
+        if(!allowNoOffset&&tno>=0&&no>=0&&tno!==no)continue;
+        QF_CH56_HINT[key]={offset:pi-qi,lastQ:qi,lastP:pi,ts:Date.now()};qfChapterHintTouchV56(key);return x;
+    }
+    return null;
+}
+
+function qfChapterHintPutV56(provider,meta,list,hit){
+    list=qdList(list);var qi=Number(meta&&meta.index);if(!hit||!list.length||!isFinite(qi)||qi<0)return hit;
+    var pi=-1;try{pi=list.indexOf(hit);}catch(_e){}
+    if(pi<0)return hit;var key=String(provider||"")+"|"+String(meta&&meta.bookId||"");
+    var h={offset:pi-qi,lastQ:qi,lastP:pi,ts:Date.now()};
+    QF_CH56_HINT[key]=h;qfChapterHintTouchV56(key);
+    qfChapterHintPersistV78.call(this,provider,meta,h);
+    return hit;
+}
+
+/* v3.1.0-beta4：连续翻章章节小窗口。
+ * 只驻留当前 JS 运行时，不写 source；首次严格匹配后缓存目标前后 72 章的必要字段。
+ * 命中时仍做标题/正文标题双重校验；失效自动回退 beta3 offset + 完整匹配。
+ */
+var QF_CHW310={},QF_CHW310_ORDER=[],QF_CHW310_MAX=12,QF_CHW310_RADIUS=72,QF_CHW310_TTL=30*60*1000;
+function qfChapterWindowKeyV310(provider,meta){return String(provider||"")+"|"+String(meta&&meta.bookId||"");}
+function qfChapterWindowTouchV310(key){
+    var i=QF_CHW310_ORDER.indexOf(key);if(i>=0)QF_CHW310_ORDER.splice(i,1);QF_CHW310_ORDER.push(key);
+    while(QF_CHW310_ORDER.length>QF_CHW310_MAX){var old=QF_CHW310_ORDER.shift();try{delete QF_CHW310[old];}catch(_e){QF_CHW310[old]=undefined;}}
+}
+function qfChapterWindowCloneV310(x){
+    if(!x||typeof x!=="object")return x;var o={},seen={},n=0;
+    var first=["id","Id","chapterId","ChapterId","serialID","serialId","serialName","chapterName","title","url","contUrlSuffix","shortContUrlSuffix","isFreeRead","_host"];
+    function add(k){if(seen[k]||!Object.prototype.hasOwnProperty.call(x,k))return;var v=x[k],t=typeof v;if(v===null||t==="string"||t==="number"||t==="boolean"){o[k]=v;seen[k]=1;n++;}}
+    for(var i=0;i<first.length;i++)add(first[i]);
+    for(var k in x){if(n>=36)break;if(Object.prototype.hasOwnProperty.call(x,k))add(k);}
+    return o;
+}
+function qfChapterWindowExtraV310(x){
+    x=x||{};var o={};for(var k in x)if(Object.prototype.hasOwnProperty.call(x,k)){var v=x[k],t=typeof v;if(v===null||t==="string"||t==="number"||t==="boolean")o[k]=v;}return o;
+}
+
+/* v3.5.0-beta23：小型持久热窗口。
+ * 运行期 ±72 章窗口仍为主缓存；另外只持久化命中点前后 ±12 章的必要字段，
+ * 最多保留 8 个“书籍+Provider”。重新进入阅读/JS 引擎重建后，可直接命中附近章节，
+ * 不必先重新下载整本第三方目录。目标章节超出小窗口时自动回到完整目录匹配，不影响正确性。 */
+var QF_CHP323_KEY="qf_chw_persist_v323",QF_CHP323_MAX=8,QF_CHP323_RADIUS=12,QF_CHP323_TTL=24*60*60*1000;
+function qfChapterWindowPersistRootV323(){
+    try{
+        var s=qfSource(this),raw=s&&s.get?String(s.get(QF_CHP323_KEY)||""):"";
+        var o=raw?qfJson(raw,{}):{};
+        return o&&typeof o==="object"&&!Array.isArray(o)?o:{};
+    }catch(_e){return {};}
+}
+function qfChapterWindowPersistLoadV323(provider,meta){
+    var key=qfChapterWindowKeyV310(provider,meta),root=qfChapterWindowPersistRootV323.call(this),r=root[key],now=Date.now();
+    if(!r||!r.items||!Number(r.ts)||now-Number(r.ts)>QF_CHP323_TTL)return null;
+    var b={offset:Number(r.offset||0),items:r.items||{},extra:r.extra||{},ts:now,lastQ:Number(r.lastQ||0),persistV323:true};
+    QF_CHW310[key]=b;qfChapterWindowTouchV310(key);return b;
+}
+function qfChapterWindowPersistPutV323(provider,meta,list,pi,offset,nameKey,extra){
+    try{
+        list=qdList(list);if(!list.length||pi<0)return;
+        var qi=Number(meta&&meta.index);if(!isFinite(qi)||qi<0)return;
+        var lo=Math.max(0,pi-QF_CHP323_RADIUS),hi=Math.min(list.length-1,pi+QF_CHP323_RADIUS),items={};
+        for(var p=lo;p<=hi;p++){
+            var q=p-offset;if(q<0)continue;
+            var x=list[p]||{},title=String(x[nameKey]||x.title||x.chapterName||x.serialName||"");
+            if(!title)continue;
+            items[String(q)]={chapter:qfChapterWindowCloneV310(x),title:title,pos:p};
+        }
+        if(!Object.keys(items).length)return;
+        var now=Date.now(),key=qfChapterWindowKeyV310(provider,meta),root=qfChapterWindowPersistRootV323.call(this);
+        for(var k in root)if(Object.prototype.hasOwnProperty.call(root,k)){
+            var rr=root[k];if(!rr||!Number(rr.ts)||now-Number(rr.ts)>QF_CHP323_TTL*2)delete root[k];
+        }
+        root[key]={ts:now,offset:offset,items:items,extra:qfChapterWindowExtraV310(extra),lastQ:qi};
+        var ks=Object.keys(root);
+        if(ks.length>QF_CHP323_MAX){
+            ks.sort(function(a,b){return Number((root[a]||{}).ts||0)-Number((root[b]||{}).ts||0);});
+            while(ks.length>QF_CHP323_MAX){var old=ks.shift();delete root[old];}
+        }
+        var s=qfSource(this);if(s&&s.put)s.put(QF_CHP323_KEY,JSON.stringify(root));
+    }catch(_e){}
+}
+function qfChapterWindowTryV310(provider,meta,nameKey,allowNoOffset){
+    var qi=Number(meta&&meta.index);if(!isFinite(qi)||qi<0)return null;
+    var key=qfChapterWindowKeyV310(provider,meta),b=QF_CHW310[key],now=Date.now();
+    if(!b||!b.items||!Number(b.ts)||now-Number(b.ts)>QF_CHW310_TTL){
+        if(b)try{delete QF_CHW310[key];}catch(_d){}
+        b=qfChapterWindowPersistLoadV323.call(this,provider,meta);
+        if(!b)return null;
+    }
+    var e=b.items[String(qi)];if(!e||!e.chapter)return null;var x=e.chapter||{};
+    var title=String(e.title||x[nameKey]||x.title||x.chapterName||x.serialName||"");if(!title)return null;
+    var tn=qfNormChapter(meta.title||""),tb=qfChapterBodyV56(meta.title||""),n=qfNormChapter(title),bb=qfChapterBodyV56(title);
+    if(!((n&&tn&&n===tn)||(bb&&tb&&bb===tb))){try{delete b.items[String(qi)];}catch(_m){}return null;}
+    if(!allowNoOffset){var tno=qfChapterNoV10(meta.title||""),no=qfChapterNoV10(title);if(tno>=0&&no>=0&&tno!==no)return null;}
+    b.ts=now;b.lastQ=qi;qfChapterWindowTouchV310(key);
+    return {chapter:x,extra:b.extra||{},pos:Number(e.pos),window:true,persist:!!b.persistV323};
+}
+function qfChapterWindowPutV310(provider,meta,list,hit,nameKey,extra){
+    list=qdList(list);var qi=Number(meta&&meta.index);if(!hit||!list.length||!isFinite(qi)||qi<0)return hit;
+    var pi=-1;try{pi=list.indexOf(hit);}catch(_e){}if(pi<0)return hit;
+    var offset=pi-qi,lo=Math.max(0,pi-QF_CHW310_RADIUS),hi=Math.min(list.length-1,pi+QF_CHW310_RADIUS),items={};
+    for(var p=lo;p<=hi;p++){var q=p-offset;if(q<0)continue;var x=list[p]||{},title=String(x[nameKey]||x.title||x.chapterName||x.serialName||"");if(!title)continue;items[String(q)]={chapter:qfChapterWindowCloneV310(x),title:title,pos:p};}
+    var key=qfChapterWindowKeyV310(provider,meta);QF_CHW310[key]={offset:offset,items:items,extra:qfChapterWindowExtraV310(extra),ts:Date.now(),lastQ:qi};qfChapterWindowTouchV310(key);
+    qfChapterWindowPersistPutV323.call(this,provider,meta,list,pi,offset,nameKey,extra);
+    return hit;
+}
+
+function qfNameVariantsV10(name) {
+    var raw = qfText(name), out = [];
+    function add(x) {
+        x = qfText(x);
+        if (x && out.indexOf(x) < 0) out.push(x);
+    }
+    add(raw);
+    add(raw.replace(/[（(【\[].*?[）)】\]]\s*$/g, ""));
+    var p = raw.split(/[：:]/);
+    if (p.length > 1 && p[0].length >= 2) add(p[0]);
+    add(raw.replace(/(?:小说|全文|最新章节|免费阅读)$/g, ""));
+    return out.slice(0, 4);
+}

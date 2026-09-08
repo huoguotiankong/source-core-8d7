@@ -1,0 +1,212 @@
+/* alpha79：本模块私有依赖内聚。未进入该功能时，不在全局运行时建立这些 helper。 */
+function qfSmAbsV30(base,u){
+    u=String(u||"").trim();
+    if(!u)return "";
+    if(/^https?:\/\//i.test(u))return u;
+    if(/^\/\//.test(u))return "https:"+u;
+    base=qfSmNormBaseV30(base);
+    var m=base.match(/^(https?:\/\/[^\/]+)/i);
+    var origin=m?m[1]:base;
+    if(u.charAt(0)==="/")return origin+u;
+    return base+"/"+u.replace(/^\/+/,"");
+}
+
+
+/* ============================================================
+ * v3.0.0-alpha30：晴天限免源（参考附件“🔅起点”）
+ * - 服务入口默认 https://sb.shazi.tk，可自定义。
+ * - 登录凭据：key + dttoken；后台 /login。
+ * - VIP 正文：/chapter/vip；目录辅助：/catalog。
+ * - 服务器段评：正文索引 /api/comments，点击详情直接复用服务端 /comments 页面；
+ *   本章说复用 /chapter/chapterEndComments + /chapterComments。
+ * ============================================================ */
+
+function qfServerChapterMetaPutV316(ctx,provider,bid,cid,root){
+    if(!provider||!bid||!cid||!root||typeof root!=="object")return;
+    qfServerCachePutV315(ctx,"qf-server-native-v316-"+provider+"-"+bid+"-"+cid,root);
+}
+
+function qfLimSetErrV30(name,msg){
+    try{qfRuntimeCacheV13(this).putMemory("qf_lim_err_"+String(name||""),String(msg||""));}catch(e0){}
+}
+function qfLimGetErrV30(name){
+    try{return String(qfRuntimeCacheV13(this).getFromMemory("qf_lim_err_"+String(name||""))||"");}catch(e0){return "";}
+}
+
+/* ---------- 神魔 ----------
+ * 精简复用附件“神魔小说—闲人”的服务器链路：
+ * detail(normalized) -> tocUrl -> chapter.url -> content
+ * 登录/session/动态域名放在全局 qfSm*V30 共享核心。
+ * ------------------------------------------------------------ */
+function qfSmParseJsonV30(raw){
+    try{return JSON.parse(String(raw||""))||{};}catch(e0){return {};}
+}
+function qfSmExtractContentV30(raw){
+    var j=qfSmParseJsonV30(raw),v="";
+    try{
+        if(j.content!=null)v=j.content;
+        else if(j.data&&j.data.content!=null)v=j.data.content;
+        else if(j.Data&&j.Data.Content!=null)v=j.Data.Content;
+    }catch(e0){}
+    var s=String(v||"")
+        .replace(/\\r\\n/g,"\n")
+        .replace(/\\n/g,"\n")
+        .replace(/\r\n/g,"\n")
+        .replace(/\r/g,"\n")
+        .replace(/\n{3,}/g,"\n\n")
+        .trim();
+    /* alpha13：限免源即起点官方正文，保留原始段落，不再走第三方正文净化正则。 */
+    return s;
+}
+function qfSmNearKeyV313(bid){return "qf_sm_near_v313_"+String(bid||"");}
+function qfSmNearGetV313(bid,cid,base){
+    try{
+        var o=qfCacheGet.call(this,qfSmNearKeyV313(bid));
+        if(!o||!o.map||Date.now()-Number(o.ts||0)>6*60*60*1000)return "";
+        if(base&&o.base&&String(o.base)!==String(base))return "";
+        return String(o.map[String(cid||"")]||"");
+    }catch(e){return "";}
+}
+function qfSmNearPutV313(meta,map,hitIndex){
+    try{
+        var items=(map&&map.items)||[],m={},idx=Number(hitIndex);
+        if(!isFinite(idx)||idx<0)idx=0;
+        var st=Math.max(0,idx-12),ed=Math.min(items.length,idx+73);
+        for(var i=st;i<ed;i++){
+            var x=items[i]||{},cid=String(x.cid||""),u=String(x.url||"");
+            if(cid&&u)m[cid]=u;
+        }
+        if(Object.keys(m).length)qfCachePut.call(this,qfSmNearKeyV313(meta.bookId),{base:String(map.base||""),ts:Date.now(),map:m});
+    }catch(e){}
+}
+function qfSmTocKeyV30(bid){return "qf_sm_tocmap_"+String(bid||"");}
+function qfSmTocMapV30(meta,force){
+    var cache=qfRuntimeCacheV13(this),key=qfSmTocKeyV30(meta.bookId),old="";
+    if(!force){
+        try{old=String(cache.getFromMemory(key)||"");}catch(e0){}
+        if(old){
+            try{return JSON.parse(old);}catch(e1){}
+        }
+    }
+
+    var base=qfSmChosenBaseV30.call(this,false),java=qfJava(this),errors=[];
+    qfSmMirrorV30.call(this,base);
+
+    var detailUrl=base+"/detail?bookId="+encodeURIComponent(meta.bookId)+"&format=normalized&min=1";
+    var dr="";
+    try{dr=String(java.ajax(detailUrl,14000)||"");}catch(e2){errors.push("detail："+String(e2&&e2.message||e2));}
+    var dj=qfSmParseJsonV30(dr),dd=(dj&&dj.data)||dj||{};
+    if(dj&&Number(dj.code)===401)errors.push("神魔会话已失效，请重新登录");
+    var tocUrl=String(dd.tocUrl||dd.TocUrl||dd.catalogUrl||dd.catalog_url||"");
+    if(!tocUrl){
+        var em=String(dj.message||dj.detail||"");
+        qfLimSetErrV30.call(this,"神魔",errors.concat([em||"detail 未返回 tocUrl"]).join("\n"));
+        return null;
+    }
+
+    tocUrl=qfSmAbsV30(base,tocUrl);
+    var tr="";
+    try{tr=String(java.ajax(tocUrl,16000)||"");}catch(e3){errors.push("目录："+String(e3&&e3.message||e3));}
+    var tj=qfSmParseJsonV30(tr),arr=(tj&&tj.data)||[];
+    if(!Array.isArray(arr)){
+        if(arr&&Array.isArray(arr.list))arr=arr.list;
+        else if(tj&&Array.isArray(tj.list))arr=tj.list;
+        else arr=[];
+    }
+
+    var map={byCid:{},items:[],base:base,ts:Date.now()};
+    function getCid(u,c){
+        var s=String(u||""),m=null;
+        var ps=[
+            /[?&](?:chapterId|chapter_id|cid|item_id)=([0-9]+)/i,
+            /\/chapter\/[0-9]+\/([0-9]+)(?:\/|$|\?)/i,
+            /\/chapter\/([0-9]+)(?:\/|$|\?)/i
+        ];
+        for(var pi=0;pi<ps.length;pi++){m=s.match(ps[pi]);if(m&&m[1])return String(m[1]);}
+        var x=c&&(c.chapterId||c.chapter_id||c.cid||c.id);
+        return x!=null?String(x):"";
+    }
+    for(var i=0;i<arr.length;i++){
+        var c=arr[i]||{};
+        var isVol=!!(c.isVolume||c.volume||c.type==="volume");
+        var u=String(c.url||c.chapterUrl||c.contentUrl||"");
+        var title=String(c.title||c.chapterName||c.name||"");
+        if(isVol||!u||!title)continue;
+        u=qfSmAbsV30(base,u);
+        var cid=getCid(u,c);
+        if(cid&&!map.byCid[cid])map.byCid[cid]=u;
+        map.items.push({cid:cid,title:title,url:u});
+    }
+
+    if(!map.items.length){
+        var tm=String(tj.message||tj.detail||"");
+        qfLimSetErrV30.call(this,"神魔",errors.concat([tm||"神魔目录为空"]).join("\n"));
+        return null;
+    }
+    try{cache.putMemory(key,JSON.stringify(map));}catch(e4){}
+    return map;
+}
+function qfSmResolveChapterV30(meta,force){
+    var cid=String(meta.chapterId||""),base=qfSmChosenBaseV30.call(this,false);
+    /* alpha13：先查持久化的附近章节 URL；顺序阅读时通常只需要一次 content 请求。 */
+    if(!force&&cid){
+        var near=qfSmNearGetV313.call(this,meta.bookId,cid,base);
+        if(near)return near;
+    }
+
+    var map=qfSmTocMapV30.call(this,meta,!!force);
+    if(!map)return "";
+    var items=map.items||[],hit=-1;
+    if(cid&&map.byCid&&map.byCid[cid]){
+        for(var hi=0;hi<items.length;hi++){if(String(items[hi]&&items[hi].cid||"")===cid){hit=hi;break;}}
+        qfSmNearPutV313.call(this,meta,map,hit);
+        return String(map.byCid[cid]);
+    }
+
+    var target=qfNormChapter(String(meta.title||"")),best="",bestIndex=-1;
+    for(var i=0;i<items.length;i++){
+        var n=qfNormChapter(String(items[i].title||""));
+        if(target&&n===target){qfSmNearPutV313.call(this,meta,map,i);return String(items[i].url||"");}
+        if(!best&&target&&n&&(n.indexOf(target)>=0||target.indexOf(n)>=0)){best=String(items[i].url||"");bestIndex=i;}
+    }
+    if(best){qfSmNearPutV313.call(this,meta,map,bestIndex);return best;}
+
+    if(!force){
+        try{qfRuntimeCacheV13(this).putMemory(qfSmTocKeyV30(meta.bookId),"");}catch(e0){}
+        try{qfCachePut.call(this,qfSmNearKeyV313(meta.bookId),{});}catch(e1){}
+        return qfSmResolveChapterV30.call(this,meta,true);
+    }
+    return "";
+}
+function qfSmContentV30(meta){
+    try{
+        var ctx=this,base=qfSmChosenBaseV30.call(ctx,false);
+        qfSmMirrorV30.call(ctx,base);
+        var u=qfSmResolveChapterV30.call(ctx,meta,false);
+        if(!u){
+            qfLimSetErrV30.call(ctx,"神魔","未在神魔目录中匹配到本章："+String(meta.title||meta.chapterId||""));
+            return "";
+        }
+        var raw=String(qfJava(ctx).ajax(u,12000)||""),j=qfSmParseJsonV30(raw);
+        if(j&&Number(j.code)===401){
+            try{source.put("qf_sm_logged","0");}catch(e0){}
+            qfLimSetErrV30.call(ctx,"神魔","登录会话已失效，请到限免源账号 → 神魔重新登录");
+            return "";
+        }
+        /* alpha16：保存神魔正文响应中的原生 review_list/title_review/say/cmtBase。
+           单独神魔源的气泡就是直接靠这些字段注入，不再先绕 end-review。 */
+        try{if(j&&typeof j==="object")qfServerChapterMetaPutV316(ctx,"神魔",String(meta.bookId),String(meta.chapterId),j);}catch(_cm){}
+        var text=qfSmExtractContentV30.call(ctx,raw);
+        if(qfValidContentV10(text)){
+            qfLimSetErrV30.call(ctx,"神魔","");
+            return text;
+        }
+        qfLimSetErrV30.call(ctx,"神魔",String(j.message||j.detail||"正文为空或过短"));
+    }catch(e1){
+        qfLimSetErrV30.call(this,"神魔",String(e1&&e1.message||e1));
+    }
+    return "";
+}
+
+
+

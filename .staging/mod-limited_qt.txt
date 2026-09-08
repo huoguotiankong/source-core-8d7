@@ -1,0 +1,340 @@
+/* alpha79：本模块私有依赖内聚。未进入该功能时，不在全局运行时建立这些 helper。 */
+function qfQtPatchNativeAuthorCardV332(tag,bid,cid){
+    tag=String(tag||'');var m=tag.match(/\bsrc\s*=\s*(["'])([\s\S]*?)\1/i);if(!m)return tag;
+    var src=String(m[2]||'').replace(/&quot;/g,'"');var cut=src.search(/,\s*\{[\s\S]*$/);if(cut>0)src=src.substring(0,cut);
+    var ob={style:'FULL',type:'qd',click:"qfQtShowAuthorV332('"+String(bid).replace(/'/g,"\\'")+"','"+String(cid).replace(/'/g,"\\'")+"')"};
+    var nv=(src+','+JSON.stringify(ob)).replace(/"/g,'&quot;');return tag.replace(m[0],'src="'+nv+'"');
+}
+
+/* 覆盖三限免服务器评论路由：晴天不再打开服务端网页，而是取服务端数据后交给本地 UI。 */
+
+/* ============================================================
+ * v3.0.0-alpha34：评论模块严格隔离 + 晴天段评按需渲染采集
+ *
+ * 设计原则：
+ * 1. 未选中的服务器源绝不进入其请求函数；未知 provider 不再默认落到神魔。
+ * 2. 晴天 /api/comments 只负责气泡索引；普通段评点击后才加载 /comments 页面。
+ * 3. /comments 是动态页面时，先走轻量 HTTP；解析不到再仅在“用户点击该段评”时
+ *    用隐藏 WebView 渲染一次并读取最终 DOM，不把 WebView 放到正文加载阶段。
+ * 4. 本章说沿用已经验证可用的 /chapterComments 数据链，本地 UI 不变。
+ * 5. 所有服务器评论统一经过同一个本地 UI，数据适配器与 UI 完全解耦。
+ * ============================================================ */
+
+function qfServerChapterMetaPutV316(ctx,provider,bid,cid,root){
+    if(!provider||!bid||!cid||!root||typeof root!=="object")return;
+    qfServerCachePutV315(ctx,"qf-server-native-v316-"+provider+"-"+bid+"-"+cid,root);
+}
+
+function qdVolumeArray(root) {
+    if (!root) return [];
+    var d = root.data || root.Data || root;
+    return qdList(d.vs || d.Volumes || d.volumes || root.Volumes || root.volumes);
+}
+
+function qdChapterArray(vol) {
+    if (!vol) return [];
+    return qdList(vol.cs || vol.Chapters || vol.chapters || vol.chapterList || vol.VolumeList);
+}
+
+function qfLimSetErrV30(name,msg){
+    try{qfRuntimeCacheV13(this).putMemory("qf_lim_err_"+String(name||""),String(msg||""));}catch(e0){}
+}
+function qfLimGetErrV30(name){
+    try{return String(qfRuntimeCacheV13(this).getFromMemory("qf_lim_err_"+String(name||""))||"");}catch(e0){return "";}
+}
+
+/* ---------- 晴天（附件“🔅起点”）· alpha30 ---------- */
+function qfQtParseV330(raw){
+    var v=String(raw==null?'':raw).trim(),o={};
+    if(!v)return {};
+    for(var i=0;i<3;i++){
+        try{o=JSON.parse(v);}catch(e){return i===0?{}:o;}
+        if(typeof o==='string'){v=String(o).trim();continue;}
+        return o||{};
+    }
+    return (o&&typeof o==='object')?o:{};
+}
+function qfQtCatalogRowsV330(root){
+    /* alpha31：先按附件晴天源的真实结构 Data.Chapters 直取，再做兼容递归。
+       原源目录字段就是 C/N/T/V/index，不应先依赖模糊扫描。 */
+    var d=(root&&(root.Data||root.data))||root||{};
+    var direct=d.Chapters||d.chapters||d.ChapterList||d.chapterList||null;
+    if(Array.isArray(direct)&&direct.length)return direct;
+
+    var hit=null,seen=0;
+    function isChapter(x){
+        if(!x||typeof x!=='object'||Array.isArray(x))return false;
+        var id=x.C!==undefined?x.C:(x.ChapterId!==undefined?x.ChapterId:(x.chapterId!==undefined?x.chapterId:(x.id!==undefined?x.id:(x.cId!==undefined?x.cId:x.cid))));
+        var nm=x.N!==undefined?x.N:(x.ChapterName!==undefined?x.ChapterName:(x.chapterName!==undefined?x.chapterName:(x.cN!==undefined?x.cN:x.title)));
+        return id!==undefined&&id!==null&&String(id)!==''&&(nm!==undefined||x.T!==undefined||x.uT!==undefined||x.index!==undefined);
+    }
+    function walk(v,depth){
+        if(hit||v==null||depth>8||seen>4000)return;
+        seen++;
+        if(Array.isArray(v)){
+            if(v.length){
+                var ok=0,lim=Math.min(v.length,10);
+                for(var i=0;i<lim;i++)if(isChapter(v[i]))ok++;
+                if(ok>=Math.max(1,Math.ceil(lim*0.4))){hit=v;return;}
+            }
+            for(var a=0;a<v.length&&!hit&&a<80;a++)walk(v[a],depth+1);
+            return;
+        }
+        if(typeof v!=='object')return;
+        var preferred=['Chapters','chapters','ChapterList','chapterList','DataList','dataList','cs','Cs','vs','Volumes','volumes'];
+        for(var p=0;p<preferred.length&&!hit;p++)if(v[preferred[p]]!==undefined)walk(v[preferred[p]],depth+1);
+        if(hit)return;
+        var n=0;
+        for(var k in v){
+            if(!Object.prototype.hasOwnProperty.call(v,k)||preferred.indexOf(k)>=0)continue;
+            walk(v[k],depth+1);
+            if(hit||++n>70)break;
+        }
+    }
+    walk(root,0);
+    return Array.isArray(hit)?hit:[];
+}
+
+function qfQtCatalogPackV330(rows,origin,msg){
+    rows=Array.isArray(rows)?rows:[];var map={},seq=0;
+    for(var i=0;i<rows.length;i++){
+        var x=rows[i]||{};
+        var cid=x.C!==undefined?x.C:(x.ChapterId!==undefined?x.ChapterId:(x.chapterId!==undefined?x.chapterId:(x.id!==undefined?x.id:(x.cId!==undefined?x.cId:x.cid))));
+        cid=String(cid==null?'':cid);
+        if(!cid)continue;
+        var idx=x.index!==undefined?x.index:(x.Index!==undefined?x.Index:(x.I!==undefined?x.I:seq));
+        idx=Number(idx);if(!isFinite(idx))idx=seq;
+        var ts='';
+        if(x.T!==undefined)ts=x.T;
+        else if(x.timestamp!==undefined)ts=x.timestamp;
+        else if(x.uT!==undefined)ts=x.uT;
+        else if(x.UT!==undefined)ts=x.UT;
+        else if(x.DisplayTime!==undefined)ts=x.DisplayTime;
+        else if(x.displayTime!==undefined)ts=x.displayTime;
+        else if(x.UpdateTime!==undefined)ts=x.UpdateTime;
+        else if(x.updateTime!==undefined)ts=x.updateTime;
+        var title=x.N||x.ChapterName||x.chapterName||x.cN||x.title||x.name||'';
+        var vip=x.V!==undefined?x.V:(x.IsVip!==undefined?x.IsVip:(x.isVip!==undefined?x.isVip:x.vip));
+        map[cid]={chapterId:cid,timestamp:ts,index:idx,title:String(title||''),vip:Number(vip||0)===1,raw:x,origin:String(origin||'')};
+        seq++;
+    }
+    return {ts:Date.now(),map:map,count:Object.keys(map).length,origin:String(origin||''),message:String(msg||'')};
+}
+
+function qfQtWarmDetailV330(meta){
+    var out={ok:false,len:0,message:'',mode:''},bid=String(meta&&meta.bookId||'');
+    if(!bid)return out;
+    var j=qfJava(this),b=qfQtBaseV328.call(this),path='/detail?bookId='+encodeURIComponent(bid),u=b+path,raw='',r={},d={};
+    function usable(x){
+        var y=(x&&(x.Data||x.data))||x||{};
+        if(!y||typeof y!=='object')return false;
+        if(y.BaseBookInfo||y.baseBookInfo||y.BookInfo||y.bookInfo||y.BookName||y.bookName||y.book_id||y.bookId)return true;
+        try{return Object.keys(y).length>2;}catch(_k){return false;}
+    }
+
+    /* 先走与正文完全相同的 key/device/dttoken 原生包装，确保服务端能建立该书缓存。 */
+    try{raw=String(qfQtRequestV328.call(this,path,'GET',{},12000)||'');}catch(e0){out.message=String(e0&&e0.message||e0);}
+    r=qfQtParseV330(raw);d=(r&&(r.Data||r.data))||r||{};
+    if(usable(r)){out.mode='auth-query';}
+    else{
+        /* 再复刻独立源进入详情页的直接 URL + Cookie 链。 */
+        var raw2='';
+        try{if(j&&typeof j.ajax==='function')raw2=String(j.ajax(u)||'');}catch(e1){out.message=String(e1&&e1.message||e1);}
+        if(raw2){var r2=qfQtParseV330(raw2);if(usable(r2)||!raw){raw=raw2;r=r2;d=(r2&&(r2.Data||r2.data))||r2||{};out.mode='cookie-direct';}}
+    }
+    out.len=String(raw||'').length;
+    out.ok=usable(r);
+    out.message=String((r&&(r.message||r.Message||r.detail))||out.message||'');
+    if(out.len){try{this.source.put('qf_qt_detail_warm_'+bid,String(Date.now()));}catch(_p){}}
+    return out;
+}
+
+function qfQtOfficialCatalogV330(meta){
+    var bid=String(meta&&meta.bookId||'');
+    if(!bid)return {ts:Date.now(),map:{},count:0,origin:'official-druid',message:''};
+    try{
+        var url='https://druid.if.qidian.com/argus/api/v1/chapterlist/chapterlist?bookId='+encodeURIComponent(bid);
+        var raw=qfAjaxTextV20(this,url,{timeout:9000,headers:{'User-Agent':(typeof QF_UA!=='undefined'?QF_UA:'Mozilla/5.0'),'Referer':'https://www.qidian.com/book/'+encodeURIComponent(bid)+'/','Accept':'application/json,text/plain,*/*'}});
+        var root=qfQtParseV330(raw),rows=qfQtCatalogRowsV330(root),flat=[];
+
+        /* Druid 当前常见结构是 Data.vs[].cs[]，字段 id/cN/uT。
+           直接按项目里已验证过的 qdVolumeArray/qdChapterArray 展平，避免 generic walker 漏掉。 */
+        if(!rows.length){
+            var vols=[];
+            try{vols=qdVolumeArray(root);}catch(_v){vols=[];}
+            if(!vols.length){
+                var dd=(root&&(root.data||root.Data))||root||{};
+                var one=[];try{one=qdList(dd.cs||dd.Cs||dd.Chapters||dd.chapters||dd.chapterList);}catch(_d){one=[];}
+                if(one.length)vols=[{cs:one}];
+            }
+            var seq=0;
+            for(var vi=0;vi<vols.length;vi++){
+                var chs=[];try{chs=qdChapterArray(vols[vi]||{});}catch(_c){chs=[];}
+                for(var ci=0;ci<chs.length;ci++){
+                    var ch=chs[ci]||{},copy={};
+                    for(var k in ch)if(Object.prototype.hasOwnProperty.call(ch,k))copy[k]=ch[k];
+                    if(copy.index===undefined&&copy.Index===undefined&&copy.I===undefined)copy.index=seq;
+                    flat.push(copy);seq++;
+                }
+            }
+            rows=flat;
+        }
+        var msg=String((root&&(root.message||root.Message||root.detail))||'');
+        var pack=qfQtCatalogPackV330(rows,'official-druid',msg);
+        pack.rawHead=String(raw||'').slice(0,180);
+        return pack;
+    }catch(e){return {ts:Date.now(),map:{},count:0,origin:'official-druid',message:String(e&&e.message||e),rawHead:''};}
+}
+
+function qfQtCatalogV330(meta,force){
+    var bid=String(meta&&meta.bookId||''),key='qf_qt_catalog_v331_'+bid,old=null;
+    if(!force){
+        try{old=qfCacheGet.call(this,key);if(old&&old.ts&&Date.now()-Number(old.ts)<30*60*1000&&old.map&&Number(old.count||0)>0)return old;}catch(e0){}
+    }
+    var warm=qfQtWarmDetailV330.call(this,meta),tries=[
+        '/catalog?cached=true&bookId='+encodeURIComponent(bid)+'&midpage=true',
+        '/catalog?cached=false&bookId='+encodeURIComponent(bid)+'&midpage=true',
+        '/catalog?bookId='+encodeURIComponent(bid)+'&midpage=true',
+        '/catalog?cached=true&bookId='+encodeURIComponent(bid)+'&midpage=false'
+    ],lastMsg='',lastRaw='',pack=null,attempts=[];
+    for(var t=0;t<tries.length;t++){
+        try{
+            var raw=qfQtRequestV328.call(this,tries[t],'GET',{},18000),r=qfQtParseV330(raw),rows=qfQtCatalogRowsV330(r);
+            lastRaw=String(raw||'');
+            lastMsg=String((r&&(r.message||r.Message||r.detail))||((r&&(r.Data||r.data)||{}).message)||'');
+            attempts.push({path:tries[t],len:lastRaw.length,rows:rows.length,message:lastMsg});
+            if(rows.length){
+                pack=qfQtCatalogPackV330(rows,'sunny:'+tries[t],lastMsg);
+                pack.warm=warm;pack.sunnyAttempts=attempts;
+                if(pack.count>0){try{qfCachePut.call(this,key,pack);}catch(_c){}return pack;}
+            }
+        }catch(e1){lastMsg=String(e1&&e1.message||e1);attempts.push({path:tries[t],len:0,rows:0,message:lastMsg});}
+    }
+
+    /* 晴天目录确实为空才走官方 Druid。Druid 仅用于恢复 timestamp/index，正文仍请求晴天。 */
+    pack=qfQtOfficialCatalogV330.call(this,meta);
+    pack.warm=warm;
+    pack.sunnyMessage=lastMsg;
+    pack.sunnyRawHead=String(lastRaw||'').slice(0,240);
+    pack.sunnyAttempts=attempts;
+    if(pack.count>0){try{qfCachePut.call(this,key,pack);}catch(_c2){}}
+    return pack;
+}
+
+function qfQtCatalogFindV331(cm,meta){
+    var map=(cm&&cm.map)||{},cid=String(meta&&meta.chapterId||'');
+    if(cid&&map[cid])return {item:map[cid],by:'chapterId'};
+
+    var title=String(meta&&meta.title||''),tn='';
+    try{tn=qfNormChapter(title);}catch(_n){tn=String(title).replace(/\s+/g,'').toLowerCase();}
+    var no=-1;try{no=qfChapterNoV10(title);}catch(_no){}
+    var titleHit=null,noHit=null,noCount=0;
+    for(var k in map){
+        if(!Object.prototype.hasOwnProperty.call(map,k))continue;
+        var x=map[k]||{},xt=String(x.title||''),xn='';
+        try{xn=qfNormChapter(xt);}catch(_xn){xn=xt.replace(/\s+/g,'').toLowerCase();}
+        if(tn&&xn&&tn===xn){titleHit=x;break;}
+        if(no>=0){
+            var xno=-2;try{xno=qfChapterNoV10(xt);}catch(_xno){}
+            if(xno===no){noHit=x;noCount++;}
+        }
+    }
+    if(titleHit)return {item:titleHit,by:'title'};
+    if(no>=0&&noCount===1&&noHit)return {item:noHit,by:'chapterNo'};
+    return {item:null,by:''};
+}
+
+function qfQtExtractContentV330(root){
+    root=root||{};
+    var d=root.data||root.Data||{},s='';
+    var vals=[root.content,root.Content,d.content,d.Content,((d.Data||{}).content),((d.Data||{}).Content)];
+    for(var i=0;i<vals.length;i++){if(vals[i]!==undefined&&vals[i]!==null&&String(vals[i]).trim()){s=String(vals[i]);break;}}
+    if(!s)return '';
+
+    /* alpha32：评论气泡仍由本书源统一重建；正文中的服务端 comment 标签不直接输出。 */
+    s=s.replace(/<comment\b[^>]*\/?\s*>/ig,'');
+    s=s.replace(/<p>\s*<img\b[^>]*\bident=["'][^"']+["'][^>]*>\s*<\/p>/ig,'');
+
+    /* 晴天正文有时自带作者说 SVG/图片卡片。若能从同一服务端响应提取到作者说文本，
+       删除原卡片，后续统一用本地作者说卡片重画；提取不到时保留原卡片但修复点击动作。 */
+    var _as='';try{_as=qfQtAuthorSayFromRootV332(root)||'';}catch(_ae){}
+    s=s.replace(/<img\b[^>]*(?:author|writer|author[_-]?say|writer[_-]?say|作者说)[^>]*>/ig,function(tag){
+        if(_as)return '';
+        try{return qfQtPatchNativeAuthorCardV332(tag,String((root.__qtBookId||'')),String((root.__qtChapterId||'')));}catch(_p){return tag;}
+    });
+
+    s=s.replace(/<\/p>\s*<p[^>]*>/ig,'\n').replace(/<p[^>]*>/ig,'').replace(/<\/p>/ig,'\n').replace(/<br\s*\/?\s*>/ig,'\n');
+    s=s.replace(/&nbsp;|&#160;/gi,' ').replace(/&lt;/gi,'<').replace(/&gt;/gi,'>').replace(/&amp;/gi,'&');
+    return s.replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+}
+function qfQtContentV330(meta){
+    var cred=qfQtCredV328.call(this),errors=[];
+    if(!cred.key||!cred.dttoken){qfLimSetErrV30.call(this,'晴天','尚未登录：登录页 → 限免源账号 → 晴天');return '';}
+    function serverMessage(r,raw){
+        if(!r||typeof r!=='object')return String(raw||'').slice(0,180);
+        var d=r.data||r.Data||{};
+        return String(r.message||r.Message||r.detail||r.error||d.message||d.Message||d.detail||'');
+    }
+    function requestOne(ctx,x,label,delta){
+        x=x||{};delta=Number(delta||0);
+        var idx=Number(x.index);if(!isFinite(idx))idx=-1;
+        if(idx>=0)idx+=delta;
+        var ts=x.timestamp==null?'':x.timestamp;
+        var reqCid=String(x.chapterId||meta.chapterId||'');
+        var path='/chapter/vip?bookId='+String(meta.bookId)+'&chapterId='+reqCid+'&para=1&god=true&img=1&timestamp='+String(ts)+'&index='+String(idx);
+        var raw=qfQtRequestV328.call(ctx,path,'GET',{},12000),r=qfQtParseV330(raw),msg=serverMessage(r,raw);
+        try{
+            if(r&&typeof r==='object'){
+                r.__content=String(r.content||r.Content||((r.data||r.Data||{}).content)||((r.data||r.Data||{}).Content)||'');
+                r.__qtBookId=String(meta.bookId||'');
+                r.__qtChapterId=String(meta.chapterId||'');
+                r.__qtCatalog={timestamp:ts,index:idx,title:x.title||'',origin:x.origin||'',requestChapterId:reqCid};
+                qfServerChapterMetaPutV316(ctx,'晴天',String(meta.bookId),String(meta.chapterId),r);
+            }
+        }catch(_m){}
+        var text=qfQtExtractContentV330(r);
+        if(qfValidContentV10(text))return text;
+        errors.push(label+'正文为空或过短'+(msg?'：'+msg:'')+(raw?'':'（接口空响应）'));
+        return '';
+    }
+    function runCatalog(ctx,cm,label){
+        var found=qfQtCatalogFindV331(cm,meta),x=found.item,text='';
+        if(!x){
+            var extra=String(cm&&cm.sunnyMessage||cm&&cm.message||'');
+            errors.push(label+'目录未找到 ChapterId='+String(meta.chapterId)+'（目录 '+Number(cm&&cm.count||0)+' 章，来源 '+String(cm&&cm.origin||'未知')+'）'+(extra?'：'+extra:''));
+            return '';
+        }
+        var tag=label+(found.by&&found.by!=='chapterId'?' ['+found.by+'匹配]':'');
+        text=requestOne(ctx,x,tag,0);if(text)return text;
+        /* 官方目录是估算 index：仅失败后尝试 ±1，不影响正常 Sunny 原生 index。 */
+        if(String(cm&&cm.origin||'').indexOf('official')>=0){
+            text=requestOne(ctx,x,tag+' index+1',1);if(text)return text;
+            if(Number(x.index)>0){text=requestOne(ctx,x,tag+' index-1',-1);if(text)return text;}
+        }
+        return '';
+    }
+
+    var cm=qfQtCatalogV330.call(this,meta,false),text=runCatalog(this,cm,'首次');
+    if(text){qfLimSetErrV30.call(this,'晴天','');return text;}
+    var cm2=qfQtCatalogV330.call(this,meta,true);
+    text=runCatalog(this,cm2,'刷新目录后');
+    if(text){qfLimSetErrV30.call(this,'晴天','');return text;}
+
+    /* 最后保留无 timestamp/index 直请，兼容可自行补齐章节元数据的晴天后端版本。 */
+    text=requestOne(this,{chapterId:String(meta.chapterId),timestamp:'',index:-1,title:meta.title||'',origin:'direct'},'直接ChapterId',0);
+    if(text){qfLimSetErrV30.call(this,'晴天','');return text;}
+
+    try{
+        var fx=qfQtCatalogFindV331(cm2,meta),xx=(fx&&fx.item)||{};
+        this.source.put('qf_qt_last_error',JSON.stringify({
+            bookId:String(meta.bookId),chapterId:String(meta.chapterId),title:String(meta.title||''),
+            catalogCount:Number(cm2&&cm2.count||0),catalogOrigin:String(cm2&&cm2.origin||''),catalogMatch:String(fx&&fx.by||''),
+            warm:cm2&&cm2.warm||null,sunnyMessage:String(cm2&&cm2.sunnyMessage||''),
+            sunnyRawHead:String(cm2&&cm2.sunnyRawHead||''),sunnyAttempts:cm2&&cm2.sunnyAttempts||[],
+            timestamp:xx.timestamp,index:xx.index,matchedChapterId:xx.chapterId||'',errors:errors,ts:Date.now()
+        }));
+    }catch(_d){}
+    qfLimSetErrV30.call(this,'晴天',errors.join('\n'));
+    return '';
+}
+

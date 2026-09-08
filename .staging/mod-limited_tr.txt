@@ -1,0 +1,273 @@
+/* v4.1.0-alpha10.9.2 · 同人小说网限免 Provider
+ * 来源：附件「起点限免（同人小说网）」。
+ * 鉴权严格使用 source.getVariable() 的共享 Token，不写入登录信息 Map。
+ * 只移植 VIP 正文所需 /novel/chap，不移植搜索、发现、目录、评论 UI。
+ */
+function qfTrSetErrV102(msg){
+    try{qfRuntimeCacheV13(this).putMemory("qf_lim_err_同人",String(msg||""));}catch(e0){}
+}
+function qfTrGetErrV102(){
+    try{return String(qfRuntimeCacheV13(this).getFromMemory("qf_lim_err_同人")||"");}catch(e0){return "";}
+}
+function qfTrSourceV102(ctx){
+    try{return qfSource(ctx);}catch(e0){return null;}
+}
+function qfTrJavaV102(ctx){
+    try{return qfJava(ctx);}catch(e0){return null;}
+}
+function qfTrTokenV102(){
+    var s=qfTrSourceV102(this),v="",o=null;
+    try{v=String(s&&s.getVariable?s.getVariable():"").trim();}catch(e0){v="";}
+    if(v&&v.charAt(0)==="{"){
+        try{o=JSON.parse(v);}catch(e1){o=null;}
+        if(o&&typeof o==="object"&&Object.prototype.hasOwnProperty.call(o,"qfV21Search"))return "";
+    }
+    return String(v||"").trim();
+}
+function qfTrBaseV102(){return "https://qd.aadcn.cn";}
+function qfTrQueryV102(data){
+    var a=[],d=data||{};
+    for(var k in d){
+        if(!Object.prototype.hasOwnProperty.call(d,k))continue;
+        if(d[k]===undefined||d[k]===null||String(d[k])==="")continue;
+        a.push(encodeURIComponent(k)+"="+encodeURIComponent(String(d[k])));
+    }
+    return a.join("&");
+}
+function qfTrRequestV102(path,data){
+    var token=qfTrTokenV102.call(this);
+    if(!token)throw new Error("未设置同人共享Token；请在书源编辑页 → 设置源变量中填写");
+    var j=qfTrJavaV102(this);
+    if(!j)throw new Error("java 运行环境不可用");
+    var url=qfTrBaseV102()+String(path||"");
+    var qs=qfTrQueryV102(data||{});
+    if(qs)url+="?"+qs;
+    var opt={
+        method:"GET",
+        headers:{
+            "authorization":"Bearer "+token,
+            "Accept":"application/json"
+        },
+        timeout:9000
+    };
+    var raw="";
+    try{
+        var arr=j.ajaxAll([url+","+JSON.stringify(opt)]);
+        if(arr&&arr.length){
+            try{raw=String(arr[0].body()||"");}catch(_b){raw=String(arr[0]||"");}
+        }
+    }catch(e0){}
+    if(!raw){
+        try{raw=String(j.ajax(url+","+JSON.stringify(opt))||"");}catch(e1){throw new Error("同人接口请求失败："+String(e1));}
+    }
+    var obj={};
+    try{obj=JSON.parse(String(raw||""));}catch(e2){throw new Error("同人接口返回无法解析");}
+    if(obj&&obj.msg&&String(obj.msg)!=="success"){
+        throw new Error("同人接口："+String(obj.msg)+(obj.code!==undefined?"（code "+obj.code+"）":""));
+    }
+    if(obj&&obj.data!==undefined&&obj.data!==null)return obj.data;
+    return null;
+}
+
+/* alpha10.9.2：同人作品 / 章节 ID 解析。
+ * 旧直连路径仍优先，只有失败后才做解析，避免影响此前已能工作的作品。 */
+function qfTrNormV1092(v){
+    return String(v==null?"":v)
+        .toLowerCase()
+        .replace(/\s+/g,"")
+        .replace(/[·•:：,，.。!！?？;；"'“”‘’《》〈〉「」『』【】\[\]（）()_\-—–]/g,"");
+}
+function qfTrCacheGetV1092(key){
+    var s=qfTrSourceV102(this),raw="";
+    try{raw=String(s&&s.get?s.get(String(key||"")):"");}catch(e0){raw="";}
+    if(!raw)return null;
+    try{return JSON.parse(raw)||null;}catch(e1){return null;}
+}
+function qfTrCachePutV1092(key,obj){
+    var s=qfTrSourceV102(this);
+    try{if(s&&s.put)s.put(String(key||""),JSON.stringify(obj||{}));}catch(e0){}
+}
+function qfTrCacheDropV1092(key){
+    var s=qfTrSourceV102(this);
+    try{if(s&&s.put)s.put(String(key||""),"");}catch(e0){}
+}
+function qfTrBooksV1092(data){
+    if(Array.isArray(data))return data;
+    if(!data||typeof data!=="object")return [];
+    var a=data.books||data.Books||data.list||data.List||data.items||data.Items||data.data||data.Data;
+    if(Array.isArray(a))return a;
+    if(a&&typeof a==="object"){
+        var b=a.books||a.Books||a.list||a.List||a.items||a.Items;
+        if(Array.isArray(b))return b;
+    }
+    return [];
+}
+function qfTrBookIdV1092(o){
+    o=o||{};
+    return String(o.id!==undefined?o.id:(o.Id!==undefined?o.Id:(o.novelId!==undefined?o.novelId:o.NovelId))||"");
+}
+function qfTrBookNameV1092(o){
+    o=o||{};
+    return String(o.name!==undefined?o.name:(o.Name!==undefined?o.Name:(o.bookName!==undefined?o.bookName:o.BookName))||"");
+}
+function qfTrBookAuthorV1092(o){
+    o=o||{};
+    return String(o.author!==undefined?o.author:(o.Author!==undefined?o.Author:(o.authorName!==undefined?o.authorName:o.AuthorName))||"");
+}
+function qfTrResolveNovelV1092(meta,force){
+    meta=meta||{};
+    var qid=String(meta.bookId||""),name=String(meta.bookName||""),author=String(meta.author||""),
+        key="qf_tr_novel_map_"+qid,cached=null;
+    if(!force){
+        cached=qfTrCacheGetV1092.call(this,key);
+        if(cached&&cached.novelId)return cached;
+    }
+    if(!name)throw new Error("同人作品映射失败：缺少书名");
+    var data=qfTrRequestV102.call(this,"/novel/search",{keyword:name,s:1,page:1}),
+        books=qfTrBooksV1092(data),nn=qfTrNormV1092(name),aa=qfTrNormV1092(author),
+        exact=[],exactAuthor=[];
+    for(var i=0;i<books.length;i++){
+        var x=books[i]||{},id=qfTrBookIdV1092(x);
+        if(!id)continue;
+        if(qfTrNormV1092(qfTrBookNameV1092(x))!==nn)continue;
+        exact.push(x);
+        if(aa&&qfTrNormV1092(qfTrBookAuthorV1092(x))===aa)exactAuthor.push(x);
+    }
+    var pick=null;
+    if(exactAuthor.length===1)pick=exactAuthor[0];
+    else if(exact.length===1)pick=exact[0];
+    else if(exactAuthor.length>1)pick=exactAuthor[0];
+    if(!pick){
+        throw new Error("同人作品映射失败：搜索“"+name+"”得到"+books.length+"项，精确书名"+exact.length+"项，精确作者"+exactAuthor.length+"项");
+    }
+    var novelId=qfTrBookIdV1092(pick);
+    if(!novelId)throw new Error("同人作品映射失败：搜索结果缺少 novelId");
+    var out={novelId:novelId,qidianBookId:qid,name:qfTrBookNameV1092(pick),author:qfTrBookAuthorV1092(pick),ts:Date.now(),cached:false};
+    qfTrCachePutV1092.call(this,key,out);
+    return out;
+}
+function qfTrCatalogChaptersV1092(data){
+    var out=[];
+    function walk(v,depth){
+        if(!v||depth>5)return;
+        if(Array.isArray(v)){for(var i=0;i<v.length;i++)walk(v[i],depth+1);return;}
+        if(typeof v!=="object")return;
+        var id=String(v.chapId!==undefined?v.chapId:(v.ChapId!==undefined?v.ChapId:(v.chapterId!==undefined?v.chapterId:v.ChapterId))||""),
+            name=String(v.chapName!==undefined?v.chapName:(v.ChapName!==undefined?v.ChapName:(v.chapterName!==undefined?v.chapterName:v.ChapterName))||"");
+        if(id&&name)out.push({id:id,name:name});
+        var ks=["chapters","Chapters","list","List","items","Items","volumes","Volumes","catalog","Catalog","data","Data"];
+        for(var k=0;k<ks.length;k++){var c=v[ks[k]];if(c&&c!==v)walk(c,depth+1);}
+    }
+    walk(data,0);
+    return out;
+}
+function qfTrResolveChapV1092(meta,novelId){
+    meta=meta||{};
+    var qbid=String(meta.bookId||""),qcid=String(meta.chapterId||""),title=String(meta.title||""),
+        key="qf_tr_chap_map_"+qbid+"_"+qcid,cached=qfTrCacheGetV1092.call(this,key);
+    if(cached&&cached.chapId)return cached;
+    if(!title)throw new Error("同人章节映射失败：缺少章节名");
+    var catalog=qfTrRequestV102.call(this,"/novel/catalog",{novelId:novelId}),
+        list=qfTrCatalogChaptersV1092(catalog),nt=qfTrNormV1092(title),sameId=null,exact=[];
+    for(var i=0;i<list.length;i++){
+        var x=list[i]||{};
+        if(String(x.id||"")===qcid)sameId=x;
+        if(qfTrNormV1092(x.name)===nt)exact.push(x);
+    }
+    var pick=sameId||(exact.length===1?exact[0]:null);
+    if(!pick){
+        throw new Error("同人章节映射失败："+title+"；目录"+list.length+"章，精确章节名"+exact.length+"项");
+    }
+    var out={chapId:String(pick.id||""),qidianChapterId:qcid,title:String(pick.name||""),novelId:String(novelId||""),ts:Date.now()};
+    qfTrCachePutV1092.call(this,key,out);
+    return out;
+}
+function qfTrReadContentV1092(data){
+    var text="";
+    if(typeof data==="string")text=data;
+    else if(data&&data.content!==undefined)text=String(data.content||"");
+    else if(data&&data.Content!==undefined)text=String(data.Content||"");
+    return String(text||"")
+        .replace(/\\r\\n/g,"\n")
+        .replace(/\\n/g,"\n")
+        .replace(/\r\n/g,"\n")
+        .replace(/\r/g,"\n")
+        .trim();
+}
+
+function qfTrContentV102(meta){
+    meta=meta||{};
+    var bid=String(meta.bookId||""),cid=String(meta.chapterId||""),
+        bname=String(meta.bookName||""),author=String(meta.author||""),title=String(meta.title||"");
+    if(!bid||!cid){qfTrSetErrV102.call(this,"章节参数错误：BookId="+bid+"，ChapterId="+cid);return null;}
+
+    var directErr="",mapErr="",catalogErr="",data=null,text="",resolved=null,trNovelId="",trChapId=cid;
+
+    /* 1. 已验证作品继续走零额外请求的旧直连快路。 */
+    try{
+        data=qfTrRequestV102.call(this,"/novel/chap",{novelId:bid,chapId:cid});
+        text=qfTrReadContentV1092(data);
+        if(text){
+            qfTrSetErrV102.call(this,"");
+            return text;
+        }
+        directErr="直连正文为空";
+    }catch(e0){
+        directErr=String(e0&&e0.message||e0);
+    }
+
+    /* 2. 直连失败后，用书名+作者解析同人服务自己的 novelId。 */
+    try{
+        resolved=qfTrResolveNovelV1092.call(this,meta,false);
+        trNovelId=String(resolved&&resolved.novelId||"");
+        if(!trNovelId)throw new Error("未解析到 novelId");
+
+        /* novelId 已变化时优先只替换书籍 ID，章节 ID 仍复用起点 ID。 */
+        try{
+            data=qfTrRequestV102.call(this,"/novel/chap",{novelId:trNovelId,chapId:cid});
+            text=qfTrReadContentV1092(data);
+            if(text){
+                qfTrSetErrV102.call(this,"");
+                return text;
+            }
+            mapErr="映射 novelId 后正文为空";
+        }catch(e1){
+            mapErr=String(e1&&e1.message||e1);
+        }
+
+        /* 3. 最后才请求目录，按唯一精确章节名解析 chapId。 */
+        try{
+            var chap=qfTrResolveChapV1092.call(this,meta,trNovelId);
+            trChapId=String(chap&&chap.chapId||cid);
+            if(trChapId&&trChapId!==cid){
+                data=qfTrRequestV102.call(this,"/novel/chap",{novelId:trNovelId,chapId:trChapId});
+                text=qfTrReadContentV1092(data);
+                if(text){
+                    qfTrSetErrV102.call(this,"");
+                    return text;
+                }
+                catalogErr="章节映射后正文为空";
+            }else{
+                catalogErr="同人目录确认 chapId 与起点一致，但正文接口仍失败";
+            }
+        }catch(e2){
+            catalogErr=String(e2&&e2.message||e2);
+        }
+    }catch(e3){
+        mapErr=String(e3&&e3.message||e3);
+    }
+
+    qfTrSetErrV102.call(
+        this,
+        "同人正文失败"+
+        "\n起点："+bid+"*"+cid+
+        (bname?("\n作品："+bname+(author?(" / "+author):"")):"")+
+        (title?("\n章节："+title):"")+
+        (trNovelId?("\n同人 novelId："+trNovelId):"")+
+        (trChapId&&trChapId!==cid?("\n同人 chapId："+trChapId):"")+
+        "\n[direct] "+String(directErr||"失败")+
+        "\n[novel-map] "+String(mapErr||"失败")+
+        "\n[catalog-map] "+String(catalogErr||"未执行")
+    );
+    return null;
+}
