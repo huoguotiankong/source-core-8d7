@@ -1,0 +1,142 @@
+name: patch-qidian-beta33-x-ui-hotfix
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta33-x-ui-hotfix.trigger']
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Patch effective X UI and publish Beta33
+        run: |
+          python3 - <<'PY'
+          import json,re,hashlib,datetime
+          from pathlib import Path
+          SRC=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(SRC.read_text()); s=arr[0] if isinstance(arr,list) else arr
+          lu=s['loginUrl']
+
+          # Final polished content UI: add X to effective pmap.
+          old='"限免源":["自动","情无","神魔","晴天","同人"]'
+          assert old in lu, 'effective content pmap anchor missing'
+          lu=lu.replace(old,'"限免源":["自动","情无","神魔","晴天","同人","X"]',1)
+
+          # Final polished account UI: provider validation and X value.
+          old="if(['情无','神魔','晴天','同人'].indexOf(provider)<0)provider='情无';"
+          assert old in lu, 'final provider validation anchor missing'
+          lu=lu.replace(old,"if(['情无','神魔','晴天','同人','X'].indexOf(provider)<0)provider='情无';",1)
+          old="var qtk=qfMGet423('晴天密钥',''),qtp=qfMGet423('晴天口令',''),qtb=qfMGet423('晴天接口地址','https://sb.shazi.tk');"
+          assert old in lu, 'final account value anchor missing'
+          lu=lu.replace(old,old+"\n    var xt=qfMGet423('🎬X佬密钥','');",1)
+
+          # Insert X card after Tongren card.
+          old="'<div class=\"section providerCard\" data-p=\"同人\"><div class=\"sectionHead\"><div><h3>🍋 同人</h3><p>使用共享 Token，无需填写账号字段。</p></div><span class=\"miniBadge\">共享</span></div><div class=\"state\">可直接进行 Token 检测或打开后台。</div></div>'+"
+          assert old in lu, 'final Tongren card anchor missing'
+          xcard=old+"\n      '<div class=\"section providerCard\" data-p=\"X\"><div class=\"sectionHead\"><div><h3>❎ X-QD</h3><p>独立 Token，仅用于 X 限免正文。</p></div><span class=\"miniBadge\">X</span></div>'+qfUxFieldV015('x_token','X 密钥',xt,'password','可网页登录自动获取，也可手工填写')+'<div class=\"state\">可执行：网页登录、检测、清除。</div></div>'+"
+          lu=lu.replace(old,xcard,1)
+
+          # Hidden state span for X token.
+          old="+qfUxSpanV015('ux_qtk',qtk)+qfUxSpanV015('ux_qtp',qtp)+qfUxSpanV015('ux_qtb',qtb);"
+          assert old in lu, 'final hidden span anchor missing'
+          lu=lu.replace(old,"+qfUxSpanV015('ux_qtk',qtk)+qfUxSpanV015('ux_qtp',qtp)+qfUxSpanV015('ux_qtb',qtb)+qfUxSpanV015('ux_xt',xt);",1)
+
+          # Effective tab providers/actions.
+          old='var providers=["情无","神魔","晴天","同人"],acts={"情无":["不执行","登录","检测","网页登录","退出"],"神魔":["不执行","登录","检测","后台","退出"],"晴天":["不执行","登录","检测","后台","退出"],"同人":["不执行","检测","后台"]};'
+          assert old in lu, 'final providers/actions anchor missing'
+          new='var providers=["情无","神魔","晴天","同人","X"],acts={"情无":["不执行","登录","检测","网页登录","退出"],"神魔":["不执行","登录","检测","后台","退出"],"晴天":["不执行","登录","检测","后台","退出"],"同人":["不执行","检测","后台"],"X":["不执行","网页登录","检测","清除"]};'
+          lu=lu.replace(old,new,1)
+
+          # Effective sync includes X token.
+          old='document.getElementById("ux_qtb").textContent=document.getElementById("qt_base").value;document.getElementById("providerBadge")'
+          assert old in lu, 'final sync anchor missing'
+          lu=lu.replace(old,'document.getElementById("ux_qtb").textContent=document.getElementById("qt_base").value;document.getElementById("ux_xt").textContent=document.getElementById("x_token").value;document.getElementById("providerBadge")',1)
+
+          # Save map persists manual X token.
+          old="['ux_qtk','晴天密钥'],['ux_qtp','晴天口令'],['ux_qtb','晴天接口地址']]"
+          assert old in lu, 'final save map anchor missing'
+          lu=lu.replace(old,"['ux_qtk','晴天密钥'],['ux_qtp','晴天口令'],['ux_qtb','晴天接口地址'],['ux_xt','🎬X佬密钥']]",1)
+
+          # Effective action dispatcher supports X.
+          old="if(provider==='同人'){\n            if(action==='检测')return qfTrCheckV102();\n            if(action==='后台')return qfTrOpenConsoleV102();\n        }"
+          assert old in lu, 'dispatcher Tongren anchor missing'
+          new=old+"\n        if(provider==='X'){\n            if(action==='网页登录')return qfXLoginV32();\n            if(action==='检测')return qfXCheckV32();\n            if(action==='清除')return qfXClearV32();\n        }"
+          lu=lu.replace(old,new,1)
+
+          # 5 tabs in polished UI.
+          lu=lu.replace(".tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}",".tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}",1)
+
+          s['loginUrl']=lu
+          s['bookSourceComment']='v1.1.0-beta33：修复 Beta32 X-QD 已接入 Provider 但最终生效的精美账号/正文设置 UI 仍被旧四 Provider 覆盖的问题；账号管理现显示 X 标签页，支持网页登录、Token 检测、清除与手工密钥，正文设置限免源也显示 X。X 正文 Provider 与书籍变量15沿用 Beta32，其它域冻结。'
+          SRC.write_text(json.dumps(arr,ensure_ascii=False,separators=(',',':')))
+
+          # Sanity checks on final runtime text.
+          raw=SRC.read_text()
+          assert 'limited_x' in raw and 'qfXContentV32' in raw
+          a2=json.loads(raw); ss=a2[0] if isinstance(a2,list) else a2; lu2=ss['loginUrl']
+          pos=lu2.rfind('qfMultiAccountsV423=function')
+          final=lu2[pos:lu2.find('\nqfMultiDiagV423=',pos)]
+          assert 'providers=["情无","神魔","晴天","同人","X"]' in final
+          assert 'data-p="X"' in final and 'x_token' in final and '🎬X佬密钥' in final
+          cpos=lu2.rfind('qfMultiContentV423=function'); cend=lu2.find('\nqfMultiAccountsV423=',cpos); cblk=lu2[cpos:cend]
+          assert '"同人","X"' in cblk
+
+          now='2026-09-08T15:58:00+08:00'; day='2026-09-08'; ver='1.1.0-beta33'; vc=11033
+          url=f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={vc}'
+          backup=f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v={vc}'
+          imp='legado://import/importonline?src='+url
+          summary='Beta33：修复 X-QD 在最终账号管理/正文设置页面未显示的问题。'
+          tags=['起点','测试版','限免源','X-QD','账号管理','Provider','Token','正文路由']
+          changes=['修复精美账号管理页仍只显示情无/神魔/晴天/同人四个标签的问题','新增 X 标签页：网页登录、Token 检测、清除、手工密钥','正文设置的限免 Provider 列表同步显示 X','X Provider 正文链和书籍变量 15 沿用 Beta32，其它域冻结']
+          sha=hashlib.sha256(SRC.read_bytes()).hexdigest()
+
+          # manifest
+          mp=Path('manifest.json'); m=json.loads(mp.read_text()); m['updatedAt']=now
+          for it in m.get('sources',[]):
+            if it.get('id')=='qidian-next-beta':
+              it.update(version=ver,versionCode=vc,updatedAt=now,sourceUrl=url,summary=summary,tags=tags,changelog=changes,sha256=sha)
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n')
+
+          def update_catalog(path):
+            p=Path(path); o=json.loads(p.read_text()); o['updatedAt']=now; o['generatedAt']=now
+            for it in o.get('items',[]):
+              if it.get('id')=='qidian-next-beta':
+                it.update(version=ver,versionCode=vc,updatedAt=day,sourceUrl=url,backupUrl=backup,importUrl=imp,summary=summary,tags=tags,changelog=changes)
+            p.write_text(json.dumps(o,ensure_ascii=False,indent=2)+'\n')
+          update_catalog('subscription/beta.json'); update_catalog('subscription/novel.json')
+
+          # Detail card
+          dp=Path('rss/data/details/beta/qidian-next.json')
+          d=json.loads(dp.read_text()); d['summary']=summary; d['badges']=['Beta',ver,'X UI 修复']; d['sourceUrl']=url; d['backupUrl']=backup; d['importUrl']=imp
+          d['sections']=[
+            {'title':'本版更新','text':'修复 Beta32 实际运行的精美账号管理/正文设置 UI 仍被旧四 Provider 配置覆盖的问题。'},
+            {'title':'X 账号管理','text':'现在 Provider 标签包含 X；可网页登录自动获取 Token、检测 Token、清除 Token，也可直接填写 X 密钥。'},
+            {'title':'正文设置','text':'限免源 Provider 列表现在包含 X；书籍变量 15 仍可固定 X。'},
+            {'title':'版本状态','text':'当前为 Beta / 测试通道，Stable 1.1.0 未修改。'},
+            {'title':'更新方式','text':'从本订阅页重新导入/更新即可覆盖现有 🌈 起点增强 · Beta。'}]
+          dp.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+
+          # Bundle: replace qidian-next-beta logical source with full current source object, preserve unrelated items.
+          bp=Path('bundles/all-beta.json')
+          try: bundle=json.loads(bp.read_text())
+          except Exception: bundle=[]
+          srcobj=(arr[0] if isinstance(arr,list) else arr)
+          if isinstance(bundle,list):
+            done=False
+            for i,x in enumerate(bundle):
+              if isinstance(x,dict) and (x.get('bookSourceUrl')==srcobj.get('bookSourceUrl') or x.get('bookSourceName')=='🌈 起点增强 · Beta'):
+                bundle[i]=srcobj; done=True; break
+            if not done: bundle.append(srcobj)
+            bp.write_text(json.dumps(bundle,ensure_ascii=False,separators=(',',':')))
+
+          # Release log prepend.
+          rp=Path('docs/RELEASE_LOG.md'); oldlog=rp.read_text()
+          entry=f'''## 2026-09-08 · 🌈 起点增强 {ver} — X 最终设置 UI 修复\n\n- Stable 继续保持 1.1.0。\n- Beta32 已接入 X Provider，但真机发现最终生效的 polished `qfMultiAccountsV423` / `qfMultiContentV423` 仍使用旧四 Provider 列表，导致 X 不显示。\n- Beta33 修复最终覆盖层：账号管理新增 X 标签页及网页登录/检测/清除/手工 Token；正文设置限免列表新增 X。\n- X 正文模块、Registry 与书籍变量 `15=X` 沿用 Beta32；其它业务域冻结。\n\n'''
+          rp.write_text(entry+oldlog)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md
+          git commit -m 'fix: publish qidian beta33 X effective UI hotfix'
+          git push origin main
