@@ -1,0 +1,3767 @@
+
+### QF_PROVIDER83 @347184
+Number(x.errors||0)+1;x.lastMs=Number(ms||0);x.totalMs=Number(x.totalMs||0)+Number(ms||0);x.lastError=qfDiagShortV85(err&&err.message?err.message:err,220);x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfDiagEventV85(area,name,cap,ok,ms,detail){
+    return QF_Diagnostic.event(this,area,name,cap,ok,ms,detail,ok===false?"error":"info");
+}
+function qfDiagInvokeV85(ctx,area,name,cap,fn,args){
+    return QF_Diagnostic.invoke(ctx,area,name,cap,fn,args);
+}
+function qfDiagRegistryCheckV85(){
+    var issues=[],pc=0,cc=0;
+    function check(mod,entry,label){
+        mod=String(mod||"");entry=String(entry||"");
+        if(!mod||!entry){issues.push(label+"：module/entry 为空");return;}
+        var m=QF_MOD85_MANIFEST[mod];
+        if(!m){issues.push(label+"：模块不存在 "+mod);return;}
+        if(m.exports.indexOf(entry)<0)issues.push(label+"：export 缺失 "+mod+"."+entry);
+    }
+    try{
+        for(var pn in QF_PROVIDER83){
+            if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,pn))continue;
+            var ps=QF_PROVIDER83[pn]||{},caps=ps.capabilities||{};
+            try{var pv1=qfProviderV1ValidateV520(pn,ps);if(!pv1.ok)issues.push("正文 "+pn+"/ProviderV1："+pv1.issues.join("；"));}catch(_pv1){}
+            for(var pk in caps){
+                if(!Object.prototype.hasOwnProperty.call(caps,pk))continue;
+                var pcfg=caps[pk];if(typeof pcfg==="string")pcfg={entry:pcfg};pcfg=pcfg||{};
+                check(pcfg.module||ps.module,pcfg.entry,"正文 "+pn+"/"+pk);pc++;
+            }
+        }
+    }catch(e0){issues.push("Provider Registry 自检异常："+qfDiagShortV85(e0,120));}
+    try{
+        for(var cn in QF_COMMENT84){
+            if(!Object.prototype.hasOwnProperty.call(QF_COMMENT84,cn))continue;
+            var cs=QF_COMMENT84[cn]||{},ccaps=cs.capabilities||{};
+            for(var ck in ccaps){
+                if(!Object.prototype.hasOwnProperty.call(ccaps,ck))continue;
+                var cfg=ccaps[ck];if(cfg===true){cc++;continue;}if(typeof cfg==="string")cfg={entry:cfg};cfg=cfg||{};
+                if(!cfg.local)check(cfg.module||cs.module,cfg.entry,"评论 "+cn+"/"+ck);cc++;
+            }
+        }
+    }catch(e1){issues.push("Comment Registry 自检异常："+qfDiagShortV85(e1,120));}
+    return {ok:issues.length===0,issues:issues,providerCaps:pc,commentCaps:cc};
+}
+function qfDiagSnapshotV85(extra){
+    var mods=[],ready=0,cold=0,loading=0,error=0,waits=0;
+    try{
+        for(var n in QF_MOD85_MANIFEST){
+            if(!Object.prototype.hasOwnProperty.call(QF_MOD85_MANIFEST,n))continue;
+            var st=qfModuleStateV85(n),state=String(st.state||"cold");
+            if(QF_MOD38_CACHE[n]&&state!=="error")state="ready";
+            if(state==="ready")ready++;else if(state
+
+### QF_PROVIDER83 @347253
+Ms||0)+Number(ms||0);x.lastError=qfDiagShortV85(err&&err.message?err.message:err,220);x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfDiagEventV85(area,name,cap,ok,ms,detail){
+    return QF_Diagnostic.event(this,area,name,cap,ok,ms,detail,ok===false?"error":"info");
+}
+function qfDiagInvokeV85(ctx,area,name,cap,fn,args){
+    return QF_Diagnostic.invoke(ctx,area,name,cap,fn,args);
+}
+function qfDiagRegistryCheckV85(){
+    var issues=[],pc=0,cc=0;
+    function check(mod,entry,label){
+        mod=String(mod||"");entry=String(entry||"");
+        if(!mod||!entry){issues.push(label+"：module/entry 为空");return;}
+        var m=QF_MOD85_MANIFEST[mod];
+        if(!m){issues.push(label+"：模块不存在 "+mod);return;}
+        if(m.exports.indexOf(entry)<0)issues.push(label+"：export 缺失 "+mod+"."+entry);
+    }
+    try{
+        for(var pn in QF_PROVIDER83){
+            if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,pn))continue;
+            var ps=QF_PROVIDER83[pn]||{},caps=ps.capabilities||{};
+            try{var pv1=qfProviderV1ValidateV520(pn,ps);if(!pv1.ok)issues.push("正文 "+pn+"/ProviderV1："+pv1.issues.join("；"));}catch(_pv1){}
+            for(var pk in caps){
+                if(!Object.prototype.hasOwnProperty.call(caps,pk))continue;
+                var pcfg=caps[pk];if(typeof pcfg==="string")pcfg={entry:pcfg};pcfg=pcfg||{};
+                check(pcfg.module||ps.module,pcfg.entry,"正文 "+pn+"/"+pk);pc++;
+            }
+        }
+    }catch(e0){issues.push("Provider Registry 自检异常："+qfDiagShortV85(e0,120));}
+    try{
+        for(var cn in QF_COMMENT84){
+            if(!Object.prototype.hasOwnProperty.call(QF_COMMENT84,cn))continue;
+            var cs=QF_COMMENT84[cn]||{},ccaps=cs.capabilities||{};
+            for(var ck in ccaps){
+                if(!Object.prototype.hasOwnProperty.call(ccaps,ck))continue;
+                var cfg=ccaps[ck];if(cfg===true){cc++;continue;}if(typeof cfg==="string")cfg={entry:cfg};cfg=cfg||{};
+                if(!cfg.local)check(cfg.module||cs.module,cfg.entry,"评论 "+cn+"/"+ck);cc++;
+            }
+        }
+    }catch(e1){issues.push("Comment Registry 自检异常："+qfDiagShortV85(e1,120));}
+    return {ok:issues.length===0,issues:issues,providerCaps:pc,commentCaps:cc};
+}
+function qfDiagSnapshotV85(extra){
+    var mods=[],ready=0,cold=0,loading=0,error=0,waits=0;
+    try{
+        for(var n in QF_MOD85_MANIFEST){
+            if(!Object.prototype.hasOwnProperty.call(QF_MOD85_MANIFEST,n))continue;
+            var st=qfModuleStateV85(n),state=String(st.state||"cold");
+            if(QF_MOD38_CACHE[n]&&state!=="error")state="ready";
+            if(state==="ready")ready++;else if(state==="loading")loading++;else if(state==="error")error++;else cold++;
+ 
+
+### QF_PROVIDER83 @347300
+(err&&err.message?err.message:err,220);x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfDiagEventV85(area,name,cap,ok,ms,detail){
+    return QF_Diagnostic.event(this,area,name,cap,ok,ms,detail,ok===false?"error":"info");
+}
+function qfDiagInvokeV85(ctx,area,name,cap,fn,args){
+    return QF_Diagnostic.invoke(ctx,area,name,cap,fn,args);
+}
+function qfDiagRegistryCheckV85(){
+    var issues=[],pc=0,cc=0;
+    function check(mod,entry,label){
+        mod=String(mod||"");entry=String(entry||"");
+        if(!mod||!entry){issues.push(label+"：module/entry 为空");return;}
+        var m=QF_MOD85_MANIFEST[mod];
+        if(!m){issues.push(label+"：模块不存在 "+mod);return;}
+        if(m.exports.indexOf(entry)<0)issues.push(label+"：export 缺失 "+mod+"."+entry);
+    }
+    try{
+        for(var pn in QF_PROVIDER83){
+            if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,pn))continue;
+            var ps=QF_PROVIDER83[pn]||{},caps=ps.capabilities||{};
+            try{var pv1=qfProviderV1ValidateV520(pn,ps);if(!pv1.ok)issues.push("正文 "+pn+"/ProviderV1："+pv1.issues.join("；"));}catch(_pv1){}
+            for(var pk in caps){
+                if(!Object.prototype.hasOwnProperty.call(caps,pk))continue;
+                var pcfg=caps[pk];if(typeof pcfg==="string")pcfg={entry:pcfg};pcfg=pcfg||{};
+                check(pcfg.module||ps.module,pcfg.entry,"正文 "+pn+"/"+pk);pc++;
+            }
+        }
+    }catch(e0){issues.push("Provider Registry 自检异常："+qfDiagShortV85(e0,120));}
+    try{
+        for(var cn in QF_COMMENT84){
+            if(!Object.prototype.hasOwnProperty.call(QF_COMMENT84,cn))continue;
+            var cs=QF_COMMENT84[cn]||{},ccaps=cs.capabilities||{};
+            for(var ck in ccaps){
+                if(!Object.prototype.hasOwnProperty.call(ccaps,ck))continue;
+                var cfg=ccaps[ck];if(cfg===true){cc++;continue;}if(typeof cfg==="string")cfg={entry:cfg};cfg=cfg||{};
+                if(!cfg.local)check(cfg.module||cs.module,cfg.entry,"评论 "+cn+"/"+ck);cc++;
+            }
+        }
+    }catch(e1){issues.push("Comment Registry 自检异常："+qfDiagShortV85(e1,120));}
+    return {ok:issues.length===0,issues:issues,providerCaps:pc,commentCaps:cc};
+}
+function qfDiagSnapshotV85(extra){
+    var mods=[],ready=0,cold=0,loading=0,error=0,waits=0;
+    try{
+        for(var n in QF_MOD85_MANIFEST){
+            if(!Object.prototype.hasOwnProperty.call(QF_MOD85_MANIFEST,n))continue;
+            var st=qfModuleStateV85(n),state=String(st.state||"cold");
+            if(QF_MOD38_CACHE[n]&&state!=="error")state="ready";
+            if(state==="ready")ready++;else if(state==="loading")loading++;else if(state==="error")error++;else cold++;
+            waits+=Number(st.waits||0);
+        
+
+### QF_PROVIDER83 @472247
+rray(args)?args.slice():[];
+    return qfDiagInvokeV85(this,"official",String(QF_OFFICIAL400.name||"起点官方"),cap,fn,a);
+}
+function qfOfficialDispatchV400(cap,args){
+    cap=String(cap||"");
+    var c=qfOfficialCapabilityV400(cap);
+    if(!c)return {handled:false,value:null};
+    var v=qfOfficialCallV400.call(this,cap,args);
+    try{qfDiagFlushV85.call(this,{kind:"official",adapter:String(QF_OFFICIAL400.id||""),cap:cap});}catch(_df){}
+    return {handled:true,value:v};
+}
+/* 注册 ABI：后续新增官方能力/正文源/评论源只追加 spec，不再扩散 switch/if。 */
+function qfOfficialRegisterV400(cap,spec){
+    cap=String(cap||"");if(!cap||!spec||typeof spec!=="object")return false;
+    if(!QF_OFFICIAL400.capabilities)QF_OFFICIAL400.capabilities={};
+    QF_OFFICIAL400.capabilities[cap]=spec;return true;
+}
+function qfProviderRegisterV400(name,spec){
+    name=String(name||"");if(!name||!spec||typeof spec!=="object")return false;
+    QF_PROVIDER83[name]=spec;QF_PROVIDER39=QF_PROVIDER83;return true;
+}
+function qfCommentRegisterV400(name,spec){
+    name=String(name||"");if(!name||!spec||typeof spec!=="object")return false;
+    QF_COMMENT84[name]=spec;QF_COMMENT83=QF_COMMENT84;return true;
+}
+
+/* ============================================================
+ * v4.0.0-alpha5 · Official Data Kernel
+ *
+ * Layer contract:
+ *   Capability/Request  -> raw implementation result
+ *   Domain Mapper       -> stable internal model
+ *   Compatibility View  -> 阅读当前字段 / 旧 UI ABI
+ *
+ * qfOfficialCallV400 继续返回 raw，保证旧代码零破坏。
+ * 新代码优先 qfOfficialQueryV410，得到统一 Envelope：
+ *   {ok, cap, model, data, raw, error, ts, duration}
+ * ============================================================ */
+var QF_OFFICIAL_SCHEMA410={
+    version:2,
+    toc:"qf.toc/1",
+    chapter:"qf.chapter/1",
+    content:"qf.content/1",
+    authorNote:"qf.author-note/1",
+    copyright:"qf.copyright/1",
+    roleSet:"qf.role-set/1",
+    role:"qf.role/1",
+    eggSet:"qf.egg-set/1",
+    eggMedia:"qf.egg-media/1",
+    circleSet:"qf.circle-set/1",
+    circlePost:"qf.circle-post/1"
+};
+function qfOfficialEnvelopeV410(cap,model){
+    return {ok:false,cap:String(cap||""),model:String(model||"raw"),data:null,raw:null,error:"",ts:Date.now(),duration:0};
+}
+function qfOfficialStrV410(v){return String(v==null?"":v);}
+function qfOfficialBoolV410(v){
+    if(v===true||v===1)return true;
+    return /^(?:1|true|yes)$/i.test(String(v==null?"":v));
+}
+function qfOfficialUrlParamV410(url,key){
+    var m=String(url||"").match(new RegExp("[?&#]"+String(key||"")+"=([^&#]+)","i"));
+    if(!m)return "";
+    try{return decodeURIComponent(String(m[1]||""));}catch(_e){return String(m[1]||"");}
+}
+function qfOfficialTocBookIdV410(list,args){
+    var base=args&&args.length>1?String(args[1
+
+### QF_PROVIDER83 @472286
+qfDiagInvokeV85(this,"official",String(QF_OFFICIAL400.name||"起点官方"),cap,fn,a);
+}
+function qfOfficialDispatchV400(cap,args){
+    cap=String(cap||"");
+    var c=qfOfficialCapabilityV400(cap);
+    if(!c)return {handled:false,value:null};
+    var v=qfOfficialCallV400.call(this,cap,args);
+    try{qfDiagFlushV85.call(this,{kind:"official",adapter:String(QF_OFFICIAL400.id||""),cap:cap});}catch(_df){}
+    return {handled:true,value:v};
+}
+/* 注册 ABI：后续新增官方能力/正文源/评论源只追加 spec，不再扩散 switch/if。 */
+function qfOfficialRegisterV400(cap,spec){
+    cap=String(cap||"");if(!cap||!spec||typeof spec!=="object")return false;
+    if(!QF_OFFICIAL400.capabilities)QF_OFFICIAL400.capabilities={};
+    QF_OFFICIAL400.capabilities[cap]=spec;return true;
+}
+function qfProviderRegisterV400(name,spec){
+    name=String(name||"");if(!name||!spec||typeof spec!=="object")return false;
+    QF_PROVIDER83[name]=spec;QF_PROVIDER39=QF_PROVIDER83;return true;
+}
+function qfCommentRegisterV400(name,spec){
+    name=String(name||"");if(!name||!spec||typeof spec!=="object")return false;
+    QF_COMMENT84[name]=spec;QF_COMMENT83=QF_COMMENT84;return true;
+}
+
+/* ============================================================
+ * v4.0.0-alpha5 · Official Data Kernel
+ *
+ * Layer contract:
+ *   Capability/Request  -> raw implementation result
+ *   Domain Mapper       -> stable internal model
+ *   Compatibility View  -> 阅读当前字段 / 旧 UI ABI
+ *
+ * qfOfficialCallV400 继续返回 raw，保证旧代码零破坏。
+ * 新代码优先 qfOfficialQueryV410，得到统一 Envelope：
+ *   {ok, cap, model, data, raw, error, ts, duration}
+ * ============================================================ */
+var QF_OFFICIAL_SCHEMA410={
+    version:2,
+    toc:"qf.toc/1",
+    chapter:"qf.chapter/1",
+    content:"qf.content/1",
+    authorNote:"qf.author-note/1",
+    copyright:"qf.copyright/1",
+    roleSet:"qf.role-set/1",
+    role:"qf.role/1",
+    eggSet:"qf.egg-set/1",
+    eggMedia:"qf.egg-media/1",
+    circleSet:"qf.circle-set/1",
+    circlePost:"qf.circle-post/1"
+};
+function qfOfficialEnvelopeV410(cap,model){
+    return {ok:false,cap:String(cap||""),model:String(model||"raw"),data:null,raw:null,error:"",ts:Date.now(),duration:0};
+}
+function qfOfficialStrV410(v){return String(v==null?"":v);}
+function qfOfficialBoolV410(v){
+    if(v===true||v===1)return true;
+    return /^(?:1|true|yes)$/i.test(String(v==null?"":v));
+}
+function qfOfficialUrlParamV410(url,key){
+    var m=String(url||"").match(new RegExp("[?&#]"+String(key||"")+"=([^&#]+)","i"));
+    if(!m)return "";
+    try{return decodeURIComponent(String(m[1]||""));}catch(_e){return String(m[1]||"");}
+}
+function qfOfficialTocBookIdV410(list,args){
+    var base=args&&args.length>1?String(args[1]||""):"",m=base.match(/(?:book\/|bookI
+
+### QF_PROVIDER83 @500272
+.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookV
+
+### QF_PROVIDER83 @500301
+41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")|
+
+### QF_PROVIDER83 @500342
+ck:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="nu
+
+### QF_PROVIDER83 @500415
+只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier
+
+### QF_PROVIDER83 @500470
+智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    
+
+### QF_PROVIDER83 @500941
+单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.
+
+### QF_PROVIDER83 @500970
+S 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierO
+
+### QF_PROVIDER83 @501011
+ tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfS
+
+### QF_PROVIDER83 @501084
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfSetting.call(this,key,def)||def);}catch(_e){cfg=def;}
+    var out=qfRouteP
+
+### QF_PROVIDER83 @501134
+源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfSetting.call(this,key,def)||def);}catch(_e){cfg=def;}
+    var out=qfRouteParseOrderV38(cfg,allow,def),sticky="";
+    try{sti
+
+### QF_PROVIDER83 @518276
+call(this,map.host,map.bookId,false);
+    }
+    var ch=qfStvResolveChapterV1(meta,toc);if(!ch||!ch.cid)throw new Error("STV 未匹配当前章节："+String(meta.title||""));
+    var text=qfStvXianrenV1.call(this,map.host,map.bookId,ch.cid);
+    if(!QF_ContentCleaner.valid(text))throw new Error("STV/xianren 正文为空或过短");
+    return text;
+}
+function qfStvAutoContentV1(meta){return qfStvContentCoreV1.call(this,meta,"auto");}
+function qfStvQidianContentV1(meta){return qfStvContentCoreV1.call(this,meta,"qidian");}
+
+/* ============================================================
+ * alpha83 Provider Capability Registry
+ *
+ * Provider 只声明：身份 / 类别 / 模块 / capabilities / policy。
+ * Router 只调用 capability，不再理解某个 Provider 的具体入口名。
+ * 以后新增 content/search/toc 等能力，只需要在 Registry 增加 capability；
+ * 旧 qfProviderSpecV39 / qfProviderReadyV79 ABI 保留，避免影响现有模块。
+ * ============================================================ */
+var QF_PROVIDER83={
+    "情无":{id:"qingwu",tier:"限免源",module:"limited_qw",capabilities:{content:{entry:"qfQwContentV44"},error:{entry:"qfLimGetErrV30",passName:true}},policy:{verify:false}},
+    "神魔":{id:"shenmo",tier:"限免源",module:"limited_sm",capabilities:{content:{entry:"qfSmContentV30"},error:{entry:"qfLimGetErrV30",passName:true}},policy:{verify:false}},
+    "晴天":{id:"qingtian",tier:"限免源",module:"limited_qt",capabilities:{content:{entry:"qfQtContentV330"},error:{entry:"qfLimGetErrV30",passName:true}},policy:{verify:false}},
+    "同人":{id:"tongren",tier:"限免源",module:"limited_tr",capabilities:{content:{entry:"qfTrContentV102"},error:{entry:"qfTrGetErrV102"}},policy:{verify:false},ui:{label:"同人",order:40}},
+    /* alpha54：优选源本身已有严格书籍/章节匹配，正文锚点关闭。 */
+    "七猫":{id:"qimao",tier:"优选源",module:"preferred_qm",capabilities:{content:{entry:"qfQimaoContentV10"}},policy:{verify:false}},
+    "书旗":{id:"shuqi",tier:"优选源",module:"preferred_sq",capabilities:{content:{entry:"qfShuqiContentV44"}},policy:{verify:false}},
+    "QQ浏览器":{id:"qqbrowser",tier:"优选源",module:"preferred_qq",capabilities:{content:{entry:"qfQQContentV50"}},policy:{verify:false}},
+    "得间":{id:"dejian",tier:"优选源",module:"preferred_dj",capabilities:{content:{entry:"qfDejianContentV521"}},policy:{verify:false},ui:{label:"得间",order:40}},
+    "酷我":{id:"kuwo",tier:"优选源",module:"preferred_kw",capabilities:{content:{entry:"qfKuwoContentV526"}},policy:{verify:false},ui:{label:"酷我",order:50}},
+    "猫眼":{id:"maoyan",tier:"兜底源",module:"fallback_my",capabilities:{content:{entry:"qfMaoyanContentV43"}},policy:{verify:true}},
+    "得奇":{id:"deqi",tier:"兜底源",module:"fallback_dq",capabilities:{content:{entry:"qfDeqiContentV44"}},policy:{verify:true}},
+    "69书吧":{id:"69shuba",tier:"兜底源",module:"fallback_69",capabilities:{content:{entry:"qf6
+
+### QF_PROVIDER83 @520955
+:{content:{entry:"qf69ContentV23"}},policy:{verify:true}},
+    "速读谷":{id:"sudugu",tier:"兜底源",module:"fallback_sdg",capabilities:{content:{entry:"qfSuduguContentV525"}},policy:{verify:true},ui:{label:"速读谷",order:40}},
+    "万相":{id:"wanxiang",tier:"兜底源",module:"fallback_wx",capabilities:{content:{entry:"qfWanxiangContentV527"}},policy:{verify:true},ui:{label:"万相",order:50}},
+    /* v4.2.1-alpha1：STV 仅允许 4x 书籍变量主动路由，不参与 UI 类别/全源智能。 */
+    "STV·自动":{id:"stv_auto",tier:"STV源",module:"",capabilities:{content:{entry:"qfStvAutoContentV1",global:true}},policy:{verify:false,bookVariableOnly:true},ui:{label:"STV·自动",order:10}},
+    "STV·qidian":{id:"stv_qidian",tier:"STV源",module:"",capabilities:{content:{entry:"qfStvQidianContentV1",global:true}},policy:{verify:false,bookVariableOnly:true},ui:{label:"STV·qidian",order:20}}
+};
+/* legacy alias：旧模块若读取 QF_PROVIDER39，继续得到同一个 Spec。 */
+var QF_PROVIDER39=QF_PROVIDER83;
+/* alpha23：现有 Provider 仅补 Contract 元数据；不包装/替换任何 capability。 */
+(function qfProviderV1StampExistingV520(){
+    try{for(var n in QF_PROVIDER83){if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;var sp=QF_PROVIDER83[n]||{};sp.abi=QF_PROVIDER_V1_520.abi;sp.contractVersion=1;sp.name=String(n);if(!sp.ui)sp.ui={label:String(n)};}}catch(_e){}
+})();
+function qfProviderSpecV39(name){return QF_PROVIDER83[String(name||"")]||null;}
+function qfProviderCapabilityV83(name,cap,sp){
+    sp=sp||qfProviderSpecV39(name);
+    if(!sp||!sp.capabilities)return null;
+    var c=sp.capabilities[String(cap||"")];
+    if(!c)return null;
+    if(typeof c==="string")return {entry:c};
+    return c;
+}
+function qfProviderPolicyV83(sp,key,def){
+    try{
+        var p=sp&&sp.policy?sp.policy:null;
+        if(p&&p[key]!==undefined&&p[key]!==null)return p[key];
+    }catch(_e){}
+    return def;
+}
+function qfProviderGlobalFnV39(name){
+    /* v4.2.1-alpha1：STV 是极小独立 Provider，非 4x 时完全不调用；
+       保留 global capability 口供，避免为两条薄入口改动已冻结 QF_MOD38_PACK。 */
+    name=String(name||"");
+    if(name==="qfStvAutoContentV1")return qfStvAutoContentV1;
+    if(name==="qfStvQidianContentV1")return qfStvQidianContentV1;
+    return null;
+}
+function qfProviderCapFnV83(name,cap,sp){
+    sp=sp||qfProviderSpecV39(name);
+    if(!sp)throw new Error("未知正文源："+name);
+    var c=qfProviderCapabilityV83(name,cap,sp);
+    if(!c||!c.entry)throw new Error("正文源能力缺失："+name+" / "+cap);
+    if(!sp._capFnsV83)sp._capFnsV83={};
+    if(typeof sp._capFnsV83[cap]==="function")return sp._capFnsV83[cap];
+
+    var req=sp.requires||[];
+    for(var i=0;i<req.length;i++)qfModuleEnsureV38.call(this,req[i]);
+    var mod=String(c.module||sp.module||"");
+    var fn=null;
+    if(mod){
+        var ex=qfModuleEnsureV38.call(this,mod);
+ 
+
+### QF_PROVIDER83 @521097
+y:"qfSuduguContentV525"}},policy:{verify:true},ui:{label:"速读谷",order:40}},
+    "万相":{id:"wanxiang",tier:"兜底源",module:"fallback_wx",capabilities:{content:{entry:"qfWanxiangContentV527"}},policy:{verify:true},ui:{label:"万相",order:50}},
+    /* v4.2.1-alpha1：STV 仅允许 4x 书籍变量主动路由，不参与 UI 类别/全源智能。 */
+    "STV·自动":{id:"stv_auto",tier:"STV源",module:"",capabilities:{content:{entry:"qfStvAutoContentV1",global:true}},policy:{verify:false,bookVariableOnly:true},ui:{label:"STV·自动",order:10}},
+    "STV·qidian":{id:"stv_qidian",tier:"STV源",module:"",capabilities:{content:{entry:"qfStvQidianContentV1",global:true}},policy:{verify:false,bookVariableOnly:true},ui:{label:"STV·qidian",order:20}}
+};
+/* legacy alias：旧模块若读取 QF_PROVIDER39，继续得到同一个 Spec。 */
+var QF_PROVIDER39=QF_PROVIDER83;
+/* alpha23：现有 Provider 仅补 Contract 元数据；不包装/替换任何 capability。 */
+(function qfProviderV1StampExistingV520(){
+    try{for(var n in QF_PROVIDER83){if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;var sp=QF_PROVIDER83[n]||{};sp.abi=QF_PROVIDER_V1_520.abi;sp.contractVersion=1;sp.name=String(n);if(!sp.ui)sp.ui={label:String(n)};}}catch(_e){}
+})();
+function qfProviderSpecV39(name){return QF_PROVIDER83[String(name||"")]||null;}
+function qfProviderCapabilityV83(name,cap,sp){
+    sp=sp||qfProviderSpecV39(name);
+    if(!sp||!sp.capabilities)return null;
+    var c=sp.capabilities[String(cap||"")];
+    if(!c)return null;
+    if(typeof c==="string")return {entry:c};
+    return c;
+}
+function qfProviderPolicyV83(sp,key,def){
+    try{
+        var p=sp&&sp.policy?sp.policy:null;
+        if(p&&p[key]!==undefined&&p[key]!==null)return p[key];
+    }catch(_e){}
+    return def;
+}
+function qfProviderGlobalFnV39(name){
+    /* v4.2.1-alpha1：STV 是极小独立 Provider，非 4x 时完全不调用；
+       保留 global capability 口供，避免为两条薄入口改动已冻结 QF_MOD38_PACK。 */
+    name=String(name||"");
+    if(name==="qfStvAutoContentV1")return qfStvAutoContentV1;
+    if(name==="qfStvQidianContentV1")return qfStvQidianContentV1;
+    return null;
+}
+function qfProviderCapFnV83(name,cap,sp){
+    sp=sp||qfProviderSpecV39(name);
+    if(!sp)throw new Error("未知正文源："+name);
+    var c=qfProviderCapabilityV83(name,cap,sp);
+    if(!c||!c.entry)throw new Error("正文源能力缺失："+name+" / "+cap);
+    if(!sp._capFnsV83)sp._capFnsV83={};
+    if(typeof sp._capFnsV83[cap]==="function")return sp._capFnsV83[cap];
+
+    var req=sp.requires||[];
+    for(var i=0;i<req.length;i++)qfModuleEnsureV38.call(this,req[i]);
+    var mod=String(c.module||sp.module||"");
+    var fn=null;
+    if(mod){
+        var ex=qfModuleEnsureV38.call(this,mod);
+        fn=ex&&ex[c.entry];
+    }else{
+        fn=qfProviderGlobalFnV39(c.entry);
+    }
+    if(typeof fn!=="function")throw new Error("正文源能力入口缺
+
+### QF_PROVIDER83 @521153
+:"速读谷",order:40}},
+    "万相":{id:"wanxiang",tier:"兜底源",module:"fallback_wx",capabilities:{content:{entry:"qfWanxiangContentV527"}},policy:{verify:true},ui:{label:"万相",order:50}},
+    /* v4.2.1-alpha1：STV 仅允许 4x 书籍变量主动路由，不参与 UI 类别/全源智能。 */
+    "STV·自动":{id:"stv_auto",tier:"STV源",module:"",capabilities:{content:{entry:"qfStvAutoContentV1",global:true}},policy:{verify:false,bookVariableOnly:true},ui:{label:"STV·自动",order:10}},
+    "STV·qidian":{id:"stv_qidian",tier:"STV源",module:"",capabilities:{content:{entry:"qfStvQidianContentV1",global:true}},policy:{verify:false,bookVariableOnly:true},ui:{label:"STV·qidian",order:20}}
+};
+/* legacy alias：旧模块若读取 QF_PROVIDER39，继续得到同一个 Spec。 */
+var QF_PROVIDER39=QF_PROVIDER83;
+/* alpha23：现有 Provider 仅补 Contract 元数据；不包装/替换任何 capability。 */
+(function qfProviderV1StampExistingV520(){
+    try{for(var n in QF_PROVIDER83){if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;var sp=QF_PROVIDER83[n]||{};sp.abi=QF_PROVIDER_V1_520.abi;sp.contractVersion=1;sp.name=String(n);if(!sp.ui)sp.ui={label:String(n)};}}catch(_e){}
+})();
+function qfProviderSpecV39(name){return QF_PROVIDER83[String(name||"")]||null;}
+function qfProviderCapabilityV83(name,cap,sp){
+    sp=sp||qfProviderSpecV39(name);
+    if(!sp||!sp.capabilities)return null;
+    var c=sp.capabilities[String(cap||"")];
+    if(!c)return null;
+    if(typeof c==="string")return {entry:c};
+    return c;
+}
+function qfProviderPolicyV83(sp,key,def){
+    try{
+        var p=sp&&sp.policy?sp.policy:null;
+        if(p&&p[key]!==undefined&&p[key]!==null)return p[key];
+    }catch(_e){}
+    return def;
+}
+function qfProviderGlobalFnV39(name){
+    /* v4.2.1-alpha1：STV 是极小独立 Provider，非 4x 时完全不调用；
+       保留 global capability 口供，避免为两条薄入口改动已冻结 QF_MOD38_PACK。 */
+    name=String(name||"");
+    if(name==="qfStvAutoContentV1")return qfStvAutoContentV1;
+    if(name==="qfStvQidianContentV1")return qfStvQidianContentV1;
+    return null;
+}
+function qfProviderCapFnV83(name,cap,sp){
+    sp=sp||qfProviderSpecV39(name);
+    if(!sp)throw new Error("未知正文源："+name);
+    var c=qfProviderCapabilityV83(name,cap,sp);
+    if(!c||!c.entry)throw new Error("正文源能力缺失："+name+" / "+cap);
+    if(!sp._capFnsV83)sp._capFnsV83={};
+    if(typeof sp._capFnsV83[cap]==="function")return sp._capFnsV83[cap];
+
+    var req=sp.requires||[];
+    for(var i=0;i<req.length;i++)qfModuleEnsureV38.call(this,req[i]);
+    var mod=String(c.module||sp.module||"");
+    var fn=null;
+    if(mod){
+        var ex=qfModuleEnsureV38.call(this,mod);
+        fn=ex&&ex[c.entry];
+    }else{
+        fn=qfProviderGlobalFnV39(c.entry);
+    }
+    if(typeof fn!=="function")throw new Error("正文源能力入口缺失："+name+" / "+cap);
+    sp._capFnsV83[cap]=fn;
+    retu
+
+### QF_PROVIDER83 @521186
+wanxiang",tier:"兜底源",module:"fallback_wx",capabilities:{content:{entry:"qfWanxiangContentV527"}},policy:{verify:true},ui:{label:"万相",order:50}},
+    /* v4.2.1-alpha1：STV 仅允许 4x 书籍变量主动路由，不参与 UI 类别/全源智能。 */
+    "STV·自动":{id:"stv_auto",tier:"STV源",module:"",capabilities:{content:{entry:"qfStvAutoContentV1",global:true}},policy:{verify:false,bookVariableOnly:true},ui:{label:"STV·自动",order:10}},
+    "STV·qidian":{id:"stv_qidian",tier:"STV源",module:"",capabilities:{content:{entry:"qfStvQidianContentV1",global:true}},policy:{verify:false,bookVariableOnly:true},ui:{label:"STV·qidian",order:20}}
+};
+/* legacy alias：旧模块若读取 QF_PROVIDER39，继续得到同一个 Spec。 */
+var QF_PROVIDER39=QF_PROVIDER83;
+/* alpha23：现有 Provider 仅补 Contract 元数据；不包装/替换任何 capability。 */
+(function qfProviderV1StampExistingV520(){
+    try{for(var n in QF_PROVIDER83){if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;var sp=QF_PROVIDER83[n]||{};sp.abi=QF_PROVIDER_V1_520.abi;sp.contractVersion=1;sp.name=String(n);if(!sp.ui)sp.ui={label:String(n)};}}catch(_e){}
+})();
+function qfProviderSpecV39(name){return QF_PROVIDER83[String(name||"")]||null;}
+function qfProviderCapabilityV83(name,cap,sp){
+    sp=sp||qfProviderSpecV39(name);
+    if(!sp||!sp.capabilities)return null;
+    var c=sp.capabilities[String(cap||"")];
+    if(!c)return null;
+    if(typeof c==="string")return {entry:c};
+    return c;
+}
+function qfProviderPolicyV83(sp,key,def){
+    try{
+        var p=sp&&sp.policy?sp.policy:null;
+        if(p&&p[key]!==undefined&&p[key]!==null)return p[key];
+    }catch(_e){}
+    return def;
+}
+function qfProviderGlobalFnV39(name){
+    /* v4.2.1-alpha1：STV 是极小独立 Provider，非 4x 时完全不调用；
+       保留 global capability 口供，避免为两条薄入口改动已冻结 QF_MOD38_PACK。 */
+    name=String(name||"");
+    if(name==="qfStvAutoContentV1")return qfStvAutoContentV1;
+    if(name==="qfStvQidianContentV1")return qfStvQidianContentV1;
+    return null;
+}
+function qfProviderCapFnV83(name,cap,sp){
+    sp=sp||qfProviderSpecV39(name);
+    if(!sp)throw new Error("未知正文源："+name);
+    var c=qfProviderCapabilityV83(name,cap,sp);
+    if(!c||!c.entry)throw new Error("正文源能力缺失："+name+" / "+cap);
+    if(!sp._capFnsV83)sp._capFnsV83={};
+    if(typeof sp._capFnsV83[cap]==="function")return sp._capFnsV83[cap];
+
+    var req=sp.requires||[];
+    for(var i=0;i<req.length;i++)qfModuleEnsureV38.call(this,req[i]);
+    var mod=String(c.module||sp.module||"");
+    var fn=null;
+    if(mod){
+        var ex=qfModuleEnsureV38.call(this,mod);
+        fn=ex&&ex[c.entry];
+    }else{
+        fn=qfProviderGlobalFnV39(c.entry);
+    }
+    if(typeof fn!=="function")throw new Error("正文源能力入口缺失："+name+" / "+cap);
+    sp._capFnsV83[cap]=fn;
+    return fn;
+}
+function qfProviderCallV
+
+### QF_PROVIDER83 @521370
+由，不参与 UI 类别/全源智能。 */
+    "STV·自动":{id:"stv_auto",tier:"STV源",module:"",capabilities:{content:{entry:"qfStvAutoContentV1",global:true}},policy:{verify:false,bookVariableOnly:true},ui:{label:"STV·自动",order:10}},
+    "STV·qidian":{id:"stv_qidian",tier:"STV源",module:"",capabilities:{content:{entry:"qfStvQidianContentV1",global:true}},policy:{verify:false,bookVariableOnly:true},ui:{label:"STV·qidian",order:20}}
+};
+/* legacy alias：旧模块若读取 QF_PROVIDER39，继续得到同一个 Spec。 */
+var QF_PROVIDER39=QF_PROVIDER83;
+/* alpha23：现有 Provider 仅补 Contract 元数据；不包装/替换任何 capability。 */
+(function qfProviderV1StampExistingV520(){
+    try{for(var n in QF_PROVIDER83){if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;var sp=QF_PROVIDER83[n]||{};sp.abi=QF_PROVIDER_V1_520.abi;sp.contractVersion=1;sp.name=String(n);if(!sp.ui)sp.ui={label:String(n)};}}catch(_e){}
+})();
+function qfProviderSpecV39(name){return QF_PROVIDER83[String(name||"")]||null;}
+function qfProviderCapabilityV83(name,cap,sp){
+    sp=sp||qfProviderSpecV39(name);
+    if(!sp||!sp.capabilities)return null;
+    var c=sp.capabilities[String(cap||"")];
+    if(!c)return null;
+    if(typeof c==="string")return {entry:c};
+    return c;
+}
+function qfProviderPolicyV83(sp,key,def){
+    try{
+        var p=sp&&sp.policy?sp.policy:null;
+        if(p&&p[key]!==undefined&&p[key]!==null)return p[key];
+    }catch(_e){}
+    return def;
+}
+function qfProviderGlobalFnV39(name){
+    /* v4.2.1-alpha1：STV 是极小独立 Provider，非 4x 时完全不调用；
+       保留 global capability 口供，避免为两条薄入口改动已冻结 QF_MOD38_PACK。 */
+    name=String(name||"");
+    if(name==="qfStvAutoContentV1")return qfStvAutoContentV1;
+    if(name==="qfStvQidianContentV1")return qfStvQidianContentV1;
+    return null;
+}
+function qfProviderCapFnV83(name,cap,sp){
+    sp=sp||qfProviderSpecV39(name);
+    if(!sp)throw new Error("未知正文源："+name);
+    var c=qfProviderCapabilityV83(name,cap,sp);
+    if(!c||!c.entry)throw new Error("正文源能力缺失："+name+" / "+cap);
+    if(!sp._capFnsV83)sp._capFnsV83={};
+    if(typeof sp._capFnsV83[cap]==="function")return sp._capFnsV83[cap];
+
+    var req=sp.requires||[];
+    for(var i=0;i<req.length;i++)qfModuleEnsureV38.call(this,req[i]);
+    var mod=String(c.module||sp.module||"");
+    var fn=null;
+    if(mod){
+        var ex=qfModuleEnsureV38.call(this,mod);
+        fn=ex&&ex[c.entry];
+    }else{
+        fn=qfProviderGlobalFnV39(c.entry);
+    }
+    if(typeof fn!=="function")throw new Error("正文源能力入口缺失："+name+" / "+cap);
+    sp._capFnsV83[cap]=fn;
+    return fn;
+}
+function qfProviderCallV83(name,cap,args,sp){
+    sp=sp||qfProviderSpecV39(name);
+    var c=qfProviderCapabilityV83(name,cap,sp),fn=qfProviderCapFnV83.call(this,name,cap,sp);
+    var a=Array.isArray(args)?arg
+
+### QF_PROVIDER83 @534377
+ovider,tier,text,duration,spec,meta){
+        return {ok:true,text:String(text||""),provider:String(provider||""),tier:String(tier||""),error:"",code:"",userMessage:"",retryable:false,duration:Math.max(0,Number(duration||0)||0),spec:spec||null,meta:meta||{}};
+    }
+    function fail(provider,tier,error,duration,spec,code,meta){
+        var msg=String(error&&error.message?error.message:(error||"")),c=String(code||QF_Error.classify(msg)||"PROVIDER_FAILED");
+        if(c==="INTERNAL_ERROR"&&/正文为空|正文过短|章节内容为空|未匹配|找不到对应章节/.test(msg))c="EMPTY_CONTENT";
+        return {ok:false,text:"",provider:String(provider||""),tier:String(tier||""),error:msg,code:c,userMessage:QF_Error.userMessage(c),retryable:retryable(c),duration:Math.max(0,Number(duration||0)||0),spec:spec||null,meta:meta||{}};
+    }
+    return {ok:ok,fail:fail};
+})();
+
+var QF_ProviderRegistry=(function(){
+    function get(name){return QF_PROVIDER83[String(name||"")]||null;}
+    function names(tier){
+        var out=[];for(var n in QF_PROVIDER83)if(Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n)){
+            var sp=QF_PROVIDER83[n]||{};if(!tier||String(sp.tier||"")===String(tier))out.push(String(n));
+        }
+        out.sort(function(a,b){var x=get(a)||{},y=get(b)||{},xo=Number(x.ui&&x.ui.order||999),yo=Number(y.ui&&y.ui.order||999);return xo-yo;});return out;
+    }
+    function capability(name,cap){var sp=get(name);if(!sp||!sp.capabilities)return null;var c=sp.capabilities[String(cap||"")];if(!c)return null;return typeof c==="string"?{entry:c}:c;}
+    function policy(name,key,def){var sp=get(name),p=sp&&sp.policy?sp.policy:null;return p&&p[key]!==undefined&&p[key]!==null?p[key]:def;}
+    function describe(name){var sp=get(name);if(!sp)return null;return {name:String(name||""),id:String(sp.id||""),tier:String(sp.tier||""),module:String(sp.module||""),abi:String(sp.abi||"legacy"),contractVersion:Number(sp.contractVersion||0),policy:sp.policy||{},ui:sp.ui||{}};}
+    function validate(){var issues=[],count=0;for(var n in QF_PROVIDER83)if(Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n)){count++;var sp=QF_PROVIDER83[n]||{},c=capability(n,"content");if(!String(sp.id||""))issues.push(n+":id");if(!String(sp.tier||""))issues.push(n+":tier");if(!c||!String(c.entry||""))issues.push(n+":content");if(c&&!String(c.module||sp.module||"")&&!c.global)issues.push(n+":module");}return {ok:issues.length===0,count:count,issues:issues};}
+    return {get:get,names:names,capability:capability,policy:policy,describe:describe,validate:validate};
+})();
+
+var QF_PROVIDER_CONTENT360_JS={};
+var QF_PROVIDER_CONTENT360_ORDER=[];
+function qfProviderContentL1GetV360(key,now){
+    try{
+        var o=QF_PROVIDER_CONTENT360
+
+### QF_PROVIDER83 @534475
+g(provider||""),tier:String(tier||""),error:"",code:"",userMessage:"",retryable:false,duration:Math.max(0,Number(duration||0)||0),spec:spec||null,meta:meta||{}};
+    }
+    function fail(provider,tier,error,duration,spec,code,meta){
+        var msg=String(error&&error.message?error.message:(error||"")),c=String(code||QF_Error.classify(msg)||"PROVIDER_FAILED");
+        if(c==="INTERNAL_ERROR"&&/正文为空|正文过短|章节内容为空|未匹配|找不到对应章节/.test(msg))c="EMPTY_CONTENT";
+        return {ok:false,text:"",provider:String(provider||""),tier:String(tier||""),error:msg,code:c,userMessage:QF_Error.userMessage(c),retryable:retryable(c),duration:Math.max(0,Number(duration||0)||0),spec:spec||null,meta:meta||{}};
+    }
+    return {ok:ok,fail:fail};
+})();
+
+var QF_ProviderRegistry=(function(){
+    function get(name){return QF_PROVIDER83[String(name||"")]||null;}
+    function names(tier){
+        var out=[];for(var n in QF_PROVIDER83)if(Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n)){
+            var sp=QF_PROVIDER83[n]||{};if(!tier||String(sp.tier||"")===String(tier))out.push(String(n));
+        }
+        out.sort(function(a,b){var x=get(a)||{},y=get(b)||{},xo=Number(x.ui&&x.ui.order||999),yo=Number(y.ui&&y.ui.order||999);return xo-yo;});return out;
+    }
+    function capability(name,cap){var sp=get(name);if(!sp||!sp.capabilities)return null;var c=sp.capabilities[String(cap||"")];if(!c)return null;return typeof c==="string"?{entry:c}:c;}
+    function policy(name,key,def){var sp=get(name),p=sp&&sp.policy?sp.policy:null;return p&&p[key]!==undefined&&p[key]!==null?p[key]:def;}
+    function describe(name){var sp=get(name);if(!sp)return null;return {name:String(name||""),id:String(sp.id||""),tier:String(sp.tier||""),module:String(sp.module||""),abi:String(sp.abi||"legacy"),contractVersion:Number(sp.contractVersion||0),policy:sp.policy||{},ui:sp.ui||{}};}
+    function validate(){var issues=[],count=0;for(var n in QF_PROVIDER83)if(Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n)){count++;var sp=QF_PROVIDER83[n]||{},c=capability(n,"content");if(!String(sp.id||""))issues.push(n+":id");if(!String(sp.tier||""))issues.push(n+":tier");if(!c||!String(c.entry||""))issues.push(n+":content");if(c&&!String(c.module||sp.module||"")&&!c.global)issues.push(n+":module");}return {ok:issues.length===0,count:count,issues:issues};}
+    return {get:get,names:names,capability:capability,policy:policy,describe:describe,validate:validate};
+})();
+
+var QF_PROVIDER_CONTENT360_JS={};
+var QF_PROVIDER_CONTENT360_ORDER=[];
+function qfProviderContentL1GetV360(key,now){
+    try{
+        var o=QF_PROVIDER_CONTENT360_JS[String(key||'')];
+        if(o&&o.ts&&Number(now||Date.now())-Number(o.ts)<480000&&qfValidCont
+
+### QF_PROVIDER83 @534529
+,userMessage:"",retryable:false,duration:Math.max(0,Number(duration||0)||0),spec:spec||null,meta:meta||{}};
+    }
+    function fail(provider,tier,error,duration,spec,code,meta){
+        var msg=String(error&&error.message?error.message:(error||"")),c=String(code||QF_Error.classify(msg)||"PROVIDER_FAILED");
+        if(c==="INTERNAL_ERROR"&&/正文为空|正文过短|章节内容为空|未匹配|找不到对应章节/.test(msg))c="EMPTY_CONTENT";
+        return {ok:false,text:"",provider:String(provider||""),tier:String(tier||""),error:msg,code:c,userMessage:QF_Error.userMessage(c),retryable:retryable(c),duration:Math.max(0,Number(duration||0)||0),spec:spec||null,meta:meta||{}};
+    }
+    return {ok:ok,fail:fail};
+})();
+
+var QF_ProviderRegistry=(function(){
+    function get(name){return QF_PROVIDER83[String(name||"")]||null;}
+    function names(tier){
+        var out=[];for(var n in QF_PROVIDER83)if(Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n)){
+            var sp=QF_PROVIDER83[n]||{};if(!tier||String(sp.tier||"")===String(tier))out.push(String(n));
+        }
+        out.sort(function(a,b){var x=get(a)||{},y=get(b)||{},xo=Number(x.ui&&x.ui.order||999),yo=Number(y.ui&&y.ui.order||999);return xo-yo;});return out;
+    }
+    function capability(name,cap){var sp=get(name);if(!sp||!sp.capabilities)return null;var c=sp.capabilities[String(cap||"")];if(!c)return null;return typeof c==="string"?{entry:c}:c;}
+    function policy(name,key,def){var sp=get(name),p=sp&&sp.policy?sp.policy:null;return p&&p[key]!==undefined&&p[key]!==null?p[key]:def;}
+    function describe(name){var sp=get(name);if(!sp)return null;return {name:String(name||""),id:String(sp.id||""),tier:String(sp.tier||""),module:String(sp.module||""),abi:String(sp.abi||"legacy"),contractVersion:Number(sp.contractVersion||0),policy:sp.policy||{},ui:sp.ui||{}};}
+    function validate(){var issues=[],count=0;for(var n in QF_PROVIDER83)if(Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n)){count++;var sp=QF_PROVIDER83[n]||{},c=capability(n,"content");if(!String(sp.id||""))issues.push(n+":id");if(!String(sp.tier||""))issues.push(n+":tier");if(!c||!String(c.entry||""))issues.push(n+":content");if(c&&!String(c.module||sp.module||"")&&!c.global)issues.push(n+":module");}return {ok:issues.length===0,count:count,issues:issues};}
+    return {get:get,names:names,capability:capability,policy:policy,describe:describe,validate:validate};
+})();
+
+var QF_PROVIDER_CONTENT360_JS={};
+var QF_PROVIDER_CONTENT360_ORDER=[];
+function qfProviderContentL1GetV360(key,now){
+    try{
+        var o=QF_PROVIDER_CONTENT360_JS[String(key||'')];
+        if(o&&o.ts&&Number(now||Date.now())-Number(o.ts)<480000&&qfValidContentV10(String(o.text||'')))return String(o.text||'');
+
+
+### QF_PROVIDER83 @534567
+on:Math.max(0,Number(duration||0)||0),spec:spec||null,meta:meta||{}};
+    }
+    function fail(provider,tier,error,duration,spec,code,meta){
+        var msg=String(error&&error.message?error.message:(error||"")),c=String(code||QF_Error.classify(msg)||"PROVIDER_FAILED");
+        if(c==="INTERNAL_ERROR"&&/正文为空|正文过短|章节内容为空|未匹配|找不到对应章节/.test(msg))c="EMPTY_CONTENT";
+        return {ok:false,text:"",provider:String(provider||""),tier:String(tier||""),error:msg,code:c,userMessage:QF_Error.userMessage(c),retryable:retryable(c),duration:Math.max(0,Number(duration||0)||0),spec:spec||null,meta:meta||{}};
+    }
+    return {ok:ok,fail:fail};
+})();
+
+var QF_ProviderRegistry=(function(){
+    function get(name){return QF_PROVIDER83[String(name||"")]||null;}
+    function names(tier){
+        var out=[];for(var n in QF_PROVIDER83)if(Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n)){
+            var sp=QF_PROVIDER83[n]||{};if(!tier||String(sp.tier||"")===String(tier))out.push(String(n));
+        }
+        out.sort(function(a,b){var x=get(a)||{},y=get(b)||{},xo=Number(x.ui&&x.ui.order||999),yo=Number(y.ui&&y.ui.order||999);return xo-yo;});return out;
+    }
+    function capability(name,cap){var sp=get(name);if(!sp||!sp.capabilities)return null;var c=sp.capabilities[String(cap||"")];if(!c)return null;return typeof c==="string"?{entry:c}:c;}
+    function policy(name,key,def){var sp=get(name),p=sp&&sp.policy?sp.policy:null;return p&&p[key]!==undefined&&p[key]!==null?p[key]:def;}
+    function describe(name){var sp=get(name);if(!sp)return null;return {name:String(name||""),id:String(sp.id||""),tier:String(sp.tier||""),module:String(sp.module||""),abi:String(sp.abi||"legacy"),contractVersion:Number(sp.contractVersion||0),policy:sp.policy||{},ui:sp.ui||{}};}
+    function validate(){var issues=[],count=0;for(var n in QF_PROVIDER83)if(Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n)){count++;var sp=QF_PROVIDER83[n]||{},c=capability(n,"content");if(!String(sp.id||""))issues.push(n+":id");if(!String(sp.tier||""))issues.push(n+":tier");if(!c||!String(c.entry||""))issues.push(n+":content");if(c&&!String(c.module||sp.module||"")&&!c.global)issues.push(n+":module");}return {ok:issues.length===0,count:count,issues:issues};}
+    return {get:get,names:names,capability:capability,policy:policy,describe:describe,validate:validate};
+})();
+
+var QF_PROVIDER_CONTENT360_JS={};
+var QF_PROVIDER_CONTENT360_ORDER=[];
+function qfProviderContentL1GetV360(key,now){
+    try{
+        var o=QF_PROVIDER_CONTENT360_JS[String(key||'')];
+        if(o&&o.ts&&Number(now||Date.now())-Number(o.ts)<480000&&qfValidContentV10(String(o.text||'')))return String(o.text||'');
+        if(o)delete QF_PROVIDER_CONTEN
+
+### QF_PROVIDER83 @535490
+(!tier||String(sp.tier||"")===String(tier))out.push(String(n));
+        }
+        out.sort(function(a,b){var x=get(a)||{},y=get(b)||{},xo=Number(x.ui&&x.ui.order||999),yo=Number(y.ui&&y.ui.order||999);return xo-yo;});return out;
+    }
+    function capability(name,cap){var sp=get(name);if(!sp||!sp.capabilities)return null;var c=sp.capabilities[String(cap||"")];if(!c)return null;return typeof c==="string"?{entry:c}:c;}
+    function policy(name,key,def){var sp=get(name),p=sp&&sp.policy?sp.policy:null;return p&&p[key]!==undefined&&p[key]!==null?p[key]:def;}
+    function describe(name){var sp=get(name);if(!sp)return null;return {name:String(name||""),id:String(sp.id||""),tier:String(sp.tier||""),module:String(sp.module||""),abi:String(sp.abi||"legacy"),contractVersion:Number(sp.contractVersion||0),policy:sp.policy||{},ui:sp.ui||{}};}
+    function validate(){var issues=[],count=0;for(var n in QF_PROVIDER83)if(Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n)){count++;var sp=QF_PROVIDER83[n]||{},c=capability(n,"content");if(!String(sp.id||""))issues.push(n+":id");if(!String(sp.tier||""))issues.push(n+":tier");if(!c||!String(c.entry||""))issues.push(n+":content");if(c&&!String(c.module||sp.module||"")&&!c.global)issues.push(n+":module");}return {ok:issues.length===0,count:count,issues:issues};}
+    return {get:get,names:names,capability:capability,policy:policy,describe:describe,validate:validate};
+})();
+
+var QF_PROVIDER_CONTENT360_JS={};
+var QF_PROVIDER_CONTENT360_ORDER=[];
+function qfProviderContentL1GetV360(key,now){
+    try{
+        var o=QF_PROVIDER_CONTENT360_JS[String(key||'')];
+        if(o&&o.ts&&Number(now||Date.now())-Number(o.ts)<480000&&qfValidContentV10(String(o.text||'')))return String(o.text||'');
+        if(o)delete QF_PROVIDER_CONTENT360_JS[String(key||'')];
+    }catch(_e){}
+    return '';
+}
+function qfProviderContentL1PutV360(key,text,ts){
+    key=String(key||'');text=String(text||'');if(!key||!qfValidContentV10(text))return false;
+    try{
+        QF_PROVIDER_CONTENT360_JS[key]={ts:Number(ts||Date.now()),text:text};
+        var ix=QF_PROVIDER_CONTENT360_ORDER.indexOf(key);if(ix>=0)QF_PROVIDER_CONTENT360_ORDER.splice(ix,1);
+        QF_PROVIDER_CONTENT360_ORDER.push(key);
+        while(QF_PROVIDER_CONTENT360_ORDER.length>8){var old=QF_PROVIDER_CONTENT360_ORDER.shift();if(old!==key)delete QF_PROVIDER_CONTENT360_JS[old];}
+        return true;
+    }catch(_e){return false;}
+}
+
+var QF_ProviderExecutor=(function(){
+function contentImpl(name,meta,sp){
+    sp=sp||qfProviderSpecV39(name);
+    if(meta&&typeof meta==="object")meta._qfProviderV56=String(name||"");
+
+    /* v3.5 beta18：成功正文只做运行期同章短缓存。
+     * 阅读在详情刷新、主题/评论重绘、回退当前章等场景可能重复调用同一章 content；
+ 
+
+### QF_PROVIDER83 @535544
+ring(n));
+        }
+        out.sort(function(a,b){var x=get(a)||{},y=get(b)||{},xo=Number(x.ui&&x.ui.order||999),yo=Number(y.ui&&y.ui.order||999);return xo-yo;});return out;
+    }
+    function capability(name,cap){var sp=get(name);if(!sp||!sp.capabilities)return null;var c=sp.capabilities[String(cap||"")];if(!c)return null;return typeof c==="string"?{entry:c}:c;}
+    function policy(name,key,def){var sp=get(name),p=sp&&sp.policy?sp.policy:null;return p&&p[key]!==undefined&&p[key]!==null?p[key]:def;}
+    function describe(name){var sp=get(name);if(!sp)return null;return {name:String(name||""),id:String(sp.id||""),tier:String(sp.tier||""),module:String(sp.module||""),abi:String(sp.abi||"legacy"),contractVersion:Number(sp.contractVersion||0),policy:sp.policy||{},ui:sp.ui||{}};}
+    function validate(){var issues=[],count=0;for(var n in QF_PROVIDER83)if(Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n)){count++;var sp=QF_PROVIDER83[n]||{},c=capability(n,"content");if(!String(sp.id||""))issues.push(n+":id");if(!String(sp.tier||""))issues.push(n+":tier");if(!c||!String(c.entry||""))issues.push(n+":content");if(c&&!String(c.module||sp.module||"")&&!c.global)issues.push(n+":module");}return {ok:issues.length===0,count:count,issues:issues};}
+    return {get:get,names:names,capability:capability,policy:policy,describe:describe,validate:validate};
+})();
+
+var QF_PROVIDER_CONTENT360_JS={};
+var QF_PROVIDER_CONTENT360_ORDER=[];
+function qfProviderContentL1GetV360(key,now){
+    try{
+        var o=QF_PROVIDER_CONTENT360_JS[String(key||'')];
+        if(o&&o.ts&&Number(now||Date.now())-Number(o.ts)<480000&&qfValidContentV10(String(o.text||'')))return String(o.text||'');
+        if(o)delete QF_PROVIDER_CONTENT360_JS[String(key||'')];
+    }catch(_e){}
+    return '';
+}
+function qfProviderContentL1PutV360(key,text,ts){
+    key=String(key||'');text=String(text||'');if(!key||!qfValidContentV10(text))return false;
+    try{
+        QF_PROVIDER_CONTENT360_JS[key]={ts:Number(ts||Date.now()),text:text};
+        var ix=QF_PROVIDER_CONTENT360_ORDER.indexOf(key);if(ix>=0)QF_PROVIDER_CONTENT360_ORDER.splice(ix,1);
+        QF_PROVIDER_CONTENT360_ORDER.push(key);
+        while(QF_PROVIDER_CONTENT360_ORDER.length>8){var old=QF_PROVIDER_CONTENT360_ORDER.shift();if(old!==key)delete QF_PROVIDER_CONTENT360_JS[old];}
+        return true;
+    }catch(_e){return false;}
+}
+
+var QF_ProviderExecutor=(function(){
+function contentImpl(name,meta,sp){
+    sp=sp||qfProviderSpecV39(name);
+    if(meta&&typeof meta==="object")meta._qfProviderV56=String(name||"");
+
+    /* v3.5 beta18：成功正文只做运行期同章短缓存。
+     * 阅读在详情刷新、主题/评论重绘、回退当前章等场景可能重复调用同一章 content；
+     * 正文是不可变章节数据，8 分钟内直接复用可避免再次命中第三方 Provider。
+     * 
+
+### QF_PROVIDER83 @535577
+ort(function(a,b){var x=get(a)||{},y=get(b)||{},xo=Number(x.ui&&x.ui.order||999),yo=Number(y.ui&&y.ui.order||999);return xo-yo;});return out;
+    }
+    function capability(name,cap){var sp=get(name);if(!sp||!sp.capabilities)return null;var c=sp.capabilities[String(cap||"")];if(!c)return null;return typeof c==="string"?{entry:c}:c;}
+    function policy(name,key,def){var sp=get(name),p=sp&&sp.policy?sp.policy:null;return p&&p[key]!==undefined&&p[key]!==null?p[key]:def;}
+    function describe(name){var sp=get(name);if(!sp)return null;return {name:String(name||""),id:String(sp.id||""),tier:String(sp.tier||""),module:String(sp.module||""),abi:String(sp.abi||"legacy"),contractVersion:Number(sp.contractVersion||0),policy:sp.policy||{},ui:sp.ui||{}};}
+    function validate(){var issues=[],count=0;for(var n in QF_PROVIDER83)if(Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n)){count++;var sp=QF_PROVIDER83[n]||{},c=capability(n,"content");if(!String(sp.id||""))issues.push(n+":id");if(!String(sp.tier||""))issues.push(n+":tier");if(!c||!String(c.entry||""))issues.push(n+":content");if(c&&!String(c.module||sp.module||"")&&!c.global)issues.push(n+":module");}return {ok:issues.length===0,count:count,issues:issues};}
+    return {get:get,names:names,capability:capability,policy:policy,describe:describe,validate:validate};
+})();
+
+var QF_PROVIDER_CONTENT360_JS={};
+var QF_PROVIDER_CONTENT360_ORDER=[];
+function qfProviderContentL1GetV360(key,now){
+    try{
+        var o=QF_PROVIDER_CONTENT360_JS[String(key||'')];
+        if(o&&o.ts&&Number(now||Date.now())-Number(o.ts)<480000&&qfValidContentV10(String(o.text||'')))return String(o.text||'');
+        if(o)delete QF_PROVIDER_CONTENT360_JS[String(key||'')];
+    }catch(_e){}
+    return '';
+}
+function qfProviderContentL1PutV360(key,text,ts){
+    key=String(key||'');text=String(text||'');if(!key||!qfValidContentV10(text))return false;
+    try{
+        QF_PROVIDER_CONTENT360_JS[key]={ts:Number(ts||Date.now()),text:text};
+        var ix=QF_PROVIDER_CONTENT360_ORDER.indexOf(key);if(ix>=0)QF_PROVIDER_CONTENT360_ORDER.splice(ix,1);
+        QF_PROVIDER_CONTENT360_ORDER.push(key);
+        while(QF_PROVIDER_CONTENT360_ORDER.length>8){var old=QF_PROVIDER_CONTENT360_ORDER.shift();if(old!==key)delete QF_PROVIDER_CONTENT360_JS[old];}
+        return true;
+    }catch(_e){return false;}
+}
+
+var QF_ProviderExecutor=(function(){
+function contentImpl(name,meta,sp){
+    sp=sp||qfProviderSpecV39(name);
+    if(meta&&typeof meta==="object")meta._qfProviderV56=String(name||"");
+
+    /* v3.5 beta18：成功正文只做运行期同章短缓存。
+     * 阅读在详情刷新、主题/评论重绘、回退当前章等场景可能重复调用同一章 content；
+     * 正文是不可变章节数据，8 分钟内直接复用可避免再次命中第三方 Provider。
+     * 仅缓存通过 qfValidContentV10 的成功正文，不缓存
+
+### tier @432147
+ debt "+n(os.debt)+" / optional "+n(os.optional)+(avg?" / avg "+avg+"ms":"");
+        var optionalProbeAudit="🔬 Detail Optional · highlevel retired / limitpopup retired · CLOSED";
+        var cache="🗃 缓存 · hit "+ct.hit+" / miss "+ct.miss+" / stale "+ct.stale+" / evict "+ct.evict;
+        var review="💬 评论网络 · "+(n(rh.criticalCooling)>0?(n(rh.criticalCooling)+" 个核心接口冷却"):"核心无冷却")+(n(rh.summaryCooling)>0?(" · summary镜像降级 "+n(rh.summaryCooling)):"");
+        var rna=s.reviewNetworkAudit||{},reviewAudit="🧪 ReviewNet直调 · canTry "+n(rna.canTryCalls)+" / mark "+n(rna.markCalls)+" / fail "+n(rna.failMarks)+" / blocked "+n(rna.blocked)+" / active "+n(rna.activeCooldown);
+        var sp=s.settingsProfile||{},settings="🎛 设置 · "+String(sp.mode||"自定义")+" · managed "+((sp.managed&&sp.managed.length)||0);
+        var pr=s.provider||{},rr=pr.route||{},pst=pr.state||{},provider="⚙️ Provider · "+String(rr.tier||"未选择")+" → "+String(rr.pick||"自动")+(pst.lastProvider?" · "+String(pst.lastProvider):"")+((pst.cooling&&pst.cooling.length)?" · 冷却"+pst.cooling.length:"")+" · Registry "+((pr.registry&&pr.registry.ok)?"OK":"WARN");
+        var od=s.officialDomains||{},domains="🏛 官方域 · Copyright / Role / Circle / Egg · "+(od.ok===false?"Registry WARN":"Registry OK");
+        var da=s.dependencyAudit||{},audit="🧭 依赖审计 · modules "+n(da.modules)+" / module-used Vxx "+n(da.directModuleUsedV)+" / unresolved "+n(da.unresolvedV)+" · NO DELETE";
+        var pa=s.proxyAudit||{},proxyAudit="🪢 代理审计 · current "+n(pa.proxyCount)+" / removed "+n(pa.removed)+" / safe "+n(pa.safe)+" / protected "+(n(pa.abi)+n(pa.module))+" / unknown "+n(pa.unknown)+" · FINAL";
+        var pm=s.proxyMigration||{},proxyMigration="🔁 代理迁移 · batch "+n(pm.batch)+" / targets "+n(pm.targets)+" / calls "+n(pm.calls)+" · COMPLETE";
+        var pra=s.proxyReAudit||{},proxyReAudit="🧪 最终代理复审 · current "+n(pra.proxies)+" / active "+n(pra.uniqueActive)+" / migrated-zero "+n(pra.migratedZero)+" / zero-all "+n(pra.zeroAll)+" · CLOSED";
+        var pp=s.proxyProbe||{},proxyProbe=n(pp.targets)>0?("🛰 代理探针 B1 · hits "+n(pp.totalHits)+" / hitTargets "+n(pp.hitTargets)+" / zeroTargets "+n(pp.zeroTargets)+" · KEEP"):"🛰 代理探针 B1 · targets 0 · RETIRED";
+        var pp2=s.proxyProbe2||{},proxyProbe2=n(pp2.targets)>0?("🛰 代理探针 B2 · hits "+n(pp2.totalHits)+" / hitTargets "+n(pp2.hitTargets)+" / zeroTargets "+n(pp2.zeroTargets)+" · KEEP"):"🛰 代理探针 B2 · targets 0 · RETIRED";
+        var pr=s.proxyRemoval||{},proxyRemoval="✂️ 代理删除 Canary · batch "+n(pr.batch)+" / removed "+n(pr.removed)+" / remaining "+n(pr.remaining)+" · COMPLETE";
+        var proxySummary="🧹 代理治理 · current "+n(pra.proxies)+" / removed "+n(pa.removed)+" / active "+n(pra.uniqueActiv
+
+### tier @453994
+不阻塞。");
+            return a.join("\n");
+        }
+        if(name==="settings"){
+            var sp=s.settingsProfile||{},sv=sp.values||{};a.push("Settings Profile · "+String(QF_BUILD_VERSION||""));a.push("mode="+String(sp.mode||"自定义")+" / presets=极速|均衡|完整|自定义");
+            var sl=Array.isArray(sp.layers)?sp.layers:[];if(sl.length)a.push("layers="+sl.join(" | "));
+            var sk=Array.isArray(sp.managed)?sp.managed:[];for(var si=0;si<sk.length;si++){var sx=String(sk[si]||"");a.push("· "+sx+" = "+String(sv[sx]||""));}
+            a.push("范围：五层设置只整理入口，不删除高级项、不迁移配置；预设仍只管理评论/附加阅读负载开关。正文源、Provider 排序、账号、服务器评论源、弹窗外观和开发者诊断保持独立。高级修改受管项后自动进入“自定义”。");return a.join("\n");
+        }
+        if(name==="provider"){
+            var pr=s.provider||{},rr=pr.route||{},rg=pr.registry||{},st=pr.state||{};a.push("Provider Runtime · "+String(QF_BUILD_VERSION||""));
+            a.push("route="+String(rr.tier||"")+" / pick="+String(rr.pick||"自动")+(rr.fromBook?" / book-variable":""));
+            a.push("registry="+(rg.ok?"OK":"WARN")+" providers="+n(rg.count));var cm=pr.common||{};a.push("common="+((cm.matcher&&cm.cleaner)?"OK":"WARN")+" matcher="+(cm.matcher?"✓":"✕")+" cleaner="+(cm.cleaner?"✓":"✕"));
+            if(st.lastProvider)a.push("最近成功："+String(st.lastProvider)+(st.lastTier?" · "+String(st.lastTier):""));
+            if(st.hot&&st.hot.provider)a.push("热路由："+String(st.hot.provider)+" · hits="+n(st.hot.hits));
+            var cool=Array.isArray(st.cooling)?st.cooling:[];if(cool.length){a.push("冷却："+cool.length+" 个");for(var ci=0;ci<Math.min(cool.length,6);ci++){var c=cool[ci]||{};a.push("! "+String(c.provider||"")+" · "+n(c.mins)+"m · "+String(c.type||"other")+(c.error?" · "+QF_Diagnostic.redact(c.error):""));}}
+            var lr=Array.isArray(st.learning)?st.learning:[];if(lr.length){var seg=[];for(var li=0;li<Math.min(lr.length,6);li++){var lx=lr[li]||{};seg.push(String(lx.provider||"")+"("+(Number(lx.score||0)>=0?"+":"")+Number(lx.score||0)+")");}a.push("学习排序："+seg.join(" → "));}
+            var issues=Array.isArray(rg.issues)?rg.issues:[];for(var pi=0;pi<Math.min(issues.length,10);pi++)a.push("! "+String(issues[pi]));
+            a.push("原则：只在实际尝试某 Provider 时 lazy-load；状态由 ProviderState 管理；章节匹配/正文清洗/普通 HTTP 传输/结果错误结构统一走 Provider Common Layer。");return a.join("\n");
+        }
+                if(name==="domains"){
+            var od=s.officialDomains||{};a.push("Official Domains · "+String(QF_BUILD_VERSION||""));a.push("registry="+(od.ok===false?"WARN":"OK")+" domains="+n(od.count)+" lazy="+(od.lazy===false?"NO":"YES"));
+            var ds=Array.isArray(od.domains)?od.domains:[];for(var di=0;di<ds.length;di++){var dx=ds[di]||{};a.push((dx.ok?"✓ ":"✕ ")+String
+
+### tier @498876
+t()||"").replace(/\s+/g," ").trim();if(qfAuthorSayRealV327(x))out.push(x);}val=out.join("\n").trim();}
+            }catch(_dom){}
+        }
+        var c=qfRuntimeCacheV13(this);
+        if(c&&qfCallableV13(c,"putMemory")){
+            /* qdAuthorSayV20 真正读取的是 v341 key。章节原始响应已经在手时直接写正/负缓存，
+             * 避免正文成功后为了“确认没有作者说”再额外请求一次 9 秒 Qidian chapter HTML。 */
+            c.putMemory("qf-author-say-v341-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+       
+
+### tier @498904
+.trim();if(qfAuthorSayRealV327(x))out.push(x);}val=out.join("\n").trim();}
+            }catch(_dom){}
+        }
+        var c=qfRuntimeCacheV13(this);
+        if(c&&qfCallableV13(c,"putMemory")){
+            /* qdAuthorSayV20 真正读取的是 v341 key。章节原始响应已经在手时直接写正/负缓存，
+             * 避免正文成功后为了“确认没有作者说”再额外请求一次 9 秒 Qidian chapter HTML。 */
+            c.putMemory("qf-author-say-v341-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(
+
+### tier @498932
+27(x))out.push(x);}val=out.join("\n").trim();}
+            }catch(_dom){}
+        }
+        var c=qfRuntimeCacheV13(this);
+        if(c&&qfCallableV13(c,"putMemory")){
+            /* qdAuthorSayV20 真正读取的是 v341 key。章节原始响应已经在手时直接写正/负缓存，
+             * 避免正文成功后为了“确认没有作者说”再额外请求一次 9 秒 Qidian chapter HTML。 */
+            c.putMemory("qf-author-say-v341-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+func
+
+### tier @498960
+oin("\n").trim();}
+            }catch(_dom){}
+        }
+        var c=qfRuntimeCacheV13(this);
+        if(c&&qfCallableV13(c,"putMemory")){
+            /* qdAuthorSayV20 真正读取的是 v341 key。章节原始响应已经在手时直接写正/负缓存，
+             * 避免正文成功后为了“确认没有作者说”再额外请求一次 9 秒 Qidian chapter HTML。 */
+            c.putMemory("qf-author-say-v341-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tie
+
+### tier @498988
+   }catch(_dom){}
+        }
+        var c=qfRuntimeCacheV13(this);
+        if(c&&qfCallableV13(c,"putMemory")){
+            /* qdAuthorSayV20 真正读取的是 v341 key。章节原始响应已经在手时直接写正/负缓存，
+             * 避免正文成功后为了“确认没有作者说”再额外请求一次 9 秒 Qidian chapter HTML。 */
+            c.putMemory("qf-author-say-v341-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||""
+
+### tier @499020
+    var c=qfRuntimeCacheV13(this);
+        if(c&&qfCallableV13(c,"putMemory")){
+            /* qdAuthorSayV20 真正读取的是 v341 key。章节原始响应已经在手时直接写正/负缓存，
+             * 避免正文成功后为了“确认没有作者说”再额外请求一次 9 秒 Qidian chapter HTML。 */
+            c.putMemory("qf-author-say-v341-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier
+
+### tier @499048
+this);
+        if(c&&qfCallableV13(c,"putMemory")){
+            /* qdAuthorSayV20 真正读取的是 v341 key。章节原始响应已经在手时直接写正/负缓存，
+             * 避免正文成功后为了“确认没有作者说”再额外请求一次 9 秒 Qidian chapter HTML。 */
+            c.putMemory("qf-author-say-v341-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i
+
+### tier @499076
+bleV13(c,"putMemory")){
+            /* qdAuthorSayV20 真正读取的是 v341 key。章节原始响应已经在手时直接写正/负缓存，
+             * 避免正文成功后为了“确认没有作者说”再额外请求一次 9 秒 Qidian chapter HTML。 */
+            c.putMemory("qf-author-say-v341-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.
+
+### tier @499104
+        /* qdAuthorSayV20 真正读取的是 v341 key。章节原始响应已经在手时直接写正/负缓存，
+             * 避免正文成功后为了“确认没有作者说”再额外请求一次 9 秒 Qidian chapter HTML。 */
+            c.putMemory("qf-author-say-v341-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(
+
+### tier @499135
+是 v341 key。章节原始响应已经在手时直接写正/负缓存，
+             * 避免正文成功后为了“确认没有作者说”再额外请求一次 9 秒 Qidian chapter HTML。 */
+            c.putMemory("qf-author-say-v341-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(t
+
+### tier @499163
+缓存，
+             * 避免正文成功后为了“确认没有作者说”再额外请求一次 9 秒 Qidian chapter HTML。 */
+            c.putMemory("qf-author-say-v341-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undef
+
+### tier @499195
+有作者说”再额外请求一次 9 秒 Qidian chapter HTML。 */
+            c.putMemory("qf-author-say-v341-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+         
+
+### tier @499223
+ter HTML。 */
+            c.putMemory("qf-author-say-v341-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER8
+
+### tier @499251
+utMemory("qf-author-say-v341-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Obje
+
+### tier @499279
+-"+String(bid)+"-"+String(cid),JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.
+
+### tier @499309
+,JSON.stringify({ts:Date.now(),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue
+
+### tier @499338
+),text:(val&&qfAuthorSayRealV327(val))?val:""}));
+            if(val&&qfAuthorSayRealV327(val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_P
+
+### tier @499428
+val))c.putMemory("qf-author-say-v327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)
+
+### tier @499461
+327-"+String(bid)+"-"+String(cid),val);
+        }
+    }catch(e){}
+}
+
+var QF38_TIERS={
+    "限免源":["情无","神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            
+
+### tier @499562
+,"神魔","晴天","同人"],
+    "优选源":["七猫","书旗","QQ浏览器","得间","酷我"],
+    "兜底源":["猫眼","得奇","69书吧","速读谷","万相"],
+    /* v4.2.1-alpha1：STV 是书籍变量专属独立域，不参与任一自动类别。 */
+    "STV源":["STV·自动","STV·qidian"]
+};
+var QF38_CODES={
+    "1":{tier:"限免源",pick:"自动"},"11":{tier:"限免源",pick:"情无"},"12":{tier:"限免源",pick:"神魔"},"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},
+    "2":{tier:"优选源",pick:"自动"},"21":{tier:"优选源",pick:"七猫"},"22":{tier:"优选源",pick:"书旗"},"23":{tier:"优选源",pick:"QQ浏览器"},"24":{tier:"优选源",pick:"得间"},"25":{tier:"优选源",pick:"酷我"},
+    "3":{tier:"兜底源",pick:"自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||
+
+### tier @500112
+自动"},"31":{tier:"兜底源",pick:"猫眼"},"32":{tier:"兜底源",pick:"得奇"},"33":{tier:"兜底源",pick:"69书吧"},"34":{tier:"兜底源",pick:"速读谷"},"35":{tier:"兜底源",pick:"万相"},
+    /* v4.2.1-alpha1：4x 仅通过书籍变量进入；40 自动、41 强制 qidian。 */
+    "40":{tier:"STV源",pick:"STV·自动"},"41":{tier:"STV源",pick:"STV·qidian"},
+    /* beta1：9 = 全源智能；只改变 Router 调度，不改变任何 Provider 内部实现。 */
+    "9":{tier:"全源智能",pick:"自动"}
+};
+function qfRouteParseOrderV38(value,allow,def){
+    allow=Array.isArray(allow)?allow:[];
+    var arr=String(value||def||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(
+
+### tier @500606
+||"").split(/[→>＞]/),out=[];
+    for(var i=0;i<arr.length;i++){var x=String(arr[i]||"").trim();if(allow.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);}
+    /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tie
+
+### tier @500757
+   /* beta2：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),
+
+### tier @500768
+：旧排序里没有的新 Provider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fro
+
+### tier @500780
+ovider 自动追加到末尾，未来加源无需扩展排列组合。 */
+    for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false}
+
+### tier @500816
+for(var j=0;j<allow.length;j++)if(out.indexOf(allow[j])<0)out.push(allow[j]);
+    return out;
+}
+/* v3.1 beta2：Tier/Provider 清单改为 Registry 驱动。
+ * QF38_TIERS 只作为旧版稳定默认顺序；Registry 新注册的 Provider 会按所属 tier 自动追加。
+ * 因此未来第4/5/6个正文源只需注册 Provider + 在设置页清单中展示，不再增加 n! 个下拉选项。 */
+function qfTierNamesV310(){
+    var out=["限免源","优选源","兜底源"];
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+
+### tier @501185
+!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfSetting.call(this,key,def)||def);}catch(_e){cfg=def;}
+    var out=qfRouteParseOrderV38(cfg,allow,def),sticky="";
+    try{sticky=String(qfBookVarV09.call(this,"qf_last_provider
+
+### tier @501197
+d"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfSetting.call(this,key,def)||def);}catch(_e){cfg=def;}
+    var out=qfRouteParseOrderV38(cfg,allow,def),sticky="";
+    try{sticky=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||
+
+### tier @501336
+inue;
+                var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfSetting.call(this,key,def)||def);}catch(_e){cfg=def;}
+    var out=qfRouteParseOrderV38(cfg,allow,def),sticky="";
+    try{sticky=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(_s){}
+    if(allow.indexOf(sticky)>=0){var ix=out.indexOf(sticky);if(ix>=0)out.splice(ix,1);out.unshift(sticky);}
+    return out
+
+### tier @501356
+  var _spTier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfSetting.call(this,key,def)||def);}catch(_e){cfg=def;}
+    var out=qfRouteParseOrderV38(cfg,allow,def),sticky="";
+    try{sticky=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(_s){}
+    if(allow.indexOf(sticky)>=0){var ix=out.indexOf(sticky);if(ix>=0)out.splice(ix,1);out.unshift(sticky);}
+    return out;
+}
+
+/* ============
+
+### tier @501730
+=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfSetting.call(this,key,def)||def);}catch(_e){cfg=def;}
+    var out=qfRouteParseOrderV38(cfg,allow,def),sticky="";
+    try{sticky=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(_s){}
+    if(allow.indexOf(sticky)>=0){var ix=out.indexOf(sticky);if(ix>=0)out.splice(ix,1);out.unshift(sticky);}
+    return out;
+}
+
+/* ============================================================
+ * v4.0.0-alpha23 · Provider V1 Contract (qf.provider/1)
+ *
+ * 目标：今后新增正文源只实现独立 lazy module + 注册 Spec，不修改正文 Router。
+ * 必需能力：content(meta) -> string | {content,...}
+ * 可选能力：probe / resolveBook / resolveChapter / normalize / health / error
+ *
+ * Provider Spec:
+ *   {
+ *     id: "stable_id",
+ *     tier: "限免源|优选源|兜底源|自定义类别",
+ *
+
+### tier @501744
+ar i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfSetting.call(this,key,def)||def);}catch(_e){cfg=def;}
+    var out=qfRouteParseOrderV38(cfg,allow,def),sticky="";
+    try{sticky=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(_s){}
+    if(allow.indexOf(sticky)>=0){var ix=out.indexOf(sticky);if(ix>=0)out.splice(ix,1);out.unshift(sticky);}
+    return out;
+}
+
+/* ============================================================
+ * v4.0.0-alpha23 · Provider V1 Contract (qf.provider/1)
+ *
+ * 目标：今后新增正文源只实现独立 lazy module + 注册 Spec，不修改正文 Router。
+ * 必需能力：content(meta) -> string | {content,...}
+ * 可选能力：probe / resolveBook / resolveChapter / normalize / health / error
+ *
+ * Provider Spec:
+ *   {
+ *     id: "stable_id",
+ *     tier: "限免源|优选源|兜底源|自定义类别",
+ *     module: "
+
+### tier @501783
+(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfSetting.call(this,key,def)||def);}catch(_e){cfg=def;}
+    var out=qfRouteParseOrderV38(cfg,allow,def),sticky="";
+    try{sticky=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(_s){}
+    if(allow.indexOf(sticky)>=0){var ix=out.indexOf(sticky);if(ix>=0)out.splice(ix,1);out.unshift(sticky);}
+    return out;
+}
+
+/* ============================================================
+ * v4.0.0-alpha23 · Provider V1 Contract (qf.provider/1)
+ *
+ * 目标：今后新增正文源只实现独立 lazy module + 注册 Spec，不修改正文 Router。
+ * 必需能力：content(meta) -> string | {content,...}
+ * 可选能力：probe / resolveBook / resolveChapter / normalize / health / error
+ *
+ * Provider Spec:
+ *   {
+ *     id: "stable_id",
+ *     tier: "限免源|优选源|兜底源|自定义类别",
+ *     module: "lazy_module_name",
+ *     capabilities:
+
+### tier @501805
+ase[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfSetting.call(this,key,def)||def);}catch(_e){cfg=def;}
+    var out=qfRouteParseOrderV38(cfg,allow,def),sticky="";
+    try{sticky=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(_s){}
+    if(allow.indexOf(sticky)>=0){var ix=out.indexOf(sticky);if(ix>=0)out.splice(ix,1);out.unshift(sticky);}
+    return out;
+}
+
+/* ============================================================
+ * v4.0.0-alpha23 · Provider V1 Contract (qf.provider/1)
+ *
+ * 目标：今后新增正文源只实现独立 lazy module + 注册 Spec，不修改正文 Router。
+ * 必需能力：content(meta) -> string | {content,...}
+ * 可选能力：probe / resolveBook / resolveChapter / normalize / health / error
+ *
+ * Provider Spec:
+ *   {
+ *     id: "stable_id",
+ *     tier: "限免源|优选源|兜底源|自定义类别",
+ *     module: "lazy_module_name",
+ *     capabilities: {
+ *       content:{e
+
+### tier @501827
+    if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfSetting.call(this,key,def)||def);}catch(_e){cfg=def;}
+    var out=qfRouteParseOrderV38(cfg,allow,def),sticky="";
+    try{sticky=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(_s){}
+    if(allow.indexOf(sticky)>=0){var ix=out.indexOf(sticky);if(ix>=0)out.splice(ix,1);out.unshift(sticky);}
+    return out;
+}
+
+/* ============================================================
+ * v4.0.0-alpha23 · Provider V1 Contract (qf.provider/1)
+ *
+ * 目标：今后新增正文源只实现独立 lazy module + 注册 Spec，不修改正文 Router。
+ * 必需能力：content(meta) -> string | {content,...}
+ * 可选能力：probe / resolveBook / resolveChapter / normalize / health / error
+ *
+ * Provider Spec:
+ *   {
+ *     id: "stable_id",
+ *     tier: "限免源|优选源|兜底源|自定义类别",
+ *     module: "lazy_module_name",
+ *     capabilities: {
+ *       content:{entry:"fn"},
+ *       p
+
+### tier @501855
+=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfSetting.call(this,key,def)||def);}catch(_e){cfg=def;}
+    var out=qfRouteParseOrderV38(cfg,allow,def),sticky="";
+    try{sticky=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(_s){}
+    if(allow.indexOf(sticky)>=0){var ix=out.indexOf(sticky);if(ix>=0)out.splice(ix,1);out.unshift(sticky);}
+    return out;
+}
+
+/* ============================================================
+ * v4.0.0-alpha23 · Provider V1 Contract (qf.provider/1)
+ *
+ * 目标：今后新增正文源只实现独立 lazy module + 注册 Spec，不修改正文 Router。
+ * 必需能力：content(meta) -> string | {content,...}
+ * 可选能力：probe / resolveBook / resolveChapter / normalize / health / error
+ *
+ * Provider Spec:
+ *   {
+ *     id: "stable_id",
+ *     tier: "限免源|优选源|兜底源|自定义类别",
+ *     module: "lazy_module_name",
+ *     capabilities: {
+ *       content:{entry:"fn"},
+ *       probe:{entry:"fn"}, ...
+ *   
+
+### tier @501978
+.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return Strin
