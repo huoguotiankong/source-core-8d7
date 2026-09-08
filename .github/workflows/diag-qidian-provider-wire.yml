@@ -1,0 +1,36 @@
+name: diag-qidian-provider-wire
+on:
+  push:
+    paths: ['.staging/diag-qidian-provider-wire.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Dump provider wiring
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json'); a=json.loads(p.read_text()); s=a[0] if isinstance(a,list) else a
+          lib=s['jsLib']; out=[]
+          pats=['limited_qw','limited_sm','limited_qt','limited_tr','情无','晴天','神魔','同人','qfLimited','QF_LIMIT','qfProvider','ProviderRegistry','qfContentProvider','qfTryProvider','qfProviderCall','qfMultiContentV423']
+          spans=[]
+          for pat in pats:
+            for m in re.finditer(re.escape(pat),lib,re.I): spans.append((max(0,m.start()-1300),min(len(lib),m.start()+3500),pat))
+          spans.sort(); merged=[]
+          for st,en,pat in spans:
+            if not merged or st>merged[-1][1]+200: merged.append([st,en,set([pat])])
+            else: merged[-1][1]=max(merged[-1][1],en); merged[-1][2].add(pat)
+          for st,en,ps in merged[:28]: out.append('### '+','.join(sorted(ps))+'\n'+lib[st:en])
+          for field in ['loginUi','loginUrl']:
+            txt=str(s.get(field,'')); out.append('\n### '+field+'\n'+txt[:50000])
+          Path('.staging/qidian-provider-wire.txt').write_text('\n\n'.join(out)[:130000])
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-provider-wire.txt
+          git commit -m 'chore: dump qidian provider wiring'
+          git push origin main
