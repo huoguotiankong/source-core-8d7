@@ -1,0 +1,278 @@
+name: patch-qidian-beta32-x-provider
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta32-x-provider.trigger']
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Integrate X limited provider and publish Beta32
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re,hashlib,datetime
+          from pathlib import Path
+
+          SRC=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(SRC.read_text())
+          s=arr[0] if isinstance(arr,list) else arr
+          stable_hash=hashlib.sha256(Path('sources/novel/qidian-next/qidian-next.json').read_bytes()).hexdigest()
+          lib=s['jsLib']
+
+          # ---- add independent lazy module limited_x ----
+          marker='var QF_MOD38_PACK='
+          a=lib.index(marker)+len(marker)
+          b=lib.index(';\nvar QF_MOD38_EXPORTS=',a)
+          pack=json.loads(lib[a:b])
+          xmod=r'''/* beta32：X-QD 独立限免 Provider。
+           * 仅移植附件「起点X-QD」的 X 正文链：api-x.shrtxs.cn/qidth/content.php。
+           * 不移植附件评论、购买、AI、发现、目录 UI，也不读取其它 Provider 账号。
+           * 固定 X 或自动路由命中 X 时才加载本模块；未配置 Token 时只尝试当前 X 登录会话取 token 一次。
+           */
+          function qfXSetErrV32(msg){try{qfRuntimeCacheV13(this).putMemory("qf_lim_err_X",String(msg||""));}catch(_e){}}
+          function qfXGetErrV32(){try{return String(qfRuntimeCacheV13(this).getFromMemory("qf_lim_err_X")||"");}catch(_e){return "";}}
+          function qfXSourceV32(ctx){try{return qfSource(ctx);}catch(_e){return null;}}
+          function qfXJavaV32(ctx){try{return qfJava(ctx);}catch(_e){return null;}}
+          function qfXMapV32(ctx,key){
+              var s=qfXSourceV32(ctx),m=null,v="";
+              try{m=s&&s.getLoginInfoMap?s.getLoginInfoMap():null;v=String(m&&(m.get?m.get(key):m[key])||"");}catch(_e){}
+              if(!v)try{var o=JSON.parse(String(s&&s.getLoginInfo?s.getLoginInfo():"")||"{}")||{};v=String(o[key]||"");}catch(_j){}
+              return v;
+          }
+          function qfXBaseV32(){return "https://api-x.shrtxs.cn/qidth";}
+          function qfXTokenV32(){
+              var s=qfXSourceV32(this),v=qfXMapV32(this,"🎬X佬密钥");
+              if(!v)try{v=String(s&&s.get?s.get("qf_x_token_v32")||s.get("token")||s.get("🎬X佬密钥")||"":"");}catch(_e){}
+              return String(v||"").trim();
+          }
+          function qfXSaveTokenV32(token){
+              token=String(token||"").trim();var s=qfXSourceV32(this);if(!token||!s)return token;
+              try{if(s.put)s.put("qf_x_token_v32",token);}catch(_e){}
+              return token;
+          }
+          function qfXQueryV32(path,data){
+              var q=[],d=data||{};for(var k in d)if(Object.prototype.hasOwnProperty.call(d,k)&&d[k]!==null&&d[k]!==undefined&&String(d[k])!=="")q.push(encodeURIComponent(k)+"="+encodeURIComponent(String(d[k])));
+              return qfXBaseV32()+"/"+String(path||"").replace(/^\/+/,"")+(q.length?"?"+q.join("&"):"");
+          }
+          function qfXJsonV32(raw){try{return JSON.parse(String(raw||""))||{};}catch(_e){return {};}}
+          function qfXAcquireTokenV32(){
+              var token=qfXTokenV32.call(this);if(token)return token;
+              var j=qfXJavaV32(this);if(!j)return "";
+              try{
+                  var raw=String(j.ajax(qfXBaseV32()+"/api_user.php?action=get_my_token")||""),o=qfXJsonV32(raw);
+                  token=String(o.token||o.data||"").trim();if(token)qfXSaveTokenV32.call(this,token);
+              }catch(_e){}
+              return token;
+          }
+          function qfXPickContentV32(raw){
+              var o=qfXJsonV32(raw),v="";
+              if(o&&o.content!==undefined)v=o.content;else if(o&&o.data&&o.data.content!==undefined)v=o.data.content;else if(o&&o.text!==undefined)v=o.text;
+              return String(v||"").trim();
+          }
+          function qfXContentV32(meta){
+              meta=meta||{};var bid=String(meta.bookId||""),cid=String(meta.chapterId||""),vip=String(meta.vip||"0"),tm=String(meta.time||meta.updateTime||""),pid=String(meta.mid||meta.pid||"");
+              if(!bid||!cid){qfXSetErrV32.call(this,"章节参数错误：BookId="+bid+"，ChapterId="+cid);return null;}
+              var token=qfXAcquireTokenV32.call(this);if(!token){qfXSetErrV32.call(this,"未获取到 X Token；请进入账号管理 → X 登录，或填写 X 密钥");return null;}
+              var p={token:token,v:vip,t:tm,bookId:bid,chapterId:cid};if(pid)p.pid=pid;
+              var url=qfXQueryV32("content.php",p),j=qfXJavaV32(this),raw="",text="";if(!j){qfXSetErrV32.call(this,"java 运行环境不可用");return null;}
+              try{raw=String(j.ajax(url+","+JSON.stringify({timeout:10000,headers:{"Accept":"application/json,text/plain,*/*"}}))||"");}catch(e0){try{raw=String(j.ajax(url)||"");}catch(e1){qfXSetErrV32.call(this,"X 正文请求失败："+String(e1));return null;}}
+              text=qfXPickContentV32(raw);
+              if(text&&text!=="您的权限不足以请求该正文内容"&&!/^\s*(?:error|错误|请求异常)/i.test(text)){qfXSetErrV32.call(this,"");return text;}
+              var o=qfXJsonV32(raw),msg=String((o&&(o.error||o.message||o.msg))||text||"X 正文为空");
+              qfXSetErrV32.call(this,msg);return null;
+          }
+          '''
+          pack['limited_x']='gz:'+base64.b64encode(gzip.compress(xmod.encode(),mtime=0)).decode().rstrip('=')
+          lib=lib[:a]+json.dumps(pack,ensure_ascii=False,separators=(',',':'))+lib[b:]
+
+          # exports map
+          em='var QF_MOD38_EXPORTS='
+          ea=lib.index(em)+len(em); eb=lib.index(';\nvar QF_MOD38_CACHE=',ea)
+          exports=json.loads(lib[ea:eb])
+          exports['limited_x']=['qfXSetErrV32','qfXGetErrV32','qfXBaseV32','qfXTokenV32','qfXAcquireTokenV32','qfXContentV32']
+          lib=lib[:ea]+json.dumps(exports,ensure_ascii=False,separators=(',',':'))+lib[eb:]
+
+          # provider registry
+          old='"同人":{id:"tongren",tier:"限免源",module:"limited_tr",capabilities:{content:{entry:"qfTrContentV102"},error:{entry:"qfTrGetErrV102"}},policy:{verify:false},ui:{label:"同人",order:40}},'
+          new=old+'\n    "X":{id:"xqd",tier:"限免源",module:"limited_x",capabilities:{content:{entry:"qfXContentV32"},error:{entry:"qfXGetErrV32"}},policy:{verify:false},ui:{label:"X",order:50}},'
+          assert old in lib, 'provider registry anchor missing'
+          lib=lib.replace(old,new,1)
+
+          # stable default tier and book-variable code
+          old='"限免源":["情无","神魔","晴天","同人"],'
+          assert old in lib, 'tier list anchor missing'
+          lib=lib.replace(old,'"限免源":["情无","神魔","晴天","同人","X"],',1)
+          old='"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},'
+          assert old in lib, 'code map anchor missing'
+          lib=lib.replace(old,'"13":{tier:"限免源",pick:"晴天"},"14":{tier:"限免源",pick:"同人"},"15":{tier:"限免源",pick:"X"},',1)
+          s['jsLib']=lib
+
+          # ---- settings/login UI ----
+          lu=s.get('loginUrl','')
+          # content selector
+          old="qfMSelect423('限免源','限免源选择',['自动','情无','神魔','晴天','同人'],'自动','限免类别的具体 Provider。')"
+          assert old in lu, 'content setting anchor missing'
+          lu=lu.replace(old,"qfMSelect423('限免源','限免源选择',['自动','情无','神魔','晴天','同人','X'],'自动','限免类别的具体 Provider。')",1)
+
+          # account input persistence key
+          old="var ik=['email','password','情无接口地址','神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址'];"
+          assert old in lu, 'account key anchor missing'
+          lu=lu.replace(old,"var ik=['email','password','情无接口地址','神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址','🎬X佬密钥'];",1)
+
+          # X account card before Tongren card
+          old="'<div class=\"card\"><div class=\"lab\"><b>🍋 同人</b></div><div class=\"grid\"><button class=\"act primary\" onclick=\"act(\\'tr-check\\')\">检测共享Token</button><button class=\"act\" onclick=\"act(\\'tr-console\\')\">打开后台</button></div></div>';"
+          assert old in lu, 'Tongren account card anchor missing'
+          xcard="'<div class=\"card\"><div class=\"lab\"><b>❎ X</b><small>仅用于 X-QD 限免正文；可网页登录自动获取 Token，也可手工填写。</small></div>'+qfMInput423('X 密钥','🎬X佬密钥','password','','X-QD Token')+'<div class=\"grid\"><button class=\"act primary\" onclick=\"act(\\'x-login\\')\">网页登录</button><button class=\"act\" onclick=\"act(\\'x-check\\')\">检测</button><button class=\"act\" onclick=\"act(\\'x-clear\\')\">清除</button></div></div>'+\n      " + old
+          lu=lu.replace(old,xcard,1)
+
+          old="else if(a==='tr-check')qfTrCheckV102();"
+          assert old in lu, 'account action anchor missing'
+          lu=lu.replace(old,"else if(a==='x-login')qfXLoginV32();\n        else if(a==='x-check')qfXCheckV32();\n        else if(a==='x-clear')qfXClearV32();\n        "+old,1)
+
+          # help text/book variable
+          lu=lu.replace('13=晴天，14=同人；','13=晴天，14=同人，15=X；')
+          lu=lu.replace('11 情无\\n12 神魔\\n13 晴天\\n\\n','11 情无\\n12 神魔\\n13 晴天\\n14 同人\\n15 X\\n\\n')
+
+          # X login/check helpers appended to loginUrl (function declarations are hoisted)
+          helpers=r'''
+          /* beta32：X Provider 账号操作，只维护 X 自己的 Token。 */
+          function qfXUiBaseV32(){return "https://api-x.shrtxs.cn/qidth";}
+          function qfXUiTokenV32(){
+              var v="";try{var m=source.getLoginInfoMap?source.getLoginInfoMap():null;v=String(m&&(m.get?m.get("🎬X佬密钥"):m["🎬X佬密钥"])||"");}catch(_e){}
+              if(!v)try{v=String(source.get("qf_x_token_v32")||source.get("token")||"");}catch(_e2){}
+              return v.trim();
+          }
+          function qfXUiSaveTokenV32(token){
+              token=String(token||"").trim();if(!token)return false;
+              try{source.put("qf_x_token_v32",token);source.put("token",token);}catch(_s){}
+              try{var hm=new Packages.java.util.HashMap();hm.put("🎬X佬密钥",token);java.upLoginData(hm);}catch(_m){}
+              try{var o=JSON.parse(String(source.getLoginInfo()||"{}"))||{};o["🎬X佬密钥"]=token;source.putLoginInfo(JSON.stringify(o));}catch(_l){}
+              return true;
+          }
+          function qfXLoginV32(){
+              try{
+                  java.startBrowserAwait(qfXUiBaseV32()+"/login.php","X-QD 登录");
+                  var raw=String(java.ajax(qfXUiBaseV32()+"/api_user.php?action=get_my_token")||""),o=JSON.parse(raw||"{}"),token=String(o.token||o.data||"").trim();
+                  if(!token)throw new Error("登录完成但未获取到 Token");
+                  qfXUiSaveTokenV32(token);java.longToast("✅ X 登录成功，Token 已保存");try{java.reLoginView();}catch(_r){}return true;
+              }catch(e){java.longToast("❌ X 登录失败："+String(e&&e.message||e));return false;}
+          }
+          function qfXCheckV32(){
+              try{
+                  var token=qfXUiTokenV32();if(!token)throw new Error("未设置 X Token");
+                  var raw=String(java.ajax(qfXUiBaseV32()+"/chaxun.php?token="+encodeURIComponent(token))||""),o=JSON.parse(raw||"{}");
+                  if(o&&o.success===false)throw new Error(String(o.message||o.msg||"Token 无效"));
+                  var d=o&&o.data||{},msg="✅ X Token 可用";
+                  if(d.level_name)msg+="\\n等级："+d.level_name;
+                  if(d.stats&&d.stats.today!==undefined)msg+="\\n今日使用："+d.stats.today+(d.stats.limit!==undefined?"/"+d.stats.limit:"");
+                  java.longToast(msg);return true;
+              }catch(e){java.longToast("❌ X 检测失败："+String(e&&e.message||e));return false;}
+          }
+          function qfXClearV32(){
+              try{source.put("qf_x_token_v32","");source.put("token","");var hm=new Packages.java.util.HashMap();hm.put("🎬X佬密钥","");java.upLoginData(hm);}catch(_e){}
+              try{var o=JSON.parse(String(source.getLoginInfo()||"{}"))||{};o["🎬X佬密钥"]="";source.putLoginInfo(JSON.stringify(o));}catch(_j){}
+              java.toast("已清除 X Token");try{java.reLoginView();}catch(_r){}return true;
+          }
+          '''
+          if 'function qfXLoginV32()' not in lu: lu += '\n'+helpers
+          s['loginUrl']=lu
+
+          # version/source comment
+          s['bookSourceComment']='v1.1.0-beta32：新增 X-QD 独立限免 Provider。仅接入 X 的限免正文 content.php + 独立 Token 登录/检测；加入限免源选择、自动顺序与书籍变量 15=X。X 不接管评论、购买、AI、发现或目录；现有情无/神魔/晴天/同人及其它域保持不变。'
+          try:s['lastUpdateTime']=int(datetime.datetime.now(datetime.timezone.utc).timestamp()*1000)
+          except:pass
+          SRC.write_text(json.dumps(arr,ensure_ascii=False,indent=2))
+
+          # ---- validation ----
+          check=json.loads(SRC.read_text()); cs=check[0] if isinstance(check,list) else check
+          assert '"X":{id:"xqd"' in cs['jsLib']
+          assert '"15":{tier:"限免源",pick:"X"}' in cs['jsLib']
+          assert "['自动','情无','神魔','晴天','同人','X']" in cs['loginUrl']
+          assert 'function qfXLoginV32()' in cs['loginUrl']
+          lib2=cs['jsLib']; aa=lib2.index(marker)+len(marker); bb=lib2.index(';\nvar QF_MOD38_EXPORTS=',aa); p2=json.loads(lib2[aa:bb]); z=p2['limited_x'][3:]; z+='='*((4-len(z)%4)%4); dec=gzip.decompress(base64.b64decode(z)).decode(); assert 'function qfXContentV32' in dec
+          assert hashlib.sha256(Path('sources/novel/qidian-next/qidian-next.json').read_bytes()).hexdigest()==stable_hash
+
+          # ---- publish metadata ----
+          VERSION='1.1.0-beta32'; VC=11032; DATE='2026-09-08'; TS='2026-09-08T15:45:00+08:00'
+          SUMMARY='Beta32：新增 X-QD 独立限免 Provider，接入 X 限免正文与独立 Token 登录/检测。'
+          TAGS=['起点','测试版','限免源','X-QD','X','Provider','Token','正文路由']
+          CHANGE=['新增独立 X 限免 Provider，不复用情无/神魔/晴天/同人账号链','X 正文仅调用 api-x.shrtxs.cn/qidth/content.php，未命中时按现有 Router 继续切源','账号管理新增 X 网页登录、Token 检测与手工密钥输入','限免源选择与自动顺序新增 X；书籍变量 15 固定 X','评论、购买、AI、发现、目录以及其它 Provider 域保持不变']
+          URL=f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={VC}'
+          BAK=f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v={VC}'
+          IMP=f'legado://import/importonline?src={URL}'
+          DETAIL='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json'
+          sha=hashlib.sha256(SRC.read_bytes()).hexdigest()
+
+          def load(p): return json.loads(Path(p).read_text())
+          def save(p,o): Path(p).write_text(json.dumps(o,ensure_ascii=False,indent=2)+'\n')
+          def find_item(items, ids):
+              for it in items:
+                  if str(it.get('id','')) in ids:return it
+              return None
+          def meta_update(it, manifest=False):
+              it['version']=VERSION; it['versionCode']=VC if manifest else it.get('versionCode',VC)
+              it['updatedAt']=TS if manifest else DATE; it['summary']=SUMMARY; it['tags']=TAGS; it['changelog']=CHANGE
+              it['sourceUrl']=URL
+              if not manifest:
+                  it['backupUrl']=BAK;it['importUrl']=IMP;it['detailUrl']=DETAIL
+              else:
+                  it['channel']='beta';it['sourcePath']=str(SRC);it['sha256']=sha
+              return it
+
+          man=load('manifest.json'); mi=find_item(man.get('sources',[]),{'qidian-next-beta'}); assert mi; meta_update(mi,True); man['updatedAt']=TS; save('manifest.json',man)
+          beta=load('subscription/beta.json'); bi=find_item(beta.get('items',[]),{'qidian-next-beta'}); assert bi; meta_update(bi); beta['updatedAt']=TS; beta['generatedAt']=TS; save('subscription/beta.json',beta)
+          novel=load('subscription/novel.json'); ni=find_item(novel.get('items',[]),{'qidian-next-beta'}); assert ni; meta_update(ni); ni['type']='novel'; novel['updatedAt']=TS; novel['generatedAt']=TS; save('subscription/novel.json',novel)
+
+          # replace logical source in beta bundle, regardless of bundle wrapper shape
+          bp=Path('bundles/all-beta.json'); bundle=json.loads(bp.read_text())
+          source_obj=cs
+          def replace_list(lst):
+              hit=False
+              for i,it in enumerate(lst):
+                  if isinstance(it,dict) and (it.get('bookSourceUrl')==source_obj.get('bookSourceUrl') or '起点增强' in str(it.get('bookSourceName',''))): lst[i]=source_obj; hit=True
+              if not hit: lst.append(source_obj)
+          if isinstance(bundle,list): replace_list(bundle)
+          elif isinstance(bundle,dict):
+              for key in ['items','sources','bookSources']:
+                  if isinstance(bundle.get(key),list): replace_list(bundle[key]); break
+              else: raise AssertionError('unknown beta bundle shape')
+          save(bp,bundle)
+
+          detail={
+            'kind':'source','title':'🌈 起点增强 · Beta','summary':SUMMARY,
+            'badges':['Beta',VERSION,'X 限免源'],
+            'sections':[
+              {'title':'本版更新','text':'新增 X-QD 独立限免 Provider；X 仅负责限免正文，支持网页登录获取 Token、Token 检测和手工密钥。限免自动路由会把 X 追加到现有 Provider 队列末尾。'},
+              {'title':'使用方式','text':'正文设置 → 限免源可选择 X；账号管理 → X 可网页登录或填写 X 密钥。书籍变量 15 可固定使用 X。'},
+              {'title':'隔离范围','text':'X 不接管评论、购买、AI、发现、目录；服务器评论仍按现有非绑定 Provider 规则处理。Stable 1.1.0 未修改。'},
+              {'title':'版本状态','text':'当前为 Beta / 测试通道，需真机确认后才会晋升正式版。'},
+              {'title':'更新方式','text':'从本订阅页重新导入/更新即可覆盖现有 🌈 起点增强 · Beta。'}
+            ],
+            'sourceUrl':URL,'backupUrl':BAK,'importUrl':IMP
+          }
+          save('rss/data/details/beta/qidian-next.json',detail)
+
+          # release log: prepend current entry after top heading
+          rp=Path('docs/RELEASE_LOG.md'); txt=rp.read_text()
+          entry=f'''\n## {DATE} · 🌈 起点增强 {VERSION}\n\n- Beta：新增 X-QD 独立限免 Provider；正文入口为 `api-x.shrtxs.cn/qidth/content.php`。\n- 账号管理新增 X 网页登录 / Token 检测 / 手工密钥；X 凭据与其它 Provider 隔离。\n- 限免源选择和自动顺序新增 X；书籍变量新增 `15 = X`。\n- 不移植附件的评论、购买、AI、发现、目录 UI；现有评论路由及情无/神魔/晴天/同人保持不变。\n- Stable 1.1.0 未修改，等待真机验证。\n'''
+          if VERSION not in txt:
+              pos=txt.find('\n',txt.find('#'))+1 if txt.startswith('#') else 0
+              txt=txt[:pos]+entry+txt[pos:]
+              rp.write_text(txt)
+
+          # handoff append compact current state
+          hp=Path('docs/sources/qidian-next/PROJECT_HANDOFF.md'); h=hp.read_text()
+          if VERSION not in h:
+              h='''## 2026-09-08 · Current Beta 1.1.0-beta32 — X-QD limited Provider\n\n- Stable remains 1.1.0.\n- Added isolated X-QD limited-content Provider (`limited_x`) using only X `content.php` + independent Token auth.\n- X is selectable in limited-provider settings, appended to auto routing, and mapped to book variable `15`.\n- X does not take over review/purchase/AI/discovery/catalog domains. Awaiting real-device verification.\n\n'''+h
+              hp.write_text(h)
+
+          print('Beta32 ready',sha)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git diff --cached --check
+          git commit -m 'feat: add X limited provider to qidian beta32'
+          git push origin main
