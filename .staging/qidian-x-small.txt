@@ -1,0 +1,2511 @@
+
+### limited_tr
+问题混在一次修改里。 */
+/* v4.1.0-alpha10.5：Safe Proxy Migration Batch 2。
+ * 继续只迁移精确真实调用，不删除任何 Vxx 代理。
+ * 本批迁移：
+ * qfReviewMetaPutV470 -> QF_ReviewCache.put
+ * qfReviewNetCanTryV510 -> QF_ReviewNetwork.canTry
+ * qfReviewNetMarkV510 -> QF_ReviewNetwork.mark
+ * qfArgusOuterSpecV350 -> QF_OfficialClient.argusSpec
+ * qfOfficialReviewSpecV400 -> QF_OfficialClient.reviewSpec
+ * qfServerCommentProviderV315 -> qfCommentServerPickV313
+ * 旧 Compatibility Registry / 动态 ABI / 31 个 lazy module 全部保留。 */
+/* v4.1.0-alpha10.4：Safe Proxy Migration Batch 1。
+ * 只迁移已定位的真实业务调用表达式；旧代理函数、Compatibility Registry、Proxy Audit 快照全部保留。
+ * qfPaidV38 -> QF_ProviderRuntime.route
+ * qfProviderContentV38 -> QF_ProviderExecutor.content
+ * qfOfficialReviewApiV402 -> QF_ReviewApi.request
+ * qfOfficialReviewRawV400 -> QF_ReviewApi.rich
+ * qfReviewMetaGetV470 -> QF_ReviewCache.get
+ * 31 个 lazy module、同人 Provider、Catalog/UI/Official Domain 均冻结。 */
+/* v4.1.0-alpha10.3：Compatibility Proxy Migration Audit。
+ * 本版只审计、不删除、不迁移实际业务调用。
+ * 构建期联合主 jsLib、31 个 lazy module、exports manifest 与所有顶层规则字符串识别旧 Vxx 薄代理。
+ * 分类：SAFE-MIGRATE / ABI-PROTECTED / MODULE-PROTECTED / UNKNOWN。
+ * SAFE-MIGRATE 仅代表“可在后续迁移调用点”，本版仍保留函数；任何函数必须引用归零并完成真机回归后才允许删除。
+ * 同人 limited_tr、Catalog、Provider、Review、Official Domain、UI 全部冻结。 */
+/* v4.1.0-alpha10.2.1：同人限免 Provider 独立接入。
+ * 新增第4个限免源“同人”，只移植附件所需的 Bearer Token + /novel/chap 正文能力。
+ * Token 严格读取 source.getVariable()（源变量），不复用情无/神魔/晴天账号字段，不写登录信息 Map。
+ * Provider 独立 lazy module=limited_tr；限免自动默认顺序在现有三源后追加“同人”，未填 Token 时本地快速失败，不发网络请求。
+ * 不移植附件搜索/目录/评论 UI，不改变现有 Review 路由；服务器评论自动模式下，同人正文仍按现有非绑定 Provider 规则走晴天。
+ * alpha10.2 Dependency Audit 重新以31个模块生成。 */
+/* v4.1.0-alpha10.2：Lazy Module Dependency Audit。
+ * 本版只审计，不删除任何业务函数。
+ * 构建期已解压 QF_MOD38_PACK 的全部模块，联合主 jsLib / exports / deps 建立跨模块依赖视图。
+ * 重点标记三类：MODULE-USED（压缩模块直接引用）、MANIFEST-PROTECTED（export/ABI 保护）、UNRESOLVED（看不到直接引用但禁止删除）。
+ * alpha10 回归证明：UNRESOLVED 不能等同于 DEAD；后续删除必须再经过动态 ABI 白名单 + 分批真机回归。 */
+/* v4.1.0-alpha10.1：Dead Code Sweep 回滚恢复版。
+ * alpha10 第一批“最终 JSON 文本零引用”判定对 gzip/base64 lazy module 不安全：
+ * 压缩模块内部的动态调用无法被纯文本引用统计发现，导致仍被 lazy module 调用的 Vxx 兼容函数被误删。
+ * 本版完整恢复 alpha9.3 已验证运行时，仅保留版本标记；正文、版权信息、彩蛋、Provider、Review、Catalog、UI 均恢复到 alpha9.3 状态。
+ * 后续 Dead Code Sweep 必须先解压全部 lazy module 建立完整符号/字符串调用图，再决定删除。 */
+/* v4.1.0-alpha9.3：Catalog / Performance 收尾。
+ * 1) 完整刷新在进入 Legacy Skeleton 网络恢复前，先复用历史 toc75 骨架缓存；命中则零额外目录网络请求获得 VIP/分卷骨架。
+ * 2) 删除 Completeness 对 skeleton+donors 的重复扫描，改用 merge 后 Canonical Model 的单次 stats 作为最终完整度。
+ * 3) CatalogReport 增加 simple / skeleton / merge / adapter 四阶段耗时与预算超标标记，便于定位剩余瓶颈。
+ * 4) CACHE_SCHEMA 保持 5，不因本次纯性能收尾强制淘汰 alpha9.2 已建立的目录缓存。
+ * 5) 字数仍为 Optional Metadata；wordRequests=0。其它业务域冻结。 */
+/* v4.1.0-alpha9.2：Catalog / Performance 第三阶段。
+ * 1) Warm Probe 检测到仅尾部新增少量章节时，满足严格安全条件才执行 delta append：缓存末尾 5 个 ChapterId 与 simple 同位置一致、增量 <=12、最近 5 章 VIP 状态一致、且不跨卷；否则完整刷新。
+ * 2) Delta 只追加 getsimple 已确认的新章节时间，不改旧章节；VIP 继承仅在最近 5 章状态稳定且新章仍处于同卷时允许。
+ * 3) CatalogReport 增加增量原因、追加章数与性能预算；fresh/probe/delta/full 均记录 elapsed。
+ * 4) 字数继续保持 Optional Metadata，wordRequests=0。
+ * UI / Provider / Review / Official Domain / 彩蛋冻结。 */
+/* v4.1.0-alpha9.1：Catalog / Performance 第二阶段。
+ * 1) 真机已证明 getchapterlistbypager 虽请求成功但不提供 cnt，彻底移除目录字数 donor/focus 扫描，字数降级为 Optional Metadata，不再作为目录完整度指标。
+ * 2) 完整刷新改为 simple-first：优先 APP getsimple；成功后直接恢复 Legacy Skeleton 并合并时间，外层不再先重复尝试 WEB category / APP-v3 / HTML-current。
+ * 3) 只有 simple 失败或骨架恢复失败时才启动 WEB/v3/HTML recovery；保留 30 分钟 fresh cache + 6 小时 warm getsimple probe。
+ * 4) CatalogReport 增加请求预算与 Optional Words 语义；正常路径 word donor 请求预算固定为 0。
+ * UI / Provider / Review / Official Domain / 彩蛋冻结。 */
+/* v4.1.0-alpha9：Catalog / Performance 第一阶段。getsimple 继续负责历史时间；getchapterlistbypager 新增为章节字数 donor；目录缓存加入温缓存轻探针，未更新时避免重跑 Web/v3/HTML 全链；补强时间格式归一化与目录完整度诊断。Provider / Review / Official Domain / UI 冻结。 */
+/*
+uterSpecV350 -> QF_OfficialClient.argusSpec
+ * qfOfficialReviewSpecV400 -> QF_OfficialClient.reviewSpec
+ * qfServerCommentProviderV315 -> qfCommentServerPickV313
+ * 旧 Compatibility Registry / 动态 ABI / 31 个 lazy module 全部保留。 */
+/* v4.1.0-alpha10.4：Safe Proxy Migration Batch 1。
+ * 只迁移已定位的真实业务调用表达式；旧代理函数、Compatibility Registry、Proxy Audit 快照全部保留。
+ * qfPaidV38 -> QF_ProviderRuntime.route
+ * qfProviderContentV38 -> QF_ProviderExecutor.content
+ * qfOfficialReviewApiV402 -> QF_ReviewApi.request
+ * qfOfficialReviewRawV400 -> QF_ReviewApi.rich
+ * qfReviewMetaGetV470 -> QF_ReviewCache.get
+ * 31 个 lazy module、同人 Provider、Catalog/UI/Official Domain 均冻结。 */
+/* v4.1.0-alpha10.3：Compatibility Proxy Migration Audit。
+ * 本版只审计、不删除、不迁移实际业务调用。
+ * 构建期联合主 jsLib、31 个 lazy module、exports manifest 与所有顶层规则字符串识别旧 Vxx 薄代理。
+ * 分类：SAFE-MIGRATE / ABI-PROTECTED / MODULE-PROTECTED / UNKNOWN。
+ * SAFE-MIGRATE 仅代表“可在后续迁移调用点”，本版仍保留函数；任何函数必须引用归零并完成真机回归后才允许删除。
+ * 同人 limited_tr、Catalog、Provider、Review、Official Domain、UI 全部冻结。 */
+/* v4.1.0-alpha10.2.1：同人限免 Provider 独立接入。
+ * 新增第4个限免源“同人”，只移植附件所需的 Bearer Token + /novel/chap 正文能力。
+ * Token 严格读取 source.getVariable()（源变量），不复用情无/神魔/晴天账号字段，不写登录信息 Map。
+ * Provider 独立 lazy module=limited_tr；限免自动默认顺序在现有三源后追加“同人”，未填 Token 时本地快速失败，不发网络请求。
+ * 不移植附件搜索/目录/评论 UI，不改变现有 Review 路由；服务器评论自动模式下，同人正文仍按现有非绑定 Provider 规则走晴天。
+ * alpha10.2 Dependency Audit 重新以31个模块生成。 */
+/* v4.1.0-alpha10.2：Lazy Module Dependency Audit。
+ * 本版只审计，不删除任何业务函数。
+ * 构建期已解压 QF_MOD38_PACK 的全部模块，联合主 jsLib / exports / deps 建立跨模块依赖视图。
+ * 重点标记三类：MODULE-USED（压缩模块直接引用）、MANIFEST-PROTECTED（export/ABI 保护）、UNRESOLVED（看不到直接引用但禁止删除）。
+ * alpha10 回归证明：UNRESOLVED 不能等同于 DEAD；后续删除必须再经过动态 ABI 白名单 + 分批真机回归。 */
+/* v4.1.0-alpha10.1：Dead Code Sweep 回滚恢复版。
+ * alpha10 第一批“最终 JSON 文本零引用”判定对 gzip/base64 lazy module 不安全：
+ * 压缩模块内部的动态调用无法被纯文本引用统计发现，导致仍被 lazy module 调用的 Vxx 兼容函数被误删。
+ * 本版完整恢复 alpha9.3 已验证运行时，仅保留版本标记；正文、版权信息、彩蛋、Provider、Review、Catalog、UI 均恢复到 alpha9.3 状态。
+ * 后续 Dead Code Sweep 必须先解压全部 lazy module 建立完整符号/字符串调用图，再决定删除。 */
+/* v4.1.0-alpha9.3：Catalog / Performance 收尾。
+ * 1) 完整刷新在进入 Legacy Skeleton 网络恢复前，先复用历史 toc75 骨架缓存；命中则零额外目录网络请求获得 VIP/分卷骨架。
+ * 2) 删除 Completeness 对 skeleton+donors 的重复扫描，改用 merge 后 Canonical Model 的单次 stats 作为最终完整度。
+ * 3) CatalogReport 增加 simple / skeleton / merge / adapter 四阶段耗时与预算超标标记，便于定位剩余瓶颈。
+ * 4) CACHE_SCHEMA 保持 5，不因本次纯性能收尾强制淘汰 alpha9.2 已建立的目录缓存。
+ * 5) 字数仍为 Optional Metadata；wordRequests=0。其它业务域冻结。 */
+/* v4.1.0-alpha9.2：Catalog / Performance 第三阶段。
+ * 1) Warm Probe 检测到仅尾部新增少量章节时，满足严格安全条件才执行 delta append：缓存末尾 5 个 ChapterId 与 simple 同位置一致、增量 <=12、最近 5 章 VIP 状态一致、且不跨卷；否则完整刷新。
+ * 2) Delta 只追加 getsimple 已确认的新章节时间，不改旧章节；VIP 继承仅在最近 5 章状态稳定且新章仍处于同卷时允许。
+ * 3) CatalogReport 增加增量原因、追加章数与性能预算；fresh/probe/delta/full 均记录 elapsed。
+ * 4) 字数继续保持 Optional Metadata，wordRequests=0。
+ * UI / Provider / Review / Official Domain / 彩蛋冻结。 */
+/* v4.1.0-alpha9.1：Catalog / Performance 第二阶段。
+ * 1) 真机已证明 getchapterlistbypager 虽请求成功但不提供 cnt，彻底移除目录字数 donor/focus 扫描，字数降级为 Optional Metadata，不再作为目录完整度指标。
+ * 2) 完整刷新改为 simple-first：优先 APP getsimple；成功后直接恢复 Legacy Skeleton 并合并时间，外层不再先重复尝试 WEB category / APP-v3 / HTML-current。
+ * 3) 只有 simple 失败或骨架恢复失败时才启动 WEB/v3/HTML recovery；保留 30 分钟 fresh cache + 6 小时 warm getsimple probe。
+ * 4) CatalogReport 增加请求预算与 Optional Words 语义；正常路径 word donor 请求预算固定为 0。
+ * UI / Provider / Review / Official Domain / 彩蛋冻结。 */
+/* v4.1.0-alpha9：Catalog / Performance 第一阶段。getsimple 继续负责历史时间；getchapterlistbypager 新增为章节字数 donor；目录缓存加入温缓存轻探针，未更新时避免重跑 Web/v3/HTML 全链；补强时间格式归一化与目录完整度诊断。Provider / Review / Official Domain / UI 冻结。 */
+/* v4.1.0-alpha8：UI / Settings Experience。新增稳定 QF_SettingsProfile；极速 / 均衡 / 完整 / 自定义预设只管理高开销阅读体验开关，保留 Provider/账号/服务器评论源/外观高级设置；受管高级项变化自动进入自定义。 */
+/* v4.1.0-alpha7：Official Domain Cleanroom。版权/角色/书友圈/彩蛋统一稳定 Data/Canonical Model/Renderer ABI；旧 V420/V430 仅兼容代理；不
+QwC2n5FQWTO+fXh3vid2ISo/t6X8O1Ye+w7X1Ymda5wDV6lr35fZomLmVUECST/s6zxC/GdICQ8eYngw0OEQGdSW8gmDKy1zJRSKHkHNU2aq7kuKdB4UyLvRpTNtY2QNuqUqnuuqB/GUVz8Av/ZiHlIsFa1ZplMu8XLHgdgTNJJn8JhR/sMxZM3zxZQs9F1xA1KQ6IwYWqSE2ALwkw5ejL+BH7oAo9pFSAOov5IbvpEuzxaDbthw8CTYzXb/0qkDiCzLrBXYJNsnucqp5MZje+OQbpKxFgPcyMzR6No1qBX1Qv8Gs+3rW8epq75UEP/znlq/fe1fPvVEg12EsOloos25g2zMhl0Z4cuIaF5GSyNrYzX4vULnFDsesS9Eg4vC2x5QVLyJtkiBK7qznaZLdQR2vjPVdLuFII3tYDbk9imWmcMh9vZklCVhDnIdlsyJvv2jpX0cWjQaIjIuESrTSwlujKiCAZQRAro1kix5SkDkPeCEvwESL0FOV1MonvgeLRRnErRo2Mj3XZJDe4w3iNhNc4GaXopGWYKWHCDCpnHB2uT0U0S8VrJ34RCF5FvD8Jmdk4rf34LUF1iDRkp6t9d0fDSlJQOAprSiIMe7lv1ITZHJHmST3QDGkOcry42+tkFUydI4p/auq4YjYMxZzmb9X1RKAlctrkF0+wkhCpnpD8DAt2b4JRxV6MVrGgEC2OlMgxYBCtIWCrtTWoS/Sc/ZDYMnpMxeEKpkTXR9+4ujKJTt0yGjKsue6zbdh6LNjsLH/nXXi0vnjRO/egs/wD/o/T02Xv95+9B1+t3b8aezXHu/wRuynB/WcLf7mGrLnJbSaYPxOYCFLa4zpoCohPXNLL7hNxYPy5ffhOoOkVroBzG6wUltb96aK3/MD7aqG98rj7n8dAM5NMtMyDkiGCE3v3yFxZjv/PE/7fNyJRfEwGIqllea6cTM6V/Xh2PHwk9TLJtVTZr5aTnLgMPtjC9Jur7fVUxCRO7ySSIot5nKkvqQJEYS7y91HTLOo5mOfJKZAY/382GzILx6vlHp41g8tkjNwN5ItKSzSZqfHqhfbTfwbqTWtFz1avC+mwwJIWQNmpkRHSMDmLYNMCQAvcBX5i//p9Il8ZLJOCZIiaMhesj1IxNN+WQC5JrPyGm9H/VzRQzs65zzvXbnaunhOCBNAlVnt+y/8BXYP6X+s4AAA","limited_tr":"gz:H4sIALhugmoC/61aW1MbRxZ+968Y5kGrsSbi4t2HSJl12TibIpU4WTvxC1DUIA0wIGbEzEjAAlWyY8cmCwavHV+x1zj2OmuXDc46weFiqvJTgJHEk//Cnr7N9FwkzG54kIbu06dPnz7nO1/3qPWoUP5juj3d9oFaKA6p7W3pD9Mdwm9rgrs4t7e+7q4u1Fde17au7d9ZdC/NC19aZlnPa9YR4ahQvf+kur74bvPu/p2Lexu/7Fbm6j+v1S78SkTfbV4JqXi3Obtbmd+tXECD92dfV+9/s/fmSfXh5t7Wdu3Gj4Jtlqyclh7UnHOqpav9BS0pCbW7F91Lr/bWnwtfmSOa8W5zbu/NvPvtHffSk9qdDXfr+73t5er5FeFztUg1uwvPak83qo/nhXNdXwrVFz9Ub16uzlb2lypCq2GWtUJrbkgtEkVEsLq4VHv9aLdy3l24Vru6Cg+1ey9BNTzUVy7WX64LX3cR5a1HBkpGztFNQxgb+Mo6qzkfW9a59raO5Kg9KE0dEeDPsSanxgbOlAxHH9U61dyQdq79WNIZ0m0pXSw5n2ujpjWZFMcG+gr6aJ9mWX3ET6J81rF0YxCpmp4WRUnKzuRUJzeU1NqkqZkjM8G5P/Hn5ia2NKdkGQLV1MgMcPFfLHO0sSkSNoCfnyoWxWzEkrN437AlOWciaszYAJHAvTE6jVKhENX6qVpWm+lE/YfTiAOId1hZtQRbCS0Be0guK6IomwpW5M1dVqhf7UTC5uP0uB2M2gw4Lw2io8mAdUgpmIXU6QPJciJRTkMoWiecZJukKIo4JVLD2ISm8unZL06ni6pla8myr6tdmqK2zXjyoNFMJJzJomYOCCZSZ/YPazlHTCS+wA/pomU6JhJID6n2F+MG5HJRs5zJdE4tFJKmDHFwrqP9rKZauSGIPn/H8RxkpmB8lXGYsJWG/X1StTXqbqZryHGKdqa1dSyfVtV8zkjnDOSRwLC/ljRrEo/Lq47KbZWqdPfKeQW1Tk9PzRCzBkwriTpHBN0Q8pz/wB8t77XwvDwiSTkT8sQoaVl+fL57pBccWTLy2oBuaPnpadqCXD89TZ2A2vD2iTFaVEh5G3bMyJl57eszXZ3maNE0NMNJjkgpURFTMT28XgCBqPfV9LCpG0kxIUadfkYbK2m2g/1XVJ0hOeREByWBEkgH4gYc91kWnC1YTnKGLHNcMLRxAbAGPC1Wl57VX76tbb2k2I6hmSLzvfrKmrv0496v/4KyUNu8WX97bX/5Z2Hn238IZAw0uwu39y8v7L154S4/BxQX6YzIsmElkPYhe4ajtgyDqFDfXqwvz9WurriPvkGVYWEFSgmvtmQVlGA0pqiDkXsIznnCYwQOgiGIgs23ZMyWQGVKEY+LqTHbH2oWHcWPvlHNGTLzGfGTj78SZa91SFOhdtoZXw79iWoJhC39byraRTEjnoQU1CxBTOFNkIPCJ3I5reiAlFosFvQcHtM6bMNAT27GH4LA3yw5mQ/b2tpIIPkWW+q4wrIboY03CCebZSnDaXVYnTgBwdGNlizKYgrjkY39pw9MJmHRUq8USBoYmEjAR7qgGYPOkBRcK4ZwmJduAch1t/Wm+838ZDJYc/r6pagglfAXSpbEV0kWLzA2BKacNrKwZJNFhQogAG4k/EgGVK8+cRd+gMivvrrgPn5Vf/0ECJHIQgwGMntn/EjpH1YYfGGUh/85nKdDwdwQC+g4yIjtG+69B9VbD6v/+b7+9Ifqg0XPWag49A8nEvCRBnqRSNBJ6P9SC8CXXYLIsu1ADWo2Hb9OpieFnxCitXC4eVwEMogaIaRZfwraZsUMXiDnH95QlHu8mkArgmBWolhzlgdJUrpnjhxpPSpw1BasJovY21pyr58XWoXa84f17y4IXacE4jRKI6u3ntbuva5vP6ivrbhvgeDO723edi9dAeIIDLO6NEt22128Wp2dd8/fJYOhd//8NtBfd+uVe32++uKxC71rP9W/2XLXnsCcwGfJzDBNhE+eNq1RgJ0PO6DYT8XVW7Lu46KYKUveLqUd8zNzXLM6AeGSXLOlFQsq0K7WHjvVOiiDq2P6un9b26k8yoBbZLA9DVa1vNs8f/zd5j+zgOjiH3YqSzuV+zuV2zuVO7uV73Yrf9+tXNmtAJOfw2T+6m5lYbcCTrvW093TC/sM25qU+no+2Knc2Klc7yUTR8oUJqRAYclqR7TJgylZGK64fGZ8jPAwlkGglWRQJsxliaYgWATCJsQ2uexEotPThHv54NCUd+K1flny1ypDwB64Xt8IsBAvEA4PEv4ML1AOA1j/MK5ZzQ8Q2KxTQIXefw8OY1PI55HpT5rmiE2m5igK6D1hWepkWrfxN+ljm+MnOdo1Upsp46WwwEgvG9Hdm+X4IxKCYgMTA5VDzye554JuO/TxM/9Rd7RRJtHFPZPJ8eMp3qqg9b7pvoTqsXSVY+lSsPz2K56hnpXMRGafZxy1LFCGg3b0e3b0x/BJ5KSY3enKk+0xqW2mYvq8OwhMZlrPBxAfNWSguSvc3IWb8Tk80kdbM2b6NHliZTjOutPqqHYI+wwQD08HTciY09Gu07Srn04U
+"qfProviderLearnLoad","qfProviderLearnSave","qfProviderLearnMark","qfProviderLearnScore","qfProviderLearnOrder","qfProviderLearnBrief","qfProviderHealthLoadV69","qfProviderHealthSaveV69","qfProviderMarkFailV69","qfProviderMarkSuccessV69","qfAutoOrderV69","qfProviderLearnLoadV320","qfProviderLearnSaveV320","qfProviderLearnMarkV320","qfProviderLearnScoreV320","qfProviderLearnOrderV320","qfProviderLearnBriefV320"],"fallback_common":["qfV23Abs","qfV23HtmlToText","qfV23CleanProviderText","qfV23Doc","qfV23CacheListGet","qfV23CacheListPut"],"provider_common":["qfCacheGetFreshV56","qfCachePutFreshV56","qfChapterHintTryV56","qfChapterHintPutV56","qfNameVariantsV10","qfChapterWindowTryV310","qfChapterWindowPutV310"],"review_common":["qdBubbleDataV20","qdQtAuthorSayCardV332"],"review_server_core":["qfQwCommentApiV315","qfSmCommentApiV315","qfServerNormV315","qfServerDataV319","qfQtAuthorSayV332","qfQtShowAuthorV332","qfServerAuthorSayV315","qfServerSummaryV315","qfServerCommentPackV315","qfServerChapterPackV315","qfShowServerCommentV315"],"preferred_dj":["qfDejianContentV521"],"fallback_sdg":["qfSuduguContentV525"],"preferred_kw":["qfKuwoContentV526"],"fallback_wx":["qfWanxiangContentV527"],"limited_tr":["qfTrSetErrV102","qfTrGetErrV102","qfTrTokenV102","qfTrBaseV102","qfTrRequestV102","qfTrContentV102"]};
+var QF_MOD38_CACHE={};
+var QF_MOD38_FN_CACHE={};
+var QF_MOD38_LOADING={};
+/* alpha80：依赖归属到模块本身。Provider 只负责选择正文源，不再承担内部工具依赖。 */
+var QF_MOD38_DEPS={"fallback_my":["fallback_common","provider_common"],"fallback_dq":["fallback_common","provider_common"],"fallback_69":["fallback_common","provider_common","match"],"preferred_qm":["match","provider_common"],"preferred_sq":["provider_common"],"preferred_qq":["provider_common"],"match":["provider_common"],"review":["review_common"],"review_sunny":["review_common"],"preferred_dj":["provider_common","match"],"fallback_sdg":["fallback_common","provider_common","match"],"preferred_kw":["provider_common","match"],"fallback_wx":["fallback_common","provider_common","match"]};
+
+
+/* ============================================================
+ * v3.0.0-alpha85 · Architecture Freeze
+ * Module Lifecycle + Diagnostics
+ *
+ * 这是最后一轮架构层改造：
+ * - 保留 alpha84 的跨线程首次并发等待；
+ * - 为 lazy module 建立 cold/loading/ready/error 生命周期状态；
+ * - 保留一份极小的 module manifest，模块加载后即使释放 PACK/EXPORTS/DEPS，
+ *   仍可用于 Registry 自检和故障诊断；
+ * - Provider / Comment capability 统一经过轻量诊断调用器；
+ * - “开发者诊断”默认关闭，关闭时不记录逐调用事件、不做 source 持久化；
+ * - 诊断只观察，不改变 Provider、评论、网络请求和 fallback 行为。
+ * ============================================================ */
+
+/* v3.1.0-beta4 功能阶段：章节小窗口直达缓存。
+ * 架构仍冻结在 alpha85.1；本轮只优化 Provider 顺序翻章热路径。 */
+var QF_ARCH85="3.0.0-alpha85.1";
+var QF_MOD85_MANIFEST={};
+var QF_MOD85_STATE={};
+var QF_DIAG85_EVENTS=[];
+var QF_DIAG85_MAX=48;
+var QF_DIAG85_LAST_FLUSH=0;
+(function(){
+    try{
+        for(var mk in QF_MOD38_EXPORTS){
+            if(!Object.prototype.hasOwnProperty.call(QF_MOD38_EXPORTS,mk))continue;
+            var ex=QF_MOD38_EXPORTS[mk]||[],dp=QF_MOD38_DEPS[mk]||[];
+            QF_MOD85_MANIFEST[mk]={
+                exports:Array.isArray(ex)?ex.slice():[],
+                deps:Array.isArray(dp)?dp.slice():[],
+                packedLength:String(QF_MOD38_PACK[mk]||"").length
+            };
+        }
+    }catch(_manifest85){}
+})();
+var QF_DIAG85_ENABLE_CACHE={ts:0,value:false};
+function qfDiagEnabledV85(){
+    /* alpha9：Provider 热路径会多次触发诊断 hook；关闭诊断时不应每个 hook 都重新读取登录配置。
+       2 秒短缓存只影响开发者开关生效延迟，不缓存任何业务数据。 */
+    var now=Date.now();
+    try{if(QF_DIAG85_ENABLE_CACHE.ts&&now-Number(QF_DIAG85_ENABLE_CACHE.ts)<2000)return !!QF_DIAG85_ENABLE_CACHE.value;}catch(_c){}
+    var v=false;try{v=qfToggle.call(this,"开发者诊断",false);}catch(e){v=false;}
+    QF_DIAG85_ENABLE_CACHE={ts:now,value:!!v};return !!v;
+}
+function qfDiagShortV85(v,n){
+  
+ps":[],"mainVRefs":1},{"name":"copyright","packed":"gzip","bytes":11939,"exports":7,"deps":[],"mainVRefs":4},{"name":"egg","packed":"gzip","bytes":37492,"exports":21,"deps":[],"mainVRefs":5},{"name":"fallback_69","packed":"gzip","bytes":7370,"exports":9,"deps":["fallback_common","provider_common","match"],"mainVRefs":4},{"name":"fallback_common","packed":"gzip","bytes":2726,"exports":6,"deps":[],"mainVRefs":0},{"name":"fallback_dq","packed":"gzip","bytes":10241,"exports":6,"deps":["fallback_common","provider_common"],"mainVRefs":3},{"name":"fallback_my","packed":"gzip","bytes":8282,"exports":6,"deps":["fallback_common","provider_common"],"mainVRefs":3},{"name":"fallback_sdg","packed":"gzip","bytes":13138,"exports":1,"deps":["fallback_common","provider_common","match"],"mainVRefs":4},{"name":"fallback_wx","packed":"gzip","bytes":14571,"exports":1,"deps":["fallback_common","provider_common","match"],"mainVRefs":4},{"name":"limited_qt","packed":"gzip","bytes":18501,"exports":11,"deps":[],"mainVRefs":8},{"name":"limited_qw","packed":"gzip","bytes":11867,"exports":8,"deps":[],"mainVRefs":1},{"name":"limited_sm","packed":"gzip","bytes":9078,"exports":11,"deps":[],"mainVRefs":5},{"name":"limited_tr","packed":"gzip","bytes":3613,"exports":6,"deps":[],"mainVRefs":1},{"name":"match","packed":"gzip","bytes":4592,"exports":8,"deps":["provider_common"],"mainVRefs":5},{"name":"official","packed":"raw","bytes":4307,"exports":2,"deps":[],"mainVRefs":5},{"name":"preferred_dj","packed":"gzip","bytes":10288,"exports":1,"deps":["provider_common","match"],"mainVRefs":5},{"name":"preferred_kw","packed":"gzip","bytes":8382,"exports":1,"deps":["provider_common","match"],"mainVRefs":5},{"name":"preferred_qm","packed":"gzip","bytes":12916,"exports":1,"deps":["match","provider_common"],"mainVRefs":6},{"name":"preferred_qq","packed":"gzip","bytes":11020,"exports":1,"deps":["provider_common"],"mainVRefs":3},{"name":"preferred_sq","packed":"gzip","bytes":18323,"exports":3,"deps":["provider_common"],"mainVRefs":3},{"name":"provider_common","packed":"raw","bytes":9013,"exports":7,"deps":[],"mainVRefs":5},{"name":"provider_runtime","packed":"gzip","bytes":11260,"exports":23,"deps":[],"mainVRefs":2},{"name":"qidian_app","packed":"gzip","bytes":61613,"exports":25,"deps":[],"mainVRefs":2},{"name":"review","packed":"gzip","bytes":42534,"exports":3,"deps":["review_common"],"mainVRefs":31},{"name":"review_align","packed":"gzip","bytes":9345,"exports":7,"deps":[],"mainVRefs":2},{"name":"review_common","packed":"gzip","bytes":6915,"exports":2,"deps":[],"mainVRefs":8},{"name":"review_local_ui","packed":"gzip","bytes":244456,"exports":1,"deps":[],"mainVRefs":1},{"name":"review_server_core","packed":"gzip","bytes":37944,"exports":11,"deps":[],"mainVRefs":26},{"name":"review_server_ui","packed":"gzip","bytes":32879,"exports":1,"deps":[],"mainVRefs":0},{"name":"review_sunny","packed":"gzip","bytes":4875,"exports":1,"deps":["review_common"],"mainVRefs":11},{"name":"role","packed":"gzip","bytes":34951,"exports":17,"deps":[],"mainVRefs":1}],"moduleRefs":{"qdAuthorSayV20":["review","review_sunny"],"qdExtractOfficialContentV10":["official"],"qdFetchChapterCommentsV22":["review","review_sunny"],"qdFetchOfficialCommentsV20":["review","review_align"],"qdFetchParagraphHotV402":["review"],"qdNormalizeCommentV13":["review","review_server_core"],"qdPrimeParagraphHotV450":["review"],"qdPrimeReviewV350":["review"],"qdReviewSummaryV11":["review"],"qdReviewSummaryV22":["review","review_align","review_server_core"],"qdReviewSummaryV292":["review"],"qdWebViewFreeV10":["official"],"qfAjaxJavaV20":["qidian_app"],"qfAjaxTextV20":["egg","limited_qt"],"qfAuthorSayRealV327":["qidian_app","review","review_common","review_server_core"],"qfBestChapterV10":["fallback_69","fallback_sdg","fallback_wx","pr
+["review"],"qfCommentRouteSetV315":["review"],"qfEmojiV13":["review","review_server_core"],"qfEscJsV13":["review","review_common","review_sunny"],"qfEscV13":["review","review_common"],"qfFlattenChapterV10":["preferred_qm"],"qfImageJavaV14":["review","review_common"],"qfModuleEnsureV38":["fallback_69","fallback_dq","fallback_my","fallback_sdg","fallback_wx","match","preferred_dj","preferred_kw","preferred_qm","preferred_qq","preferred_sq","review","review_sunny"],"qfModuleFnV38":["review","review_server_core","review_sunny"],"qfOfficialCallV400":["copyright","egg"],"qfOpenAuthorSayV314":["review","review_common"],"qfPickBookV10":["fallback_69","preferred_dj","preferred_kw","preferred_qm"],"qfPrimeAuthorSayV38":["review","review_sunny"],"qfPutBookVarV09":["provider_runtime"],"qfQtBaseV328":["limited_qt"],"qfQtBrowserUrlV328":["review_server_core","review_sunny"],"qfQtCredV328":["limited_qt","review_server_core"],"qfQtNativeMetaV328":["review_server_core"],"qfQtRequestV328":["limited_qt","review_server_core"],"qfQtShowAuthorV332":["limited_qt","review_common"],"qfQueryV09":["copyright","egg"],"qfQwCommentApiV315":["review"],"qfRuntimeCacheV13":["limited_qt","limited_qw","limited_sm","limited_tr","review","review_server_core","review_sunny"],"qfRuntimeJavaV13":["egg","review_server_core"],"qfServerCommentPackV315":["review"],"qfServerNormV315":["review"],"qfSmChosenBaseV30":["limited_sm","review_server_core"],"qfSmMirrorV30":["limited_sm"],"qfSmNormBaseV30":["limited_sm"],"qfSmSessV30":["review_server_core"],"qfTextKeepMediaLiteV38":["egg"],"qfTimeValueV13":["review_server_core"],"qfValidContentV10":["fallback_69","fallback_dq","fallback_my","fallback_sdg","fallback_wx","limited_qt","limited_sm","official","preferred_dj","preferred_kw","preferred_qm","preferred_qq","preferred_sq"],"showCmtV20":["review","review_common","review_sunny"]},"unresolved":[]};
+var QF_DependencyAudit=(function(){
+    function summary(){
+        var a=QF_DEPENDENCY_AUDIT||{};
+        return {
+            version:String(a.version||""),
+            policy:String(a.policy||"AUDIT_ONLY_NO_DELETE"),
+            modules:Number(a.modules||0),
+            gzipModules:Number(a.gzipModules||0),
+            rawModules:Number(a.rawModules||0),
+            mainVFunctions:Number(a.mainVFunctions||0),
+            directModuleUsedV:Number(a.directModuleUsedV||0),
+            manifestProtectedV:Number(a.manifestProtectedV||0),
+            unresolvedV:Number(a.unresolvedV||0)
+        };
+    }
+    function text(){
+        var a=QF_DEPENDENCY_AUDIT||{},s=summary(),out=[];
+        out.push("Lazy Module Dependency Audit · "+String(s.version||""));
+        out.push("policy="+String(s.policy||""));
+        out.push("modules="+s.modules+" (gzip "+s.gzipModules+" / raw "+s.rawModules+")");
+        out.push("main Vxx="+s.mainVFunctions+" / module-used="+s.directModuleUsedV+" / manifest-protected="+s.manifestProtectedV+" / unresolved="+s.unresolvedV);
+        var pr=a.previousRegression||{},proved=Array.isArray(pr.provedModuleRefs)?pr.provedModuleRefs:[],unk=Array.isArray(pr.unknownDynamic)?pr.unknownDynamic:[];
+        out.push("alpha10 回归复盘：误删 "+Number(pr.deletedCount||0)+" 个；其中 "+proved.length+" 个已由解压模块直接证明仍有引用，"+unk.length+" 个属于动态/隐式依赖未知区。");
+        if(proved.length)out.push("已证明模块依赖："+proved.slice(0,16).join(" / ")+(proved.length>16?" …":""));
+        out.push("结论：本版不删除代码；UNRESOLVED ≠ DEAD。只有完成动态 ABI 白名单、模块 export/deps 校验并分批真机回归后才允许删除。");
+        var ms=Array.isArray(a.moduleSummary)?a.moduleSummary:[];out.push("");
+        out.push("模块摘要：");
+        for(var i=0;i<ms.length;i++){
+            var m=ms[i]||{};
+            out.push("· "+String(m.name||"")+" · "+String(m.packed||"")+" · "+Number(m.bytes||0)+"B · exports "+Number(m.exports||0)+" · deps "+((m.deps||[]).length)+" · mainVR
+ew Error("STV/xianren 正文为空或过短");
+    return text;
+}
+function qfStvAutoContentV1(meta){return qfStvContentCoreV1.call(this,meta,"auto");}
+function qfStvQidianContentV1(meta){return qfStvContentCoreV1.call(this,meta,"qidian");}
+
+/* ============================================================
+ * alpha83 Provider Capability Registry
+ *
+ * Provider 只声明：身份 / 类别 / 模块 / capabilities / policy。
+ * Router 只调用 capability，不再理解某个 Provider 的具体入口名。
+ * 以后新增 content/search/toc 等能力，只需要在 Registry 增加 capability；
+ * 旧 qfProviderSpecV39 / qfProviderReadyV79 ABI 保留，避免影响现有模块。
+ * ============================================================ */
+var QF_PROVIDER83={
+    "情无":{id:"qingwu",tier:"限免源",module:"limited_qw",capabilities:{content:{entry:"qfQwContentV44"},error:{entry:"qfLimGetErrV30",passName:true}},policy:{verify:false}},
+    "神魔":{id:"shenmo",tier:"限免源",module:"limited_sm",capabilities:{content:{entry:"qfSmContentV30"},error:{entry:"qfLimGetErrV30",passName:true}},policy:{verify:false}},
+    "晴天":{id:"qingtian",tier:"限免源",module:"limited_qt",capabilities:{content:{entry:"qfQtContentV330"},error:{entry:"qfLimGetErrV30",passName:true}},policy:{verify:false}},
+    "同人":{id:"tongren",tier:"限免源",module:"limited_tr",capabilities:{content:{entry:"qfTrContentV102"},error:{entry:"qfTrGetErrV102"}},policy:{verify:false},ui:{label:"同人",order:40}},
+    /* alpha54：优选源本身已有严格书籍/章节匹配，正文锚点关闭。 */
+    "七猫":{id:"qimao",tier:"优选源",module:"preferred_qm",capabilities:{content:{entry:"qfQimaoContentV10"}},policy:{verify:false}},
+    "书旗":{id:"shuqi",tier:"优选源",module:"preferred_sq",capabilities:{content:{entry:"qfShuqiContentV44"}},policy:{verify:false}},
+    "QQ浏览器":{id:"qqbrowser",tier:"优选源",module:"preferred_qq",capabilities:{content:{entry:"qfQQContentV50"}},policy:{verify:false}},
+    "得间":{id:"dejian",tier:"优选源",module:"preferred_dj",capabilities:{content:{entry:"qfDejianContentV521"}},policy:{verify:false},ui:{label:"得间",order:40}},
+    "酷我":{id:"kuwo",tier:"优选源",module:"preferred_kw",capabilities:{content:{entry:"qfKuwoContentV526"}},policy:{verify:false},ui:{label:"酷我",order:50}},
+    "猫眼":{id:"maoyan",tier:"兜底源",module:"fallback_my",capabilities:{content:{entry:"qfMaoyanContentV43"}},policy:{verify:true}},
+    "得奇":{id:"deqi",tier:"兜底源",module:"fallback_dq",capabilities:{content:{entry:"qfDeqiContentV44"}},policy:{verify:true}},
+    "69书吧":{id:"69shuba",tier:"兜底源",module:"fallback_69",capabilities:{content:{entry:"qf69ContentV23"}},policy:{verify:true}},
+    "速读谷":{id:"sudugu",tier:"兜底源",module:"fallback_sdg",capabilities:{content:{entry:"qfSuduguContentV525"}},policy:{verify:true},ui:{label:"速读谷",order:40}},
+    "万相":{id:"wanxiang",tier:"兜底源",module:"fallback_wx",capabilities:{content:{entry:"qfWanxiangContentV527"}},policy:{verify:true},ui:{label:"万相",order:50}},
+    /* v4.2.1-alpha1：STV 仅允许 4x 书籍变量主动路由，不参与 UI 类别/全源智能。 */
+    "STV·自动":{id:"stv_auto",tier:"STV源",module:"",capabilities:{content:{entry:"qfStvAutoContentV1",global:true}},policy:{verify:false,bookVariableOnly:true},ui:{label:"STV·自动",order:10}},
+    "STV·qidian":{id:"stv_qidian",tier:"STV源",module:"",capabilities:{content:{entry:"qfStvQidianContentV1",global:true}},policy:{verify:false,bookVariableOnly:true},ui:{label:"STV·qidian",order:20}}
+};
+/* legacy alias：旧模块若读取 QF_PROVIDER39，继续得到同一个 Spec。 */
+var QF_PROVIDER39=QF_PROVIDER83;
+/* alpha23：现有 Provider 仅补 Contract 元数据；不包装/替换任何 capability。 */
+(function qfProviderV1StampExistingV520(){
+    try{for(var n in QF_PROVIDER83){if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;var sp=QF_PROVIDER83[n]||{};sp.abi=QF_PROVIDER_V1_520.abi;sp.contractVersion=1;sp.name=String(n);if(!sp.ui)sp.ui={label:String(n)};}}catch(_e){}
+})();
+function qfProviderSpecV39(name){return QF_PROVIDER83[String(name||"")]||null;}
+function qfProviderCapabilityV83(name
+
+### 同人
+etparagraphshotcomments
+ * - v1/chapterreview/getchapterendreview
+ *
+ * Review 专用分类顺序：
+ * 1) 先 JSON parse；
+ * 2) 显式顶层 Code/code/Status/status 非 0/1/200 => 失败；
+ * 3) 显式顶层 Message/msg/detail/error 若为 auth/sign/risk => 失败；
+ * 4) 否则存在 Data/data/Result/result => 合法响应；
+ * 5) 非 JSON/无结构才回退旧字符串关键词分类。
+ *
+ * 通用 OfficialClient.classify 完全不改。
+ * 签名算法、请求参数、headers、Reader/Argus fallback、cooldown、评论解析不改。
+ * alpha11 Signing Observability 保留用于验证。
+ */
+/* v4.1.0-alpha11.0：Official Review Signing Observability。
+ * alpha10.19 已完成 Review API Direct Canary 收口。
+ * 本版正式进入 Official Review signing debt 调查，但只增加可观测性，不修签名。
+ *
+ * 目标 endpoint 仅：
+ * - v1/chapterreview/getparagraphshotcomments
+ * - v1/chapterreview/getchapterendreview
+ *
+ * 每个真实网络尝试最多落 1 次 source-KV 记录，采集：
+ * - canonical path / 脱敏 canonical query；
+ * - reader_ext / reader_legacy / argus profile；
+ * - deviceId 仅长度 + 末4位；
+ * - QDSign/QDInfo 仅长度 + 短指纹；
+ * - tstamp 是否存在 / 与当前时间偏差；
+ * - Cookie/CSRF 仅存在性 + cookie总长度；
+ * - explicit Cookie/CSRF header 是否存在；
+ * - response code/message/classification + 强脱敏短 excerpt。
+ *
+ * 不改变签名算法、请求参数、header、profile顺序、Reader→alternate→Argus fallback、
+ * ReviewNetwork cooldown 或评论解析。
+ * Detail Optional / Catalog / Provider / 同人 / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.19：Review API Audit Closeout。
+ * Proxy Removal Canary 已完成并真机证明。
+ * 本版仅退休旧 Review API Cross-Context Canary 的每-hit source-KV 热路径审计，
+ * 为下一阶段 Official Review Signing Observability 清理时序噪音。
+ *
+ * 不改 Review 请求、签名、profile、fallback、cooldown、解析。
+ * Detail Optional / Catalog / Provider / 同人 Resolver / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.18：Optional Probe Closeout & Audit Cleanup。
+ * alpha10.17 真机确认：
+ * - 详情 highlevel 主动请求 = 0；
+ * - limitfreepopup 主动请求 = 0；
+ * - rawErr=0 / optional=0；
+ * - detail 3/3 完整；
+ * - Catalog 373/373，720ms。
+ *
+ * 本版不再改详情业务，只撤销 alpha10.13~10.17 临时取证设施：
+ * - 移除 QF_OptionalProbeAudit；
+ * - 移除 ruleBookInfo.init 中 detail/cache 事件 source-KV 写入；
+ * - 移除 optional-probe-audit 详细 section / reset key；
+ * - Overview 仅保留静态“DETAIL OPTIONAL CLOSED”状态。
+ *
+ * highlevel / limitpopup 历史正缓存兼容继续保留；
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.17：Optional Probe Canary 3。
+ * alpha10.14~10.16 动态证据：limitfreepopup A1(bookId) 合计 10/10 code=-11205、hit=0。
+ * 本版只移除最后的 A1 主动请求；保留已有 qf_limit_popup_v310_<bookId> 正缓存兼容。
+ * 不写新的 checked 负缓存；其它限免判定来源继续工作。
+ * highlevel / A2 保持退休；Catalog / Provider / 同人 / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.16：Optional Probe Canary 2。
+ * 动态证据累计：
+ * - alpha10.14：highlevel 3/3 code=-301, usable=0；
+ * - alpha10.15：highlevel 4/4 code=-301, usable=0；
+ * - 合计 7/7 无有效阅读人数。
+ *
+ * 本版只将 getHighLevelBookReadInfo 从详情关键路径退出：
+ * - 不再在 ruleBookInfo.init 主动请求该接口；
+ * - 保留其已有缓存读取兼容，若历史缓存有 value 仍可展示；
+ * - 后续官网搜索 / Atom / Raw BookDetail 阅读人数兜底保持原样；
+ * - limitfreepopup A1(bookId) 继续保留观察；
+ * - A2(empty) 维持已退休状态。
+ *
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.15：Optional Probe Canary 1。
+ * alpha10.14 真机证据：
+ * - limitfreepopup A1(bookId)：3/3 code=-11205, hit=0；
+ * - limitfreepopup A2(empty)：3/3 code=-11205, hit=0；
+ * - A2 没有出现任何独立 ok/hit。
+ *
+ * 本版只移除 A2(empty) 空参数尝试：
+ * - 每本详情 limitfreepopup 从最多2次降为最多1次；
+ * - A1(bookId) 完整保留；
+ * - highlevel(-301) 完整保留继续观察；
+ * - 缓存、timeout、命中判定、其它详情逻辑不改。
+ *
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.14：Optional Probe Outcome Audit。
+ * alpha10.13 已确认：
+ * - 两次详情初始化来自两本不同书，不是同书重复初始化；
+ * - 每本详情固定触发 highlevel×1 + limitfreepopup×2；
+ * - 首次访问时缓存为空属于正常现象。
+ *
+ * 本版继续冻结业务，只增加结果级证据：
+ * - highlevel：记录 rr.ok / code / message / 是否提取到有效阅读人数；
+ * - limitfreepopup：按 attempt1(bookId) / attempt2(empty) 分别记录 ok/code/message/hit；
+ * - 用于判断第2套空参数尝试是否存在独立成功价值，以及 -301 是否始终无可用数据。
+ *
+ * 不删请求、不改参数、不改 timeout、不改缓存、不改 fallback。
+ */
+/* v4.1.0-alpha10.13：Critical Path Free
+y 完全不改。
+ * 签名算法、请求参数、headers、Reader/Argus fallback、cooldown、评论解析不改。
+ * alpha11 Signing Observability 保留用于验证。
+ */
+/* v4.1.0-alpha11.0：Official Review Signing Observability。
+ * alpha10.19 已完成 Review API Direct Canary 收口。
+ * 本版正式进入 Official Review signing debt 调查，但只增加可观测性，不修签名。
+ *
+ * 目标 endpoint 仅：
+ * - v1/chapterreview/getparagraphshotcomments
+ * - v1/chapterreview/getchapterendreview
+ *
+ * 每个真实网络尝试最多落 1 次 source-KV 记录，采集：
+ * - canonical path / 脱敏 canonical query；
+ * - reader_ext / reader_legacy / argus profile；
+ * - deviceId 仅长度 + 末4位；
+ * - QDSign/QDInfo 仅长度 + 短指纹；
+ * - tstamp 是否存在 / 与当前时间偏差；
+ * - Cookie/CSRF 仅存在性 + cookie总长度；
+ * - explicit Cookie/CSRF header 是否存在；
+ * - response code/message/classification + 强脱敏短 excerpt。
+ *
+ * 不改变签名算法、请求参数、header、profile顺序、Reader→alternate→Argus fallback、
+ * ReviewNetwork cooldown 或评论解析。
+ * Detail Optional / Catalog / Provider / 同人 / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.19：Review API Audit Closeout。
+ * Proxy Removal Canary 已完成并真机证明。
+ * 本版仅退休旧 Review API Cross-Context Canary 的每-hit source-KV 热路径审计，
+ * 为下一阶段 Official Review Signing Observability 清理时序噪音。
+ *
+ * 不改 Review 请求、签名、profile、fallback、cooldown、解析。
+ * Detail Optional / Catalog / Provider / 同人 Resolver / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.18：Optional Probe Closeout & Audit Cleanup。
+ * alpha10.17 真机确认：
+ * - 详情 highlevel 主动请求 = 0；
+ * - limitfreepopup 主动请求 = 0；
+ * - rawErr=0 / optional=0；
+ * - detail 3/3 完整；
+ * - Catalog 373/373，720ms。
+ *
+ * 本版不再改详情业务，只撤销 alpha10.13~10.17 临时取证设施：
+ * - 移除 QF_OptionalProbeAudit；
+ * - 移除 ruleBookInfo.init 中 detail/cache 事件 source-KV 写入；
+ * - 移除 optional-probe-audit 详细 section / reset key；
+ * - Overview 仅保留静态“DETAIL OPTIONAL CLOSED”状态。
+ *
+ * highlevel / limitpopup 历史正缓存兼容继续保留；
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.17：Optional Probe Canary 3。
+ * alpha10.14~10.16 动态证据：limitfreepopup A1(bookId) 合计 10/10 code=-11205、hit=0。
+ * 本版只移除最后的 A1 主动请求；保留已有 qf_limit_popup_v310_<bookId> 正缓存兼容。
+ * 不写新的 checked 负缓存；其它限免判定来源继续工作。
+ * highlevel / A2 保持退休；Catalog / Provider / 同人 / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.16：Optional Probe Canary 2。
+ * 动态证据累计：
+ * - alpha10.14：highlevel 3/3 code=-301, usable=0；
+ * - alpha10.15：highlevel 4/4 code=-301, usable=0；
+ * - 合计 7/7 无有效阅读人数。
+ *
+ * 本版只将 getHighLevelBookReadInfo 从详情关键路径退出：
+ * - 不再在 ruleBookInfo.init 主动请求该接口；
+ * - 保留其已有缓存读取兼容，若历史缓存有 value 仍可展示；
+ * - 后续官网搜索 / Atom / Raw BookDetail 阅读人数兜底保持原样；
+ * - limitfreepopup A1(bookId) 继续保留观察；
+ * - A2(empty) 维持已退休状态。
+ *
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.15：Optional Probe Canary 1。
+ * alpha10.14 真机证据：
+ * - limitfreepopup A1(bookId)：3/3 code=-11205, hit=0；
+ * - limitfreepopup A2(empty)：3/3 code=-11205, hit=0；
+ * - A2 没有出现任何独立 ok/hit。
+ *
+ * 本版只移除 A2(empty) 空参数尝试：
+ * - 每本详情 limitfreepopup 从最多2次降为最多1次；
+ * - A1(bookId) 完整保留；
+ * - highlevel(-301) 完整保留继续观察；
+ * - 缓存、timeout、命中判定、其它详情逻辑不改。
+ *
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.14：Optional Probe Outcome Audit。
+ * alpha10.13 已确认：
+ * - 两次详情初始化来自两本不同书，不是同书重复初始化；
+ * - 每本详情固定触发 highlevel×1 + limitfreepopup×2；
+ * - 首次访问时缓存为空属于正常现象。
+ *
+ * 本版继续冻结业务，只增加结果级证据：
+ * - highlevel：记录 rr.ok / code / message / 是否提取到有效阅读人数；
+ * - limitfreepopup：按 attempt1(bookId) / attempt2(empty) 分别记录 ok/code/message/hit；
+ * - 用于判断第2套空参数尝试是否存在独立成功价值，以及 -301 是否始终无可用数据。
+ *
+ * 不删请求、不改参数、不改 timeout、不改缓存、不改 fallback。
+ */
+/* v4.1.0-alpha10.13：Critical Path Freeze & Optional Probe Audit。
+ * alpha10.12.2 已真机恢复详情/目录；本版冻结其业务语义。
+ * 不减少请求、不删除请求、不改 timeout、不改参数、不改 fallback、不改缓存实现。
+ *
+ * 只审计详情页两个 OPTIONAL 官方探针：
+ * - bookshelf/getHighLevelBookReadInfo (-301)
+ * - freshman/limitfreepopup (-11205)
+ *
+ * 跨 JS Context 记录 detail init start/end、cache state、真实调用次数、
+ * limitfreepopup attempt1/att
+QDInfo 仅长度 + 短指纹；
+ * - tstamp 是否存在 / 与当前时间偏差；
+ * - Cookie/CSRF 仅存在性 + cookie总长度；
+ * - explicit Cookie/CSRF header 是否存在；
+ * - response code/message/classification + 强脱敏短 excerpt。
+ *
+ * 不改变签名算法、请求参数、header、profile顺序、Reader→alternate→Argus fallback、
+ * ReviewNetwork cooldown 或评论解析。
+ * Detail Optional / Catalog / Provider / 同人 / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.19：Review API Audit Closeout。
+ * Proxy Removal Canary 已完成并真机证明。
+ * 本版仅退休旧 Review API Cross-Context Canary 的每-hit source-KV 热路径审计，
+ * 为下一阶段 Official Review Signing Observability 清理时序噪音。
+ *
+ * 不改 Review 请求、签名、profile、fallback、cooldown、解析。
+ * Detail Optional / Catalog / Provider / 同人 Resolver / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.18：Optional Probe Closeout & Audit Cleanup。
+ * alpha10.17 真机确认：
+ * - 详情 highlevel 主动请求 = 0；
+ * - limitfreepopup 主动请求 = 0；
+ * - rawErr=0 / optional=0；
+ * - detail 3/3 完整；
+ * - Catalog 373/373，720ms。
+ *
+ * 本版不再改详情业务，只撤销 alpha10.13~10.17 临时取证设施：
+ * - 移除 QF_OptionalProbeAudit；
+ * - 移除 ruleBookInfo.init 中 detail/cache 事件 source-KV 写入；
+ * - 移除 optional-probe-audit 详细 section / reset key；
+ * - Overview 仅保留静态“DETAIL OPTIONAL CLOSED”状态。
+ *
+ * highlevel / limitpopup 历史正缓存兼容继续保留；
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.17：Optional Probe Canary 3。
+ * alpha10.14~10.16 动态证据：limitfreepopup A1(bookId) 合计 10/10 code=-11205、hit=0。
+ * 本版只移除最后的 A1 主动请求；保留已有 qf_limit_popup_v310_<bookId> 正缓存兼容。
+ * 不写新的 checked 负缓存；其它限免判定来源继续工作。
+ * highlevel / A2 保持退休；Catalog / Provider / 同人 / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.16：Optional Probe Canary 2。
+ * 动态证据累计：
+ * - alpha10.14：highlevel 3/3 code=-301, usable=0；
+ * - alpha10.15：highlevel 4/4 code=-301, usable=0；
+ * - 合计 7/7 无有效阅读人数。
+ *
+ * 本版只将 getHighLevelBookReadInfo 从详情关键路径退出：
+ * - 不再在 ruleBookInfo.init 主动请求该接口；
+ * - 保留其已有缓存读取兼容，若历史缓存有 value 仍可展示；
+ * - 后续官网搜索 / Atom / Raw BookDetail 阅读人数兜底保持原样；
+ * - limitfreepopup A1(bookId) 继续保留观察；
+ * - A2(empty) 维持已退休状态。
+ *
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.15：Optional Probe Canary 1。
+ * alpha10.14 真机证据：
+ * - limitfreepopup A1(bookId)：3/3 code=-11205, hit=0；
+ * - limitfreepopup A2(empty)：3/3 code=-11205, hit=0；
+ * - A2 没有出现任何独立 ok/hit。
+ *
+ * 本版只移除 A2(empty) 空参数尝试：
+ * - 每本详情 limitfreepopup 从最多2次降为最多1次；
+ * - A1(bookId) 完整保留；
+ * - highlevel(-301) 完整保留继续观察；
+ * - 缓存、timeout、命中判定、其它详情逻辑不改。
+ *
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.14：Optional Probe Outcome Audit。
+ * alpha10.13 已确认：
+ * - 两次详情初始化来自两本不同书，不是同书重复初始化；
+ * - 每本详情固定触发 highlevel×1 + limitfreepopup×2；
+ * - 首次访问时缓存为空属于正常现象。
+ *
+ * 本版继续冻结业务，只增加结果级证据：
+ * - highlevel：记录 rr.ok / code / message / 是否提取到有效阅读人数；
+ * - limitfreepopup：按 attempt1(bookId) / attempt2(empty) 分别记录 ok/code/message/hit；
+ * - 用于判断第2套空参数尝试是否存在独立成功价值，以及 -301 是否始终无可用数据。
+ *
+ * 不删请求、不改参数、不改 timeout、不改缓存、不改 fallback。
+ */
+/* v4.1.0-alpha10.13：Critical Path Freeze & Optional Probe Audit。
+ * alpha10.12.2 已真机恢复详情/目录；本版冻结其业务语义。
+ * 不减少请求、不删除请求、不改 timeout、不改参数、不改 fallback、不改缓存实现。
+ *
+ * 只审计详情页两个 OPTIONAL 官方探针：
+ * - bookshelf/getHighLevelBookReadInfo (-301)
+ * - freshman/limitfreepopup (-11205)
+ *
+ * 跨 JS Context 记录 detail init start/end、cache state、真实调用次数、
+ * limitfreepopup attempt1/attempt2、bookId 与 context token。
+ */
+/* v4.1.0-alpha10.12.2：Detail Critical Path Recovery。
+ * alpha10.12/10.12.1 真机：详情页无法完成，CatalogReport 一直残留 alpha10.11。
+ * 静态排查发现 ruleBookInfo.init 在详情关键路径同步探测“晴天→神魔”限免状态，
+ * 单 Provider timeout=5000ms，最坏可阻塞详情约10秒；tocUrl 又在脚本末尾生成。
+ *
+ * 本版仅做关键路径隔离：
+ * - 详情页不再主动请求晴天/神魔限免接口；
+ * - 只读取已有 qf-server-limit-v314-<bookId> 缓存；
+ * - 无缓存/缓存无效时限免状态=未知；
+ * - 正文 Provider 仍照常使用晴天/神魔/同人等，不受影响；
+ * - Catalog / Review / Proxy / Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.12.1：Rollback Recovery。
+ * alpha10.12 Debt Gate 真机回归：详情页无法加载，新目录运行
+ Provider / 同人 / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.19：Review API Audit Closeout。
+ * Proxy Removal Canary 已完成并真机证明。
+ * 本版仅退休旧 Review API Cross-Context Canary 的每-hit source-KV 热路径审计，
+ * 为下一阶段 Official Review Signing Observability 清理时序噪音。
+ *
+ * 不改 Review 请求、签名、profile、fallback、cooldown、解析。
+ * Detail Optional / Catalog / Provider / 同人 Resolver / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.18：Optional Probe Closeout & Audit Cleanup。
+ * alpha10.17 真机确认：
+ * - 详情 highlevel 主动请求 = 0；
+ * - limitfreepopup 主动请求 = 0；
+ * - rawErr=0 / optional=0；
+ * - detail 3/3 完整；
+ * - Catalog 373/373，720ms。
+ *
+ * 本版不再改详情业务，只撤销 alpha10.13~10.17 临时取证设施：
+ * - 移除 QF_OptionalProbeAudit；
+ * - 移除 ruleBookInfo.init 中 detail/cache 事件 source-KV 写入；
+ * - 移除 optional-probe-audit 详细 section / reset key；
+ * - Overview 仅保留静态“DETAIL OPTIONAL CLOSED”状态。
+ *
+ * highlevel / limitpopup 历史正缓存兼容继续保留；
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.17：Optional Probe Canary 3。
+ * alpha10.14~10.16 动态证据：limitfreepopup A1(bookId) 合计 10/10 code=-11205、hit=0。
+ * 本版只移除最后的 A1 主动请求；保留已有 qf_limit_popup_v310_<bookId> 正缓存兼容。
+ * 不写新的 checked 负缓存；其它限免判定来源继续工作。
+ * highlevel / A2 保持退休；Catalog / Provider / 同人 / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.16：Optional Probe Canary 2。
+ * 动态证据累计：
+ * - alpha10.14：highlevel 3/3 code=-301, usable=0；
+ * - alpha10.15：highlevel 4/4 code=-301, usable=0；
+ * - 合计 7/7 无有效阅读人数。
+ *
+ * 本版只将 getHighLevelBookReadInfo 从详情关键路径退出：
+ * - 不再在 ruleBookInfo.init 主动请求该接口；
+ * - 保留其已有缓存读取兼容，若历史缓存有 value 仍可展示；
+ * - 后续官网搜索 / Atom / Raw BookDetail 阅读人数兜底保持原样；
+ * - limitfreepopup A1(bookId) 继续保留观察；
+ * - A2(empty) 维持已退休状态。
+ *
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.15：Optional Probe Canary 1。
+ * alpha10.14 真机证据：
+ * - limitfreepopup A1(bookId)：3/3 code=-11205, hit=0；
+ * - limitfreepopup A2(empty)：3/3 code=-11205, hit=0；
+ * - A2 没有出现任何独立 ok/hit。
+ *
+ * 本版只移除 A2(empty) 空参数尝试：
+ * - 每本详情 limitfreepopup 从最多2次降为最多1次；
+ * - A1(bookId) 完整保留；
+ * - highlevel(-301) 完整保留继续观察；
+ * - 缓存、timeout、命中判定、其它详情逻辑不改。
+ *
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.14：Optional Probe Outcome Audit。
+ * alpha10.13 已确认：
+ * - 两次详情初始化来自两本不同书，不是同书重复初始化；
+ * - 每本详情固定触发 highlevel×1 + limitfreepopup×2；
+ * - 首次访问时缓存为空属于正常现象。
+ *
+ * 本版继续冻结业务，只增加结果级证据：
+ * - highlevel：记录 rr.ok / code / message / 是否提取到有效阅读人数；
+ * - limitfreepopup：按 attempt1(bookId) / attempt2(empty) 分别记录 ok/code/message/hit；
+ * - 用于判断第2套空参数尝试是否存在独立成功价值，以及 -301 是否始终无可用数据。
+ *
+ * 不删请求、不改参数、不改 timeout、不改缓存、不改 fallback。
+ */
+/* v4.1.0-alpha10.13：Critical Path Freeze & Optional Probe Audit。
+ * alpha10.12.2 已真机恢复详情/目录；本版冻结其业务语义。
+ * 不减少请求、不删除请求、不改 timeout、不改参数、不改 fallback、不改缓存实现。
+ *
+ * 只审计详情页两个 OPTIONAL 官方探针：
+ * - bookshelf/getHighLevelBookReadInfo (-301)
+ * - freshman/limitfreepopup (-11205)
+ *
+ * 跨 JS Context 记录 detail init start/end、cache state、真实调用次数、
+ * limitfreepopup attempt1/attempt2、bookId 与 context token。
+ */
+/* v4.1.0-alpha10.12.2：Detail Critical Path Recovery。
+ * alpha10.12/10.12.1 真机：详情页无法完成，CatalogReport 一直残留 alpha10.11。
+ * 静态排查发现 ruleBookInfo.init 在详情关键路径同步探测“晴天→神魔”限免状态，
+ * 单 Provider timeout=5000ms，最坏可阻塞详情约10秒；tocUrl 又在脚本末尾生成。
+ *
+ * 本版仅做关键路径隔离：
+ * - 详情页不再主动请求晴天/神魔限免接口；
+ * - 只读取已有 qf-server-limit-v314-<bookId> 缓存；
+ * - 无缓存/缓存无效时限免状态=未知；
+ * - 正文 Provider 仍照常使用晴天/神魔/同人等，不受影响；
+ * - Catalog / Review / Proxy / Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.12.1：Rollback Recovery。
+ * alpha10.12 Debt Gate 真机回归：详情页无法加载，新目录运行未完成。
+ * 本版严格恢复到最后真机确认正常的 alpha10.11 运行语义。
+ * 仅保留 alpha10.11 已验证的诊断分级与 Proxy CLOSED 状态。
+ * 不修签名、不减少请求、不做其它优化。
+ */
+/* v4.1.0-alpha10.11：Diagnostic Severity Cleanup。
+ * Proxy 阶段已在 alpha10.10 CLOSED，本版不再删除代理。
+ * 仅治理诊断噪音，不改变任何网络请求数量、fallback、签名、评论、正文、目录或 Provider 语义。
+ *
+ * Official Request 失败分为：
+ * 1) ACTIONABLE：未
+主动请求 = 0；
+ * - limitfreepopup 主动请求 = 0；
+ * - rawErr=0 / optional=0；
+ * - detail 3/3 完整；
+ * - Catalog 373/373，720ms。
+ *
+ * 本版不再改详情业务，只撤销 alpha10.13~10.17 临时取证设施：
+ * - 移除 QF_OptionalProbeAudit；
+ * - 移除 ruleBookInfo.init 中 detail/cache 事件 source-KV 写入；
+ * - 移除 optional-probe-audit 详细 section / reset key；
+ * - Overview 仅保留静态“DETAIL OPTIONAL CLOSED”状态。
+ *
+ * highlevel / limitpopup 历史正缓存兼容继续保留；
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.17：Optional Probe Canary 3。
+ * alpha10.14~10.16 动态证据：limitfreepopup A1(bookId) 合计 10/10 code=-11205、hit=0。
+ * 本版只移除最后的 A1 主动请求；保留已有 qf_limit_popup_v310_<bookId> 正缓存兼容。
+ * 不写新的 checked 负缓存；其它限免判定来源继续工作。
+ * highlevel / A2 保持退休；Catalog / Provider / 同人 / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.16：Optional Probe Canary 2。
+ * 动态证据累计：
+ * - alpha10.14：highlevel 3/3 code=-301, usable=0；
+ * - alpha10.15：highlevel 4/4 code=-301, usable=0；
+ * - 合计 7/7 无有效阅读人数。
+ *
+ * 本版只将 getHighLevelBookReadInfo 从详情关键路径退出：
+ * - 不再在 ruleBookInfo.init 主动请求该接口；
+ * - 保留其已有缓存读取兼容，若历史缓存有 value 仍可展示；
+ * - 后续官网搜索 / Atom / Raw BookDetail 阅读人数兜底保持原样；
+ * - limitfreepopup A1(bookId) 继续保留观察；
+ * - A2(empty) 维持已退休状态。
+ *
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.15：Optional Probe Canary 1。
+ * alpha10.14 真机证据：
+ * - limitfreepopup A1(bookId)：3/3 code=-11205, hit=0；
+ * - limitfreepopup A2(empty)：3/3 code=-11205, hit=0；
+ * - A2 没有出现任何独立 ok/hit。
+ *
+ * 本版只移除 A2(empty) 空参数尝试：
+ * - 每本详情 limitfreepopup 从最多2次降为最多1次；
+ * - A1(bookId) 完整保留；
+ * - highlevel(-301) 完整保留继续观察；
+ * - 缓存、timeout、命中判定、其它详情逻辑不改。
+ *
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.14：Optional Probe Outcome Audit。
+ * alpha10.13 已确认：
+ * - 两次详情初始化来自两本不同书，不是同书重复初始化；
+ * - 每本详情固定触发 highlevel×1 + limitfreepopup×2；
+ * - 首次访问时缓存为空属于正常现象。
+ *
+ * 本版继续冻结业务，只增加结果级证据：
+ * - highlevel：记录 rr.ok / code / message / 是否提取到有效阅读人数；
+ * - limitfreepopup：按 attempt1(bookId) / attempt2(empty) 分别记录 ok/code/message/hit；
+ * - 用于判断第2套空参数尝试是否存在独立成功价值，以及 -301 是否始终无可用数据。
+ *
+ * 不删请求、不改参数、不改 timeout、不改缓存、不改 fallback。
+ */
+/* v4.1.0-alpha10.13：Critical Path Freeze & Optional Probe Audit。
+ * alpha10.12.2 已真机恢复详情/目录；本版冻结其业务语义。
+ * 不减少请求、不删除请求、不改 timeout、不改参数、不改 fallback、不改缓存实现。
+ *
+ * 只审计详情页两个 OPTIONAL 官方探针：
+ * - bookshelf/getHighLevelBookReadInfo (-301)
+ * - freshman/limitfreepopup (-11205)
+ *
+ * 跨 JS Context 记录 detail init start/end、cache state、真实调用次数、
+ * limitfreepopup attempt1/attempt2、bookId 与 context token。
+ */
+/* v4.1.0-alpha10.12.2：Detail Critical Path Recovery。
+ * alpha10.12/10.12.1 真机：详情页无法完成，CatalogReport 一直残留 alpha10.11。
+ * 静态排查发现 ruleBookInfo.init 在详情关键路径同步探测“晴天→神魔”限免状态，
+ * 单 Provider timeout=5000ms，最坏可阻塞详情约10秒；tocUrl 又在脚本末尾生成。
+ *
+ * 本版仅做关键路径隔离：
+ * - 详情页不再主动请求晴天/神魔限免接口；
+ * - 只读取已有 qf-server-limit-v314-<bookId> 缓存；
+ * - 无缓存/缓存无效时限免状态=未知；
+ * - 正文 Provider 仍照常使用晴天/神魔/同人等，不受影响；
+ * - Catalog / Review / Proxy / Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.12.1：Rollback Recovery。
+ * alpha10.12 Debt Gate 真机回归：详情页无法加载，新目录运行未完成。
+ * 本版严格恢复到最后真机确认正常的 alpha10.11 运行语义。
+ * 仅保留 alpha10.11 已验证的诊断分级与 Proxy CLOSED 状态。
+ * 不修签名、不减少请求、不做其它优化。
+ */
+/* v4.1.0-alpha10.11：Diagnostic Severity Cleanup。
+ * Proxy 阶段已在 alpha10.10 CLOSED，本版不再删除代理。
+ * 仅治理诊断噪音，不改变任何网络请求数量、fallback、签名、评论、正文、目录或 Provider 语义。
+ *
+ * Official Request 失败分为：
+ * 1) ACTIONABLE：未知/核心请求异常，继续进入顶部告警；
+ * 2) KNOWN-DEBT：已确认的 Official Review auth/sign 债，仅保留可观测性，不污染运行健康状态；
+ * 3) OPTIONAL：可选官方能力失败（当前已知 -11205 / -301，以及目录已有输出时的 chapterlist -1004）。
+ *
+ * 顶部 Overview 同时收口已完成的 Proxy Canary 调试行，只保留一条“代理治理 CLOSED”摘要；
+ * 完整历史仍保留在详细诊断 section 中。
+ */
+/* v4.1.0-alpha10.10：Final Proxy Re-Audit。
+ * alpha10.9.7 最终 Canary 真机通过后，代理删除阶段正式关闭。
+ * 本版按当前 jsLib + 31 lazy modules + 顶层规则重新统计，不做新的代理删除。
+ * 历史集合 86；Canary 已删除 11；当前真实定义 75。
+ * 当前真实活动：main-active 13 / module-activ
+ver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.17：Optional Probe Canary 3。
+ * alpha10.14~10.16 动态证据：limitfreepopup A1(bookId) 合计 10/10 code=-11205、hit=0。
+ * 本版只移除最后的 A1 主动请求；保留已有 qf_limit_popup_v310_<bookId> 正缓存兼容。
+ * 不写新的 checked 负缓存；其它限免判定来源继续工作。
+ * highlevel / A2 保持退休；Catalog / Provider / 同人 / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.16：Optional Probe Canary 2。
+ * 动态证据累计：
+ * - alpha10.14：highlevel 3/3 code=-301, usable=0；
+ * - alpha10.15：highlevel 4/4 code=-301, usable=0；
+ * - 合计 7/7 无有效阅读人数。
+ *
+ * 本版只将 getHighLevelBookReadInfo 从详情关键路径退出：
+ * - 不再在 ruleBookInfo.init 主动请求该接口；
+ * - 保留其已有缓存读取兼容，若历史缓存有 value 仍可展示；
+ * - 后续官网搜索 / Atom / Raw BookDetail 阅读人数兜底保持原样；
+ * - limitfreepopup A1(bookId) 继续保留观察；
+ * - A2(empty) 维持已退休状态。
+ *
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.15：Optional Probe Canary 1。
+ * alpha10.14 真机证据：
+ * - limitfreepopup A1(bookId)：3/3 code=-11205, hit=0；
+ * - limitfreepopup A2(empty)：3/3 code=-11205, hit=0；
+ * - A2 没有出现任何独立 ok/hit。
+ *
+ * 本版只移除 A2(empty) 空参数尝试：
+ * - 每本详情 limitfreepopup 从最多2次降为最多1次；
+ * - A1(bookId) 完整保留；
+ * - highlevel(-301) 完整保留继续观察；
+ * - 缓存、timeout、命中判定、其它详情逻辑不改。
+ *
+ * Catalog / Provider / 同人 Resolver / Review / Proxy CLOSED 全部冻结。
+ */
+/* v4.1.0-alpha10.14：Optional Probe Outcome Audit。
+ * alpha10.13 已确认：
+ * - 两次详情初始化来自两本不同书，不是同书重复初始化；
+ * - 每本详情固定触发 highlevel×1 + limitfreepopup×2；
+ * - 首次访问时缓存为空属于正常现象。
+ *
+ * 本版继续冻结业务，只增加结果级证据：
+ * - highlevel：记录 rr.ok / code / message / 是否提取到有效阅读人数；
+ * - limitfreepopup：按 attempt1(bookId) / attempt2(empty) 分别记录 ok/code/message/hit；
+ * - 用于判断第2套空参数尝试是否存在独立成功价值，以及 -301 是否始终无可用数据。
+ *
+ * 不删请求、不改参数、不改 timeout、不改缓存、不改 fallback。
+ */
+/* v4.1.0-alpha10.13：Critical Path Freeze & Optional Probe Audit。
+ * alpha10.12.2 已真机恢复详情/目录；本版冻结其业务语义。
+ * 不减少请求、不删除请求、不改 timeout、不改参数、不改 fallback、不改缓存实现。
+ *
+ * 只审计详情页两个 OPTIONAL 官方探针：
+ * - bookshelf/getHighLevelBookReadInfo (-301)
+ * - freshman/limitfreepopup (-11205)
+ *
+ * 跨 JS Context 记录 detail init start/end、cache state、真实调用次数、
+ * limitfreepopup attempt1/attempt2、bookId 与 context token。
+ */
+/* v4.1.0-alpha10.12.2：Detail Critical Path Recovery。
+ * alpha10.12/10.12.1 真机：详情页无法完成，CatalogReport 一直残留 alpha10.11。
+ * 静态排查发现 ruleBookInfo.init 在详情关键路径同步探测“晴天→神魔”限免状态，
+ * 单 Provider timeout=5000ms，最坏可阻塞详情约10秒；tocUrl 又在脚本末尾生成。
+ *
+ * 本版仅做关键路径隔离：
+ * - 详情页不再主动请求晴天/神魔限免接口；
+ * - 只读取已有 qf-server-limit-v314-<bookId> 缓存；
+ * - 无缓存/缓存无效时限免状态=未知；
+ * - 正文 Provider 仍照常使用晴天/神魔/同人等，不受影响；
+ * - Catalog / Review / Proxy / Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.12.1：Rollback Recovery。
+ * alpha10.12 Debt Gate 真机回归：详情页无法加载，新目录运行未完成。
+ * 本版严格恢复到最后真机确认正常的 alpha10.11 运行语义。
+ * 仅保留 alpha10.11 已验证的诊断分级与 Proxy CLOSED 状态。
+ * 不修签名、不减少请求、不做其它优化。
+ */
+/* v4.1.0-alpha10.11：Diagnostic Severity Cleanup。
+ * Proxy 阶段已在 alpha10.10 CLOSED，本版不再删除代理。
+ * 仅治理诊断噪音，不改变任何网络请求数量、fallback、签名、评论、正文、目录或 Provider 语义。
+ *
+ * Official Request 失败分为：
+ * 1) ACTIONABLE：未知/核心请求异常，继续进入顶部告警；
+ * 2) KNOWN-DEBT：已确认的 Official Review auth/sign 债，仅保留可观测性，不污染运行健康状态；
+ * 3) OPTIONAL：可选官方能力失败（当前已知 -11205 / -301，以及目录已有输出时的 chapterlist -1004）。
+ *
+ * 顶部 Overview 同时收口已完成的 Proxy Canary 调试行，只保留一条“代理治理 CLOSED”摘要；
+ * 完整历史仍保留在详细诊断 section 中。
+ */
+/* v4.1.0-alpha10.10：Final Proxy Re-Audit。
+ * alpha10.9.7 最终 Canary 真机通过后，代理删除阶段正式关闭。
+ * 本版按当前 jsLib + 31 lazy modules + 顶层规则重新统计，不做新的代理删除。
+ * 历史集合 86；Canary 已删除 11；当前真实定义 75。
+ * 当前真实活动：main-active 13 / module-active 8 / overlap 3 / unique-active 18。
+ * 无主/模块/顶层调用 57，其中 SAFE 34 / MODULE 18 / ABI 1 / UNKNOWN 4。
+ * 独占状态桶：MAIN 13 / MODULE 5 / STATIC-ZERO 52 / ABI 1 / UNKNOWN 4。
+ * 当前 MIGRATED-ZERO=0；后续不再把 STATIC-ZERO 自动视为删除候选。
+ * Catalog / Provider / 同人 Resolver / Review / Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.9.7：Proxy Removal Canary Batch 6（最终批）。
+ * alpha10.9.6.2 真机跨Context证据：
+ * request=2 / reviewSpec=9 / argusSpec=4 / kvWrit
+。
+ */
+/* v4.1.0-alpha10.14：Optional Probe Outcome Audit。
+ * alpha10.13 已确认：
+ * - 两次详情初始化来自两本不同书，不是同书重复初始化；
+ * - 每本详情固定触发 highlevel×1 + limitfreepopup×2；
+ * - 首次访问时缓存为空属于正常现象。
+ *
+ * 本版继续冻结业务，只增加结果级证据：
+ * - highlevel：记录 rr.ok / code / message / 是否提取到有效阅读人数；
+ * - limitfreepopup：按 attempt1(bookId) / attempt2(empty) 分别记录 ok/code/message/hit；
+ * - 用于判断第2套空参数尝试是否存在独立成功价值，以及 -301 是否始终无可用数据。
+ *
+ * 不删请求、不改参数、不改 timeout、不改缓存、不改 fallback。
+ */
+/* v4.1.0-alpha10.13：Critical Path Freeze & Optional Probe Audit。
+ * alpha10.12.2 已真机恢复详情/目录；本版冻结其业务语义。
+ * 不减少请求、不删除请求、不改 timeout、不改参数、不改 fallback、不改缓存实现。
+ *
+ * 只审计详情页两个 OPTIONAL 官方探针：
+ * - bookshelf/getHighLevelBookReadInfo (-301)
+ * - freshman/limitfreepopup (-11205)
+ *
+ * 跨 JS Context 记录 detail init start/end、cache state、真实调用次数、
+ * limitfreepopup attempt1/attempt2、bookId 与 context token。
+ */
+/* v4.1.0-alpha10.12.2：Detail Critical Path Recovery。
+ * alpha10.12/10.12.1 真机：详情页无法完成，CatalogReport 一直残留 alpha10.11。
+ * 静态排查发现 ruleBookInfo.init 在详情关键路径同步探测“晴天→神魔”限免状态，
+ * 单 Provider timeout=5000ms，最坏可阻塞详情约10秒；tocUrl 又在脚本末尾生成。
+ *
+ * 本版仅做关键路径隔离：
+ * - 详情页不再主动请求晴天/神魔限免接口；
+ * - 只读取已有 qf-server-limit-v314-<bookId> 缓存；
+ * - 无缓存/缓存无效时限免状态=未知；
+ * - 正文 Provider 仍照常使用晴天/神魔/同人等，不受影响；
+ * - Catalog / Review / Proxy / Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.12.1：Rollback Recovery。
+ * alpha10.12 Debt Gate 真机回归：详情页无法加载，新目录运行未完成。
+ * 本版严格恢复到最后真机确认正常的 alpha10.11 运行语义。
+ * 仅保留 alpha10.11 已验证的诊断分级与 Proxy CLOSED 状态。
+ * 不修签名、不减少请求、不做其它优化。
+ */
+/* v4.1.0-alpha10.11：Diagnostic Severity Cleanup。
+ * Proxy 阶段已在 alpha10.10 CLOSED，本版不再删除代理。
+ * 仅治理诊断噪音，不改变任何网络请求数量、fallback、签名、评论、正文、目录或 Provider 语义。
+ *
+ * Official Request 失败分为：
+ * 1) ACTIONABLE：未知/核心请求异常，继续进入顶部告警；
+ * 2) KNOWN-DEBT：已确认的 Official Review auth/sign 债，仅保留可观测性，不污染运行健康状态；
+ * 3) OPTIONAL：可选官方能力失败（当前已知 -11205 / -301，以及目录已有输出时的 chapterlist -1004）。
+ *
+ * 顶部 Overview 同时收口已完成的 Proxy Canary 调试行，只保留一条“代理治理 CLOSED”摘要；
+ * 完整历史仍保留在详细诊断 section 中。
+ */
+/* v4.1.0-alpha10.10：Final Proxy Re-Audit。
+ * alpha10.9.7 最终 Canary 真机通过后，代理删除阶段正式关闭。
+ * 本版按当前 jsLib + 31 lazy modules + 顶层规则重新统计，不做新的代理删除。
+ * 历史集合 86；Canary 已删除 11；当前真实定义 75。
+ * 当前真实活动：main-active 13 / module-active 8 / overlap 3 / unique-active 18。
+ * 无主/模块/顶层调用 57，其中 SAFE 34 / MODULE 18 / ABI 1 / UNKNOWN 4。
+ * 独占状态桶：MAIN 13 / MODULE 5 / STATIC-ZERO 52 / ABI 1 / UNKNOWN 4。
+ * 当前 MIGRATED-ZERO=0；后续不再把 STATIC-ZERO 自动视为删除候选。
+ * Catalog / Provider / 同人 Resolver / Review / Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.9.7：Proxy Removal Canary Batch 6（最终批）。
+ * alpha10.9.6.2 真机跨Context证据：
+ * request=2 / reviewSpec=9 / argusSpec=4 / kvWrites=15 / SOURCE-KV-HIT；
+ * 最后两个 Compatibility 代理同时保持动态 hits=0/2。
+ * 本版仅真删除：
+ *   qfArgusOuterSpecV350 → QF_OfficialClient.argusSpec
+ *   qfOfficialReviewSpecV400 → QF_OfficialClient.reviewSpec
+ * 至此 11 个已迁移且多轮动态零命中的代理全部完成 6 个小批次 Canary 真删除。
+ * Compatibility Registry、迁移历史、Removal Canary 回滚历史继续保留。
+ * Review API Cross-Context Audit 与 Review Network Audit 保留一轮。
+ * Catalog / Provider / 同人 Resolver / Review 业务 / Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.9.6.2：Review API Cross-Context Audit。
+ * 修复 alpha10.9.6.1 审计自身的跨 JS Context 丢计数问题。
+ * 阅读的正文/评论/诊断可运行在不同 JS 上下文；仅内存计数无法跨上下文保留。
+ * 本版每次 QF_ReviewApi.request/rich、QF_OfficialClient.reviewSpec/argusSpec
+ * 真正命中时立即写入 source KV；诊断页只读取并合并，不再先用 0 覆盖持久证据。
+ * 纯可观测性：不新增/删除业务代理，不改变评论、签名、fallback、冷却、Provider、目录语义。
+ */
+/* v4.1.0-alpha10.9.6.1：Review API Direct Audit。
+ * 纯可观测性补丁：不新增/删除代理，不改变评论业务、签名、fallback、冷却语义。
+ * 验证 alpha10.9.6 删除 qfOfficialReviewApiV402 / qfOfficialReviewRawV400 后，
+ * 实际评论链是否直达 QF_ReviewApi.request / rich；
+ * 同时记录 QF_OfficialClient.reviewSpec / argusSpec 的真实调用，
+ * 为最后两个签名兼容代理提供动态接管证据。
+ */
+/* v4.1.0-alpha10.9.6：Proxy Removal Canary Batch 5。
+ * alpha10.9.5.1 已真机证明 Review Network 稳定入口直接运行：
+ * canTry=8 / mark=7 / fail=4 / activeCooldown=1。
+ * 本版第五批仅真删除两个 Official Review API 
+* - 正文 Provider 仍照常使用晴天/神魔/同人等，不受影响；
+ * - Catalog / Review / Proxy / Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.12.1：Rollback Recovery。
+ * alpha10.12 Debt Gate 真机回归：详情页无法加载，新目录运行未完成。
+ * 本版严格恢复到最后真机确认正常的 alpha10.11 运行语义。
+ * 仅保留 alpha10.11 已验证的诊断分级与 Proxy CLOSED 状态。
+ * 不修签名、不减少请求、不做其它优化。
+ */
+/* v4.1.0-alpha10.11：Diagnostic Severity Cleanup。
+ * Proxy 阶段已在 alpha10.10 CLOSED，本版不再删除代理。
+ * 仅治理诊断噪音，不改变任何网络请求数量、fallback、签名、评论、正文、目录或 Provider 语义。
+ *
+ * Official Request 失败分为：
+ * 1) ACTIONABLE：未知/核心请求异常，继续进入顶部告警；
+ * 2) KNOWN-DEBT：已确认的 Official Review auth/sign 债，仅保留可观测性，不污染运行健康状态；
+ * 3) OPTIONAL：可选官方能力失败（当前已知 -11205 / -301，以及目录已有输出时的 chapterlist -1004）。
+ *
+ * 顶部 Overview 同时收口已完成的 Proxy Canary 调试行，只保留一条“代理治理 CLOSED”摘要；
+ * 完整历史仍保留在详细诊断 section 中。
+ */
+/* v4.1.0-alpha10.10：Final Proxy Re-Audit。
+ * alpha10.9.7 最终 Canary 真机通过后，代理删除阶段正式关闭。
+ * 本版按当前 jsLib + 31 lazy modules + 顶层规则重新统计，不做新的代理删除。
+ * 历史集合 86；Canary 已删除 11；当前真实定义 75。
+ * 当前真实活动：main-active 13 / module-active 8 / overlap 3 / unique-active 18。
+ * 无主/模块/顶层调用 57，其中 SAFE 34 / MODULE 18 / ABI 1 / UNKNOWN 4。
+ * 独占状态桶：MAIN 13 / MODULE 5 / STATIC-ZERO 52 / ABI 1 / UNKNOWN 4。
+ * 当前 MIGRATED-ZERO=0；后续不再把 STATIC-ZERO 自动视为删除候选。
+ * Catalog / Provider / 同人 Resolver / Review / Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.9.7：Proxy Removal Canary Batch 6（最终批）。
+ * alpha10.9.6.2 真机跨Context证据：
+ * request=2 / reviewSpec=9 / argusSpec=4 / kvWrites=15 / SOURCE-KV-HIT；
+ * 最后两个 Compatibility 代理同时保持动态 hits=0/2。
+ * 本版仅真删除：
+ *   qfArgusOuterSpecV350 → QF_OfficialClient.argusSpec
+ *   qfOfficialReviewSpecV400 → QF_OfficialClient.reviewSpec
+ * 至此 11 个已迁移且多轮动态零命中的代理全部完成 6 个小批次 Canary 真删除。
+ * Compatibility Registry、迁移历史、Removal Canary 回滚历史继续保留。
+ * Review API Cross-Context Audit 与 Review Network Audit 保留一轮。
+ * Catalog / Provider / 同人 Resolver / Review 业务 / Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.9.6.2：Review API Cross-Context Audit。
+ * 修复 alpha10.9.6.1 审计自身的跨 JS Context 丢计数问题。
+ * 阅读的正文/评论/诊断可运行在不同 JS 上下文；仅内存计数无法跨上下文保留。
+ * 本版每次 QF_ReviewApi.request/rich、QF_OfficialClient.reviewSpec/argusSpec
+ * 真正命中时立即写入 source KV；诊断页只读取并合并，不再先用 0 覆盖持久证据。
+ * 纯可观测性：不新增/删除业务代理，不改变评论、签名、fallback、冷却、Provider、目录语义。
+ */
+/* v4.1.0-alpha10.9.6.1：Review API Direct Audit。
+ * 纯可观测性补丁：不新增/删除代理，不改变评论业务、签名、fallback、冷却语义。
+ * 验证 alpha10.9.6 删除 qfOfficialReviewApiV402 / qfOfficialReviewRawV400 后，
+ * 实际评论链是否直达 QF_ReviewApi.request / rich；
+ * 同时记录 QF_OfficialClient.reviewSpec / argusSpec 的真实调用，
+ * 为最后两个签名兼容代理提供动态接管证据。
+ */
+/* v4.1.0-alpha10.9.6：Proxy Removal Canary Batch 5。
+ * alpha10.9.5.1 已真机证明 Review Network 稳定入口直接运行：
+ * canTry=8 / mark=7 / fail=4 / activeCooldown=1。
+ * 本版第五批仅真删除两个 Official Review API 外围兼容代理：
+ *   qfOfficialReviewApiV402 → QF_ReviewApi.request
+ *   qfOfficialReviewRawV400 → QF_ReviewApi.rich
+ * 其余两个签名构造兼容代理继续 KEEP：
+ *   qfArgusOuterSpecV350 / qfOfficialReviewSpecV400
+ * Review Network Canary Audit 保留；Catalog / Provider / 同人 Resolver /
+ * Review 业务实现 / Official Domain 全部冻结。
+ * 若段评详情、热评、本章说/章评或作者说聚合出现回归，只恢复本批两个精确定义。
+ */
+/* v4.1.0-alpha10.9.5.1：Review Network Canary Audit。
+ * 纯可观测性补丁：不新增/删除代理，不改变任何评论请求、冷却阈值或 fallback 顺序。
+ * 用于验证 alpha10.9.5 删除 qfReviewNetCanTryV510 / qfReviewNetMarkV510 后，
+ * 主链是否真实直接调用 QF_ReviewNetwork.canTry / mark，以及 cooldown 是否仍能触发。
+ * 新增：canTryCalls / markCalls / okMarks / failMarks / blocked / activeCooldown。
+ * 冷却语义保持：fails>=2；12s阶梯；75s上限。
+ */
+/* v4.1.0-alpha10.9.5：Proxy Removal Canary Batch 4。
+ * alpha10.9.4 真机确认 Server Comment Provider 单代理删除后服务器评论路由正常。
+ * 本版第四批只删除两个 Review Network 冷却兼容代理：
+ *   qfReviewNetCanTryV510 → QF_ReviewNetwork.canTry
+ *   qfReviewNetMarkV510   → QF_ReviewNetwork.mark
+ * 前三批累计删除5个代理继续保持删除。
+ * 剩余4个 Official Review 请求/签名兼容代理全部继续 KEEP。
+ * Catalog / Provider / 同人 Resolver / Review 业务逻辑 / Official Domain 全部冻结。
+ * 若评论接口冷却、失败计数、重试节流出现回归，只恢复本批两个精确定义。
+ */
+/* v4.1.0-alpha10.9.4：Proxy Removal Canary B
+行健康状态；
+ * 3) OPTIONAL：可选官方能力失败（当前已知 -11205 / -301，以及目录已有输出时的 chapterlist -1004）。
+ *
+ * 顶部 Overview 同时收口已完成的 Proxy Canary 调试行，只保留一条“代理治理 CLOSED”摘要；
+ * 完整历史仍保留在详细诊断 section 中。
+ */
+/* v4.1.0-alpha10.10：Final Proxy Re-Audit。
+ * alpha10.9.7 最终 Canary 真机通过后，代理删除阶段正式关闭。
+ * 本版按当前 jsLib + 31 lazy modules + 顶层规则重新统计，不做新的代理删除。
+ * 历史集合 86；Canary 已删除 11；当前真实定义 75。
+ * 当前真实活动：main-active 13 / module-active 8 / overlap 3 / unique-active 18。
+ * 无主/模块/顶层调用 57，其中 SAFE 34 / MODULE 18 / ABI 1 / UNKNOWN 4。
+ * 独占状态桶：MAIN 13 / MODULE 5 / STATIC-ZERO 52 / ABI 1 / UNKNOWN 4。
+ * 当前 MIGRATED-ZERO=0；后续不再把 STATIC-ZERO 自动视为删除候选。
+ * Catalog / Provider / 同人 Resolver / Review / Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.9.7：Proxy Removal Canary Batch 6（最终批）。
+ * alpha10.9.6.2 真机跨Context证据：
+ * request=2 / reviewSpec=9 / argusSpec=4 / kvWrites=15 / SOURCE-KV-HIT；
+ * 最后两个 Compatibility 代理同时保持动态 hits=0/2。
+ * 本版仅真删除：
+ *   qfArgusOuterSpecV350 → QF_OfficialClient.argusSpec
+ *   qfOfficialReviewSpecV400 → QF_OfficialClient.reviewSpec
+ * 至此 11 个已迁移且多轮动态零命中的代理全部完成 6 个小批次 Canary 真删除。
+ * Compatibility Registry、迁移历史、Removal Canary 回滚历史继续保留。
+ * Review API Cross-Context Audit 与 Review Network Audit 保留一轮。
+ * Catalog / Provider / 同人 Resolver / Review 业务 / Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.9.6.2：Review API Cross-Context Audit。
+ * 修复 alpha10.9.6.1 审计自身的跨 JS Context 丢计数问题。
+ * 阅读的正文/评论/诊断可运行在不同 JS 上下文；仅内存计数无法跨上下文保留。
+ * 本版每次 QF_ReviewApi.request/rich、QF_OfficialClient.reviewSpec/argusSpec
+ * 真正命中时立即写入 source KV；诊断页只读取并合并，不再先用 0 覆盖持久证据。
+ * 纯可观测性：不新增/删除业务代理，不改变评论、签名、fallback、冷却、Provider、目录语义。
+ */
+/* v4.1.0-alpha10.9.6.1：Review API Direct Audit。
+ * 纯可观测性补丁：不新增/删除代理，不改变评论业务、签名、fallback、冷却语义。
+ * 验证 alpha10.9.6 删除 qfOfficialReviewApiV402 / qfOfficialReviewRawV400 后，
+ * 实际评论链是否直达 QF_ReviewApi.request / rich；
+ * 同时记录 QF_OfficialClient.reviewSpec / argusSpec 的真实调用，
+ * 为最后两个签名兼容代理提供动态接管证据。
+ */
+/* v4.1.0-alpha10.9.6：Proxy Removal Canary Batch 5。
+ * alpha10.9.5.1 已真机证明 Review Network 稳定入口直接运行：
+ * canTry=8 / mark=7 / fail=4 / activeCooldown=1。
+ * 本版第五批仅真删除两个 Official Review API 外围兼容代理：
+ *   qfOfficialReviewApiV402 → QF_ReviewApi.request
+ *   qfOfficialReviewRawV400 → QF_ReviewApi.rich
+ * 其余两个签名构造兼容代理继续 KEEP：
+ *   qfArgusOuterSpecV350 / qfOfficialReviewSpecV400
+ * Review Network Canary Audit 保留；Catalog / Provider / 同人 Resolver /
+ * Review 业务实现 / Official Domain 全部冻结。
+ * 若段评详情、热评、本章说/章评或作者说聚合出现回归，只恢复本批两个精确定义。
+ */
+/* v4.1.0-alpha10.9.5.1：Review Network Canary Audit。
+ * 纯可观测性补丁：不新增/删除代理，不改变任何评论请求、冷却阈值或 fallback 顺序。
+ * 用于验证 alpha10.9.5 删除 qfReviewNetCanTryV510 / qfReviewNetMarkV510 后，
+ * 主链是否真实直接调用 QF_ReviewNetwork.canTry / mark，以及 cooldown 是否仍能触发。
+ * 新增：canTryCalls / markCalls / okMarks / failMarks / blocked / activeCooldown。
+ * 冷却语义保持：fails>=2；12s阶梯；75s上限。
+ */
+/* v4.1.0-alpha10.9.5：Proxy Removal Canary Batch 4。
+ * alpha10.9.4 真机确认 Server Comment Provider 单代理删除后服务器评论路由正常。
+ * 本版第四批只删除两个 Review Network 冷却兼容代理：
+ *   qfReviewNetCanTryV510 → QF_ReviewNetwork.canTry
+ *   qfReviewNetMarkV510   → QF_ReviewNetwork.mark
+ * 前三批累计删除5个代理继续保持删除。
+ * 剩余4个 Official Review 请求/签名兼容代理全部继续 KEEP。
+ * Catalog / Provider / 同人 Resolver / Review 业务逻辑 / Official Domain 全部冻结。
+ * 若评论接口冷却、失败计数、重试节流出现回归，只恢复本批两个精确定义。
+ */
+/* v4.1.0-alpha10.9.4：Proxy Removal Canary Batch 3。
+ * alpha10.9.3 真机已确认：
+ * - 同人 Provider 正文成功；
+ * - Review Cache 实际 hit/miss/set 正常；
+ * - qfServerCommentProviderV315 在真实评论链与服务器评论源逻辑下仍动态 0 命中。
+ * 本版第三批真删除只移除 1 个兼容代理：
+ *   qfServerCommentProviderV315 → qfCommentServerPickV313
+ * 前两批已删除 4 个代理继续保持删除。
+ * B2 六个评论网络/签名代理全部继续 KEEP，不与本批混合。
+ * Catalog / Provider / 同人 Resolver / Review / Official Domain 全部冻结。
+ * 若服务器评论源自动选择、晴天评论、限免源自有服务器评论出现回归，只恢复本批单个定义。
+ */
+/* v4.1.0-alpha10.9.3：Proxy Removal Canary Batch 2。
+ * alpha10.9.2 真机确认：同人正文恢复；Review 请求大量运行后，
+ * qfReviewMetaGetV470 / qfReviewMetaPutV470 仍保持动态 0 命中。
+ * 本版第二批
+nary 回滚历史继续保留。
+ * Review API Cross-Context Audit 与 Review Network Audit 保留一轮。
+ * Catalog / Provider / 同人 Resolver / Review 业务 / Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.9.6.2：Review API Cross-Context Audit。
+ * 修复 alpha10.9.6.1 审计自身的跨 JS Context 丢计数问题。
+ * 阅读的正文/评论/诊断可运行在不同 JS 上下文；仅内存计数无法跨上下文保留。
+ * 本版每次 QF_ReviewApi.request/rich、QF_OfficialClient.reviewSpec/argusSpec
+ * 真正命中时立即写入 source KV；诊断页只读取并合并，不再先用 0 覆盖持久证据。
+ * 纯可观测性：不新增/删除业务代理，不改变评论、签名、fallback、冷却、Provider、目录语义。
+ */
+/* v4.1.0-alpha10.9.6.1：Review API Direct Audit。
+ * 纯可观测性补丁：不新增/删除代理，不改变评论业务、签名、fallback、冷却语义。
+ * 验证 alpha10.9.6 删除 qfOfficialReviewApiV402 / qfOfficialReviewRawV400 后，
+ * 实际评论链是否直达 QF_ReviewApi.request / rich；
+ * 同时记录 QF_OfficialClient.reviewSpec / argusSpec 的真实调用，
+ * 为最后两个签名兼容代理提供动态接管证据。
+ */
+/* v4.1.0-alpha10.9.6：Proxy Removal Canary Batch 5。
+ * alpha10.9.5.1 已真机证明 Review Network 稳定入口直接运行：
+ * canTry=8 / mark=7 / fail=4 / activeCooldown=1。
+ * 本版第五批仅真删除两个 Official Review API 外围兼容代理：
+ *   qfOfficialReviewApiV402 → QF_ReviewApi.request
+ *   qfOfficialReviewRawV400 → QF_ReviewApi.rich
+ * 其余两个签名构造兼容代理继续 KEEP：
+ *   qfArgusOuterSpecV350 / qfOfficialReviewSpecV400
+ * Review Network Canary Audit 保留；Catalog / Provider / 同人 Resolver /
+ * Review 业务实现 / Official Domain 全部冻结。
+ * 若段评详情、热评、本章说/章评或作者说聚合出现回归，只恢复本批两个精确定义。
+ */
+/* v4.1.0-alpha10.9.5.1：Review Network Canary Audit。
+ * 纯可观测性补丁：不新增/删除代理，不改变任何评论请求、冷却阈值或 fallback 顺序。
+ * 用于验证 alpha10.9.5 删除 qfReviewNetCanTryV510 / qfReviewNetMarkV510 后，
+ * 主链是否真实直接调用 QF_ReviewNetwork.canTry / mark，以及 cooldown 是否仍能触发。
+ * 新增：canTryCalls / markCalls / okMarks / failMarks / blocked / activeCooldown。
+ * 冷却语义保持：fails>=2；12s阶梯；75s上限。
+ */
+/* v4.1.0-alpha10.9.5：Proxy Removal Canary Batch 4。
+ * alpha10.9.4 真机确认 Server Comment Provider 单代理删除后服务器评论路由正常。
+ * 本版第四批只删除两个 Review Network 冷却兼容代理：
+ *   qfReviewNetCanTryV510 → QF_ReviewNetwork.canTry
+ *   qfReviewNetMarkV510   → QF_ReviewNetwork.mark
+ * 前三批累计删除5个代理继续保持删除。
+ * 剩余4个 Official Review 请求/签名兼容代理全部继续 KEEP。
+ * Catalog / Provider / 同人 Resolver / Review 业务逻辑 / Official Domain 全部冻结。
+ * 若评论接口冷却、失败计数、重试节流出现回归，只恢复本批两个精确定义。
+ */
+/* v4.1.0-alpha10.9.4：Proxy Removal Canary Batch 3。
+ * alpha10.9.3 真机已确认：
+ * - 同人 Provider 正文成功；
+ * - Review Cache 实际 hit/miss/set 正常；
+ * - qfServerCommentProviderV315 在真实评论链与服务器评论源逻辑下仍动态 0 命中。
+ * 本版第三批真删除只移除 1 个兼容代理：
+ *   qfServerCommentProviderV315 → qfCommentServerPickV313
+ * 前两批已删除 4 个代理继续保持删除。
+ * B2 六个评论网络/签名代理全部继续 KEEP，不与本批混合。
+ * Catalog / Provider / 同人 Resolver / Review / Official Domain 全部冻结。
+ * 若服务器评论源自动选择、晴天评论、限免源自有服务器评论出现回归，只恢复本批单个定义。
+ */
+/* v4.1.0-alpha10.9.3：Proxy Removal Canary Batch 2。
+ * alpha10.9.2 真机确认：同人正文恢复；Review 请求大量运行后，
+ * qfReviewMetaGetV470 / qfReviewMetaPutV470 仍保持动态 0 命中。
+ * 本版第二批真删除仅移除这两个 Review Cache 兼容代理函数定义：
+ * - qfReviewMetaGetV470 → QF_ReviewCache.get
+ * - qfReviewMetaPutV470 → QF_ReviewCache.put
+ * 第一批已删除 qfPaidV38 / qfProviderContentV38 继续保持删除。
+ * qfServerCommentProviderV315 与 Batch2 六个评论网络/签名代理继续 KEEP。
+ * Catalog / Provider / 同人 Resolver / Review 业务链 / Official Domain 全部冻结。
+ * 任何段评、本章说、热评、评论缓存回归：立即恢复本批两个精确代理定义，不叠加其它修复。
+ */
+/* v4.1.0-alpha10.9.2：Tongren ID Resolver。
+ * alpha10.9.1 已解决共享 Token 被 qfV21Search 覆盖。
+ * 本版修复同人 Provider 对不同作品的 ID 兼容：
+ * - 保留已验证过的直连快路：起点 bookId + chapterId 直接 /novel/chap；
+ * - 直连失败时才调用 /novel/search，以书名+作者精确解析同人服务 novelId；
+ * - novelId 映射后先复用原 chapterId；
+ * - 若章节仍失败，再按 /novel/catalog 的精确章节名解析同人 chapId；
+ * - book/chapter 映射分别缓存到 source KV，后续章节不重复搜索；
+ * - 只接受精确书名（同名时优先精确作者）和唯一精确章节名，不做模糊猜测。
+ * alpha10.9 Provider 代理删除 Canary、Catalog/Review/Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.9.1：Source Variable Isolation。
+ * 修复同人共享 Token 与 qfV21Search 共用“源变量”导致 Token 被搜索 JSON 覆盖。
+ * 源变量现在只用于同人 Token；搜索状态迁移到独立 source KV。
+ * 旧 {"qfV21Search":"..."} 会迁移到 KV，并在确认它只是纯搜索 JSON 后清空源变量。
+ * 同人正文、登录验证、登录页状态都拒绝把旧搜索 JSON 当作 Bearer Token。
+ * alpha10.9
+Proxy Removal Canary Batch 5。
+ * alpha10.9.5.1 已真机证明 Review Network 稳定入口直接运行：
+ * canTry=8 / mark=7 / fail=4 / activeCooldown=1。
+ * 本版第五批仅真删除两个 Official Review API 外围兼容代理：
+ *   qfOfficialReviewApiV402 → QF_ReviewApi.request
+ *   qfOfficialReviewRawV400 → QF_ReviewApi.rich
+ * 其余两个签名构造兼容代理继续 KEEP：
+ *   qfArgusOuterSpecV350 / qfOfficialReviewSpecV400
+ * Review Network Canary Audit 保留；Catalog / Provider / 同人 Resolver /
+ * Review 业务实现 / Official Domain 全部冻结。
+ * 若段评详情、热评、本章说/章评或作者说聚合出现回归，只恢复本批两个精确定义。
+ */
+/* v4.1.0-alpha10.9.5.1：Review Network Canary Audit。
+ * 纯可观测性补丁：不新增/删除代理，不改变任何评论请求、冷却阈值或 fallback 顺序。
+ * 用于验证 alpha10.9.5 删除 qfReviewNetCanTryV510 / qfReviewNetMarkV510 后，
+ * 主链是否真实直接调用 QF_ReviewNetwork.canTry / mark，以及 cooldown 是否仍能触发。
+ * 新增：canTryCalls / markCalls / okMarks / failMarks / blocked / activeCooldown。
+ * 冷却语义保持：fails>=2；12s阶梯；75s上限。
+ */
+/* v4.1.0-alpha10.9.5：Proxy Removal Canary Batch 4。
+ * alpha10.9.4 真机确认 Server Comment Provider 单代理删除后服务器评论路由正常。
+ * 本版第四批只删除两个 Review Network 冷却兼容代理：
+ *   qfReviewNetCanTryV510 → QF_ReviewNetwork.canTry
+ *   qfReviewNetMarkV510   → QF_ReviewNetwork.mark
+ * 前三批累计删除5个代理继续保持删除。
+ * 剩余4个 Official Review 请求/签名兼容代理全部继续 KEEP。
+ * Catalog / Provider / 同人 Resolver / Review 业务逻辑 / Official Domain 全部冻结。
+ * 若评论接口冷却、失败计数、重试节流出现回归，只恢复本批两个精确定义。
+ */
+/* v4.1.0-alpha10.9.4：Proxy Removal Canary Batch 3。
+ * alpha10.9.3 真机已确认：
+ * - 同人 Provider 正文成功；
+ * - Review Cache 实际 hit/miss/set 正常；
+ * - qfServerCommentProviderV315 在真实评论链与服务器评论源逻辑下仍动态 0 命中。
+ * 本版第三批真删除只移除 1 个兼容代理：
+ *   qfServerCommentProviderV315 → qfCommentServerPickV313
+ * 前两批已删除 4 个代理继续保持删除。
+ * B2 六个评论网络/签名代理全部继续 KEEP，不与本批混合。
+ * Catalog / Provider / 同人 Resolver / Review / Official Domain 全部冻结。
+ * 若服务器评论源自动选择、晴天评论、限免源自有服务器评论出现回归，只恢复本批单个定义。
+ */
+/* v4.1.0-alpha10.9.3：Proxy Removal Canary Batch 2。
+ * alpha10.9.2 真机确认：同人正文恢复；Review 请求大量运行后，
+ * qfReviewMetaGetV470 / qfReviewMetaPutV470 仍保持动态 0 命中。
+ * 本版第二批真删除仅移除这两个 Review Cache 兼容代理函数定义：
+ * - qfReviewMetaGetV470 → QF_ReviewCache.get
+ * - qfReviewMetaPutV470 → QF_ReviewCache.put
+ * 第一批已删除 qfPaidV38 / qfProviderContentV38 继续保持删除。
+ * qfServerCommentProviderV315 与 Batch2 六个评论网络/签名代理继续 KEEP。
+ * Catalog / Provider / 同人 Resolver / Review 业务链 / Official Domain 全部冻结。
+ * 任何段评、本章说、热评、评论缓存回归：立即恢复本批两个精确代理定义，不叠加其它修复。
+ */
+/* v4.1.0-alpha10.9.2：Tongren ID Resolver。
+ * alpha10.9.1 已解决共享 Token 被 qfV21Search 覆盖。
+ * 本版修复同人 Provider 对不同作品的 ID 兼容：
+ * - 保留已验证过的直连快路：起点 bookId + chapterId 直接 /novel/chap；
+ * - 直连失败时才调用 /novel/search，以书名+作者精确解析同人服务 novelId；
+ * - novelId 映射后先复用原 chapterId；
+ * - 若章节仍失败，再按 /novel/catalog 的精确章节名解析同人 chapId；
+ * - book/chapter 映射分别缓存到 source KV，后续章节不重复搜索；
+ * - 只接受精确书名（同名时优先精确作者）和唯一精确章节名，不做模糊猜测。
+ * alpha10.9 Provider 代理删除 Canary、Catalog/Review/Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.9.1：Source Variable Isolation。
+ * 修复同人共享 Token 与 qfV21Search 共用“源变量”导致 Token 被搜索 JSON 覆盖。
+ * 源变量现在只用于同人 Token；搜索状态迁移到独立 source KV。
+ * 旧 {"qfV21Search":"..."} 会迁移到 KV，并在确认它只是纯搜索 JSON 后清空源变量。
+ * 同人正文、登录验证、登录页状态都拒绝把旧搜索 JSON 当作 Bearer Token。
+ * alpha10.9 两个 Provider 代理删除 Canary、Catalog/Review/Official Domain 均冻结。
+ */
+/* v4.1.0-alpha10.9：Proxy Removal Canary Batch 1。
+ * 前置证据（alpha10.7~10.8.5）：
+ * - qfPaidV38 / qfProviderContentV38 主 jsLib 真实调用=0；
+ * - 31 个 lazy module 直接引用=0；
+ * - 顶层规则引用=0；
+ * - 多轮真机 Provider/目录/评论运行动态探针命中=0。
+ * 本版首次做极小真删除实验，仅移除这两个 Provider 兼容代理函数定义。
+ * Compatibility Registry 与迁移历史保留为审计元数据；真实正文调用已迁至
+ * QF_ProviderRuntime.route / QF_ProviderExecutor.content。
+ * 其余 9 个 MIGRATED-ZERO-CALL 代理继续 KEEP；Catalog/Review/Official Domain 全部冻结。
+ * 若任何付费正文、切源、连续翻章回归：直接回滚这两个定义，不叠加其它修复。
+ */
+/* v4.1.0-alpha10.8.5：WebId Extractor Fix。
+ * alpha10.8.4 真机已达 887ms，但 parallelCold 的 webUnique=0 暴露出预选提取器未识别转义 Chapter URL。
+ * 本版只修冷启动候选选择的 Web ChapterId 提取：
+ * - 先规范化 \/、\u002F、&#47;、&#x2F; 等斜杠转义；
+ * - 再按当前 bookId 精确提取 /chapter/<bookId>/<chapterI
+ *   qfOfficialReviewApiV402 → QF_ReviewApi.request
+ *   qfOfficialReviewRawV400 → QF_ReviewApi.rich
+ * 其余两个签名构造兼容代理继续 KEEP：
+ *   qfArgusOuterSpecV350 / qfOfficialReviewSpecV400
+ * Review Network Canary Audit 保留；Catalog / Provider / 同人 Resolver /
+ * Review 业务实现 / Official Domain 全部冻结。
+ * 若段评详情、热评、本章说/章评或作者说聚合出现回归，只恢复本批两个精确定义。
+ */
+/* v4.1.0-alpha10.9.5.1：Review Network Canary Audit。
+ * 纯可观测性补丁：不新增/删除代理，不改变任何评论请求、冷却阈值或 fallback 顺序。
+ * 用于验证 alpha10.9.5 删除 qfReviewNetCanTryV510 / qfReviewNetMarkV510 后，
+ * 主链是否真实直接调用 QF_ReviewNetwork.canTry / mark，以及 cooldown 是否仍能触发。
+ * 新增：canTryCalls / markCalls / okMarks / failMarks / blocked / activeCooldown。
+ * 冷却语义保持：fails>=2；12s阶梯；75s上限。
+ */
+/* v4.1.0-alpha10.9.5：Proxy Removal Canary Batch 4。
+ * alpha10.9.4 真机确认 Server Comment Provider 单代理删除后服务器评论路由正常。
+ * 本版第四批只删除两个 Review Network 冷却兼容代理：
+ *   qfReviewNetCanTryV510 → QF_ReviewNetwork.canTry
+ *   qfReviewNetMarkV510   → QF_ReviewNetwork.mark
+ * 前三批累计删除5个代理继续保持删除。
+ * 剩余4个 Official Review 请求/签名兼容代理全部继续 KEEP。
+ * Catalog / Provider / 同人 Resolver / Review 业务逻辑 / Official Domain 全部冻结。
+ * 若评论接口冷却、失败计数、重试节流出现回归，只恢复本批两个精确定义。
+ */
+/* v4.1.0-alpha10.9.4：Proxy Removal Canary Batch 3。
+ * alpha10.9.3 真机已确认：
+ * - 同人 Provider 正文成功；
+ * - Review Cache 实际 hit/miss/set 正常；
+ * - qfServerCommentProviderV315 在真实评论链与服务器评论源逻辑下仍动态 0 命中。
+ * 本版第三批真删除只移除 1 个兼容代理：
+ *   qfServerCommentProviderV315 → qfCommentServerPickV313
+ * 前两批已删除 4 个代理继续保持删除。
+ * B2 六个评论网络/签名代理全部继续 KEEP，不与本批混合。
+ * Catalog / Provider / 同人 Resolver / Review / Official Domain 全部冻结。
+ * 若服务器评论源自动选择、晴天评论、限免源自有服务器评论出现回归，只恢复本批单个定义。
+ */
+/* v4.1.0-alpha10.9.3：Proxy Removal Canary Batch 2。
+ * alpha10.9.2 真机确认：同人正文恢复；Review 请求大量运行后，
+ * qfReviewMetaGetV470 / qfReviewMetaPutV470 仍保持动态 0 命中。
+ * 本版第二批真删除仅移除这两个 Review Cache 兼容代理函数定义：
+ * - qfReviewMetaGetV470 → QF_ReviewCache.get
+ * - qfReviewMetaPutV470 → QF_ReviewCache.put
+ * 第一批已删除 qfPaidV38 / qfProviderContentV38 继续保持删除。
+ * qfServerCommentProviderV315 与 Batch2 六个评论网络/签名代理继续 KEEP。
+ * Catalog / Provider / 同人 Resolver / Review 业务链 / Official Domain 全部冻结。
+ * 任何段评、本章说、热评、评论缓存回归：立即恢复本批两个精确代理定义，不叠加其它修复。
+ */
+/* v4.1.0-alpha10.9.2：Tongren ID Resolver。
+ * alpha10.9.1 已解决共享 Token 被 qfV21Search 覆盖。
+ * 本版修复同人 Provider 对不同作品的 ID 兼容：
+ * - 保留已验证过的直连快路：起点 bookId + chapterId 直接 /novel/chap；
+ * - 直连失败时才调用 /novel/search，以书名+作者精确解析同人服务 novelId；
+ * - novelId 映射后先复用原 chapterId；
+ * - 若章节仍失败，再按 /novel/catalog 的精确章节名解析同人 chapId；
+ * - book/chapter 映射分别缓存到 source KV，后续章节不重复搜索；
+ * - 只接受精确书名（同名时优先精确作者）和唯一精确章节名，不做模糊猜测。
+ * alpha10.9 Provider 代理删除 Canary、Catalog/Review/Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.9.1：Source Variable Isolation。
+ * 修复同人共享 Token 与 qfV21Search 共用“源变量”导致 Token 被搜索 JSON 覆盖。
+ * 源变量现在只用于同人 Token；搜索状态迁移到独立 source KV。
+ * 旧 {"qfV21Search":"..."} 会迁移到 KV，并在确认它只是纯搜索 JSON 后清空源变量。
+ * 同人正文、登录验证、登录页状态都拒绝把旧搜索 JSON 当作 Bearer Token。
+ * alpha10.9 两个 Provider 代理删除 Canary、Catalog/Review/Official Domain 均冻结。
+ */
+/* v4.1.0-alpha10.9：Proxy Removal Canary Batch 1。
+ * 前置证据（alpha10.7~10.8.5）：
+ * - qfPaidV38 / qfProviderContentV38 主 jsLib 真实调用=0；
+ * - 31 个 lazy module 直接引用=0；
+ * - 顶层规则引用=0；
+ * - 多轮真机 Provider/目录/评论运行动态探针命中=0。
+ * 本版首次做极小真删除实验，仅移除这两个 Provider 兼容代理函数定义。
+ * Compatibility Registry 与迁移历史保留为审计元数据；真实正文调用已迁至
+ * QF_ProviderRuntime.route / QF_ProviderExecutor.content。
+ * 其余 9 个 MIGRATED-ZERO-CALL 代理继续 KEEP；Catalog/Review/Official Domain 全部冻结。
+ * 若任何付费正文、切源、连续翻章回归：直接回滚这两个定义，不叠加其它修复。
+ */
+/* v4.1.0-alpha10.8.5：WebId Extractor Fix。
+ * alpha10.8.4 真机已达 887ms，但 parallelCold 的 webUnique=0 暴露出预选提取器未识别转义 Chapter URL。
+ * 本版只修冷启动候选选择的 Web ChapterId 提取：
+ * - 先规范化 \/、\u002F、&#47;、&#x2F; 等斜杠转义；
+ * - 再按当前 bookId 精确提取 /chapter/<bookId>/<chapterId>；
+ * - 去重统计 unique ChapterId；
+ * - 仅用于 simple0/simple1 候选择优，不参与最终正确性判断。
+ * 最终仍由 WEB-EXACT / WEB-SET-EXACT 严格门控。
+ * CPU Fast Path、三路 ajaxAll、11个代理动态探针、Provider/Review/Off
+全部冻结。
+ * 若段评详情、热评、本章说/章评或作者说聚合出现回归，只恢复本批两个精确定义。
+ */
+/* v4.1.0-alpha10.9.5.1：Review Network Canary Audit。
+ * 纯可观测性补丁：不新增/删除代理，不改变任何评论请求、冷却阈值或 fallback 顺序。
+ * 用于验证 alpha10.9.5 删除 qfReviewNetCanTryV510 / qfReviewNetMarkV510 后，
+ * 主链是否真实直接调用 QF_ReviewNetwork.canTry / mark，以及 cooldown 是否仍能触发。
+ * 新增：canTryCalls / markCalls / okMarks / failMarks / blocked / activeCooldown。
+ * 冷却语义保持：fails>=2；12s阶梯；75s上限。
+ */
+/* v4.1.0-alpha10.9.5：Proxy Removal Canary Batch 4。
+ * alpha10.9.4 真机确认 Server Comment Provider 单代理删除后服务器评论路由正常。
+ * 本版第四批只删除两个 Review Network 冷却兼容代理：
+ *   qfReviewNetCanTryV510 → QF_ReviewNetwork.canTry
+ *   qfReviewNetMarkV510   → QF_ReviewNetwork.mark
+ * 前三批累计删除5个代理继续保持删除。
+ * 剩余4个 Official Review 请求/签名兼容代理全部继续 KEEP。
+ * Catalog / Provider / 同人 Resolver / Review 业务逻辑 / Official Domain 全部冻结。
+ * 若评论接口冷却、失败计数、重试节流出现回归，只恢复本批两个精确定义。
+ */
+/* v4.1.0-alpha10.9.4：Proxy Removal Canary Batch 3。
+ * alpha10.9.3 真机已确认：
+ * - 同人 Provider 正文成功；
+ * - Review Cache 实际 hit/miss/set 正常；
+ * - qfServerCommentProviderV315 在真实评论链与服务器评论源逻辑下仍动态 0 命中。
+ * 本版第三批真删除只移除 1 个兼容代理：
+ *   qfServerCommentProviderV315 → qfCommentServerPickV313
+ * 前两批已删除 4 个代理继续保持删除。
+ * B2 六个评论网络/签名代理全部继续 KEEP，不与本批混合。
+ * Catalog / Provider / 同人 Resolver / Review / Official Domain 全部冻结。
+ * 若服务器评论源自动选择、晴天评论、限免源自有服务器评论出现回归，只恢复本批单个定义。
+ */
+/* v4.1.0-alpha10.9.3：Proxy Removal Canary Batch 2。
+ * alpha10.9.2 真机确认：同人正文恢复；Review 请求大量运行后，
+ * qfReviewMetaGetV470 / qfReviewMetaPutV470 仍保持动态 0 命中。
+ * 本版第二批真删除仅移除这两个 Review Cache 兼容代理函数定义：
+ * - qfReviewMetaGetV470 → QF_ReviewCache.get
+ * - qfReviewMetaPutV470 → QF_ReviewCache.put
+ * 第一批已删除 qfPaidV38 / qfProviderContentV38 继续保持删除。
+ * qfServerCommentProviderV315 与 Batch2 六个评论网络/签名代理继续 KEEP。
+ * Catalog / Provider / 同人 Resolver / Review 业务链 / Official Domain 全部冻结。
+ * 任何段评、本章说、热评、评论缓存回归：立即恢复本批两个精确代理定义，不叠加其它修复。
+ */
+/* v4.1.0-alpha10.9.2：Tongren ID Resolver。
+ * alpha10.9.1 已解决共享 Token 被 qfV21Search 覆盖。
+ * 本版修复同人 Provider 对不同作品的 ID 兼容：
+ * - 保留已验证过的直连快路：起点 bookId + chapterId 直接 /novel/chap；
+ * - 直连失败时才调用 /novel/search，以书名+作者精确解析同人服务 novelId；
+ * - novelId 映射后先复用原 chapterId；
+ * - 若章节仍失败，再按 /novel/catalog 的精确章节名解析同人 chapId；
+ * - book/chapter 映射分别缓存到 source KV，后续章节不重复搜索；
+ * - 只接受精确书名（同名时优先精确作者）和唯一精确章节名，不做模糊猜测。
+ * alpha10.9 Provider 代理删除 Canary、Catalog/Review/Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.9.1：Source Variable Isolation。
+ * 修复同人共享 Token 与 qfV21Search 共用“源变量”导致 Token 被搜索 JSON 覆盖。
+ * 源变量现在只用于同人 Token；搜索状态迁移到独立 source KV。
+ * 旧 {"qfV21Search":"..."} 会迁移到 KV，并在确认它只是纯搜索 JSON 后清空源变量。
+ * 同人正文、登录验证、登录页状态都拒绝把旧搜索 JSON 当作 Bearer Token。
+ * alpha10.9 两个 Provider 代理删除 Canary、Catalog/Review/Official Domain 均冻结。
+ */
+/* v4.1.0-alpha10.9：Proxy Removal Canary Batch 1。
+ * 前置证据（alpha10.7~10.8.5）：
+ * - qfPaidV38 / qfProviderContentV38 主 jsLib 真实调用=0；
+ * - 31 个 lazy module 直接引用=0；
+ * - 顶层规则引用=0；
+ * - 多轮真机 Provider/目录/评论运行动态探针命中=0。
+ * 本版首次做极小真删除实验，仅移除这两个 Provider 兼容代理函数定义。
+ * Compatibility Registry 与迁移历史保留为审计元数据；真实正文调用已迁至
+ * QF_ProviderRuntime.route / QF_ProviderExecutor.content。
+ * 其余 9 个 MIGRATED-ZERO-CALL 代理继续 KEEP；Catalog/Review/Official Domain 全部冻结。
+ * 若任何付费正文、切源、连续翻章回归：直接回滚这两个定义，不叠加其它修复。
+ */
+/* v4.1.0-alpha10.8.5：WebId Extractor Fix。
+ * alpha10.8.4 真机已达 887ms，但 parallelCold 的 webUnique=0 暴露出预选提取器未识别转义 Chapter URL。
+ * 本版只修冷启动候选选择的 Web ChapterId 提取：
+ * - 先规范化 \/、\u002F、&#47;、&#x2F; 等斜杠转义；
+ * - 再按当前 bookId 精确提取 /chapter/<bookId>/<chapterId>；
+ * - 去重统计 unique ChapterId；
+ * - 仅用于 simple0/simple1 候选择优，不参与最终正确性判断。
+ * 最终仍由 WEB-EXACT / WEB-SET-EXACT 严格门控。
+ * CPU Fast Path、三路 ajaxAll、11个代理动态探针、Provider/Review/Official Domain 均冻结。
+ */
+/* v4.1.0-alpha10.8.4：Dual Simple Parallel Select。
+ * alpha10.8.3 真机证明 simple-list-fast 有效，但不同书 showrelate=0/1 与 Web 的章节集合不一致。
+ * 本版冷启动使用 java.ajaxAll 同时请求：
+ *   getsimple(showrelate=0) + getsimple(showrelate=1) + Web catalog
+ * 三路并行，不增加串行等待。
+ * 选择策略只影响“时间 d
+10.9.5 删除 qfReviewNetCanTryV510 / qfReviewNetMarkV510 后，
+ * 主链是否真实直接调用 QF_ReviewNetwork.canTry / mark，以及 cooldown 是否仍能触发。
+ * 新增：canTryCalls / markCalls / okMarks / failMarks / blocked / activeCooldown。
+ * 冷却语义保持：fails>=2；12s阶梯；75s上限。
+ */
+/* v4.1.0-alpha10.9.5：Proxy Removal Canary Batch 4。
+ * alpha10.9.4 真机确认 Server Comment Provider 单代理删除后服务器评论路由正常。
+ * 本版第四批只删除两个 Review Network 冷却兼容代理：
+ *   qfReviewNetCanTryV510 → QF_ReviewNetwork.canTry
+ *   qfReviewNetMarkV510   → QF_ReviewNetwork.mark
+ * 前三批累计删除5个代理继续保持删除。
+ * 剩余4个 Official Review 请求/签名兼容代理全部继续 KEEP。
+ * Catalog / Provider / 同人 Resolver / Review 业务逻辑 / Official Domain 全部冻结。
+ * 若评论接口冷却、失败计数、重试节流出现回归，只恢复本批两个精确定义。
+ */
+/* v4.1.0-alpha10.9.4：Proxy Removal Canary Batch 3。
+ * alpha10.9.3 真机已确认：
+ * - 同人 Provider 正文成功；
+ * - Review Cache 实际 hit/miss/set 正常；
+ * - qfServerCommentProviderV315 在真实评论链与服务器评论源逻辑下仍动态 0 命中。
+ * 本版第三批真删除只移除 1 个兼容代理：
+ *   qfServerCommentProviderV315 → qfCommentServerPickV313
+ * 前两批已删除 4 个代理继续保持删除。
+ * B2 六个评论网络/签名代理全部继续 KEEP，不与本批混合。
+ * Catalog / Provider / 同人 Resolver / Review / Official Domain 全部冻结。
+ * 若服务器评论源自动选择、晴天评论、限免源自有服务器评论出现回归，只恢复本批单个定义。
+ */
+/* v4.1.0-alpha10.9.3：Proxy Removal Canary Batch 2。
+ * alpha10.9.2 真机确认：同人正文恢复；Review 请求大量运行后，
+ * qfReviewMetaGetV470 / qfReviewMetaPutV470 仍保持动态 0 命中。
+ * 本版第二批真删除仅移除这两个 Review Cache 兼容代理函数定义：
+ * - qfReviewMetaGetV470 → QF_ReviewCache.get
+ * - qfReviewMetaPutV470 → QF_ReviewCache.put
+ * 第一批已删除 qfPaidV38 / qfProviderContentV38 继续保持删除。
+ * qfServerCommentProviderV315 与 Batch2 六个评论网络/签名代理继续 KEEP。
+ * Catalog / Provider / 同人 Resolver / Review 业务链 / Official Domain 全部冻结。
+ * 任何段评、本章说、热评、评论缓存回归：立即恢复本批两个精确代理定义，不叠加其它修复。
+ */
+/* v4.1.0-alpha10.9.2：Tongren ID Resolver。
+ * alpha10.9.1 已解决共享 Token 被 qfV21Search 覆盖。
+ * 本版修复同人 Provider 对不同作品的 ID 兼容：
+ * - 保留已验证过的直连快路：起点 bookId + chapterId 直接 /novel/chap；
+ * - 直连失败时才调用 /novel/search，以书名+作者精确解析同人服务 novelId；
+ * - novelId 映射后先复用原 chapterId；
+ * - 若章节仍失败，再按 /novel/catalog 的精确章节名解析同人 chapId；
+ * - book/chapter 映射分别缓存到 source KV，后续章节不重复搜索；
+ * - 只接受精确书名（同名时优先精确作者）和唯一精确章节名，不做模糊猜测。
+ * alpha10.9 Provider 代理删除 Canary、Catalog/Review/Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.9.1：Source Variable Isolation。
+ * 修复同人共享 Token 与 qfV21Search 共用“源变量”导致 Token 被搜索 JSON 覆盖。
+ * 源变量现在只用于同人 Token；搜索状态迁移到独立 source KV。
+ * 旧 {"qfV21Search":"..."} 会迁移到 KV，并在确认它只是纯搜索 JSON 后清空源变量。
+ * 同人正文、登录验证、登录页状态都拒绝把旧搜索 JSON 当作 Bearer Token。
+ * alpha10.9 两个 Provider 代理删除 Canary、Catalog/Review/Official Domain 均冻结。
+ */
+/* v4.1.0-alpha10.9：Proxy Removal Canary Batch 1。
+ * 前置证据（alpha10.7~10.8.5）：
+ * - qfPaidV38 / qfProviderContentV38 主 jsLib 真实调用=0；
+ * - 31 个 lazy module 直接引用=0；
+ * - 顶层规则引用=0；
+ * - 多轮真机 Provider/目录/评论运行动态探针命中=0。
+ * 本版首次做极小真删除实验，仅移除这两个 Provider 兼容代理函数定义。
+ * Compatibility Registry 与迁移历史保留为审计元数据；真实正文调用已迁至
+ * QF_ProviderRuntime.route / QF_ProviderExecutor.content。
+ * 其余 9 个 MIGRATED-ZERO-CALL 代理继续 KEEP；Catalog/Review/Official Domain 全部冻结。
+ * 若任何付费正文、切源、连续翻章回归：直接回滚这两个定义，不叠加其它修复。
+ */
+/* v4.1.0-alpha10.8.5：WebId Extractor Fix。
+ * alpha10.8.4 真机已达 887ms，但 parallelCold 的 webUnique=0 暴露出预选提取器未识别转义 Chapter URL。
+ * 本版只修冷启动候选选择的 Web ChapterId 提取：
+ * - 先规范化 \/、\u002F、&#47;、&#x2F; 等斜杠转义；
+ * - 再按当前 bookId 精确提取 /chapter/<bookId>/<chapterId>；
+ * - 去重统计 unique ChapterId；
+ * - 仅用于 simple0/simple1 候选择优，不参与最终正确性判断。
+ * 最终仍由 WEB-EXACT / WEB-SET-EXACT 严格门控。
+ * CPU Fast Path、三路 ajaxAll、11个代理动态探针、Provider/Review/Official Domain 均冻结。
+ */
+/* v4.1.0-alpha10.8.4：Dual Simple Parallel Select。
+ * alpha10.8.3 真机证明 simple-list-fast 有效，但不同书 showrelate=0/1 与 Web 的章节集合不一致。
+ * 本版冷启动使用 java.ajaxAll 同时请求：
+ *   getsimple(showrelate=0) + getsimple(showrelate=1) + Web catalog
+ * 三路并行，不增加串行等待。
+ * 选择策略只影响“时间 donor / Web exact gate 的 expectedIds”：
+ * - 先从已并发取得的 Web HTML 提取唯一 ChapterId 数量；
+ * - simple0/1 若有一个章节数恰好等于 Web 唯一数，优先选择该候选；
+ * - 都相等时优先时间覆盖更高者，再优先 simple1；
+ * - 都不相等则选
+常。
+ * 本版第四批只删除两个 Review Network 冷却兼容代理：
+ *   qfReviewNetCanTryV510 → QF_ReviewNetwork.canTry
+ *   qfReviewNetMarkV510   → QF_ReviewNetwork.mark
+ * 前三批累计删除5个代理继续保持删除。
+ * 剩余4个 Official Review 请求/签名兼容代理全部继续 KEEP。
+ * Catalog / Provider / 同人 Resolver / Review 业务逻辑 / Official Domain 全部冻结。
+ * 若评论接口冷却、失败计数、重试节流出现回归，只恢复本批两个精确定义。
+ */
+/* v4.1.0-alpha10.9.4：Proxy Removal Canary Batch 3。
+ * alpha10.9.3 真机已确认：
+ * - 同人 Provider 正文成功；
+ * - Review Cache 实际 hit/miss/set 正常；
+ * - qfServerCommentProviderV315 在真实评论链与服务器评论源逻辑下仍动态 0 命中。
+ * 本版第三批真删除只移除 1 个兼容代理：
+ *   qfServerCommentProviderV315 → qfCommentServerPickV313
+ * 前两批已删除 4 个代理继续保持删除。
+ * B2 六个评论网络/签名代理全部继续 KEEP，不与本批混合。
+ * Catalog / Provider / 同人 Resolver / Review / Official Domain 全部冻结。
+ * 若服务器评论源自动选择、晴天评论、限免源自有服务器评论出现回归，只恢复本批单个定义。
+ */
+/* v4.1.0-alpha10.9.3：Proxy Removal Canary Batch 2。
+ * alpha10.9.2 真机确认：同人正文恢复；Review 请求大量运行后，
+ * qfReviewMetaGetV470 / qfReviewMetaPutV470 仍保持动态 0 命中。
+ * 本版第二批真删除仅移除这两个 Review Cache 兼容代理函数定义：
+ * - qfReviewMetaGetV470 → QF_ReviewCache.get
+ * - qfReviewMetaPutV470 → QF_ReviewCache.put
+ * 第一批已删除 qfPaidV38 / qfProviderContentV38 继续保持删除。
+ * qfServerCommentProviderV315 与 Batch2 六个评论网络/签名代理继续 KEEP。
+ * Catalog / Provider / 同人 Resolver / Review 业务链 / Official Domain 全部冻结。
+ * 任何段评、本章说、热评、评论缓存回归：立即恢复本批两个精确代理定义，不叠加其它修复。
+ */
+/* v4.1.0-alpha10.9.2：Tongren ID Resolver。
+ * alpha10.9.1 已解决共享 Token 被 qfV21Search 覆盖。
+ * 本版修复同人 Provider 对不同作品的 ID 兼容：
+ * - 保留已验证过的直连快路：起点 bookId + chapterId 直接 /novel/chap；
+ * - 直连失败时才调用 /novel/search，以书名+作者精确解析同人服务 novelId；
+ * - novelId 映射后先复用原 chapterId；
+ * - 若章节仍失败，再按 /novel/catalog 的精确章节名解析同人 chapId；
+ * - book/chapter 映射分别缓存到 source KV，后续章节不重复搜索；
+ * - 只接受精确书名（同名时优先精确作者）和唯一精确章节名，不做模糊猜测。
+ * alpha10.9 Provider 代理删除 Canary、Catalog/Review/Official Domain 全部冻结。
+ */
+/* v4.1.0-alpha10.9.1：Source Variable Isolation。
+ * 修复同人共享 Token 与 qfV21Search 共用“源变量”导致 Token 被搜索 JSON 覆盖。
+ * 源变量现在只用于同人 Token；搜索状态迁移到独立 source KV。
+ * 旧 {"qfV21Search":"..."} 会迁移到 KV，并在确认它只是纯搜索 JSON 后清空源变量。
+ * 同人正文、登录验证、登录页状态都拒绝把旧搜索 JSON 当作 Bearer Token。
+ * alpha10.9 两个 Provider 代理删除 Canary、Catalog/Review/Official Domain 均冻结。
+ */
+/* v4.1.0-alpha10.9：Proxy Removal Canary Batch 1。
+ * 前置证据（alpha10.7~10.8.5）：
+ * - qfPaidV38 / qfProviderContentV38 主 jsLib 真实调用=0；
+ * - 31 个 lazy module 直接引用=0；
+ * - 顶层规则引用=0；
+ * - 多轮真机 Provider/目录/评论运行动态探针命中=0。
+ * 本版首次做极小真删除实验，仅移除这两个 Provider 兼容代理函数定义。
+ * Compatibility Registry 与迁移历史保留为审计元数据；真实正文调用已迁至
+ * QF_ProviderRuntime.route / QF_ProviderExecutor.content。
+ * 其余 9 个 MIGRATED-ZERO-CALL 代理继续 KEEP；Catalog/Review/Official Domain 全部冻结。
+ * 若任何付费正文、切源、连续翻章回归：直接回滚这两个定义，不叠加其它修复。
+ */
+/* v4.1.0-alpha10.8.5：WebId Extractor Fix。
+ * alpha10.8.4 真机已达 887ms，但 parallelCold 的 webUnique=0 暴露出预选提取器未识别转义 Chapter URL。
+ * 本版只修冷启动候选选择的 Web ChapterId 提取：
+ * - 先规范化 \/、\u002F、&#47;、&#x2F; 等斜杠转义；
+ * - 再按当前 bookId 精确提取 /chapter/<bookId>/<chapterId>；
+ * - 去重统计 unique ChapterId；
+ * - 仅用于 simple0/simple1 候选择优，不参与最终正确性判断。
+ * 最终仍由 WEB-EXACT / WEB-SET-EXACT 严格门控。
+ * CPU Fast Path、三路 ajaxAll、11个代理动态探针、Provider/Review/Official Domain 均冻结。
+ */
+/* v4.1.0-alpha10.8.4：Dual Simple Parallel Select。
+ * alpha10.8.3 真机证明 simple-list-fast 有效，但不同书 showrelate=0/1 与 Web 的章节集合不一致。
+ * 本版冷启动使用 java.ajaxAll 同时请求：
+ *   getsimple(showrelate=0) + getsimple(showrelate=1) + Web catalog
+ * 三路并行，不增加串行等待。
+ * 选择策略只影响“时间 donor / Web exact gate 的 expectedIds”：
+ * - 先从已并发取得的 Web HTML 提取唯一 ChapterId 数量；
+ * - simple0/1 若有一个章节数恰好等于 Web 唯一数，优先选择该候选；
+ * - 都相等时优先时间覆盖更高者，再优先 simple1；
+ * - 都不相等则选择章节/时间覆盖更完整者。
+ * 最终仍必须通过原 WEB-EXACT / WEB-SET-EXACT 严格 ID 门控；选错只回退旧链，不放宽正确性。
+ * Large Catalog CPU Fast Path 与 11 个代理动态探针全部保留。
+ */
+/* v4.1.0-alpha10.8.3：Large Catalog CPU Fast Path。
+ * alpha10.8.2 已解决 Web 与 getsimple 同集合异顺序问题；4937章真机瓶颈转为本地CPU。
+ * 本版只优化已被强门控证明安全的大目录数据处理：
+ * 1) getsimple：优先按 APK Retrofit 已确认的 ServerResponse<List<ChapterData>> 直接线性解析
+
+### 限免自动
+0 -> QF_OfficialClient.argusSpec
+ * qfOfficialReviewSpecV400 -> QF_OfficialClient.reviewSpec
+ * qfServerCommentProviderV315 -> qfCommentServerPickV313
+ * 旧 Compatibility Registry / 动态 ABI / 31 个 lazy module 全部保留。 */
+/* v4.1.0-alpha10.4：Safe Proxy Migration Batch 1。
+ * 只迁移已定位的真实业务调用表达式；旧代理函数、Compatibility Registry、Proxy Audit 快照全部保留。
+ * qfPaidV38 -> QF_ProviderRuntime.route
+ * qfProviderContentV38 -> QF_ProviderExecutor.content
+ * qfOfficialReviewApiV402 -> QF_ReviewApi.request
+ * qfOfficialReviewRawV400 -> QF_ReviewApi.rich
+ * qfReviewMetaGetV470 -> QF_ReviewCache.get
+ * 31 个 lazy module、同人 Provider、Catalog/UI/Official Domain 均冻结。 */
+/* v4.1.0-alpha10.3：Compatibility Proxy Migration Audit。
+ * 本版只审计、不删除、不迁移实际业务调用。
+ * 构建期联合主 jsLib、31 个 lazy module、exports manifest 与所有顶层规则字符串识别旧 Vxx 薄代理。
+ * 分类：SAFE-MIGRATE / ABI-PROTECTED / MODULE-PROTECTED / UNKNOWN。
+ * SAFE-MIGRATE 仅代表“可在后续迁移调用点”，本版仍保留函数；任何函数必须引用归零并完成真机回归后才允许删除。
+ * 同人 limited_tr、Catalog、Provider、Review、Official Domain、UI 全部冻结。 */
+/* v4.1.0-alpha10.2.1：同人限免 Provider 独立接入。
+ * 新增第4个限免源“同人”，只移植附件所需的 Bearer Token + /novel/chap 正文能力。
+ * Token 严格读取 source.getVariable()（源变量），不复用情无/神魔/晴天账号字段，不写登录信息 Map。
+ * Provider 独立 lazy module=limited_tr；限免自动默认顺序在现有三源后追加“同人”，未填 Token 时本地快速失败，不发网络请求。
+ * 不移植附件搜索/目录/评论 UI，不改变现有 Review 路由；服务器评论自动模式下，同人正文仍按现有非绑定 Provider 规则走晴天。
+ * alpha10.2 Dependency Audit 重新以31个模块生成。 */
+/* v4.1.0-alpha10.2：Lazy Module Dependency Audit。
+ * 本版只审计，不删除任何业务函数。
+ * 构建期已解压 QF_MOD38_PACK 的全部模块，联合主 jsLib / exports / deps 建立跨模块依赖视图。
+ * 重点标记三类：MODULE-USED（压缩模块直接引用）、MANIFEST-PROTECTED（export/ABI 保护）、UNRESOLVED（看不到直接引用但禁止删除）。
+ * alpha10 回归证明：UNRESOLVED 不能等同于 DEAD；后续删除必须再经过动态 ABI 白名单 + 分批真机回归。 */
+/* v4.1.0-alpha10.1：Dead Code Sweep 回滚恢复版。
+ * alpha10 第一批“最终 JSON 文本零引用”判定对 gzip/base64 lazy module 不安全：
+ * 压缩模块内部的动态调用无法被纯文本引用统计发现，导致仍被 lazy module 调用的 Vxx 兼容函数被误删。
+ * 本版完整恢复 alpha9.3 已验证运行时，仅保留版本标记；正文、版权信息、彩蛋、Provider、Review、Catalog、UI 均恢复到 alpha9.3 状态。
+ * 后续 Dead Code Sweep 必须先解压全部 lazy module 建立完整符号/字符串调用图，再决定删除。 */
+/* v4.1.0-alpha9.3：Catalog / Performance 收尾。
+ * 1) 完整刷新在进入 Legacy Skeleton 网络恢复前，先复用历史 toc75 骨架缓存；命中则零额外目录网络请求获得 VIP/分卷骨架。
+ * 2) 删除 Completeness 对 skeleton+donors 的重复扫描，改用 merge 后 Canonical Model 的单次 stats 作为最终完整度。
+ * 3) CatalogReport 增加 simple / skeleton / merge / adapter 四阶段耗时与预算超标标记，便于定位剩余瓶颈。
+ * 4) CACHE_SCHEMA 保持 5，不因本次纯性能收尾强制淘汰 alpha9.2 已建立的目录缓存。
+ * 5) 字数仍为 Optional Metadata；wordRequests=0。其它业务域冻结。 */
+/* v4.1.0-alpha9.2：Catalog / Performance 第三阶段。
+ * 1) Warm Probe 检测到仅尾部新增少量章节时，满足严格安全条件才执行 delta append：缓存末尾 5 个 ChapterId 与 simple 同位置一致、增量 <=12、最近 5 章 VIP 状态一致、且不跨卷；否则完整刷新。
+ * 2) Delta 只追加 getsimple 已确认的新章节时间，不改旧章节；VIP 继承仅在最近 5 章状态稳定且新章仍处于同卷时允许。
+ * 3) CatalogReport 增加增量原因、追加章数与性能预算；fresh/probe/delta/full 均记录 elapsed。
+ * 4) 字数继续保持 Optional Metadata，wordRequests=0。
+ * UI / Provider / Review / Official Domain / 彩蛋冻结。 */
+/* v4.1.0-alpha9.1：Catalog / Performance 第二阶段。
+ * 1) 真机已证明 getchapterlistbypager 虽请求成功但不提供 cnt，彻底移除目录字数 donor/focus 扫描，字数降级为 Optional Metadata，不再作为目录完整度指标。
+ * 2) 完整刷新改为 simple-first：优先 APP getsimple；成功后直接恢复 Legacy Skeleton 并合并时间，外层不再先重复尝试 WEB category / APP-v3 / HTML-current。
+ * 3) 只有 simple 失败或骨架恢复失败时才启动 WEB/v3/HTML recovery；保留 30 分钟 fresh cache + 6 小时 warm getsimple probe。
+ * 4) CatalogReport 增加请求预算与 Optional Words 语义；正常路径 word donor 请求预算固定为 0。
+ * UI / Provider / Review / Official Domain / 彩蛋冻结。 */
+/* v4.1.0-alpha9：Catalog / Performance 第一阶段。getsimple 继续负责历史时间；getchapterlistbypager 新增为章节字数 donor；目录缓存加入温缓存轻探针，未更新时避免重跑 Web/v3/HTML 全链；补强时间格式归一化与目录完整度诊断。Provider / Review / Official Domain / UI 冻结。 */
+/* v4.1.0-alpha8：UI / Settings Experience。新增稳定 QF_SettingsProfile；极速 / 均衡 / 完整 / 自定义预设只管理高开销阅读体验开关，保留 Provider/账号/服务器评论源/外观高级设置；受管高级项变化自动进入自定义。 */
+/* v4.1.0-alpha7：Official Domain Cleanroom。版权/角色/书友圈/彩蛋统一稳定 Data/Canonical Model/Renderer ABI；旧 V420/V430 仅兼容代理；不改现有数据抓取与 UI
+
+### QF_MOD38_EXPORTS
+NuF4V2l+7cMnDHQRjG0VJSzmX7kwwohaEgl885Ejk/CFgoxir7A4Ia5GxGjqfB9NnRFNwYMzGoA74+5Ae6yeHgPdRvYYDQSa9loHdEc7/beiIb7k7QyB+uYQ3wzhDwB4/5z3/525mxUKP6H7UY60IHiZCv40ggdXmo0LF6rfr+7fuFNfWYF8JnxXgRMAKiqQuV5+QRtSmA1er/pHYt0CngbToJf1UJjoE8Vd+h+OagyxNOxlixRcCryORS+bUJdjEX6mwLRZMlHrUaE9LbhrP+0/m6uvnCeUv7bxtLbxov7z6v69X/Yf3Xcf3yRvgGp3L3rvDdzt5/W1FXrNH3nH9p7HebSlXA3qR9WWwBNYyFMovLjGyR+AeiQbei/XeMt4YselHNKRDb2Iw+vy94S4gfwAZ+/Neu3f6+ynBP61cMw49uqsLZHQ2tLA52x1EIJNa/PQmu1LR1qgrmavYhDs3/iRnBdT5FBI3svQF1dL8+53y/XLz9y1V7BV7FzWaI+8QIm9DeOcRO7F0MGK3xEvsNgbPaoukWBPab4eBO8yvNHx7+DJoq6s8kdLbzy4hjajuHUXbrtzN6u3fiHvr9DLq3vb1flH4KXaq3mh6xRymvcObG9j3n08D04kv+WCJs47EQ/975Hsra9BPB8qphvH9eFiu2F8B2McwzWFG8JNfH8vXo0JeD7o20MWUkXeC2OI+nYu6tslPsv4LT6WFqpLFfL+kaIPJkOwndW5WffGyt6bSogDkbARiMcP2lfMl0FSiTukhIPfD9fQFjJApetDCoH4wyel/dPTGOEjW0nHJRLsCagBLi6RDfud4o/NMxMTE4cKxObBePiAbBqU0cAkl9t+BQxQ6IbRifUgXjbVVBll5TjOILDqLx/TYBL23lwliAFRV7/8Gv28cutb+uNL/HMBDCwIpsVGacX9zuFIAwNYlnRAlnRwWdIhZRv8KOQYpyyUasdAyTFOybFggYnbJe68Atvl/cd+F4GXS1eZ8nt7DOIafHbBJOcoJja+SBJTtONJECUEg4jiO1J6xw6dQqsgpuiNe4a92OaUYFqGlZBN989KEUkW/ViaWM8wjIzy8jkyMj4xeUUkJKgeIhRSA7LdpOL3Ct6PSDwKAOWQOjE0BFv4AWwjN4psasMhNHhCg/yQgoFQT6uzT+vLc5S9S3G/I/kv6GtxIigtAAA="};
+var QF_MOD38_EXPORTS={"review":["qfTextKeepMediaV323","qdDecorateContentV26","qdChapterTalkCardV20"],"review_align":["qdV26FetchQuote","qdV26Norm","qdV26Dice","qdV26Window","qdV26FindAnchor","qdV26BuildAlignMap","qdV54VerifyBody"],"official":["qdMobileFreeExtractV282","qdOfficialFreeV10"],"match":["qfV284BookFields","qfV284NormAuthor","qfV284BookTitleRel","qfV284AuthorRel","qfBookScoreV10","qfPickBookV10","qfV284ChapterBody","qfBestChapterV10"],"limited_qw":["qfLimSetErrV30","qfLimGetErrV30","qfQwNormBaseV44","qfQwBaseV44","qfQwRootsV44","qfQwHeadersV44","qfQwAcquireTokenV44","qfQwContentV44"],"limited_sm":["qfLimSetErrV30","qfLimGetErrV30","qfSmParseJsonV30","qfSmExtractContentV30","qfSmNearKeyV313","qfSmNearGetV313","qfSmNearPutV313","qfSmTocKeyV30","qfSmTocMapV30","qfSmResolveChapterV30","qfSmContentV30"],"limited_qt":["qfLimSetErrV30","qfLimGetErrV30","qfQtParseV330","qfQtCatalogRowsV330","qfQtCatalogPackV330","qfQtWarmDetailV330","qfQtOfficialCatalogV330","qfQtCatalogV330","qfQtCatalogFindV331","qfQtExtractContentV330","qfQtContentV330"],"fallback_my":["myRequestV23","mySearchBooksV23","myLoadTocV23","qfMyPickBookV43","qfMyPickChapterV43","qfMaoyanContentV43"],"fallback_dq":["dqAjaxV44","dqSearchBooksV44","dqLoadTocV44","qfDqPickBookV44","qfDqPickChapterV44","qfDeqiContentV44"],"fallback_69":["s69HeadersV23","s69IsCfV23","s69AjaxV23","s69MaybeVerifyV23","s69SearchBooksV23","s69FindTocUrlV23","s69LoadTocV23","s69ContentByUrlV23","qf69ContentV23"],"egg":["qfEggData","qfEggRender","qfEggAbsV324","qfEggGoodImageV324","qfEggPushImageV325","qfEggHintV325","qfEggLooksV324","qfEggNodeHasHintV325","qfEggCollectV324","qfEggFromRawV324","qfEggWebProbeV325","qfLocalEggContentV324","qfEggArchiveJsonV326","qfEggArchiveApiV326","qfEggArchiveFindParentV326","qfEggArchiveFallbackV326","qfEggArchiveExactV327","qfEggOfficialAppV57","qfEggContentV326","qfEggDataV430","qfEggRenderV430"],"role":["qfRoleData","qfRoleView","qfRoleEsc2940","qfRoleArr2940","qfRoleNormImg2940","qfRoleParse2940","qfRoleFetchOfficial2940","qfRoleBestImg2940","qfRoleTags2940","qfRoleNum2943","qfRolePrettyNum2943","qfRoleNormalize2940","qfRoleBookName2940","qfRoleHtml2940","qfRoleDataV420","qfRoleViewV420","qfOpenRoleCardV20"],"circle":["qfCircleData","qfCircleView","qfCircleCleanResult2964","qfCircleExtractScript2965","qfCircleExtract2965","qfCircleFindRealUrl2965","qfCircleEsc2964","qfCircleBookName2964","qfCircleHtml2964","qfCircleApiJson2970","qfCircleApiKeys2970","qfCircleApiCode2970","qfCircleApiMsg2970","qfCircleFindIds2970","qfCirclePostText2970","qfCirclePostUser2970","qfCirclePostImage2970"
+"provider_common"],"preferred_sq":["provider_common"],"preferred_qq":["provider_common"],"match":["provider_common"],"review":["review_common"],"review_sunny":["review_common"],"preferred_dj":["provider_common","match"],"fallback_sdg":["fallback_common","provider_common","match"],"preferred_kw":["provider_common","match"],"fallback_wx":["fallback_common","provider_common","match"]};
+
+
+/* ============================================================
+ * v3.0.0-alpha85 · Architecture Freeze
+ * Module Lifecycle + Diagnostics
+ *
+ * 这是最后一轮架构层改造：
+ * - 保留 alpha84 的跨线程首次并发等待；
+ * - 为 lazy module 建立 cold/loading/ready/error 生命周期状态；
+ * - 保留一份极小的 module manifest，模块加载后即使释放 PACK/EXPORTS/DEPS，
+ *   仍可用于 Registry 自检和故障诊断；
+ * - Provider / Comment capability 统一经过轻量诊断调用器；
+ * - “开发者诊断”默认关闭，关闭时不记录逐调用事件、不做 source 持久化；
+ * - 诊断只观察，不改变 Provider、评论、网络请求和 fallback 行为。
+ * ============================================================ */
+
+/* v3.1.0-beta4 功能阶段：章节小窗口直达缓存。
+ * 架构仍冻结在 alpha85.1；本轮只优化 Provider 顺序翻章热路径。 */
+var QF_ARCH85="3.0.0-alpha85.1";
+var QF_MOD85_MANIFEST={};
+var QF_MOD85_STATE={};
+var QF_DIAG85_EVENTS=[];
+var QF_DIAG85_MAX=48;
+var QF_DIAG85_LAST_FLUSH=0;
+(function(){
+    try{
+        for(var mk in QF_MOD38_EXPORTS){
+            if(!Object.prototype.hasOwnProperty.call(QF_MOD38_EXPORTS,mk))continue;
+            var ex=QF_MOD38_EXPORTS[mk]||[],dp=QF_MOD38_DEPS[mk]||[];
+            QF_MOD85_MANIFEST[mk]={
+                exports:Array.isArray(ex)?ex.slice():[],
+                deps:Array.isArray(dp)?dp.slice():[],
+                packedLength:String(QF_MOD38_PACK[mk]||"").length
+            };
+        }
+    }catch(_manifest85){}
+})();
+var QF_DIAG85_ENABLE_CACHE={ts:0,value:false};
+function qfDiagEnabledV85(){
+    /* alpha9：Provider 热路径会多次触发诊断 hook；关闭诊断时不应每个 hook 都重新读取登录配置。
+       2 秒短缓存只影响开发者开关生效延迟，不缓存任何业务数据。 */
+    var now=Date.now();
+    try{if(QF_DIAG85_ENABLE_CACHE.ts&&now-Number(QF_DIAG85_ENABLE_CACHE.ts)<2000)return !!QF_DIAG85_ENABLE_CACHE.value;}catch(_c){}
+    var v=false;try{v=qfToggle.call(this,"开发者诊断",false);}catch(e){v=false;}
+    QF_DIAG85_ENABLE_CACHE={ts:now,value:!!v};return !!v;
+}
+function qfDiagShortV85(v,n){
+    var s=String(v==null?"":v).replace(/[\r\n]+/g," ").trim(),m=Number(n||180)||180;
+    return s.length>m?s.substring(0,m)+"…":s;
+}
+function qfModuleStateV85(name){
+    name=String(name||"");
+    var x=QF_MOD85_STATE[name];
+    if(!x){
+        x={name:name,state:QF_MOD38_CACHE[name]?"ready":"cold",loads:0,waits:0,errors:0,lastMs:0,totalMs:0,lastError:"",lastTs:0,owner:""};
+        QF_MOD85_STATE[name]=x;
+    }
+    return x;
+}
+function qfModuleWaitMarkV85(name){
+    try{var x=qfModuleStateV85(name);x.waits=Number(x.waits||0)+1;x.lastTs=Date.now();}catch(_e){}
+}
+function qfModuleLoadStartV85(name,owner){
+    try{
+        var x=qfModuleStateV85(name);x.state="loading";x.owner=String(owner||"");x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfModuleLoadDoneV85(name,ms){
+    try{
+        var x=qfModuleStateV85(name);x.state="ready";x.owner="";x.loads=Number(x.loads||0)+1;x.lastMs=Number(ms||0);x.totalMs=Number(x.totalMs||0)+Number(ms||0);x.lastError="";x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfModuleLoadFailV85(name,ms,err){
+    try{
+        var x=qfModuleStateV85(name);x.state="error";x.owner="";x.errors=Number(x.errors||0)+1;x.lastMs=Number(ms||0);x.totalMs=Number(x.totalMs||0)+Number(ms||0);x.lastError=qfDiagShortV85(err&&err.message?err.message:err,220);x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfDiagEventV85(area,name,cap,ok,ms,detail){
+    return QF_Diagnostic.event(this,area,name,cap,ok,ms,detail,ok===false?"error":"info");
+}
+function qfDiagInvokeV85(ctx,area,name,cap,fn,args){
+    return QF_Diagnostic.invoke(ctx,area,name,cap,fn,args);
+}
+function qfDiagRegistryCheckV85(){
+    var issues=[],pc=0,cc=0;
+    
+rovider_common"],"match":["provider_common"],"review":["review_common"],"review_sunny":["review_common"],"preferred_dj":["provider_common","match"],"fallback_sdg":["fallback_common","provider_common","match"],"preferred_kw":["provider_common","match"],"fallback_wx":["fallback_common","provider_common","match"]};
+
+
+/* ============================================================
+ * v3.0.0-alpha85 · Architecture Freeze
+ * Module Lifecycle + Diagnostics
+ *
+ * 这是最后一轮架构层改造：
+ * - 保留 alpha84 的跨线程首次并发等待；
+ * - 为 lazy module 建立 cold/loading/ready/error 生命周期状态；
+ * - 保留一份极小的 module manifest，模块加载后即使释放 PACK/EXPORTS/DEPS，
+ *   仍可用于 Registry 自检和故障诊断；
+ * - Provider / Comment capability 统一经过轻量诊断调用器；
+ * - “开发者诊断”默认关闭，关闭时不记录逐调用事件、不做 source 持久化；
+ * - 诊断只观察，不改变 Provider、评论、网络请求和 fallback 行为。
+ * ============================================================ */
+
+/* v3.1.0-beta4 功能阶段：章节小窗口直达缓存。
+ * 架构仍冻结在 alpha85.1；本轮只优化 Provider 顺序翻章热路径。 */
+var QF_ARCH85="3.0.0-alpha85.1";
+var QF_MOD85_MANIFEST={};
+var QF_MOD85_STATE={};
+var QF_DIAG85_EVENTS=[];
+var QF_DIAG85_MAX=48;
+var QF_DIAG85_LAST_FLUSH=0;
+(function(){
+    try{
+        for(var mk in QF_MOD38_EXPORTS){
+            if(!Object.prototype.hasOwnProperty.call(QF_MOD38_EXPORTS,mk))continue;
+            var ex=QF_MOD38_EXPORTS[mk]||[],dp=QF_MOD38_DEPS[mk]||[];
+            QF_MOD85_MANIFEST[mk]={
+                exports:Array.isArray(ex)?ex.slice():[],
+                deps:Array.isArray(dp)?dp.slice():[],
+                packedLength:String(QF_MOD38_PACK[mk]||"").length
+            };
+        }
+    }catch(_manifest85){}
+})();
+var QF_DIAG85_ENABLE_CACHE={ts:0,value:false};
+function qfDiagEnabledV85(){
+    /* alpha9：Provider 热路径会多次触发诊断 hook；关闭诊断时不应每个 hook 都重新读取登录配置。
+       2 秒短缓存只影响开发者开关生效延迟，不缓存任何业务数据。 */
+    var now=Date.now();
+    try{if(QF_DIAG85_ENABLE_CACHE.ts&&now-Number(QF_DIAG85_ENABLE_CACHE.ts)<2000)return !!QF_DIAG85_ENABLE_CACHE.value;}catch(_c){}
+    var v=false;try{v=qfToggle.call(this,"开发者诊断",false);}catch(e){v=false;}
+    QF_DIAG85_ENABLE_CACHE={ts:now,value:!!v};return !!v;
+}
+function qfDiagShortV85(v,n){
+    var s=String(v==null?"":v).replace(/[\r\n]+/g," ").trim(),m=Number(n||180)||180;
+    return s.length>m?s.substring(0,m)+"…":s;
+}
+function qfModuleStateV85(name){
+    name=String(name||"");
+    var x=QF_MOD85_STATE[name];
+    if(!x){
+        x={name:name,state:QF_MOD38_CACHE[name]?"ready":"cold",loads:0,waits:0,errors:0,lastMs:0,totalMs:0,lastError:"",lastTs:0,owner:""};
+        QF_MOD85_STATE[name]=x;
+    }
+    return x;
+}
+function qfModuleWaitMarkV85(name){
+    try{var x=qfModuleStateV85(name);x.waits=Number(x.waits||0)+1;x.lastTs=Date.now();}catch(_e){}
+}
+function qfModuleLoadStartV85(name,owner){
+    try{
+        var x=qfModuleStateV85(name);x.state="loading";x.owner=String(owner||"");x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfModuleLoadDoneV85(name,ms){
+    try{
+        var x=qfModuleStateV85(name);x.state="ready";x.owner="";x.loads=Number(x.loads||0)+1;x.lastMs=Number(ms||0);x.totalMs=Number(x.totalMs||0)+Number(ms||0);x.lastError="";x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfModuleLoadFailV85(name,ms,err){
+    try{
+        var x=qfModuleStateV85(name);x.state="error";x.owner="";x.errors=Number(x.errors||0)+1;x.lastMs=Number(ms||0);x.totalMs=Number(x.totalMs||0)+Number(ms||0);x.lastError=qfDiagShortV85(err&&err.message?err.message:err,220);x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfDiagEventV85(area,name,cap,ok,ms,detail){
+    return QF_Diagnostic.event(this,area,name,cap,ok,ms,detail,ok===false?"error":"info");
+}
+function qfDiagInvokeV85(ctx,area,name,cap,fn,args){
+    return QF_Diagnostic.invoke(ctx,area,name,cap,fn,args);
+}
+function qfDiagRegistryCheckV85(){
+    var issues=[],pc=0,cc=0;
+    function check(mod,entry,label){
+        mod=String(mod||"");entry=Strin
+ew":["review_common"],"review_sunny":["review_common"],"preferred_dj":["provider_common","match"],"fallback_sdg":["fallback_common","provider_common","match"],"preferred_kw":["provider_common","match"],"fallback_wx":["fallback_common","provider_common","match"]};
+
+
+/* ============================================================
+ * v3.0.0-alpha85 · Architecture Freeze
+ * Module Lifecycle + Diagnostics
+ *
+ * 这是最后一轮架构层改造：
+ * - 保留 alpha84 的跨线程首次并发等待；
+ * - 为 lazy module 建立 cold/loading/ready/error 生命周期状态；
+ * - 保留一份极小的 module manifest，模块加载后即使释放 PACK/EXPORTS/DEPS，
+ *   仍可用于 Registry 自检和故障诊断；
+ * - Provider / Comment capability 统一经过轻量诊断调用器；
+ * - “开发者诊断”默认关闭，关闭时不记录逐调用事件、不做 source 持久化；
+ * - 诊断只观察，不改变 Provider、评论、网络请求和 fallback 行为。
+ * ============================================================ */
+
+/* v3.1.0-beta4 功能阶段：章节小窗口直达缓存。
+ * 架构仍冻结在 alpha85.1；本轮只优化 Provider 顺序翻章热路径。 */
+var QF_ARCH85="3.0.0-alpha85.1";
+var QF_MOD85_MANIFEST={};
+var QF_MOD85_STATE={};
+var QF_DIAG85_EVENTS=[];
+var QF_DIAG85_MAX=48;
+var QF_DIAG85_LAST_FLUSH=0;
+(function(){
+    try{
+        for(var mk in QF_MOD38_EXPORTS){
+            if(!Object.prototype.hasOwnProperty.call(QF_MOD38_EXPORTS,mk))continue;
+            var ex=QF_MOD38_EXPORTS[mk]||[],dp=QF_MOD38_DEPS[mk]||[];
+            QF_MOD85_MANIFEST[mk]={
+                exports:Array.isArray(ex)?ex.slice():[],
+                deps:Array.isArray(dp)?dp.slice():[],
+                packedLength:String(QF_MOD38_PACK[mk]||"").length
+            };
+        }
+    }catch(_manifest85){}
+})();
+var QF_DIAG85_ENABLE_CACHE={ts:0,value:false};
+function qfDiagEnabledV85(){
+    /* alpha9：Provider 热路径会多次触发诊断 hook；关闭诊断时不应每个 hook 都重新读取登录配置。
+       2 秒短缓存只影响开发者开关生效延迟，不缓存任何业务数据。 */
+    var now=Date.now();
+    try{if(QF_DIAG85_ENABLE_CACHE.ts&&now-Number(QF_DIAG85_ENABLE_CACHE.ts)<2000)return !!QF_DIAG85_ENABLE_CACHE.value;}catch(_c){}
+    var v=false;try{v=qfToggle.call(this,"开发者诊断",false);}catch(e){v=false;}
+    QF_DIAG85_ENABLE_CACHE={ts:now,value:!!v};return !!v;
+}
+function qfDiagShortV85(v,n){
+    var s=String(v==null?"":v).replace(/[\r\n]+/g," ").trim(),m=Number(n||180)||180;
+    return s.length>m?s.substring(0,m)+"…":s;
+}
+function qfModuleStateV85(name){
+    name=String(name||"");
+    var x=QF_MOD85_STATE[name];
+    if(!x){
+        x={name:name,state:QF_MOD38_CACHE[name]?"ready":"cold",loads:0,waits:0,errors:0,lastMs:0,totalMs:0,lastError:"",lastTs:0,owner:""};
+        QF_MOD85_STATE[name]=x;
+    }
+    return x;
+}
+function qfModuleWaitMarkV85(name){
+    try{var x=qfModuleStateV85(name);x.waits=Number(x.waits||0)+1;x.lastTs=Date.now();}catch(_e){}
+}
+function qfModuleLoadStartV85(name,owner){
+    try{
+        var x=qfModuleStateV85(name);x.state="loading";x.owner=String(owner||"");x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfModuleLoadDoneV85(name,ms){
+    try{
+        var x=qfModuleStateV85(name);x.state="ready";x.owner="";x.loads=Number(x.loads||0)+1;x.lastMs=Number(ms||0);x.totalMs=Number(x.totalMs||0)+Number(ms||0);x.lastError="";x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfModuleLoadFailV85(name,ms,err){
+    try{
+        var x=qfModuleStateV85(name);x.state="error";x.owner="";x.errors=Number(x.errors||0)+1;x.lastMs=Number(ms||0);x.totalMs=Number(x.totalMs||0)+Number(ms||0);x.lastError=qfDiagShortV85(err&&err.message?err.message:err,220);x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfDiagEventV85(area,name,cap,ok,ms,detail){
+    return QF_Diagnostic.event(this,area,name,cap,ok,ms,detail,ok===false?"error":"info");
+}
+function qfDiagInvokeV85(ctx,area,name,cap,fn,args){
+    return QF_Diagnostic.invoke(ctx,area,name,cap,fn,args);
+}
+function qfDiagRegistryCheckV85(){
+    var issues=[],pc=0,cc=0;
+    function check(mod,entry,label){
+        mod=String(mod||"");entry=String(entry||"");
+        if(!mod||!entry){issues.push
+me);qfDiagEventV85.call(this,"module",name,"cycle",false,0,ce.message);throw ce;
+    }
+    var end=Date.now()+2500;
+    while(Date.now()<end){
+        if(QF_MOD38_CACHE[name])return QF_MOD38_CACHE[name];
+        var cur=QF_MOD38_LOADING[name];
+        if(!cur)return null;
+        if(String(cur)===me){
+            var ce2=new Error("模块循环依赖："+name);qfDiagEventV85.call(this,"module",name,"cycle",false,0,ce2.message);throw ce2;
+        }
+        qfModuleSleepV84(8);
+    }
+    if(QF_MOD38_CACHE[name])return QF_MOD38_CACHE[name];
+    if(QF_MOD38_LOADING[name]){
+        var te=new Error("模块并发初始化超时："+name);qfDiagEventV85.call(this,"module",name,"wait",false,2500,te.message);throw te;
+    }
+    return null;
+}
+function qfModuleEnsureV38(name){
+    name=String(name||"");
+    qfChapterModuleUseV533(name,"","ensure");
+    if(QF_MOD38_CACHE[name]){try{qfModuleStateV85(name).state="ready";}catch(_cached){}return QF_MOD38_CACHE[name];}
+
+    var owner=QF_MOD38_LOADING[name];
+    if(owner){
+        var waited=qfModuleWaitV84.call(this,name,owner);
+        if(waited)return waited;
+        if(QF_MOD38_CACHE[name])return QF_MOD38_CACHE[name];
+    }
+
+    var packed=String(QF_MOD38_PACK[name]||""),names=QF_MOD38_EXPORTS[name]||[];
+    if(!packed){
+        var ne=new Error("模块不存在："+name);qfModuleLoadFailV85(name,0,ne);qfDiagEventV85.call(this,"module",name,"load",false,0,ne.message);throw ne;
+    }
+
+    var me=qfModuleThreadIdV84(),started=Date.now();
+    QF_MOD38_LOADING[name]=me;qfModuleLoadStartV85(name,me);
+    try{
+        var deps=QF_MOD38_DEPS[name]||[];
+        for(var di=0;di<deps.length;di++)qfModuleEnsureV38.call(this,deps[di]);
+
+        var code=qfModuleUnpackV41(packed);
+        if(!code)throw new Error("模块内容为空："+name);
+        var pairs=[];
+        for(var i=0;i<names.length;i++)pairs.push(JSON.stringify(names[i])+":(typeof "+names[i]+"==='function'?"+names[i]+":null)");
+        var factory=eval("(function(){\n"+code+"\n;return {"+pairs.join(",")+"};\n})");
+        var ex=factory();
+        QF_MOD38_CACHE[name]=ex||{};
+
+        try{
+            for(var fi=0;fi<names.length;fi++){
+                var fnName=String(names[fi]||""),fnObj=ex&&ex[fnName];
+                if(typeof fnObj==="function")QF_MOD38_FN_CACHE[name+"."+fnName]=fnObj;
+            }
+        }catch(_seed){}
+
+        try{QF_MOD38_PACK[name]="";}catch(_release){}
+        try{QF_MOD38_EXPORTS[name]=null;}catch(_releaseExports){}
+        try{QF_MOD38_DEPS[name]=null;}catch(_releaseDeps){}
+
+        if(name==="match"){
+            try{if(ex.qfBookScoreV10)qfBookScoreV10=ex.qfBookScoreV10;}catch(_m0){}
+            try{if(ex.qfPickBookV10)qfPickBookV10=ex.qfPickBookV10;}catch(_m1){}
+            try{if(ex.qfBestChapterV10)qfBestChapterV10=ex.qfBestChapterV10;}catch(_m2){}
+        }
+        var used=Date.now()-started;qfModuleLoadDoneV85(name,used);qfDiagEventV85.call(this,"module",name,"load",true,used,"");
+        return QF_MOD38_CACHE[name];
+    }catch(e){
+        var failMs=Date.now()-started;qfModuleLoadFailV85(name,failMs,e);qfDiagEventV85.call(this,"module",name,"load",false,failMs,e&&e.message?e.message:e);throw e;
+    }finally{
+        /* 只释放自己的 owner，避免并发线程把另一个首载任务的状态清掉。 */
+        try{if(String(QF_MOD38_LOADING[name]||"")===me)delete QF_MOD38_LOADING[name];}catch(_loading){}
+    }
+}
+function qfModuleFnV38(mod,name){
+    mod=String(mod||"");name=String(name||"");
+    qfChapterModuleUseV533(mod,name,"fn");
+    var key=mod+"."+name,hit=QF_MOD38_FN_CACHE[key];
+    if(typeof hit==="function")return hit;
+    var ex=qfModuleEnsureV38.call(this,mod),fn=ex&&ex[name];
+    if(typeof fn!=="function"){
+        var fe=new Error("模块函数缺失："+key);qfDiagEventV85.call(this,"module",mod,name,false,0,fe.message);throw fe;
+    }
+    QF_MOD38_FN_CACHE[key]=fn;
+    return fn;
+}
+
+/* =================
+F_MOD38_PACK[name]||""),names=QF_MOD38_EXPORTS[name]||[];
+    if(!packed){
+        var ne=new Error("模块不存在："+name);qfModuleLoadFailV85(name,0,ne);qfDiagEventV85.call(this,"module",name,"load",false,0,ne.message);throw ne;
+    }
+
+    var me=qfModuleThreadIdV84(),started=Date.now();
+    QF_MOD38_LOADING[name]=me;qfModuleLoadStartV85(name,me);
+    try{
+        var deps=QF_MOD38_DEPS[name]||[];
+        for(var di=0;di<deps.length;di++)qfModuleEnsureV38.call(this,deps[di]);
+
+        var code=qfModuleUnpackV41(packed);
+        if(!code)throw new Error("模块内容为空："+name);
+        var pairs=[];
+        for(var i=0;i<names.length;i++)pairs.push(JSON.stringify(names[i])+":(typeof "+names[i]+"==='function'?"+names[i]+":null)");
+        var factory=eval("(function(){\n"+code+"\n;return {"+pairs.join(",")+"};\n})");
+        var ex=factory();
+        QF_MOD38_CACHE[name]=ex||{};
+
+        try{
+            for(var fi=0;fi<names.length;fi++){
+                var fnName=String(names[fi]||""),fnObj=ex&&ex[fnName];
+                if(typeof fnObj==="function")QF_MOD38_FN_CACHE[name+"."+fnName]=fnObj;
+            }
+        }catch(_seed){}
+
+        try{QF_MOD38_PACK[name]="";}catch(_release){}
+        try{QF_MOD38_EXPORTS[name]=null;}catch(_releaseExports){}
+        try{QF_MOD38_DEPS[name]=null;}catch(_releaseDeps){}
+
+        if(name==="match"){
+            try{if(ex.qfBookScoreV10)qfBookScoreV10=ex.qfBookScoreV10;}catch(_m0){}
+            try{if(ex.qfPickBookV10)qfPickBookV10=ex.qfPickBookV10;}catch(_m1){}
+            try{if(ex.qfBestChapterV10)qfBestChapterV10=ex.qfBestChapterV10;}catch(_m2){}
+        }
+        var used=Date.now()-started;qfModuleLoadDoneV85(name,used);qfDiagEventV85.call(this,"module",name,"load",true,used,"");
+        return QF_MOD38_CACHE[name];
+    }catch(e){
+        var failMs=Date.now()-started;qfModuleLoadFailV85(name,failMs,e);qfDiagEventV85.call(this,"module",name,"load",false,failMs,e&&e.message?e.message:e);throw e;
+    }finally{
+        /* 只释放自己的 owner，避免并发线程把另一个首载任务的状态清掉。 */
+        try{if(String(QF_MOD38_LOADING[name]||"")===me)delete QF_MOD38_LOADING[name];}catch(_loading){}
+    }
+}
+function qfModuleFnV38(mod,name){
+    mod=String(mod||"");name=String(name||"");
+    qfChapterModuleUseV533(mod,name,"fn");
+    var key=mod+"."+name,hit=QF_MOD38_FN_CACHE[key];
+    if(typeof hit==="function")return hit;
+    var ex=qfModuleEnsureV38.call(this,mod),fn=ex&&ex[name];
+    if(typeof fn!=="function"){
+        var fe=new Error("模块函数缺失："+key);qfDiagEventV85.call(this,"module",mod,name,false,0,fe.message);throw fe;
+    }
+    QF_MOD38_FN_CACHE[key]=fn;
+    return fn;
+}
+
+/* ============================================================
+ * v4.0 alpha4 · Official Adapter / Capability Runtime
+ *
+ * 目标：业务入口只表达“我要什么能力”，不再知道能力在哪个模块、入口函数叫什么。
+ * - 新官方功能：只注册 capability，不改正文 Router。
+ * - 模块仍按需懒加载；未命中的功能不会 eval。
+ * - side-effect 能力（书友圈/角色卡）区分 handled 与返回值。
+ * - 当前第一轮只迁移调用边界，不重写任何业务算法，降低回归风险。
+ * ============================================================ */
+var QF_OFFICIAL400={
+    id:"qidian_official",
+    name:"起点官方",
+    capabilities:{
+        toc:{global:true,entry:"qfCatalogLoad",model:"toc"},
+        catalog:{module:"qidian_app",entry:"qfAppCatalogFetchV57"},
+        bookDetail:{module:"qidian_app",entry:"qfAppBookDetailV57"},
+        bookDetailInfo:{module:"qidian_app",entry:"qfAppBookInfoV530"},
+        midpageWidgets:{module:"qidian_app",entry:"qfAppMidpageWidgetsV64"},
+        requestStats:{global:true,entry:"qfOfficialClientSummary"},
+        copyright:{module:"copyright",entry:"qdCopyrightV17"},
+        copyrightData:{module:"copyright",entry:"qfCopyrightData",model:"copyright"},
+        copyrightView:{module:"copyright",entry:"qfCopyrightRender"},
+        roleOpen:{module:"role",entry:"qfOpenRoleCardV20",sideEffect:true},
+        roleData
+
+### QF_MOD38_DEPS
+rV69","qfProviderLearnLoadV320","qfProviderLearnSaveV320","qfProviderLearnMarkV320","qfProviderLearnScoreV320","qfProviderLearnOrderV320","qfProviderLearnBriefV320"],"fallback_common":["qfV23Abs","qfV23HtmlToText","qfV23CleanProviderText","qfV23Doc","qfV23CacheListGet","qfV23CacheListPut"],"provider_common":["qfCacheGetFreshV56","qfCachePutFreshV56","qfChapterHintTryV56","qfChapterHintPutV56","qfNameVariantsV10","qfChapterWindowTryV310","qfChapterWindowPutV310"],"review_common":["qdBubbleDataV20","qdQtAuthorSayCardV332"],"review_server_core":["qfQwCommentApiV315","qfSmCommentApiV315","qfServerNormV315","qfServerDataV319","qfQtAuthorSayV332","qfQtShowAuthorV332","qfServerAuthorSayV315","qfServerSummaryV315","qfServerCommentPackV315","qfServerChapterPackV315","qfShowServerCommentV315"],"preferred_dj":["qfDejianContentV521"],"fallback_sdg":["qfSuduguContentV525"],"preferred_kw":["qfKuwoContentV526"],"fallback_wx":["qfWanxiangContentV527"],"limited_tr":["qfTrSetErrV102","qfTrGetErrV102","qfTrTokenV102","qfTrBaseV102","qfTrRequestV102","qfTrContentV102"]};
+var QF_MOD38_CACHE={};
+var QF_MOD38_FN_CACHE={};
+var QF_MOD38_LOADING={};
+/* alpha80：依赖归属到模块本身。Provider 只负责选择正文源，不再承担内部工具依赖。 */
+var QF_MOD38_DEPS={"fallback_my":["fallback_common","provider_common"],"fallback_dq":["fallback_common","provider_common"],"fallback_69":["fallback_common","provider_common","match"],"preferred_qm":["match","provider_common"],"preferred_sq":["provider_common"],"preferred_qq":["provider_common"],"match":["provider_common"],"review":["review_common"],"review_sunny":["review_common"],"preferred_dj":["provider_common","match"],"fallback_sdg":["fallback_common","provider_common","match"],"preferred_kw":["provider_common","match"],"fallback_wx":["fallback_common","provider_common","match"]};
+
+
+/* ============================================================
+ * v3.0.0-alpha85 · Architecture Freeze
+ * Module Lifecycle + Diagnostics
+ *
+ * 这是最后一轮架构层改造：
+ * - 保留 alpha84 的跨线程首次并发等待；
+ * - 为 lazy module 建立 cold/loading/ready/error 生命周期状态；
+ * - 保留一份极小的 module manifest，模块加载后即使释放 PACK/EXPORTS/DEPS，
+ *   仍可用于 Registry 自检和故障诊断；
+ * - Provider / Comment capability 统一经过轻量诊断调用器；
+ * - “开发者诊断”默认关闭，关闭时不记录逐调用事件、不做 source 持久化；
+ * - 诊断只观察，不改变 Provider、评论、网络请求和 fallback 行为。
+ * ============================================================ */
+
+/* v3.1.0-beta4 功能阶段：章节小窗口直达缓存。
+ * 架构仍冻结在 alpha85.1；本轮只优化 Provider 顺序翻章热路径。 */
+var QF_ARCH85="3.0.0-alpha85.1";
+var QF_MOD85_MANIFEST={};
+var QF_MOD85_STATE={};
+var QF_DIAG85_EVENTS=[];
+var QF_DIAG85_MAX=48;
+var QF_DIAG85_LAST_FLUSH=0;
+(function(){
+    try{
+        for(var mk in QF_MOD38_EXPORTS){
+            if(!Object.prototype.hasOwnProperty.call(QF_MOD38_EXPORTS,mk))continue;
+            var ex=QF_MOD38_EXPORTS[mk]||[],dp=QF_MOD38_DEPS[mk]||[];
+            QF_MOD85_MANIFEST[mk]={
+                exports:Array.isArray(ex)?ex.slice():[],
+                deps:Array.isArray(dp)?dp.slice():[],
+                packedLength:String(QF_MOD38_PACK[mk]||"").length
+            };
+        }
+    }catch(_manifest85){}
+})();
+var QF_DIAG85_ENABLE_CACHE={ts:0,value:false};
+function qfDiagEnabledV85(){
+    /* alpha9：Provider 热路径会多次触发诊断 hook；关闭诊断时不应每个 hook 都重新读取登录配置。
+       2 秒短缓存只影响开发者开关生效延迟，不缓存任何业务数据。 */
+    var now=Date.now();
+    try{if(QF_DIAG85_ENABLE_CACHE.ts&&now-Number(QF_DIAG85_ENABLE_CACHE.ts)<2000)return !!QF_DIAG85_ENABLE_CACHE.value;}catch(_c){}
+    var v=false;try{v=qfToggle.call(this,"开发者诊断",false);}catch(e){v=false;}
+    QF_DIAG85_ENABLE_CACHE={ts:now,value:!!v};return !!v;
+}
+function qfDiagShortV85(v,n){
+    var s=String(v==null?"":v).replace(/[\r\n]+/g," ").trim(),m=Number(n||180)||180;
+    return s.length>m?s.substring(0,m)+"…":s;
+}
+function qfModuleStateV85(name){
+    name=String(name||"");
+    var x=QF_MOD85_STATE[name];
+    if(!x){
+        x={nam
+w_sunny":["review_common"],"preferred_dj":["provider_common","match"],"fallback_sdg":["fallback_common","provider_common","match"],"preferred_kw":["provider_common","match"],"fallback_wx":["fallback_common","provider_common","match"]};
+
+
+/* ============================================================
+ * v3.0.0-alpha85 · Architecture Freeze
+ * Module Lifecycle + Diagnostics
+ *
+ * 这是最后一轮架构层改造：
+ * - 保留 alpha84 的跨线程首次并发等待；
+ * - 为 lazy module 建立 cold/loading/ready/error 生命周期状态；
+ * - 保留一份极小的 module manifest，模块加载后即使释放 PACK/EXPORTS/DEPS，
+ *   仍可用于 Registry 自检和故障诊断；
+ * - Provider / Comment capability 统一经过轻量诊断调用器；
+ * - “开发者诊断”默认关闭，关闭时不记录逐调用事件、不做 source 持久化；
+ * - 诊断只观察，不改变 Provider、评论、网络请求和 fallback 行为。
+ * ============================================================ */
+
+/* v3.1.0-beta4 功能阶段：章节小窗口直达缓存。
+ * 架构仍冻结在 alpha85.1；本轮只优化 Provider 顺序翻章热路径。 */
+var QF_ARCH85="3.0.0-alpha85.1";
+var QF_MOD85_MANIFEST={};
+var QF_MOD85_STATE={};
+var QF_DIAG85_EVENTS=[];
+var QF_DIAG85_MAX=48;
+var QF_DIAG85_LAST_FLUSH=0;
+(function(){
+    try{
+        for(var mk in QF_MOD38_EXPORTS){
+            if(!Object.prototype.hasOwnProperty.call(QF_MOD38_EXPORTS,mk))continue;
+            var ex=QF_MOD38_EXPORTS[mk]||[],dp=QF_MOD38_DEPS[mk]||[];
+            QF_MOD85_MANIFEST[mk]={
+                exports:Array.isArray(ex)?ex.slice():[],
+                deps:Array.isArray(dp)?dp.slice():[],
+                packedLength:String(QF_MOD38_PACK[mk]||"").length
+            };
+        }
+    }catch(_manifest85){}
+})();
+var QF_DIAG85_ENABLE_CACHE={ts:0,value:false};
+function qfDiagEnabledV85(){
+    /* alpha9：Provider 热路径会多次触发诊断 hook；关闭诊断时不应每个 hook 都重新读取登录配置。
+       2 秒短缓存只影响开发者开关生效延迟，不缓存任何业务数据。 */
+    var now=Date.now();
+    try{if(QF_DIAG85_ENABLE_CACHE.ts&&now-Number(QF_DIAG85_ENABLE_CACHE.ts)<2000)return !!QF_DIAG85_ENABLE_CACHE.value;}catch(_c){}
+    var v=false;try{v=qfToggle.call(this,"开发者诊断",false);}catch(e){v=false;}
+    QF_DIAG85_ENABLE_CACHE={ts:now,value:!!v};return !!v;
+}
+function qfDiagShortV85(v,n){
+    var s=String(v==null?"":v).replace(/[\r\n]+/g," ").trim(),m=Number(n||180)||180;
+    return s.length>m?s.substring(0,m)+"…":s;
+}
+function qfModuleStateV85(name){
+    name=String(name||"");
+    var x=QF_MOD85_STATE[name];
+    if(!x){
+        x={name:name,state:QF_MOD38_CACHE[name]?"ready":"cold",loads:0,waits:0,errors:0,lastMs:0,totalMs:0,lastError:"",lastTs:0,owner:""};
+        QF_MOD85_STATE[name]=x;
+    }
+    return x;
+}
+function qfModuleWaitMarkV85(name){
+    try{var x=qfModuleStateV85(name);x.waits=Number(x.waits||0)+1;x.lastTs=Date.now();}catch(_e){}
+}
+function qfModuleLoadStartV85(name,owner){
+    try{
+        var x=qfModuleStateV85(name);x.state="loading";x.owner=String(owner||"");x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfModuleLoadDoneV85(name,ms){
+    try{
+        var x=qfModuleStateV85(name);x.state="ready";x.owner="";x.loads=Number(x.loads||0)+1;x.lastMs=Number(ms||0);x.totalMs=Number(x.totalMs||0)+Number(ms||0);x.lastError="";x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfModuleLoadFailV85(name,ms,err){
+    try{
+        var x=qfModuleStateV85(name);x.state="error";x.owner="";x.errors=Number(x.errors||0)+1;x.lastMs=Number(ms||0);x.totalMs=Number(x.totalMs||0)+Number(ms||0);x.lastError=qfDiagShortV85(err&&err.message?err.message:err,220);x.lastTs=Date.now();
+    }catch(_e){}
+}
+function qfDiagEventV85(area,name,cap,ok,ms,detail){
+    return QF_Diagnostic.event(this,area,name,cap,ok,ms,detail,ok===false?"error":"info");
+}
+function qfDiagInvokeV85(ctx,area,name,cap,fn,args){
+    return QF_Diagnostic.invoke(ctx,area,name,cap,fn,args);
+}
+function qfDiagRegistryCheckV85(){
+    var issues=[],pc=0,cc=0;
+    function check(mod,entry,label){
+        mod=String(mod||"");entry=String(entry||"");
+        if(!mod||!entry){issues.push(label+"：module/entry 为空");r
+赖："+name);qfDiagEventV85.call(this,"module",name,"cycle",false,0,ce2.message);throw ce2;
+        }
+        qfModuleSleepV84(8);
+    }
+    if(QF_MOD38_CACHE[name])return QF_MOD38_CACHE[name];
+    if(QF_MOD38_LOADING[name]){
+        var te=new Error("模块并发初始化超时："+name);qfDiagEventV85.call(this,"module",name,"wait",false,2500,te.message);throw te;
+    }
+    return null;
+}
+function qfModuleEnsureV38(name){
+    name=String(name||"");
+    qfChapterModuleUseV533(name,"","ensure");
+    if(QF_MOD38_CACHE[name]){try{qfModuleStateV85(name).state="ready";}catch(_cached){}return QF_MOD38_CACHE[name];}
+
+    var owner=QF_MOD38_LOADING[name];
+    if(owner){
+        var waited=qfModuleWaitV84.call(this,name,owner);
+        if(waited)return waited;
+        if(QF_MOD38_CACHE[name])return QF_MOD38_CACHE[name];
+    }
+
+    var packed=String(QF_MOD38_PACK[name]||""),names=QF_MOD38_EXPORTS[name]||[];
+    if(!packed){
+        var ne=new Error("模块不存在："+name);qfModuleLoadFailV85(name,0,ne);qfDiagEventV85.call(this,"module",name,"load",false,0,ne.message);throw ne;
+    }
+
+    var me=qfModuleThreadIdV84(),started=Date.now();
+    QF_MOD38_LOADING[name]=me;qfModuleLoadStartV85(name,me);
+    try{
+        var deps=QF_MOD38_DEPS[name]||[];
+        for(var di=0;di<deps.length;di++)qfModuleEnsureV38.call(this,deps[di]);
+
+        var code=qfModuleUnpackV41(packed);
+        if(!code)throw new Error("模块内容为空："+name);
+        var pairs=[];
+        for(var i=0;i<names.length;i++)pairs.push(JSON.stringify(names[i])+":(typeof "+names[i]+"==='function'?"+names[i]+":null)");
+        var factory=eval("(function(){\n"+code+"\n;return {"+pairs.join(",")+"};\n})");
+        var ex=factory();
+        QF_MOD38_CACHE[name]=ex||{};
+
+        try{
+            for(var fi=0;fi<names.length;fi++){
+                var fnName=String(names[fi]||""),fnObj=ex&&ex[fnName];
+                if(typeof fnObj==="function")QF_MOD38_FN_CACHE[name+"."+fnName]=fnObj;
+            }
+        }catch(_seed){}
+
+        try{QF_MOD38_PACK[name]="";}catch(_release){}
+        try{QF_MOD38_EXPORTS[name]=null;}catch(_releaseExports){}
+        try{QF_MOD38_DEPS[name]=null;}catch(_releaseDeps){}
+
+        if(name==="match"){
+            try{if(ex.qfBookScoreV10)qfBookScoreV10=ex.qfBookScoreV10;}catch(_m0){}
+            try{if(ex.qfPickBookV10)qfPickBookV10=ex.qfPickBookV10;}catch(_m1){}
+            try{if(ex.qfBestChapterV10)qfBestChapterV10=ex.qfBestChapterV10;}catch(_m2){}
+        }
+        var used=Date.now()-started;qfModuleLoadDoneV85(name,used);qfDiagEventV85.call(this,"module",name,"load",true,used,"");
+        return QF_MOD38_CACHE[name];
+    }catch(e){
+        var failMs=Date.now()-started;qfModuleLoadFailV85(name,failMs,e);qfDiagEventV85.call(this,"module",name,"load",false,failMs,e&&e.message?e.message:e);throw e;
+    }finally{
+        /* 只释放自己的 owner，避免并发线程把另一个首载任务的状态清掉。 */
+        try{if(String(QF_MOD38_LOADING[name]||"")===me)delete QF_MOD38_LOADING[name];}catch(_loading){}
+    }
+}
+function qfModuleFnV38(mod,name){
+    mod=String(mod||"");name=String(name||"");
+    qfChapterModuleUseV533(mod,name,"fn");
+    var key=mod+"."+name,hit=QF_MOD38_FN_CACHE[key];
+    if(typeof hit==="function")return hit;
+    var ex=qfModuleEnsureV38.call(this,mod),fn=ex&&ex[name];
+    if(typeof fn!=="function"){
+        var fe=new Error("模块函数缺失："+key);qfDiagEventV85.call(this,"module",mod,name,false,0,fe.message);throw fe;
+    }
+    QF_MOD38_FN_CACHE[key]=fn;
+    return fn;
+}
+
+/* ============================================================
+ * v4.0 alpha4 · Official Adapter / Capability Runtime
+ *
+ * 目标：业务入口只表达“我要什么能力”，不再知道能力在哪个模块、入口函数叫什么。
+ * - 新官方功能：只注册 capability，不改正文 Router。
+ * - 模块仍按需懒加载；未命中的功能不会 eval。
+ * - side-effect 能力（书友圈/角色卡）区分 handled 与返回值。
+ * - 当前第一轮只迁移调用边界，不重写任何业务算法，降低回归风险。
+ * ==========================================
+packed){
+        var ne=new Error("模块不存在："+name);qfModuleLoadFailV85(name,0,ne);qfDiagEventV85.call(this,"module",name,"load",false,0,ne.message);throw ne;
+    }
+
+    var me=qfModuleThreadIdV84(),started=Date.now();
+    QF_MOD38_LOADING[name]=me;qfModuleLoadStartV85(name,me);
+    try{
+        var deps=QF_MOD38_DEPS[name]||[];
+        for(var di=0;di<deps.length;di++)qfModuleEnsureV38.call(this,deps[di]);
+
+        var code=qfModuleUnpackV41(packed);
+        if(!code)throw new Error("模块内容为空："+name);
+        var pairs=[];
+        for(var i=0;i<names.length;i++)pairs.push(JSON.stringify(names[i])+":(typeof "+names[i]+"==='function'?"+names[i]+":null)");
+        var factory=eval("(function(){\n"+code+"\n;return {"+pairs.join(",")+"};\n})");
+        var ex=factory();
+        QF_MOD38_CACHE[name]=ex||{};
+
+        try{
+            for(var fi=0;fi<names.length;fi++){
+                var fnName=String(names[fi]||""),fnObj=ex&&ex[fnName];
+                if(typeof fnObj==="function")QF_MOD38_FN_CACHE[name+"."+fnName]=fnObj;
+            }
+        }catch(_seed){}
+
+        try{QF_MOD38_PACK[name]="";}catch(_release){}
+        try{QF_MOD38_EXPORTS[name]=null;}catch(_releaseExports){}
+        try{QF_MOD38_DEPS[name]=null;}catch(_releaseDeps){}
+
+        if(name==="match"){
+            try{if(ex.qfBookScoreV10)qfBookScoreV10=ex.qfBookScoreV10;}catch(_m0){}
+            try{if(ex.qfPickBookV10)qfPickBookV10=ex.qfPickBookV10;}catch(_m1){}
+            try{if(ex.qfBestChapterV10)qfBestChapterV10=ex.qfBestChapterV10;}catch(_m2){}
+        }
+        var used=Date.now()-started;qfModuleLoadDoneV85(name,used);qfDiagEventV85.call(this,"module",name,"load",true,used,"");
+        return QF_MOD38_CACHE[name];
+    }catch(e){
+        var failMs=Date.now()-started;qfModuleLoadFailV85(name,failMs,e);qfDiagEventV85.call(this,"module",name,"load",false,failMs,e&&e.message?e.message:e);throw e;
+    }finally{
+        /* 只释放自己的 owner，避免并发线程把另一个首载任务的状态清掉。 */
+        try{if(String(QF_MOD38_LOADING[name]||"")===me)delete QF_MOD38_LOADING[name];}catch(_loading){}
+    }
+}
+function qfModuleFnV38(mod,name){
+    mod=String(mod||"");name=String(name||"");
+    qfChapterModuleUseV533(mod,name,"fn");
+    var key=mod+"."+name,hit=QF_MOD38_FN_CACHE[key];
+    if(typeof hit==="function")return hit;
+    var ex=qfModuleEnsureV38.call(this,mod),fn=ex&&ex[name];
+    if(typeof fn!=="function"){
+        var fe=new Error("模块函数缺失："+key);qfDiagEventV85.call(this,"module",mod,name,false,0,fe.message);throw fe;
+    }
+    QF_MOD38_FN_CACHE[key]=fn;
+    return fn;
+}
+
+/* ============================================================
+ * v4.0 alpha4 · Official Adapter / Capability Runtime
+ *
+ * 目标：业务入口只表达“我要什么能力”，不再知道能力在哪个模块、入口函数叫什么。
+ * - 新官方功能：只注册 capability，不改正文 Router。
+ * - 模块仍按需懒加载；未命中的功能不会 eval。
+ * - side-effect 能力（书友圈/角色卡）区分 handled 与返回值。
+ * - 当前第一轮只迁移调用边界，不重写任何业务算法，降低回归风险。
+ * ============================================================ */
+var QF_OFFICIAL400={
+    id:"qidian_official",
+    name:"起点官方",
+    capabilities:{
+        toc:{global:true,entry:"qfCatalogLoad",model:"toc"},
+        catalog:{module:"qidian_app",entry:"qfAppCatalogFetchV57"},
+        bookDetail:{module:"qidian_app",entry:"qfAppBookDetailV57"},
+        bookDetailInfo:{module:"qidian_app",entry:"qfAppBookInfoV530"},
+        midpageWidgets:{module:"qidian_app",entry:"qfAppMidpageWidgetsV64"},
+        requestStats:{global:true,entry:"qfOfficialClientSummary"},
+        copyright:{module:"copyright",entry:"qdCopyrightV17"},
+        copyrightData:{module:"copyright",entry:"qfCopyrightData",model:"copyright"},
+        copyrightView:{module:"copyright",entry:"qfCopyrightRender"},
+        roleOpen:{module:"role",entry:"qfOpenRoleCardV20",sideEffect:true},
+        roleData:{module:"role",entry:"qfRoleData",model:"roleSet"},
+        roleV
