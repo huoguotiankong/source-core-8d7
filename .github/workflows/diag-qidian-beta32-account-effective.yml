@@ -1,0 +1,34 @@
+name: diag-qidian-beta32-account-effective
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta32-account-effective.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Dump effective account definitions
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          a=json.loads(p.read_text()); s=a[0] if isinstance(a,list) else a
+          lu=s.get('loginUrl','')
+          out=[]
+          for name in ['qfMultiAccountsV423','qfMultiContentV423']:
+            hits=[m.start() for m in re.finditer(r'function\s+'+re.escape(name)+r'\s*\(',lu)]
+            out.append(f'{name} count={len(hits)} hits={hits}')
+            for idx,pos in enumerate(hits):
+              out.append(f'--- {name} #{idx+1} @{pos} ---\n'+lu[pos:pos+18000])
+          for pat in ['Provider','情无','神魔','晴天','同人','X','🎬X佬密钥']:
+            out.append(f'PAT {pat} count={lu.count(pat)}')
+          Path('.staging/qidian-beta32-account-effective.txt').write_text('\n\n'.join(out)[:120000])
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-beta32-account-effective.txt
+          git commit -m 'chore: dump beta32 effective account UI'
+          git push origin main
