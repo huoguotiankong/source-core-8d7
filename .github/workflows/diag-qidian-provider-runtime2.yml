@@ -1,0 +1,48 @@
+name: diag-qidian-provider-runtime2
+on:
+  push:
+    paths: ['.staging/diag-qidian-provider-runtime2.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Dump focused runtime
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json'); a=json.loads(p.read_text()); s=a[0] if isinstance(a,list) else a
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; x=lib.index(mk)+len(mk); y=lib.index(';\nvar QF_MOD38_EXPORTS=',x); pack=json.loads(lib[x:y])
+          def dec(k): return gzip.decompress(base64.b64decode(pack[k][3:])).decode()
+          out=[]
+          for k in ['provider_runtime','limited_qw','limited_sm','limited_tr']:
+            code=dec(k); out.append('### '+k+' LEN '+str(len(code)))
+            if k=='provider_runtime':
+              pats=['QF_PROVIDER','ProviderRegistry','providerRegistry','限免','情无','晴天','神魔','同人','qfLim','limited_','strategy','优选','兜底','书籍变量','正文启动','qfMultiContentV423']
+            else:
+              pats=['function qf','return {','qfLimSetErr','ContentV','contentV','exports','Provider']
+            spans=[]
+            for pat in pats:
+              for m in re.finditer(re.escape(pat),code,re.I):
+                spans.append((max(0,m.start()-900),min(len(code),m.start()+2200)))
+            spans.sort(); merged=[]
+            for st,en in spans:
+              if not merged or st>merged[-1][1]+200: merged.append([st,en])
+              else: merged[-1][1]=max(merged[-1][1],en)
+            for st,en in merged[:18]: out.append(code[st:en])
+          # top-level settings/context snippets
+          for field in ['loginUi','loginUrl','ruleContent']:
+            txt=json.dumps(s.get(field,''),ensure_ascii=False)
+            for pat in ['限免','情无','晴天','神魔','同人','正文启动','优选','兜底']:
+              i=txt.find(pat)
+              if i>=0: out.append('### FIELD '+field+' '+pat+'\n'+txt[max(0,i-1500):i+3500])
+          Path('.staging/qidian-provider-runtime2.txt').write_text('\n\n'.join(out)[:80000])
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-provider-runtime2.txt
+          git commit -m 'chore: dump qidian provider runtime focus'
+          git push origin main
