@@ -1,0 +1,2016 @@
+
+### qfBookVar @110845
+)&&nonEmpty(x.time))t.time=x.time;if(!nonEmpty(t.words)&&nonEmpty(x.words))t.words=x.words;tm[nt]=t;}
+            }
+        }
+        return {id:dm,title:tm};
+    }
+    function valueFor(b,field,m){
+        if(nonEmpty(b&&b[field]))return b[field];var id=String(b&&b.id||""),x=id&&m.id[id]?m.id[id]:null;if(x&&nonEmpty(x[field]))return x[field];
+        var nt="";try{nt=qfNormChapter(b&&b.name);}catch(_e){nt=String(b&&b.name||"").toLowerCase().replace(/\s+/g,"");}var t=nt&&m.title[nt]?m.title[nt]:null;return t&&nonEmpty(t[field])?t[field]:"";
+    }
+    function coverage(base,donors){
+        var cs=base&&Array.isArray(base.chapters)?base.chapters:[],m=maps(donors),z={chapters:0,time:0,words:0};
+        for(var i=0;i<cs.length;i++){var b=cs[i]||{};if(!b.id||!b.name)continue;z.chapters++;if(nonEmpty(valueFor(b,"time",m)))z.time++;if(nonEmpty(valueFor(b,"words",m)))z.words++;}return z;
+    }
+    function missing(base,donors,field,max){
+        var cs=base&&Array.isArray(base.chapters)?base.chapters:[],m=maps(donors),out={chapters:[],volumes:[],source:"CATALOG-MISSING-"+String(field||"")},lim=Number(max||0);
+        for(var i=0;i<cs.length;i++){var b=cs[i]||{};if(!b.id||!b.name)continue;if(!nonEmpty(valueFor(b,field,m))){out.chapters.push(b);if(lim>0&&out.chapters.length>=lim)break;}}return out;
+    }
+    return {coverage:coverage,missing:missing};
+})();
+
+var QF_CatalogService=(function(){
+    var CACHE_SCHEMA=6,FRESH_MS=30*60*1000,WARM_MS=6*60*60*1000,DELTA_MAX=12;
+    function bookMeta(ctx,baseUrl){
+        var bid="",name="",author="",latest="",kind="";
+        try{bid=String(qfBookVarV09.call(ctx,"qf_bid","")||"");name=String(qfBookVarV09.call(ctx,"qf_name","")||"");author=String(qfBookVarV09.call(ctx,"qf_author","")||"");latest=String(qfBookVarV09.call(ctx,"qf_lastChapter_v70","")||"");kind=String(qfBookVarV09.call(ctx,"qf_kind","")||"");}catch(_e){}
+        if(!bid){var m=String(baseUrl||"").match(/(?:book\/|bookId=)(\d+)/i);if(m)bid=String(m[1]);}
+        return {bookId:bid,bookName:name,author:author,latest:latest,kind:kind};
+    }
+    function perf(report,path,start,target){report.performance={path:String(path||""),elapsed:Math.max(0,Date.now()-Number(start||Date.now())),target:String(target||"")};}
+    function chooseSkeleton(models){
+        var best=null,bestScore=-1;models=Array.isArray(models)?models:[];
+        for(var i=0;i<models.length;i++){
+            var mm=models[i];if(!mm||!Array.isArray(mm.chapters))continue;
+            var s=QF_CatalogNormalizer.stats(mm),score=s.chapters*100000+s.time*10+s.words;
+            if(score>bestScore){best=mm;bestScore=score;}
+        }
+        return best;
+    }
+    function missingTimeModel(base,donor){
+        var out={chapters:[],volumes:[],source:"APP-pager-time-focus"},have={},dc=donor&&Array.isArray(donor.chapters)?donor.chapters:[];
+        for(var i=0;i<dc.length;i++){var d=dc[i]||{};if(d.id&&d.time!==undefined&&d.time!==null&&String(d.time).trim()!=="")have[String(d.id)]=1;}
+        var bc=base&&Array.isArray(base.chapters)?base.chapters:[];
+        for(var j=0;j<bc.length;j++){var b=bc[j]||{};if(b.id&&!have[String(b.id)]&&(b.time===undefined||b.time===null||String(b.time).trim()===""))out.chapters.push(b);}
+        return out;
+    }
+    function chapterRows(rows){
+        var out=[],a=Array.isArray(rows)?rows:[];
+        for(var i=0;i<a.length;i++){var x=a[i]||{};if(x.Vo||x.N==="版权信息"||!x.C)continue;out.push(x);}
+        return out;
+    }
+    function chapterIdFromRow(x){
+        var u=String(x&&x.C||""),m=u.match(/\/chapter\/\d+\/(\d+)/i)||u.match(/[?&#](?:chapterId|cid)=(\d+)/i);return m&&m[1]?String(m[1]):"";
+    }
+    function vipFromRow(x){
+        if(x&&typeof x.V==="boolean")return x.V;
+        var m=String(x&&x.C||"").match(/[?&#]qfVip=([01])/i);return m?m[1]==="1":null;
+    }
+    function lastVolumeName(rows){
+        var a=Array.isArray(rows)?rows:[],v="";
+        for(var i=0;i<a.length;i++){var x=a[i]||{};if(x.Vo&&x.N)v=String(x.N||"").trim();}
+        return v;
+    }
+    function lastChapterIdFromRows(rows){
+        var c=chapterRows(rows);return c.length?chapterIdFromRow(c[c.length-1]):"";
+    }
+    function prefixTailMatches(rows,simpleChapters,count){
+        var cr=chapterRows(rows),sc=Array.isArray(simpleChapters)?simpleChapters:[],n=Math.min(5,Number(count||0));
+        if(!n||cr.length<count||sc.length<count)return false;
+        for(var i=count-n;i<count;i++){if(chapterIdFromRow(cr[i])!==String(sc[i]&&sc[i].id||""))return false;}
+        return true;
+    }
+    function stableTailVip(rows){
+        var cr=chapterRows(rows),n=Math.min(5,cr.length);if(n<3)return {ok:false,vip:false};
+        var first=vipFromRow(cr[cr.length-n]);if(first===null)return {ok:false,vip:false};
+        for(var i=cr.length-n+1;i<cr.length;i++){if(vipFromRow(cr[i])!==first)return {ok:false,vip:false};}
+        return {ok:true,vip:!!first};
+    }
+    function canDelta(cached,simpleModel,cc,pc){
+        var sc=simpleModel&&Array.isArray(simpleModel.chapters)?simpleModel.chapters:[],delta=pc-cc;
+        if(delta<=0||delta>DELTA_MAX)return {ok:false,reason:"delta-size",delta:delta};
+        if(!prefixTailMatches(cached.rows,sc,cc))return {ok:false,reason:"
+
+### qfBookVar @110897
+ds)&&nonEmpty(x.words))t.words=x.words;tm[nt]=t;}
+            }
+        }
+        return {id:dm,title:tm};
+    }
+    function valueFor(b,field,m){
+        if(nonEmpty(b&&b[field]))return b[field];var id=String(b&&b.id||""),x=id&&m.id[id]?m.id[id]:null;if(x&&nonEmpty(x[field]))return x[field];
+        var nt="";try{nt=qfNormChapter(b&&b.name);}catch(_e){nt=String(b&&b.name||"").toLowerCase().replace(/\s+/g,"");}var t=nt&&m.title[nt]?m.title[nt]:null;return t&&nonEmpty(t[field])?t[field]:"";
+    }
+    function coverage(base,donors){
+        var cs=base&&Array.isArray(base.chapters)?base.chapters:[],m=maps(donors),z={chapters:0,time:0,words:0};
+        for(var i=0;i<cs.length;i++){var b=cs[i]||{};if(!b.id||!b.name)continue;z.chapters++;if(nonEmpty(valueFor(b,"time",m)))z.time++;if(nonEmpty(valueFor(b,"words",m)))z.words++;}return z;
+    }
+    function missing(base,donors,field,max){
+        var cs=base&&Array.isArray(base.chapters)?base.chapters:[],m=maps(donors),out={chapters:[],volumes:[],source:"CATALOG-MISSING-"+String(field||"")},lim=Number(max||0);
+        for(var i=0;i<cs.length;i++){var b=cs[i]||{};if(!b.id||!b.name)continue;if(!nonEmpty(valueFor(b,field,m))){out.chapters.push(b);if(lim>0&&out.chapters.length>=lim)break;}}return out;
+    }
+    return {coverage:coverage,missing:missing};
+})();
+
+var QF_CatalogService=(function(){
+    var CACHE_SCHEMA=6,FRESH_MS=30*60*1000,WARM_MS=6*60*60*1000,DELTA_MAX=12;
+    function bookMeta(ctx,baseUrl){
+        var bid="",name="",author="",latest="",kind="";
+        try{bid=String(qfBookVarV09.call(ctx,"qf_bid","")||"");name=String(qfBookVarV09.call(ctx,"qf_name","")||"");author=String(qfBookVarV09.call(ctx,"qf_author","")||"");latest=String(qfBookVarV09.call(ctx,"qf_lastChapter_v70","")||"");kind=String(qfBookVarV09.call(ctx,"qf_kind","")||"");}catch(_e){}
+        if(!bid){var m=String(baseUrl||"").match(/(?:book\/|bookId=)(\d+)/i);if(m)bid=String(m[1]);}
+        return {bookId:bid,bookName:name,author:author,latest:latest,kind:kind};
+    }
+    function perf(report,path,start,target){report.performance={path:String(path||""),elapsed:Math.max(0,Date.now()-Number(start||Date.now())),target:String(target||"")};}
+    function chooseSkeleton(models){
+        var best=null,bestScore=-1;models=Array.isArray(models)?models:[];
+        for(var i=0;i<models.length;i++){
+            var mm=models[i];if(!mm||!Array.isArray(mm.chapters))continue;
+            var s=QF_CatalogNormalizer.stats(mm),score=s.chapters*100000+s.time*10+s.words;
+            if(score>bestScore){best=mm;bestScore=score;}
+        }
+        return best;
+    }
+    function missingTimeModel(base,donor){
+        var out={chapters:[],volumes:[],source:"APP-pager-time-focus"},have={},dc=donor&&Array.isArray(donor.chapters)?donor.chapters:[];
+        for(var i=0;i<dc.length;i++){var d=dc[i]||{};if(d.id&&d.time!==undefined&&d.time!==null&&String(d.time).trim()!=="")have[String(d.id)]=1;}
+        var bc=base&&Array.isArray(base.chapters)?base.chapters:[];
+        for(var j=0;j<bc.length;j++){var b=bc[j]||{};if(b.id&&!have[String(b.id)]&&(b.time===undefined||b.time===null||String(b.time).trim()===""))out.chapters.push(b);}
+        return out;
+    }
+    function chapterRows(rows){
+        var out=[],a=Array.isArray(rows)?rows:[];
+        for(var i=0;i<a.length;i++){var x=a[i]||{};if(x.Vo||x.N==="版权信息"||!x.C)continue;out.push(x);}
+        return out;
+    }
+    function chapterIdFromRow(x){
+        var u=String(x&&x.C||""),m=u.match(/\/chapter\/\d+\/(\d+)/i)||u.match(/[?&#](?:chapterId|cid)=(\d+)/i);return m&&m[1]?String(m[1]):"";
+    }
+    function vipFromRow(x){
+        if(x&&typeof x.V==="boolean")return x.V;
+        var m=String(x&&x.C||"").match(/[?&#]qfVip=([01])/i);return m?m[1]==="1":null;
+    }
+    function lastVolumeName(rows){
+        var a=Array.isArray(rows)?rows:[],v="";
+        for(var i=0;i<a.length;i++){var x=a[i]||{};if(x.Vo&&x.N)v=String(x.N||"").trim();}
+        return v;
+    }
+    function lastChapterIdFromRows(rows){
+        var c=chapterRows(rows);return c.length?chapterIdFromRow(c[c.length-1]):"";
+    }
+    function prefixTailMatches(rows,simpleChapters,count){
+        var cr=chapterRows(rows),sc=Array.isArray(simpleChapters)?simpleChapters:[],n=Math.min(5,Number(count||0));
+        if(!n||cr.length<count||sc.length<count)return false;
+        for(var i=count-n;i<count;i++){if(chapterIdFromRow(cr[i])!==String(sc[i]&&sc[i].id||""))return false;}
+        return true;
+    }
+    function stableTailVip(rows){
+        var cr=chapterRows(rows),n=Math.min(5,cr.length);if(n<3)return {ok:false,vip:false};
+        var first=vipFromRow(cr[cr.length-n]);if(first===null)return {ok:false,vip:false};
+        for(var i=cr.length-n+1;i<cr.length;i++){if(vipFromRow(cr[i])!==first)return {ok:false,vip:false};}
+        return {ok:true,vip:!!first};
+    }
+    function canDelta(cached,simpleModel,cc,pc){
+        var sc=simpleModel&&Array.isArray(simpleModel.chapters)?simpleModel.chapters:[],delta=pc-cc;
+        if(delta<=0||delta>DELTA_MAX)return {ok:false,reason:"delta-size",delta:delta};
+        if(!prefixTailMatches(cached.rows,sc,cc))return {ok:false,reason:"prefix-mismatch",delta:delta};
+        var sv=stable
+
+### qfBookVar @110952
+       }
+        }
+        return {id:dm,title:tm};
+    }
+    function valueFor(b,field,m){
+        if(nonEmpty(b&&b[field]))return b[field];var id=String(b&&b.id||""),x=id&&m.id[id]?m.id[id]:null;if(x&&nonEmpty(x[field]))return x[field];
+        var nt="";try{nt=qfNormChapter(b&&b.name);}catch(_e){nt=String(b&&b.name||"").toLowerCase().replace(/\s+/g,"");}var t=nt&&m.title[nt]?m.title[nt]:null;return t&&nonEmpty(t[field])?t[field]:"";
+    }
+    function coverage(base,donors){
+        var cs=base&&Array.isArray(base.chapters)?base.chapters:[],m=maps(donors),z={chapters:0,time:0,words:0};
+        for(var i=0;i<cs.length;i++){var b=cs[i]||{};if(!b.id||!b.name)continue;z.chapters++;if(nonEmpty(valueFor(b,"time",m)))z.time++;if(nonEmpty(valueFor(b,"words",m)))z.words++;}return z;
+    }
+    function missing(base,donors,field,max){
+        var cs=base&&Array.isArray(base.chapters)?base.chapters:[],m=maps(donors),out={chapters:[],volumes:[],source:"CATALOG-MISSING-"+String(field||"")},lim=Number(max||0);
+        for(var i=0;i<cs.length;i++){var b=cs[i]||{};if(!b.id||!b.name)continue;if(!nonEmpty(valueFor(b,field,m))){out.chapters.push(b);if(lim>0&&out.chapters.length>=lim)break;}}return out;
+    }
+    return {coverage:coverage,missing:missing};
+})();
+
+var QF_CatalogService=(function(){
+    var CACHE_SCHEMA=6,FRESH_MS=30*60*1000,WARM_MS=6*60*60*1000,DELTA_MAX=12;
+    function bookMeta(ctx,baseUrl){
+        var bid="",name="",author="",latest="",kind="";
+        try{bid=String(qfBookVarV09.call(ctx,"qf_bid","")||"");name=String(qfBookVarV09.call(ctx,"qf_name","")||"");author=String(qfBookVarV09.call(ctx,"qf_author","")||"");latest=String(qfBookVarV09.call(ctx,"qf_lastChapter_v70","")||"");kind=String(qfBookVarV09.call(ctx,"qf_kind","")||"");}catch(_e){}
+        if(!bid){var m=String(baseUrl||"").match(/(?:book\/|bookId=)(\d+)/i);if(m)bid=String(m[1]);}
+        return {bookId:bid,bookName:name,author:author,latest:latest,kind:kind};
+    }
+    function perf(report,path,start,target){report.performance={path:String(path||""),elapsed:Math.max(0,Date.now()-Number(start||Date.now())),target:String(target||"")};}
+    function chooseSkeleton(models){
+        var best=null,bestScore=-1;models=Array.isArray(models)?models:[];
+        for(var i=0;i<models.length;i++){
+            var mm=models[i];if(!mm||!Array.isArray(mm.chapters))continue;
+            var s=QF_CatalogNormalizer.stats(mm),score=s.chapters*100000+s.time*10+s.words;
+            if(score>bestScore){best=mm;bestScore=score;}
+        }
+        return best;
+    }
+    function missingTimeModel(base,donor){
+        var out={chapters:[],volumes:[],source:"APP-pager-time-focus"},have={},dc=donor&&Array.isArray(donor.chapters)?donor.chapters:[];
+        for(var i=0;i<dc.length;i++){var d=dc[i]||{};if(d.id&&d.time!==undefined&&d.time!==null&&String(d.time).trim()!=="")have[String(d.id)]=1;}
+        var bc=base&&Array.isArray(base.chapters)?base.chapters:[];
+        for(var j=0;j<bc.length;j++){var b=bc[j]||{};if(b.id&&!have[String(b.id)]&&(b.time===undefined||b.time===null||String(b.time).trim()===""))out.chapters.push(b);}
+        return out;
+    }
+    function chapterRows(rows){
+        var out=[],a=Array.isArray(rows)?rows:[];
+        for(var i=0;i<a.length;i++){var x=a[i]||{};if(x.Vo||x.N==="版权信息"||!x.C)continue;out.push(x);}
+        return out;
+    }
+    function chapterIdFromRow(x){
+        var u=String(x&&x.C||""),m=u.match(/\/chapter\/\d+\/(\d+)/i)||u.match(/[?&#](?:chapterId|cid)=(\d+)/i);return m&&m[1]?String(m[1]):"";
+    }
+    function vipFromRow(x){
+        if(x&&typeof x.V==="boolean")return x.V;
+        var m=String(x&&x.C||"").match(/[?&#]qfVip=([01])/i);return m?m[1]==="1":null;
+    }
+    function lastVolumeName(rows){
+        var a=Array.isArray(rows)?rows:[],v="";
+        for(var i=0;i<a.length;i++){var x=a[i]||{};if(x.Vo&&x.N)v=String(x.N||"").trim();}
+        return v;
+    }
+    function lastChapterIdFromRows(rows){
+        var c=chapterRows(rows);return c.length?chapterIdFromRow(c[c.length-1]):"";
+    }
+    function prefixTailMatches(rows,simpleChapters,count){
+        var cr=chapterRows(rows),sc=Array.isArray(simpleChapters)?simpleChapters:[],n=Math.min(5,Number(count||0));
+        if(!n||cr.length<count||sc.length<count)return false;
+        for(var i=count-n;i<count;i++){if(chapterIdFromRow(cr[i])!==String(sc[i]&&sc[i].id||""))return false;}
+        return true;
+    }
+    function stableTailVip(rows){
+        var cr=chapterRows(rows),n=Math.min(5,cr.length);if(n<3)return {ok:false,vip:false};
+        var first=vipFromRow(cr[cr.length-n]);if(first===null)return {ok:false,vip:false};
+        for(var i=cr.length-n+1;i<cr.length;i++){if(vipFromRow(cr[i])!==first)return {ok:false,vip:false};}
+        return {ok:true,vip:!!first};
+    }
+    function canDelta(cached,simpleModel,cc,pc){
+        var sc=simpleModel&&Array.isArray(simpleModel.chapters)?simpleModel.chapters:[],delta=pc-cc;
+        if(delta<=0||delta>DELTA_MAX)return {ok:false,reason:"delta-size",delta:delta};
+        if(!prefixTailMatches(cached.rows,sc,cc))return {ok:false,reason:"prefix-mismatch",delta:delta};
+        var sv=stableTailVip(cached.rows);if(!sv.ok)return {ok:false,reason:
+
+### qfBookVar @111009
+
+    function valueFor(b,field,m){
+        if(nonEmpty(b&&b[field]))return b[field];var id=String(b&&b.id||""),x=id&&m.id[id]?m.id[id]:null;if(x&&nonEmpty(x[field]))return x[field];
+        var nt="";try{nt=qfNormChapter(b&&b.name);}catch(_e){nt=String(b&&b.name||"").toLowerCase().replace(/\s+/g,"");}var t=nt&&m.title[nt]?m.title[nt]:null;return t&&nonEmpty(t[field])?t[field]:"";
+    }
+    function coverage(base,donors){
+        var cs=base&&Array.isArray(base.chapters)?base.chapters:[],m=maps(donors),z={chapters:0,time:0,words:0};
+        for(var i=0;i<cs.length;i++){var b=cs[i]||{};if(!b.id||!b.name)continue;z.chapters++;if(nonEmpty(valueFor(b,"time",m)))z.time++;if(nonEmpty(valueFor(b,"words",m)))z.words++;}return z;
+    }
+    function missing(base,donors,field,max){
+        var cs=base&&Array.isArray(base.chapters)?base.chapters:[],m=maps(donors),out={chapters:[],volumes:[],source:"CATALOG-MISSING-"+String(field||"")},lim=Number(max||0);
+        for(var i=0;i<cs.length;i++){var b=cs[i]||{};if(!b.id||!b.name)continue;if(!nonEmpty(valueFor(b,field,m))){out.chapters.push(b);if(lim>0&&out.chapters.length>=lim)break;}}return out;
+    }
+    return {coverage:coverage,missing:missing};
+})();
+
+var QF_CatalogService=(function(){
+    var CACHE_SCHEMA=6,FRESH_MS=30*60*1000,WARM_MS=6*60*60*1000,DELTA_MAX=12;
+    function bookMeta(ctx,baseUrl){
+        var bid="",name="",author="",latest="",kind="";
+        try{bid=String(qfBookVarV09.call(ctx,"qf_bid","")||"");name=String(qfBookVarV09.call(ctx,"qf_name","")||"");author=String(qfBookVarV09.call(ctx,"qf_author","")||"");latest=String(qfBookVarV09.call(ctx,"qf_lastChapter_v70","")||"");kind=String(qfBookVarV09.call(ctx,"qf_kind","")||"");}catch(_e){}
+        if(!bid){var m=String(baseUrl||"").match(/(?:book\/|bookId=)(\d+)/i);if(m)bid=String(m[1]);}
+        return {bookId:bid,bookName:name,author:author,latest:latest,kind:kind};
+    }
+    function perf(report,path,start,target){report.performance={path:String(path||""),elapsed:Math.max(0,Date.now()-Number(start||Date.now())),target:String(target||"")};}
+    function chooseSkeleton(models){
+        var best=null,bestScore=-1;models=Array.isArray(models)?models:[];
+        for(var i=0;i<models.length;i++){
+            var mm=models[i];if(!mm||!Array.isArray(mm.chapters))continue;
+            var s=QF_CatalogNormalizer.stats(mm),score=s.chapters*100000+s.time*10+s.words;
+            if(score>bestScore){best=mm;bestScore=score;}
+        }
+        return best;
+    }
+    function missingTimeModel(base,donor){
+        var out={chapters:[],volumes:[],source:"APP-pager-time-focus"},have={},dc=donor&&Array.isArray(donor.chapters)?donor.chapters:[];
+        for(var i=0;i<dc.length;i++){var d=dc[i]||{};if(d.id&&d.time!==undefined&&d.time!==null&&String(d.time).trim()!=="")have[String(d.id)]=1;}
+        var bc=base&&Array.isArray(base.chapters)?base.chapters:[];
+        for(var j=0;j<bc.length;j++){var b=bc[j]||{};if(b.id&&!have[String(b.id)]&&(b.time===undefined||b.time===null||String(b.time).trim()===""))out.chapters.push(b);}
+        return out;
+    }
+    function chapterRows(rows){
+        var out=[],a=Array.isArray(rows)?rows:[];
+        for(var i=0;i<a.length;i++){var x=a[i]||{};if(x.Vo||x.N==="版权信息"||!x.C)continue;out.push(x);}
+        return out;
+    }
+    function chapterIdFromRow(x){
+        var u=String(x&&x.C||""),m=u.match(/\/chapter\/\d+\/(\d+)/i)||u.match(/[?&#](?:chapterId|cid)=(\d+)/i);return m&&m[1]?String(m[1]):"";
+    }
+    function vipFromRow(x){
+        if(x&&typeof x.V==="boolean")return x.V;
+        var m=String(x&&x.C||"").match(/[?&#]qfVip=([01])/i);return m?m[1]==="1":null;
+    }
+    function lastVolumeName(rows){
+        var a=Array.isArray(rows)?rows:[],v="";
+        for(var i=0;i<a.length;i++){var x=a[i]||{};if(x.Vo&&x.N)v=String(x.N||"").trim();}
+        return v;
+    }
+    function lastChapterIdFromRows(rows){
+        var c=chapterRows(rows);return c.length?chapterIdFromRow(c[c.length-1]):"";
+    }
+    function prefixTailMatches(rows,simpleChapters,count){
+        var cr=chapterRows(rows),sc=Array.isArray(simpleChapters)?simpleChapters:[],n=Math.min(5,Number(count||0));
+        if(!n||cr.length<count||sc.length<count)return false;
+        for(var i=count-n;i<count;i++){if(chapterIdFromRow(cr[i])!==String(sc[i]&&sc[i].id||""))return false;}
+        return true;
+    }
+    function stableTailVip(rows){
+        var cr=chapterRows(rows),n=Math.min(5,cr.length);if(n<3)return {ok:false,vip:false};
+        var first=vipFromRow(cr[cr.length-n]);if(first===null)return {ok:false,vip:false};
+        for(var i=cr.length-n+1;i<cr.length;i++){if(vipFromRow(cr[i])!==first)return {ok:false,vip:false};}
+        return {ok:true,vip:!!first};
+    }
+    function canDelta(cached,simpleModel,cc,pc){
+        var sc=simpleModel&&Array.isArray(simpleModel.chapters)?simpleModel.chapters:[],delta=pc-cc;
+        if(delta<=0||delta>DELTA_MAX)return {ok:false,reason:"delta-size",delta:delta};
+        if(!prefixTailMatches(cached.rows,sc,cc))return {ok:false,reason:"prefix-mismatch",delta:delta};
+        var sv=stableTailVip(cached.rows);if(!sv.ok)return {ok:false,reason:"vip-unstable",delta:delta};
+        var lv=lastVolumeNam
+
+### qfBookVar @111073
+d]))return b[field];var id=String(b&&b.id||""),x=id&&m.id[id]?m.id[id]:null;if(x&&nonEmpty(x[field]))return x[field];
+        var nt="";try{nt=qfNormChapter(b&&b.name);}catch(_e){nt=String(b&&b.name||"").toLowerCase().replace(/\s+/g,"");}var t=nt&&m.title[nt]?m.title[nt]:null;return t&&nonEmpty(t[field])?t[field]:"";
+    }
+    function coverage(base,donors){
+        var cs=base&&Array.isArray(base.chapters)?base.chapters:[],m=maps(donors),z={chapters:0,time:0,words:0};
+        for(var i=0;i<cs.length;i++){var b=cs[i]||{};if(!b.id||!b.name)continue;z.chapters++;if(nonEmpty(valueFor(b,"time",m)))z.time++;if(nonEmpty(valueFor(b,"words",m)))z.words++;}return z;
+    }
+    function missing(base,donors,field,max){
+        var cs=base&&Array.isArray(base.chapters)?base.chapters:[],m=maps(donors),out={chapters:[],volumes:[],source:"CATALOG-MISSING-"+String(field||"")},lim=Number(max||0);
+        for(var i=0;i<cs.length;i++){var b=cs[i]||{};if(!b.id||!b.name)continue;if(!nonEmpty(valueFor(b,field,m))){out.chapters.push(b);if(lim>0&&out.chapters.length>=lim)break;}}return out;
+    }
+    return {coverage:coverage,missing:missing};
+})();
+
+var QF_CatalogService=(function(){
+    var CACHE_SCHEMA=6,FRESH_MS=30*60*1000,WARM_MS=6*60*60*1000,DELTA_MAX=12;
+    function bookMeta(ctx,baseUrl){
+        var bid="",name="",author="",latest="",kind="";
+        try{bid=String(qfBookVarV09.call(ctx,"qf_bid","")||"");name=String(qfBookVarV09.call(ctx,"qf_name","")||"");author=String(qfBookVarV09.call(ctx,"qf_author","")||"");latest=String(qfBookVarV09.call(ctx,"qf_lastChapter_v70","")||"");kind=String(qfBookVarV09.call(ctx,"qf_kind","")||"");}catch(_e){}
+        if(!bid){var m=String(baseUrl||"").match(/(?:book\/|bookId=)(\d+)/i);if(m)bid=String(m[1]);}
+        return {bookId:bid,bookName:name,author:author,latest:latest,kind:kind};
+    }
+    function perf(report,path,start,target){report.performance={path:String(path||""),elapsed:Math.max(0,Date.now()-Number(start||Date.now())),target:String(target||"")};}
+    function chooseSkeleton(models){
+        var best=null,bestScore=-1;models=Array.isArray(models)?models:[];
+        for(var i=0;i<models.length;i++){
+            var mm=models[i];if(!mm||!Array.isArray(mm.chapters))continue;
+            var s=QF_CatalogNormalizer.stats(mm),score=s.chapters*100000+s.time*10+s.words;
+            if(score>bestScore){best=mm;bestScore=score;}
+        }
+        return best;
+    }
+    function missingTimeModel(base,donor){
+        var out={chapters:[],volumes:[],source:"APP-pager-time-focus"},have={},dc=donor&&Array.isArray(donor.chapters)?donor.chapters:[];
+        for(var i=0;i<dc.length;i++){var d=dc[i]||{};if(d.id&&d.time!==undefined&&d.time!==null&&String(d.time).trim()!=="")have[String(d.id)]=1;}
+        var bc=base&&Array.isArray(base.chapters)?base.chapters:[];
+        for(var j=0;j<bc.length;j++){var b=bc[j]||{};if(b.id&&!have[String(b.id)]&&(b.time===undefined||b.time===null||String(b.time).trim()===""))out.chapters.push(b);}
+        return out;
+    }
+    function chapterRows(rows){
+        var out=[],a=Array.isArray(rows)?rows:[];
+        for(var i=0;i<a.length;i++){var x=a[i]||{};if(x.Vo||x.N==="版权信息"||!x.C)continue;out.push(x);}
+        return out;
+    }
+    function chapterIdFromRow(x){
+        var u=String(x&&x.C||""),m=u.match(/\/chapter\/\d+\/(\d+)/i)||u.match(/[?&#](?:chapterId|cid)=(\d+)/i);return m&&m[1]?String(m[1]):"";
+    }
+    function vipFromRow(x){
+        if(x&&typeof x.V==="boolean")return x.V;
+        var m=String(x&&x.C||"").match(/[?&#]qfVip=([01])/i);return m?m[1]==="1":null;
+    }
+    function lastVolumeName(rows){
+        var a=Array.isArray(rows)?rows:[],v="";
+        for(var i=0;i<a.length;i++){var x=a[i]||{};if(x.Vo&&x.N)v=String(x.N||"").trim();}
+        return v;
+    }
+    function lastChapterIdFromRows(rows){
+        var c=chapterRows(rows);return c.length?chapterIdFromRow(c[c.length-1]):"";
+    }
+    function prefixTailMatches(rows,simpleChapters,count){
+        var cr=chapterRows(rows),sc=Array.isArray(simpleChapters)?simpleChapters:[],n=Math.min(5,Number(count||0));
+        if(!n||cr.length<count||sc.length<count)return false;
+        for(var i=count-n;i<count;i++){if(chapterIdFromRow(cr[i])!==String(sc[i]&&sc[i].id||""))return false;}
+        return true;
+    }
+    function stableTailVip(rows){
+        var cr=chapterRows(rows),n=Math.min(5,cr.length);if(n<3)return {ok:false,vip:false};
+        var first=vipFromRow(cr[cr.length-n]);if(first===null)return {ok:false,vip:false};
+        for(var i=cr.length-n+1;i<cr.length;i++){if(vipFromRow(cr[i])!==first)return {ok:false,vip:false};}
+        return {ok:true,vip:!!first};
+    }
+    function canDelta(cached,simpleModel,cc,pc){
+        var sc=simpleModel&&Array.isArray(simpleModel.chapters)?simpleModel.chapters:[],delta=pc-cc;
+        if(delta<=0||delta>DELTA_MAX)return {ok:false,reason:"delta-size",delta:delta};
+        if(!prefixTailMatches(cached.rows,sc,cc))return {ok:false,reason:"prefix-mismatch",delta:delta};
+        var sv=stableTailVip(cached.rows);if(!sv.ok)return {ok:false,reason:"vip-unstable",delta:delta};
+        var lv=lastVolumeName(cached.rows),firstNew=sc[cc]||{},nv=String(firstNew.volumeName
+
+### qfBookVar @168573
+ength;i++){
+        var x=list[i]||{};if(x.Vo||x.N==='版权信息'||!x.C)continue;
+        out.count++;out.last=String(x.N||out.last||'');
+        var t=String(x.T||'').trim();if(t)out.info++;
+        if(/(?:19|20)\d{2}[-\/.年]\d{1,2}[-\/.月]\d{1,2}|\b(?:19|20)\d{8,12}\b/.test(t))out.time++;
+    }
+    return out;
+}
+function qfTocRichEnoughV313(st){
+    st=st||{};var n=Number(st.count||0),tm=Number(st.time||0);
+    if(n<=0)return false;
+    /* 小书至少 3 章；正常长篇要求至少 60% 章节带时间。
+       这样“只有最新章有时间”永远不会进入富目录缓存。 */
+    return tm>=Math.max(Math.min(n,3),Math.floor(n*0.60));
+}
+function qfTocMergeInfoV313(base,donor){
+    base=Array.isArray(base)?base:[];donor=Array.isArray(donor)?donor:[];
+    var map={};
+    function cid(x){var m=String(x&&x.C||'').match(/\/chapter\/\d+\/(\d+)/i);return m?String(m[1]):'';}
+    for(var i=0;i<donor.length;i++){
+        var d=donor[i]||{},id=cid(d);if(!id)continue;
+        var old=map[id];
+        if(!old||(!String(old.T||'')&&String(d.T||'')))map[id]=d;
+    }
+    for(var j=0;j<base.length;j++){
+        var x=base[j]||{},id2=cid(x),d2=id2?map[id2]:null;if(!d2)continue;
+        if(!String(x.T||'').trim()&&String(d2.T||'').trim())x.T=d2.T;
+        /* 同一章节只补元数据，不覆盖章节名、URL、VIP 与 qfIndex。 */
+    }
+    return base;
+}
+function qfTocLoadLegacyV70(raw,baseUrl,opt){
+    opt=opt&&typeof opt==="object"?opt:{};
+    var skeletonOnly=!!opt.skeletonOnly,expectedIds=Array.isArray(opt.expectedIds)?opt.expectedIds:[],expectedCount=Number(opt.expectedCount||expectedIds.length||0),prefetchWebRaw=String(opt.prefetchWebRaw||''),parallelMs=Number(opt.parallelMs||0);
+
+    var bid=String(qfBookVarV09.call(this,'qf_bid','')||''),name=String(qfBookVarV09.call(this,'qf_name','')||''),author=String(qfBookVarV09.call(this,'qf_author','')||'');
+    if(!bid){var bm=String(baseUrl||'').match(/(?:book\/|bookId=)(\d+)/i);if(bm)bid=String(bm[1]);}
+    if(!bid)return [];
+    var leanStart=Date.now(),leanAudit={
+        expected:Number(expectedCount||0),got:0,appCallMs:0,appNormalizeMs:0,
+        firstMismatch:-1,expectedId:"",gotId:"",setOverlap:0,missing:0,extra:0,
+        categoryMs:0,webFetchMs:0,webNormalizeMs:0,selected:"",appTag:"",
+        webGot:0,webFirstMismatch:-1,webExpectedId:"",webGotId:"",webOverlap:0,webMissing:0,webExtra:0,webExact:false,
+        webSetExact:false,webReordered:false,webDup:0,expectedDup:0,webUnique:0,expectedUnique:0,
+        parallel:!!prefetchWebRaw,parallelMs:parallelMs
+    };
+    function qfLeanAuditTextV1065(){
+        var a=leanAudit||{};
+        return "selected="+String(a.selected||"")+" appTag="+String(a.appTag||"")+
+            " expected="+Number(a.expected||0)+" got="+Number(a.got||0)+
+            " firstMismatch="+Number(a.firstMismatch===undefined?-1:a.firstMismatch)+
+            (a.firstMismatch>=0?(" expId="+String(a.expectedId||"")+" gotId="+String(a.gotId||"")):"")+
+            " overlap="+Number(a.setOverlap||0)+" missing="+Number(a.missing||0)+" extra="+Number(a.extra||0)+
+            " | webExact="+(a.webExact?"yes":"no")+" webGot="+Number(a.webGot||0)+
+            " webMismatch="+Number(a.webFirstMismatch===undefined?-1:a.webFirstMismatch)+
+            (a.webFirstMismatch>=0?(" webExpId="+String(a.webExpectedId||"")+" webGotId="+String(a.webGotId||"")):"")+
+            " webOverlap="+Number(a.webOverlap||0)+" webMissing="+Number(a.webMissing||0)+" webExtra="+Number(a.webExtra||0)+
+            " webSetExact="+(a.webSetExact?"yes":"no")+" reordered="+(a.webReordered?"yes":"no")+
+            " unique="+Number(a.webUnique||0)+"/"+Number(a.expectedUnique||0)+" dup="+Number(a.webDup||0)+"/"+Number(a.expectedDup||0)+
+            " | parallel="+(a.parallel?"yes":"no")+" parallelMs="+Number(a.parallelMs||0)+"ms"+
+            " appCall="+Number(a.appCallMs||0)+"ms normalize="+Number(a.appNormalizeMs||0)+"ms"+
+            " category="+Number(a.categoryMs||0)+"ms webFetch="+Number(a.webFetchMs||0)+"ms webNorm="+Number(a.webNormalizeMs||0)+"ms"+
+            " total="+Math.max(0,Date.now()-leanStart)+"ms";
+    }
+    function qfLeanAttachV1065(list,selected){
+        if(Array.isArray(list)){leanAudit.selected=String(selected||leanAudit.selected||"");try{list._qfSkeletonAudit=qfLeanAuditTextV1065();}catch(_aa){}}
+        return list;
+    }
+
+    var latest=String(qfBookVarV09.call(this,'qf_lastChapter_v70','')||'');
+    var kind=String(qfBookVarV09.call(this,'qf_kind','')||'');
+    /* alpha31.5：缓存升 toc75，强制淘汰 alpha31/31.1 已经保存的稀疏时间目录。 */
+    var key=qfCacheKeyV56('toc76','起点',bid),cached=qfCacheGet.call(this,key),now=Date.now();
+    if(cached&&Array.isArray(cached.list)&&!Number(cached.indexedV311||0)){
+        try{qfTocEnsureIndexV311(cached.list);cached.indexedV311=1;qfCachePut.call(this,key,cached);}catch(_idx311){}
+    }
+
+    if(cached&&Array.isArray(cached.list)){
+        var cst=qfTocStatV313(cached.list),cc=Number(cached.count||cst.count||0);
+        if(cc>0){
+            var age=now-Number(cached.ts||0),soft=30*60*1000;
+            var cachedLast=String(cached.last||cached.latest||cst.last||''),sameLatest=false;
+            if(latest&&cachedLast){
+                sameLatest=qfNormChapter(latest)===qfNormChapter(cachedLast);
+                if(!sameLatest){try{var ln=qfChapterNoV10(la
+
+### qfBookVar @168626
+'版权信息'||!x.C)continue;
+        out.count++;out.last=String(x.N||out.last||'');
+        var t=String(x.T||'').trim();if(t)out.info++;
+        if(/(?:19|20)\d{2}[-\/.年]\d{1,2}[-\/.月]\d{1,2}|\b(?:19|20)\d{8,12}\b/.test(t))out.time++;
+    }
+    return out;
+}
+function qfTocRichEnoughV313(st){
+    st=st||{};var n=Number(st.count||0),tm=Number(st.time||0);
+    if(n<=0)return false;
+    /* 小书至少 3 章；正常长篇要求至少 60% 章节带时间。
+       这样“只有最新章有时间”永远不会进入富目录缓存。 */
+    return tm>=Math.max(Math.min(n,3),Math.floor(n*0.60));
+}
+function qfTocMergeInfoV313(base,donor){
+    base=Array.isArray(base)?base:[];donor=Array.isArray(donor)?donor:[];
+    var map={};
+    function cid(x){var m=String(x&&x.C||'').match(/\/chapter\/\d+\/(\d+)/i);return m?String(m[1]):'';}
+    for(var i=0;i<donor.length;i++){
+        var d=donor[i]||{},id=cid(d);if(!id)continue;
+        var old=map[id];
+        if(!old||(!String(old.T||'')&&String(d.T||'')))map[id]=d;
+    }
+    for(var j=0;j<base.length;j++){
+        var x=base[j]||{},id2=cid(x),d2=id2?map[id2]:null;if(!d2)continue;
+        if(!String(x.T||'').trim()&&String(d2.T||'').trim())x.T=d2.T;
+        /* 同一章节只补元数据，不覆盖章节名、URL、VIP 与 qfIndex。 */
+    }
+    return base;
+}
+function qfTocLoadLegacyV70(raw,baseUrl,opt){
+    opt=opt&&typeof opt==="object"?opt:{};
+    var skeletonOnly=!!opt.skeletonOnly,expectedIds=Array.isArray(opt.expectedIds)?opt.expectedIds:[],expectedCount=Number(opt.expectedCount||expectedIds.length||0),prefetchWebRaw=String(opt.prefetchWebRaw||''),parallelMs=Number(opt.parallelMs||0);
+
+    var bid=String(qfBookVarV09.call(this,'qf_bid','')||''),name=String(qfBookVarV09.call(this,'qf_name','')||''),author=String(qfBookVarV09.call(this,'qf_author','')||'');
+    if(!bid){var bm=String(baseUrl||'').match(/(?:book\/|bookId=)(\d+)/i);if(bm)bid=String(bm[1]);}
+    if(!bid)return [];
+    var leanStart=Date.now(),leanAudit={
+        expected:Number(expectedCount||0),got:0,appCallMs:0,appNormalizeMs:0,
+        firstMismatch:-1,expectedId:"",gotId:"",setOverlap:0,missing:0,extra:0,
+        categoryMs:0,webFetchMs:0,webNormalizeMs:0,selected:"",appTag:"",
+        webGot:0,webFirstMismatch:-1,webExpectedId:"",webGotId:"",webOverlap:0,webMissing:0,webExtra:0,webExact:false,
+        webSetExact:false,webReordered:false,webDup:0,expectedDup:0,webUnique:0,expectedUnique:0,
+        parallel:!!prefetchWebRaw,parallelMs:parallelMs
+    };
+    function qfLeanAuditTextV1065(){
+        var a=leanAudit||{};
+        return "selected="+String(a.selected||"")+" appTag="+String(a.appTag||"")+
+            " expected="+Number(a.expected||0)+" got="+Number(a.got||0)+
+            " firstMismatch="+Number(a.firstMismatch===undefined?-1:a.firstMismatch)+
+            (a.firstMismatch>=0?(" expId="+String(a.expectedId||"")+" gotId="+String(a.gotId||"")):"")+
+            " overlap="+Number(a.setOverlap||0)+" missing="+Number(a.missing||0)+" extra="+Number(a.extra||0)+
+            " | webExact="+(a.webExact?"yes":"no")+" webGot="+Number(a.webGot||0)+
+            " webMismatch="+Number(a.webFirstMismatch===undefined?-1:a.webFirstMismatch)+
+            (a.webFirstMismatch>=0?(" webExpId="+String(a.webExpectedId||"")+" webGotId="+String(a.webGotId||"")):"")+
+            " webOverlap="+Number(a.webOverlap||0)+" webMissing="+Number(a.webMissing||0)+" webExtra="+Number(a.webExtra||0)+
+            " webSetExact="+(a.webSetExact?"yes":"no")+" reordered="+(a.webReordered?"yes":"no")+
+            " unique="+Number(a.webUnique||0)+"/"+Number(a.expectedUnique||0)+" dup="+Number(a.webDup||0)+"/"+Number(a.expectedDup||0)+
+            " | parallel="+(a.parallel?"yes":"no")+" parallelMs="+Number(a.parallelMs||0)+"ms"+
+            " appCall="+Number(a.appCallMs||0)+"ms normalize="+Number(a.appNormalizeMs||0)+"ms"+
+            " category="+Number(a.categoryMs||0)+"ms webFetch="+Number(a.webFetchMs||0)+"ms webNorm="+Number(a.webNormalizeMs||0)+"ms"+
+            " total="+Math.max(0,Date.now()-leanStart)+"ms";
+    }
+    function qfLeanAttachV1065(list,selected){
+        if(Array.isArray(list)){leanAudit.selected=String(selected||leanAudit.selected||"");try{list._qfSkeletonAudit=qfLeanAuditTextV1065();}catch(_aa){}}
+        return list;
+    }
+
+    var latest=String(qfBookVarV09.call(this,'qf_lastChapter_v70','')||'');
+    var kind=String(qfBookVarV09.call(this,'qf_kind','')||'');
+    /* alpha31.5：缓存升 toc75，强制淘汰 alpha31/31.1 已经保存的稀疏时间目录。 */
+    var key=qfCacheKeyV56('toc76','起点',bid),cached=qfCacheGet.call(this,key),now=Date.now();
+    if(cached&&Array.isArray(cached.list)&&!Number(cached.indexedV311||0)){
+        try{qfTocEnsureIndexV311(cached.list);cached.indexedV311=1;qfCachePut.call(this,key,cached);}catch(_idx311){}
+    }
+
+    if(cached&&Array.isArray(cached.list)){
+        var cst=qfTocStatV313(cached.list),cc=Number(cached.count||cst.count||0);
+        if(cc>0){
+            var age=now-Number(cached.ts||0),soft=30*60*1000;
+            var cachedLast=String(cached.last||cached.latest||cst.last||''),sameLatest=false;
+            if(latest&&cachedLast){
+                sameLatest=qfNormChapter(latest)===qfNormChapter(cachedLast);
+                if(!sameLatest){try{var ln=qfChapterNoV10(latest),cn=qfChapterNoV10(cachedLast);if(ln>=0&&cn>=0&&
+
+### qfBookVar @168682
+ng(x.N||out.last||'');
+        var t=String(x.T||'').trim();if(t)out.info++;
+        if(/(?:19|20)\d{2}[-\/.年]\d{1,2}[-\/.月]\d{1,2}|\b(?:19|20)\d{8,12}\b/.test(t))out.time++;
+    }
+    return out;
+}
+function qfTocRichEnoughV313(st){
+    st=st||{};var n=Number(st.count||0),tm=Number(st.time||0);
+    if(n<=0)return false;
+    /* 小书至少 3 章；正常长篇要求至少 60% 章节带时间。
+       这样“只有最新章有时间”永远不会进入富目录缓存。 */
+    return tm>=Math.max(Math.min(n,3),Math.floor(n*0.60));
+}
+function qfTocMergeInfoV313(base,donor){
+    base=Array.isArray(base)?base:[];donor=Array.isArray(donor)?donor:[];
+    var map={};
+    function cid(x){var m=String(x&&x.C||'').match(/\/chapter\/\d+\/(\d+)/i);return m?String(m[1]):'';}
+    for(var i=0;i<donor.length;i++){
+        var d=donor[i]||{},id=cid(d);if(!id)continue;
+        var old=map[id];
+        if(!old||(!String(old.T||'')&&String(d.T||'')))map[id]=d;
+    }
+    for(var j=0;j<base.length;j++){
+        var x=base[j]||{},id2=cid(x),d2=id2?map[id2]:null;if(!d2)continue;
+        if(!String(x.T||'').trim()&&String(d2.T||'').trim())x.T=d2.T;
+        /* 同一章节只补元数据，不覆盖章节名、URL、VIP 与 qfIndex。 */
+    }
+    return base;
+}
+function qfTocLoadLegacyV70(raw,baseUrl,opt){
+    opt=opt&&typeof opt==="object"?opt:{};
+    var skeletonOnly=!!opt.skeletonOnly,expectedIds=Array.isArray(opt.expectedIds)?opt.expectedIds:[],expectedCount=Number(opt.expectedCount||expectedIds.length||0),prefetchWebRaw=String(opt.prefetchWebRaw||''),parallelMs=Number(opt.parallelMs||0);
+
+    var bid=String(qfBookVarV09.call(this,'qf_bid','')||''),name=String(qfBookVarV09.call(this,'qf_name','')||''),author=String(qfBookVarV09.call(this,'qf_author','')||'');
+    if(!bid){var bm=String(baseUrl||'').match(/(?:book\/|bookId=)(\d+)/i);if(bm)bid=String(bm[1]);}
+    if(!bid)return [];
+    var leanStart=Date.now(),leanAudit={
+        expected:Number(expectedCount||0),got:0,appCallMs:0,appNormalizeMs:0,
+        firstMismatch:-1,expectedId:"",gotId:"",setOverlap:0,missing:0,extra:0,
+        categoryMs:0,webFetchMs:0,webNormalizeMs:0,selected:"",appTag:"",
+        webGot:0,webFirstMismatch:-1,webExpectedId:"",webGotId:"",webOverlap:0,webMissing:0,webExtra:0,webExact:false,
+        webSetExact:false,webReordered:false,webDup:0,expectedDup:0,webUnique:0,expectedUnique:0,
+        parallel:!!prefetchWebRaw,parallelMs:parallelMs
+    };
+    function qfLeanAuditTextV1065(){
+        var a=leanAudit||{};
+        return "selected="+String(a.selected||"")+" appTag="+String(a.appTag||"")+
+            " expected="+Number(a.expected||0)+" got="+Number(a.got||0)+
+            " firstMismatch="+Number(a.firstMismatch===undefined?-1:a.firstMismatch)+
+            (a.firstMismatch>=0?(" expId="+String(a.expectedId||"")+" gotId="+String(a.gotId||"")):"")+
+            " overlap="+Number(a.setOverlap||0)+" missing="+Number(a.missing||0)+" extra="+Number(a.extra||0)+
+            " | webExact="+(a.webExact?"yes":"no")+" webGot="+Number(a.webGot||0)+
+            " webMismatch="+Number(a.webFirstMismatch===undefined?-1:a.webFirstMismatch)+
+            (a.webFirstMismatch>=0?(" webExpId="+String(a.webExpectedId||"")+" webGotId="+String(a.webGotId||"")):"")+
+            " webOverlap="+Number(a.webOverlap||0)+" webMissing="+Number(a.webMissing||0)+" webExtra="+Number(a.webExtra||0)+
+            " webSetExact="+(a.webSetExact?"yes":"no")+" reordered="+(a.webReordered?"yes":"no")+
+            " unique="+Number(a.webUnique||0)+"/"+Number(a.expectedUnique||0)+" dup="+Number(a.webDup||0)+"/"+Number(a.expectedDup||0)+
+            " | parallel="+(a.parallel?"yes":"no")+" parallelMs="+Number(a.parallelMs||0)+"ms"+
+            " appCall="+Number(a.appCallMs||0)+"ms normalize="+Number(a.appNormalizeMs||0)+"ms"+
+            " category="+Number(a.categoryMs||0)+"ms webFetch="+Number(a.webFetchMs||0)+"ms webNorm="+Number(a.webNormalizeMs||0)+"ms"+
+            " total="+Math.max(0,Date.now()-leanStart)+"ms";
+    }
+    function qfLeanAttachV1065(list,selected){
+        if(Array.isArray(list)){leanAudit.selected=String(selected||leanAudit.selected||"");try{list._qfSkeletonAudit=qfLeanAuditTextV1065();}catch(_aa){}}
+        return list;
+    }
+
+    var latest=String(qfBookVarV09.call(this,'qf_lastChapter_v70','')||'');
+    var kind=String(qfBookVarV09.call(this,'qf_kind','')||'');
+    /* alpha31.5：缓存升 toc75，强制淘汰 alpha31/31.1 已经保存的稀疏时间目录。 */
+    var key=qfCacheKeyV56('toc76','起点',bid),cached=qfCacheGet.call(this,key),now=Date.now();
+    if(cached&&Array.isArray(cached.list)&&!Number(cached.indexedV311||0)){
+        try{qfTocEnsureIndexV311(cached.list);cached.indexedV311=1;qfCachePut.call(this,key,cached);}catch(_idx311){}
+    }
+
+    if(cached&&Array.isArray(cached.list)){
+        var cst=qfTocStatV313(cached.list),cc=Number(cached.count||cst.count||0);
+        if(cc>0){
+            var age=now-Number(cached.ts||0),soft=30*60*1000;
+            var cachedLast=String(cached.last||cached.latest||cst.last||''),sameLatest=false;
+            if(latest&&cachedLast){
+                sameLatest=qfNormChapter(latest)===qfNormChapter(cachedLast);
+                if(!sameLatest){try{var ln=qfChapterNoV10(latest),cn=qfChapterNoV10(cachedLast);if(ln>=0&&cn>=0&&ln===cn){var lb=qfChapterBodyV56(latest),cb=qfChapterBod
+
+### qfBookVar @171227
+          " firstMismatch="+Number(a.firstMismatch===undefined?-1:a.firstMismatch)+
+            (a.firstMismatch>=0?(" expId="+String(a.expectedId||"")+" gotId="+String(a.gotId||"")):"")+
+            " overlap="+Number(a.setOverlap||0)+" missing="+Number(a.missing||0)+" extra="+Number(a.extra||0)+
+            " | webExact="+(a.webExact?"yes":"no")+" webGot="+Number(a.webGot||0)+
+            " webMismatch="+Number(a.webFirstMismatch===undefined?-1:a.webFirstMismatch)+
+            (a.webFirstMismatch>=0?(" webExpId="+String(a.webExpectedId||"")+" webGotId="+String(a.webGotId||"")):"")+
+            " webOverlap="+Number(a.webOverlap||0)+" webMissing="+Number(a.webMissing||0)+" webExtra="+Number(a.webExtra||0)+
+            " webSetExact="+(a.webSetExact?"yes":"no")+" reordered="+(a.webReordered?"yes":"no")+
+            " unique="+Number(a.webUnique||0)+"/"+Number(a.expectedUnique||0)+" dup="+Number(a.webDup||0)+"/"+Number(a.expectedDup||0)+
+            " | parallel="+(a.parallel?"yes":"no")+" parallelMs="+Number(a.parallelMs||0)+"ms"+
+            " appCall="+Number(a.appCallMs||0)+"ms normalize="+Number(a.appNormalizeMs||0)+"ms"+
+            " category="+Number(a.categoryMs||0)+"ms webFetch="+Number(a.webFetchMs||0)+"ms webNorm="+Number(a.webNormalizeMs||0)+"ms"+
+            " total="+Math.max(0,Date.now()-leanStart)+"ms";
+    }
+    function qfLeanAttachV1065(list,selected){
+        if(Array.isArray(list)){leanAudit.selected=String(selected||leanAudit.selected||"");try{list._qfSkeletonAudit=qfLeanAuditTextV1065();}catch(_aa){}}
+        return list;
+    }
+
+    var latest=String(qfBookVarV09.call(this,'qf_lastChapter_v70','')||'');
+    var kind=String(qfBookVarV09.call(this,'qf_kind','')||'');
+    /* alpha31.5：缓存升 toc75，强制淘汰 alpha31/31.1 已经保存的稀疏时间目录。 */
+    var key=qfCacheKeyV56('toc76','起点',bid),cached=qfCacheGet.call(this,key),now=Date.now();
+    if(cached&&Array.isArray(cached.list)&&!Number(cached.indexedV311||0)){
+        try{qfTocEnsureIndexV311(cached.list);cached.indexedV311=1;qfCachePut.call(this,key,cached);}catch(_idx311){}
+    }
+
+    if(cached&&Array.isArray(cached.list)){
+        var cst=qfTocStatV313(cached.list),cc=Number(cached.count||cst.count||0);
+        if(cc>0){
+            var age=now-Number(cached.ts||0),soft=30*60*1000;
+            var cachedLast=String(cached.last||cached.latest||cst.last||''),sameLatest=false;
+            if(latest&&cachedLast){
+                sameLatest=qfNormChapter(latest)===qfNormChapter(cachedLast);
+                if(!sameLatest){try{var ln=qfChapterNoV10(latest),cn=qfChapterNoV10(cachedLast);if(ln>=0&&cn>=0&&ln===cn){var lb=qfChapterBodyV56(latest),cb=qfChapterBodyV56(cachedLast);sameLatest=!!lb&&!!cb&&(lb===cb||lb.indexOf(cb)>=0||cb.indexOf(lb)>=0);}}catch(_cmp){}}
+            }
+            if(age>=0&&age<soft){try{var s0=qfSource(this);if(s0&&s0.put)s0.put('qf_toc_last_v70','CACHE75 '+cc+'章 / 时间'+cst.time+'章');}catch(_d0){}return cached.list;}
+            if(sameLatest){var validated=/(?:完本|完结|已完结|完结作品)/.test(kind)?24*60*60*1000:6*60*60*1000;if(age>=0&&age<validated){try{var s1=qfSource(this);if(s1&&s1.put)s1.put('qf_toc_last_v70','VALID75 '+cc+'章 / 时间'+cst.time+'章');}catch(_d1){}return cached.list;}}
+        }
+    }
+
+    var best=null,bestStat={count:0,time:0,info:0,last:''},donors=[];
+    function consider(list,tag){
+        if(!Array.isArray(list))return false;
+        var st=qfTocStatV313(list);if(st.count<=0)return false;
+        donors.push(list);
+        /* 按时间覆盖优先，章节完整度次之。 */
+        if(!best||st.time>bestStat.time||(st.time===bestStat.time&&st.count>bestStat.count)){best=list;bestStat=st;}
+        if(qfTocRichEnoughV313(st)){
+            qfTocCachePutV70.call(this,key,{list:list,src:String(tag||''),count:st.count,last:st.last||latest,latest:latest,richCount:st.info,timeCount:st.time,ts:now});
+            try{var ss=qfSource(this);if(ss&&ss.put)ss.put('qf_toc_last_v70',String(tag||'RICH')+' '+st.count+'章 / 时间'+st.time+'章 / 信息'+st.info+'章');}catch(_dg){}
+            return true;
+        }
+        try{var sd=qfSource(this);if(sd&&sd.put)sd.put('qf_toc_last_v70',String(tag||'SPARSE')+'-SPARSE '+st.count+'章 / 时间'+st.time+'章');}catch(_ds){}
+        return false;
+    }
+
+    /* alpha10.6.6：skeletonOnly 优先尝试 Web 精确骨架。
+       Web 只有在 ChapterId 数量与顺序和外层 getsimple 100%一致时才允许提前返回。 */
+    var leanWebHtml=prefetchWebRaw,leanWebList=null;if(prefetchWebRaw)leanAudit.webFetchMs=0;
+    function qfRowIdsV1066(list){
+        var ids=[];list=Array.isArray(list)?list:[];
+        for(var ri=0;ri<list.length;ri++){
+            var rx=list[ri]||{};if(rx.Vo||rx.N==='版权信息'||!rx.C)continue;
+            var rm=String(rx.C||'').match(/\/chapter\/\d+\/(\d+)/i);if(rm)ids.push(String(rm[1]));
+        }
+        return ids;
+    }
+    function qfExactWebV1066(ids){
+        ids=Array.isArray(ids)?ids:[];
+        var expSet={},gotSet={},overlap=0,first=-1,lim=Math.min(ids.length,expectedIds.length),
+            expDup=0,gotDup=0,expUnique=0,gotUnique=0;
+        leanAudit.webGot=ids.length;
+        for(var ei=0;ei<expectedIds.length;ei++){
+            var eid=String(expectedIds[ei]||"");
+            if(!eid)continue;
+            if(expSet[eid])expDup++;else{expSet[eid]=1;expUnique++;}
+  
+
+### qfBookVar @171301
+ismatch)+
+            (a.firstMismatch>=0?(" expId="+String(a.expectedId||"")+" gotId="+String(a.gotId||"")):"")+
+            " overlap="+Number(a.setOverlap||0)+" missing="+Number(a.missing||0)+" extra="+Number(a.extra||0)+
+            " | webExact="+(a.webExact?"yes":"no")+" webGot="+Number(a.webGot||0)+
+            " webMismatch="+Number(a.webFirstMismatch===undefined?-1:a.webFirstMismatch)+
+            (a.webFirstMismatch>=0?(" webExpId="+String(a.webExpectedId||"")+" webGotId="+String(a.webGotId||"")):"")+
+            " webOverlap="+Number(a.webOverlap||0)+" webMissing="+Number(a.webMissing||0)+" webExtra="+Number(a.webExtra||0)+
+            " webSetExact="+(a.webSetExact?"yes":"no")+" reordered="+(a.webReordered?"yes":"no")+
+            " unique="+Number(a.webUnique||0)+"/"+Number(a.expectedUnique||0)+" dup="+Number(a.webDup||0)+"/"+Number(a.expectedDup||0)+
+            " | parallel="+(a.parallel?"yes":"no")+" parallelMs="+Number(a.parallelMs||0)+"ms"+
+            " appCall="+Number(a.appCallMs||0)+"ms normalize="+Number(a.appNormalizeMs||0)+"ms"+
+            " category="+Number(a.categoryMs||0)+"ms webFetch="+Number(a.webFetchMs||0)+"ms webNorm="+Number(a.webNormalizeMs||0)+"ms"+
+            " total="+Math.max(0,Date.now()-leanStart)+"ms";
+    }
+    function qfLeanAttachV1065(list,selected){
+        if(Array.isArray(list)){leanAudit.selected=String(selected||leanAudit.selected||"");try{list._qfSkeletonAudit=qfLeanAuditTextV1065();}catch(_aa){}}
+        return list;
+    }
+
+    var latest=String(qfBookVarV09.call(this,'qf_lastChapter_v70','')||'');
+    var kind=String(qfBookVarV09.call(this,'qf_kind','')||'');
+    /* alpha31.5：缓存升 toc75，强制淘汰 alpha31/31.1 已经保存的稀疏时间目录。 */
+    var key=qfCacheKeyV56('toc76','起点',bid),cached=qfCacheGet.call(this,key),now=Date.now();
+    if(cached&&Array.isArray(cached.list)&&!Number(cached.indexedV311||0)){
+        try{qfTocEnsureIndexV311(cached.list);cached.indexedV311=1;qfCachePut.call(this,key,cached);}catch(_idx311){}
+    }
+
+    if(cached&&Array.isArray(cached.list)){
+        var cst=qfTocStatV313(cached.list),cc=Number(cached.count||cst.count||0);
+        if(cc>0){
+            var age=now-Number(cached.ts||0),soft=30*60*1000;
+            var cachedLast=String(cached.last||cached.latest||cst.last||''),sameLatest=false;
+            if(latest&&cachedLast){
+                sameLatest=qfNormChapter(latest)===qfNormChapter(cachedLast);
+                if(!sameLatest){try{var ln=qfChapterNoV10(latest),cn=qfChapterNoV10(cachedLast);if(ln>=0&&cn>=0&&ln===cn){var lb=qfChapterBodyV56(latest),cb=qfChapterBodyV56(cachedLast);sameLatest=!!lb&&!!cb&&(lb===cb||lb.indexOf(cb)>=0||cb.indexOf(lb)>=0);}}catch(_cmp){}}
+            }
+            if(age>=0&&age<soft){try{var s0=qfSource(this);if(s0&&s0.put)s0.put('qf_toc_last_v70','CACHE75 '+cc+'章 / 时间'+cst.time+'章');}catch(_d0){}return cached.list;}
+            if(sameLatest){var validated=/(?:完本|完结|已完结|完结作品)/.test(kind)?24*60*60*1000:6*60*60*1000;if(age>=0&&age<validated){try{var s1=qfSource(this);if(s1&&s1.put)s1.put('qf_toc_last_v70','VALID75 '+cc+'章 / 时间'+cst.time+'章');}catch(_d1){}return cached.list;}}
+        }
+    }
+
+    var best=null,bestStat={count:0,time:0,info:0,last:''},donors=[];
+    function consider(list,tag){
+        if(!Array.isArray(list))return false;
+        var st=qfTocStatV313(list);if(st.count<=0)return false;
+        donors.push(list);
+        /* 按时间覆盖优先，章节完整度次之。 */
+        if(!best||st.time>bestStat.time||(st.time===bestStat.time&&st.count>bestStat.count)){best=list;bestStat=st;}
+        if(qfTocRichEnoughV313(st)){
+            qfTocCachePutV70.call(this,key,{list:list,src:String(tag||''),count:st.count,last:st.last||latest,latest:latest,richCount:st.info,timeCount:st.time,ts:now});
+            try{var ss=qfSource(this);if(ss&&ss.put)ss.put('qf_toc_last_v70',String(tag||'RICH')+' '+st.count+'章 / 时间'+st.time+'章 / 信息'+st.info+'章');}catch(_dg){}
+            return true;
+        }
+        try{var sd=qfSource(this);if(sd&&sd.put)sd.put('qf_toc_last_v70',String(tag||'SPARSE')+'-SPARSE '+st.count+'章 / 时间'+st.time+'章');}catch(_ds){}
+        return false;
+    }
+
+    /* alpha10.6.6：skeletonOnly 优先尝试 Web 精确骨架。
+       Web 只有在 ChapterId 数量与顺序和外层 getsimple 100%一致时才允许提前返回。 */
+    var leanWebHtml=prefetchWebRaw,leanWebList=null;if(prefetchWebRaw)leanAudit.webFetchMs=0;
+    function qfRowIdsV1066(list){
+        var ids=[];list=Array.isArray(list)?list:[];
+        for(var ri=0;ri<list.length;ri++){
+            var rx=list[ri]||{};if(rx.Vo||rx.N==='版权信息'||!rx.C)continue;
+            var rm=String(rx.C||'').match(/\/chapter\/\d+\/(\d+)/i);if(rm)ids.push(String(rm[1]));
+        }
+        return ids;
+    }
+    function qfExactWebV1066(ids){
+        ids=Array.isArray(ids)?ids:[];
+        var expSet={},gotSet={},overlap=0,first=-1,lim=Math.min(ids.length,expectedIds.length),
+            expDup=0,gotDup=0,expUnique=0,gotUnique=0;
+        leanAudit.webGot=ids.length;
+        for(var ei=0;ei<expectedIds.length;ei++){
+            var eid=String(expectedIds[ei]||"");
+            if(!eid)continue;
+            if(expSet[eid])expDup++;else{expSet[eid]=1;expUnique++;}
+        }
+        for(var gi=0;gi<ids.length;gi++){
+            var gid=Stri
+
+### qfBookVar @189841
+replace(/^chapter\s*\d+\s*[:：.\-—]?\s*/i,"");
+    return qfNormChapter(s);
+}
+function qfChapterHintTouchV56(key){
+    var i=QF_CH56_ORDER.indexOf(key);if(i>=0)QF_CH56_ORDER.splice(i,1);QF_CH56_ORDER.push(key);
+    while(QF_CH56_ORDER.length>QF_CH56_MAX){var old=QF_CH56_ORDER.shift();try{delete QF_CH56_HINT[old];}catch(_e){QF_CH56_HINT[old]=undefined;}}
+}
+
+
+
+/* =========================
+ * 正文总路由
+ * ========================= */
+function qfAddSourceMark(content, provider, enabled) {
+    /* alpha13：正文入口已经形成 Capability Plan 时直接消费快照，避免 Provider 网络请求后
+       再次跨 Java/Source 读取登录设置；旧调用保持兼容。 */
+    var on=(typeof enabled==="boolean")?enabled:qfToggle.call(this,"正文来源标记",false);
+    if(!on)return content;
+    return "〔正文来源：" + provider + "〕\n\n" + content;
+}
+/* =========================
+ * 起点 Cookie / 发现页修复
+ * ========================= */
+/* =========================
+ * v0.4 起点发现页：纯官方三层获取
+ * 1. 阅读普通 HTTP 返回
+ * 2. m.qidian.com WebView 同源 XHR
+ * 3. www.qidian.com WebView 渲染 DOM
+ * ========================= */
+function qfExploreArr(v) {
+    if (!v) return [];
+    if (Array.isArray(v)) return v;
+    try {
+        if (v.size && v.get) {
+            var a = [];
+            for (var i = 0; i < v.size(); i++) a.push(v.get(i));
+            return a;
+        }
+    } catch(e) {}
+    return [];
+}
+
+/* v0.9 历史目录/彩蛋网络链已于 v2.9 清理。 */
+function qfQueryV09(url, key) {
+    var raw = String(url || "");
+    var m = raw.match(new RegExp("[?&#]" + key + "=([^&#]+)", "i"));
+    if (!m) return "";
+    try { return decodeURIComponent(String(m[1] || "")); }
+    catch(e) { return String(m[1] || ""); }
+}
+function qfBookVarV09(key, def) {
+    try {
+        var b = qfBook(this);
+        if (b && b.getVariable) {
+            var v = b.getVariable(key);
+            if (v !== null && v !== undefined && String(v) !== "") return String(v);
+        }
+    } catch(e) {}
+    return def == null ? "" : String(def);
+}
+function qfPutBookVarV09(key, value) {
+    try {
+        var b = qfBook(this);
+        if (b && b.putVariable) b.putVariable(key, String(value == null ? "" : value));
+    } catch(e) {}
+}
+
+
+/* alpha39：已移除旧 qdCopyrightV09，当前版权页按需加载 v2.9.29。 */
+
+function qfValidContentV10(v){return QF_ContentCleaner.valid(v);}
+function qfGetParamV10(url, key) {
+    var m = String(url || "").match(new RegExp("[?&#]" + key + "=([^&#,]+)", "i"));
+    if (!m) return "";
+    try { return decodeURIComponent(String(m[1] || "")); }
+    catch(e) { return String(m[1] || ""); }
+}
+function qdChapterMetaV10(url) {
+    var x = qdChapterMeta.call(this, url);
+    x.index = Number(qfGetParamV10(url, "qfIndex"));
+    if (!isFinite(x.index) || x.index < 0) x.index = -1;
+    return x;
+}
+function qfCleanChapterTextV10(text,title){return QF_ContentCleaner.clean(text,title);}
+function qdExtractOfficialContentV10(html, title) {
+    var raw = String(html || "");
+    var doc = qdDoc(raw);
+    var best = "";
+
+    var selectors = [
+        "#chapterContent p", "#chapterContent span", "#chapterContent",
+        ".read-content p", ".read-content span", ".read-content",
+        ".chapter-content p", ".chapter-content span", ".chapter-content",
+        ".main-text-wrap p", ".main-text-wrap span", ".main-text-wrap",
+        ".content-wrap p", ".content-wrap span", ".content-wrap",
+        ".reading-content p", ".reading-content span", ".reading-content",
+        "[class*=chapterContent] p", "[class*=chapterContent] span", "[class*=chapterContent]",
+        "[class*=chapter-content] p", "[class*=chapter-content] span", "[class*=chapter-content]",
+        "[class*=read-content] p", "[class*=read-content] span", "[class*=read-content]",
+        "[id*=chapterContent]", "[id*=chapter-content]",
+        "article p", "article"
+    ];
+
+    if (doc) {
+        for (var s = 0; s < selectors.length; s++) {
+            try {
+                var es = doc.select(selectors[s]);
+                if (!es || !es.size()) continue;
+                var parts = [];
+                for (var i = 0; i < es.size(); i++) {
+                    var t = qfText(String(es.get(i).text() || ""));
+                    if (t && t.length > 1) parts.push(t);
+                }
+                var joined = qfCleanChapterTextV10(parts.join("\n"), title);
+                if (joined.length > best.length && joined.length < 200000) best = joined;
+            } catch(e0) {}
+        }
+
+        /* 当前页面若把正文放到 script JSON 中，也尝试读取。 */
+        try {
+            var scripts = doc.select("script");
+            for (var si = 0; si < scripts.size(); si++) {
+                var st = String(scripts.get(si).html() || "");
+                if (!st || st.length < 80) continue;
+                var keys = ["content","chapterContent","ChapterContent","contentText","rawContent"];
+                for (var ki = 0; ki < keys.length; ki++) {
+                    var re1 = new RegExp('"' + keys[ki] + '"\\s*:\\s*"((?:\\\\.|[^"\\\\]){20,})"', "g");
+                    var mm;
+                    while ((mm = re1.exec(st)) !== null) {
+                        try {
+                            var decoded = JSON.parse('"' + mm[1] + '"');
+                            decoded = qfCleanChapterTextV10(decoded, title);
+                            if (decoded.length > best.length 
+
+### qfBookVar @246784
+(this);if(c&&qfCallableV13(c,"putMemory"))c.putMemory("qf-cmt-route-v315-"+k,JSON.stringify(o));}catch(e0){}
+    try{
+        var m={};try{m=JSON.parse(String(this.source.get("qf_cmt_routes_v315")||"{}"))||{};}catch(_p){m={};}
+        m[k]=o;
+        var keys=Object.keys(m);if(keys.length>32){keys.sort(function(a,b){return Number((m[a]||{}).ts||0)-Number((m[b]||{}).ts||0);});for(var i=0;i<keys.length-32;i++)delete m[keys[i]];}
+        this.source.put("qf_cmt_routes_v315",JSON.stringify(m));
+    }catch(e1){}
+    return server;
+}
+function qfCommentRouteGetV315(bid,cid){
+    if(qfCommentPrefV315.call(this)!=="服务器")return "";
+    var k=String(bid||"")+"|"+String(cid||""),raw="",actual="",pick="自动";
+    try{pick=String(qfSetting.call(this,"服务器评论源","自动")||"自动");}catch(_sp){pick="自动";}
+    function choose(a){a=String(a||"");if(["情无","神魔","晴天"].indexOf(pick)>=0)return pick;if(qfCommentIsServerV83(a))return a;return "晴天";}
+    function readActual(o){o=o||{};return String(o.actualProvider||"");}
+    try{var l1=qfCommentRouteL1GetV470(k);if(l1){actual=readActual(l1);if(actual)return choose(actual);}}catch(_l1){}
+    try{var c=qfRuntimeCacheV13(this);if(c&&qfCallableV13(c,"getFromMemory"))raw=String(c.getFromMemory("qf-cmt-route-v315-"+k)||"");}catch(e0){}
+    if(raw){try{var mo=JSON.parse(raw);actual=readActual(mo);if(actual)qfCommentRouteL1PutV470(k,mo);}catch(_m){}}
+    if(!actual){try{var map=JSON.parse(String(this.source.get("qf_cmt_routes_v315")||"{}"))||{},po=map[k]||{};actual=readActual(po);if(actual)qfCommentRouteL1PutV470(k,po);}catch(e1){}}
+    if(!actual){try{actual=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(e2){}}
+    return choose(actual);
+}
+/* ============================================================
+ * alpha82 server-review ABI
+ * Heavy 情无/神魔/晴天 server-comment logic lives in review_server_core.
+ * These tiny wrappers preserve old internal/dynamic entry names.
+ * ============================================================ */
+function qfServerCoreFnV82(name){
+    return qfModuleFnV38.call(this,"review_server_core",String(name||""));
+}
+function qfQwCommentApiV315(){return qfServerCoreFnV82.call(this,"qfQwCommentApiV315").apply(this,arguments);}
+function qfSmCommentApiV315(){return qfServerCoreFnV82.call(this,"qfSmCommentApiV315").apply(this,arguments);}
+function qfServerNormV315(){return qfServerCoreFnV82.call(this,"qfServerNormV315").apply(this,arguments);}
+function qfServerDataV319(){return qfServerCoreFnV82.call(this,"qfServerDataV319").apply(this,arguments);}
+function qfQtAuthorSayV332(){return qfServerCoreFnV82.call(this,"qfQtAuthorSayV332").apply(this,arguments);}
+function qfQtShowAuthorV332(){return qfServerCoreFnV82.call(this,"qfQtShowAuthorV332").apply(this,arguments);}
+function qfServerSummaryV315(){return qfServerCoreFnV82.call(this,"qfServerSummaryV315").apply(this,arguments);}
+function qfServerCommentPackV315(){return qfServerCoreFnV82.call(this,"qfServerCommentPackV315").apply(this,arguments);}
+function qfServerChapterPackV315(){return qfServerCoreFnV82.call(this,"qfServerChapterPackV315").apply(this,arguments);}
+function qfShowServerCommentV315(){return qfServerCoreFnV82.call(this,"qfShowServerCommentV315").apply(this,arguments);}
+
+/* beta14：作者说是章节内容，不再绑定段评来源。
+ * 卡片可显式指定实际正文 Provider（目前晴天有原生作者说详情页）。 */
+function qfOpenAuthorSayV314(bid,cid,provider,authorTextEncoded,authorNameEncoded){
+    provider=String(provider||"");
+    if(provider&&qfCommentIsServerV83(provider)){
+        try{
+            var d=qfCommentDispatchV841.call(this,provider,"open",[bid,cid,-10,0,"author","",1]);
+            if(d&&d.handled)return d.value;
+        }catch(e0){}
+    }
+    /* v4.0.0-alpha3.2：正文卡已经拥有真实作者说时直接把正文交给 BottomSheet。
+       不在点击后重新请求 safegetcontent / Web HTML，避免跨执行环境缓存失效导致“卡片有内容、详情为空”。 */
+    return showCmtV20.call(this,bid,cid,-10,0,"author","",1,authorTextEncoded,authorNameEncoded);
+}
+
+function showCmtV20(bid,cid,para,seg,type,quoteEncoded,countHint,authorTextEncoded,authorNameEncoded){
+    var j=qfRuntimeJavaV13(this);
+    if(!j)return;
+
+    try{
+        var p=Number(para);
+        if(isNaN(p))p=0;
+
+        var sg=Number(seg);
+        if(isNaN(sg))sg=p>0?p:0;
+
+        var tp=String(type||"dp");
+        var isZp=(tp.toLowerCase()==="zp");
+        if(isZp)sg=0;
+
+        var expected=Number(countHint||0);
+        if(isNaN(expected)||expected<0)expected=0;
+
+        var quote="",authorSay="",authorName="作者",authorAvatar="",authorReviewId="",authorParagraphId="",authorReplyCount=0,authorReplyList=[],cacheObj=qfRuntimeCacheV13(this);
+
+        try{
+            if(quoteEncoded)quote=decodeURIComponent(String(quoteEncoded));
+        }catch(e0){quote="";}
+
+        if(!quote){
+            try{
+                if(cacheObj&&qfCallableV13(cacheObj,"getFromMemory")){
+                    quote=String(
+                        cacheObj.getFromMemory(
+                            p>0
+                              ?"qfv20-"+bid+"-"+cid+"-"+p+"-text"
+                              :"qfv20-"+bid+"-"+cid+"-chapter-title"
+                        )||""
+                    );
+                }
+            }catch(e1){}
+        }
+
+        var serverProvider=qfCommentRouteGetV315.call(this,bid,cid);
+
+
+### qfBookVar @290811
+0))out.replyCount=Number(sm.replyCount||0)||0;
+                if((!out.replyList||!out.replyList.length)&&Array.isArray(sm.replyList)&&sm.replyList.length)out.replyList=sm.replyList;
+                if(sm.reviewId||Number(sm.replyCount||0)>0)out.source+=(out.source?'+':'')+'SafeRoot.AuthorMeta';
+            }
+        }catch(_sm){}
+    
+        /* C. 阅读器真实作者点评对象：DataList[*].AuthorReview。 */
+        try{
+            var social=qdParagraphCountAuthorV406.call(ctx,String(bid),String(cid),String(out.text||''));
+            if(social){
+                if(!out.name)out.name=String(social.name||'');
+                if(!out.avatar)out.avatar=String(social.avatar||'');
+                if(social.reviewId)out.reviewId=String(social.reviewId||'');
+                if(Number(social.replyCount||0)>Number(out.replyCount||0))out.replyCount=Number(social.replyCount||0)||0;
+                if((!out.replyList||!out.replyList.length)&&Array.isArray(social.replyList)&&social.replyList.length)out.replyList=social.replyList;
+                out.reviewText=String(social.reviewText||out.reviewText||'');
+                if(social.paragraphId)out.paragraphId=String(social.paragraphId||'');
+                if(social.reviewId||social.avatar)out.source+=(out.source?'+':'')+'ParagraphCount.AuthorReview';
+            }
+        }catch(_social){}
+    
+        if(!out.text){try{out.text=String(qdAuthorSayV20.call(ctx,bid,cid)||'');}catch(_tx){out.text='';}}
+        /* 卡片生成阶段已有真实作者名，点击时直传；比跨执行环境再读 Book 变量可靠。 */
+        if(!out.name&&fallbackName)out.name=fallbackName;
+        if(!out.name){try{out.name=String(qfBookVarV09.call(ctx,'qf_author','')||'');}catch(_bn){}}
+        if(!out.name)out.name='作者';
+    
+        try{if(mc&&qfCallableV13(mc,'putMemory'))mc.putMemory(key,JSON.stringify(out));}catch(_pm){}
+        return out;
+    }
+    return {summary:summary,paragraph:paragraph,chapter:chapter,hot:hot,author:author};
+})();
+
+/* ============================================================
+ * v4.1.0-alpha5.4 · Review Transport Cleanroom
+ * Review endpoint policy/response parse lives here; QDSign/QDInfo stays in QF_OfficialClient.
+ * ============================================================ */
+/* alpha5.4 Review Response Validation: transport errors are no longer legal review responses. */
+var QF_ReviewApi=(function(){
+    function parse(raw,profile){
+        raw=String(raw||'').trim();if(!raw)return null;
+        /* alpha5.4: OfficialClient transport classification is authoritative.
+         * Auth/sign/risk-control JSON objects are failures and must trigger failover. */
+        var transport=(QF_OfficialClient.classifyReview?QF_OfficialClient.classifyReview(raw):QF_OfficialClient.classify(raw));if(!transport||!transport.ok)return null;
+        try{raw=raw.replace(/(\"(?:Id|ID|ReviewId|reviewId|RootReviewId|rootReviewId|UserId|userId|ParagraphId|paragraphId)\"\s*:\s*)(\d{16,})/g,'$1\"$2\"');}catch(_r){}
+        var root=null;try{root=JSON.parse(raw);}catch(_j){return null;}
+        var code=(root.Code!==undefined?root.Code:(root.code!==undefined?root.code:(root.Status!==undefined?root.Status:root.status)));
+        var hasCode=!(code===undefined||code===null||code===''),valid=hasCode?(Number(code)===0||Number(code)===1||Number(code)===200):(root.Data!==undefined||root.data!==undefined||root.Result!==undefined||root.result!==undefined||typeof root==='object');
+        if(!valid)return null;
+        return {ok:true,root:root,data:(root.Data||root.data||root.Result||root.result||root||{}),raw:raw,profile:String(profile||''),code:code};
+    }
+    function profile(ctx){try{return qfOfficialReviewProfileGetV400.call(ctx);}catch(_e){return 'reader_ext';}}
+    function remember(ctx,p){if(p!=='reader_ext'&&p!=='reader_legacy')return;try{qfOfficialReviewProfilePutV400.call(ctx,p);}catch(_e){}}
+    function alternate(p){return String(p||'reader_ext')==='reader_legacy'?'reader_ext':'reader_legacy';}
+    function requestProfile(ctx,path,params,p,timeout){
+        p=String(p||'reader_ext');var key='reader:'+QF_OfficialClient.normPath(path)+':'+p;if(!QF_ReviewNetwork.canTry(key)){if(/getparagraphshotcomments$/.test(QF_OfficialClient.normPath(path)))qfChapterHotTraceV535({stage:"sync-blocked",pid:String(params&&params.paragraphId||""),profile:p,transport:"review-api",cache:"",ok:false,blocked:true,detail:"cooldown"});return null;}
+        var sp=QF_OfficialClient.reviewSpec(ctx,path,params,{profile:p,timeout:Math.min(5200,Math.max(2300,Number(timeout)||3500))});
+        if(!sp){QF_ReviewNetwork.mark(key,false,0);try{QF_Diagnostic.warn(ctx,'review','transport',key,'review spec unavailable','SIGNATURE_ERROR');}catch(_spDiag){}return null;}
+        var st=Date.now(),raw='';
+        try{raw=QF_OfficialClient.run(ctx,'review-reader:'+p,path,params,{noCache:true},function(){return qfAjaxTextV20(ctx,sp.url,sp.opt);});}
+        catch(e){QF_Diagnostic.warn(ctx,'review','transport',key,e,QF_Error.classify(e));raw='';}
+        var out=parse(raw,p);QF_ReviewNetwork.mark(key,!!out,Date.now()-st);return out;
+    }
+    function request(ctx,path,params,timeout){
+        var first=profile(ctx),second=alternate(first),a=requestProfile(ctx,path,params,first,timeout);
+      
+
+### qfBookVar @362231
+ytes":61613,"exports":25,"deps":[],"mainVRefs":2},{"name":"review","packed":"gzip","bytes":42534,"exports":3,"deps":["review_common"],"mainVRefs":31},{"name":"review_align","packed":"gzip","bytes":9345,"exports":7,"deps":[],"mainVRefs":2},{"name":"review_common","packed":"gzip","bytes":6915,"exports":2,"deps":[],"mainVRefs":8},{"name":"review_local_ui","packed":"gzip","bytes":244456,"exports":1,"deps":[],"mainVRefs":1},{"name":"review_server_core","packed":"gzip","bytes":37944,"exports":11,"deps":[],"mainVRefs":26},{"name":"review_server_ui","packed":"gzip","bytes":32879,"exports":1,"deps":[],"mainVRefs":0},{"name":"review_sunny","packed":"gzip","bytes":4875,"exports":1,"deps":["review_common"],"mainVRefs":11},{"name":"role","packed":"gzip","bytes":34951,"exports":17,"deps":[],"mainVRefs":1}],"moduleRefs":{"qdAuthorSayV20":["review","review_sunny"],"qdExtractOfficialContentV10":["official"],"qdFetchChapterCommentsV22":["review","review_sunny"],"qdFetchOfficialCommentsV20":["review","review_align"],"qdFetchParagraphHotV402":["review"],"qdNormalizeCommentV13":["review","review_server_core"],"qdPrimeParagraphHotV450":["review"],"qdPrimeReviewV350":["review"],"qdReviewSummaryV11":["review"],"qdReviewSummaryV22":["review","review_align","review_server_core"],"qdReviewSummaryV292":["review"],"qdWebViewFreeV10":["official"],"qfAjaxJavaV20":["qidian_app"],"qfAjaxTextV20":["egg","limited_qt"],"qfAuthorSayRealV327":["qidian_app","review","review_common","review_server_core"],"qfBestChapterV10":["fallback_69","fallback_sdg","fallback_wx","preferred_dj","preferred_kw","preferred_qm"],"qfBookVarV09":["copyright","provider_runtime","review","review_common"],"qfBubbleItemsUsableV353":["review"],"qfCacheKeyV56":["preferred_dj","preferred_kw","preferred_qm","preferred_qq"],"qfCallableV13":["review","review_server_core","review_sunny"],"qfChapterBodyV56":["provider_common"],"qfChapterHintLoadV78":["provider_common"],"qfChapterHintPersistV78":["provider_common"],"qfChapterHintTouchV56":["provider_common"],"qfChapterNoV10":["fallback_dq","fallback_my","fallback_sdg","fallback_wx","limited_qt","match","preferred_sq","provider_common"],"qfCommentCallV83":["review","review_sunny"],"qfCommentHtmlV2987":["review_server_core"],"qfCommentIsServerV83":["review"],"qfCommentPolicyV83":["review"],"qfCommentRouteSetV315":["review"],"qfEmojiV13":["review","review_server_core"],"qfEscJsV13":["review","review_common","review_sunny"],"qfEscV13":["review","review_common"],"qfFlattenChapterV10":["preferred_qm"],"qfImageJavaV14":["review","review_common"],"qfModuleEnsureV38":["fallback_69","fallback_dq","fallback_my","fallback_sdg","fallback_wx","match","preferred_dj","preferred_kw","preferred_qm","preferred_qq","preferred_sq","review","review_sunny"],"qfModuleFnV38":["review","review_server_core","review_sunny"],"qfOfficialCallV400":["copyright","egg"],"qfOpenAuthorSayV314":["review","review_common"],"qfPickBookV10":["fallback_69","preferred_dj","preferred_kw","preferred_qm"],"qfPrimeAuthorSayV38":["review","review_sunny"],"qfPutBookVarV09":["provider_runtime"],"qfQtBaseV328":["limited_qt"],"qfQtBrowserUrlV328":["review_server_core","review_sunny"],"qfQtCredV328":["limited_qt","review_server_core"],"qfQtNativeMetaV328":["review_server_core"],"qfQtRequestV328":["limited_qt","review_server_core"],"qfQtShowAuthorV332":["limited_qt","review_common"],"qfQueryV09":["copyright","egg"],"qfQwCommentApiV315":["review"],"qfRuntimeCacheV13":["limited_qt","limited_qw","limited_sm","limited_tr","review","review_server_core","review_sunny"],"qfRuntimeJavaV13":["egg","review_server_core"],"qfServerCommentPackV315":["review"],"qfServerNormV315":["review"],"qfSmChosenBaseV30":["limited_sm","review_server_core"],"qfSmMirrorV30":["limited_sm"],"qfSmNormBaseV30":["limited_sm"],"qfSmSessV30":["review_server_core"],"qfTextKeepMediaLiteV38":["egg"],"qfTimeValueV13":["review_server_core"],"qfValidContentV10":["fallback_69","fallback_dq","fallback_my","fallback_sdg","fallback_wx","limited_qt","limited_sm","official","preferred_dj","preferred_kw","preferred_qm","preferred_qq","preferred_sq"],"showCmtV20":["review","review_common","review_sunny"]},"unresolved":[]};
+var QF_DependencyAudit=(function(){
+    function summary(){
+        var a=QF_DEPENDENCY_AUDIT||{};
+        return {
+            version:String(a.version||""),
+            policy:String(a.policy||"AUDIT_ONLY_NO_DELETE"),
+            modules:Number(a.modules||0),
+            gzipModules:Number(a.gzipModules||0),
+            rawModules:Number(a.rawModules||0),
+            mainVFunctions:Number(a.mainVFunctions||0),
+            directModuleUsedV:Number(a.directModuleUsedV||0),
+            manifestProtectedV:Number(a.manifestProtectedV||0),
+            unresolvedV:Number(a.unresolvedV||0)
+        };
+    }
+    function text(){
+        var a=QF_DEPENDENCY_AUDIT||{},s=summary(),out=[];
+        out.push("Lazy Module Dependency Audit · "+String(s.version||""));
+        out.push("policy="+String(s.policy||""));
+        out.push("modules="+s.modules+" (gzip "+s.gzipModules+" / raw "+s.rawModules+")");
+        out.push("main Vxx="+s.mainVFunctions+" / module-used="+s.directModuleUsedV+" / manifest-protected="+s.manifest
+
+### qfBookVar @474389
+继续返回 raw，保证旧代码零破坏。
+ * 新代码优先 qfOfficialQueryV410，得到统一 Envelope：
+ *   {ok, cap, model, data, raw, error, ts, duration}
+ * ============================================================ */
+var QF_OFFICIAL_SCHEMA410={
+    version:2,
+    toc:"qf.toc/1",
+    chapter:"qf.chapter/1",
+    content:"qf.content/1",
+    authorNote:"qf.author-note/1",
+    copyright:"qf.copyright/1",
+    roleSet:"qf.role-set/1",
+    role:"qf.role/1",
+    eggSet:"qf.egg-set/1",
+    eggMedia:"qf.egg-media/1",
+    circleSet:"qf.circle-set/1",
+    circlePost:"qf.circle-post/1"
+};
+function qfOfficialEnvelopeV410(cap,model){
+    return {ok:false,cap:String(cap||""),model:String(model||"raw"),data:null,raw:null,error:"",ts:Date.now(),duration:0};
+}
+function qfOfficialStrV410(v){return String(v==null?"":v);}
+function qfOfficialBoolV410(v){
+    if(v===true||v===1)return true;
+    return /^(?:1|true|yes)$/i.test(String(v==null?"":v));
+}
+function qfOfficialUrlParamV410(url,key){
+    var m=String(url||"").match(new RegExp("[?&#]"+String(key||"")+"=([^&#]+)","i"));
+    if(!m)return "";
+    try{return decodeURIComponent(String(m[1]||""));}catch(_e){return String(m[1]||"");}
+}
+function qfOfficialTocBookIdV410(list,args){
+    var base=args&&args.length>1?String(args[1]||""):"",m=base.match(/(?:book\/|bookId=)(\d+)/i);
+    if(m)return String(m[1]);
+    list=Array.isArray(list)?list:[];
+    for(var i=0;i<list.length;i++){
+        var u=String(list[i]&&list[i].C||"");
+        m=u.match(/\/chapter\/(\d+)\/\d+/i);if(m)return String(m[1]);
+        m=u.match(/\/book\/(\d+)/i);if(m)return String(m[1]);
+    }
+    try{return String(qfBookVarV09.call(this,"qf_bid","")||"");}catch(_b){return "";}
+}
+function qfOfficialMapTocV410(raw,args){
+    var list=Array.isArray(raw)?raw:[],bid=qfOfficialTocBookIdV410.call(this,list,args),items=[],volume="",chapterIndex=0,volumeCount=0,lastTitle="";
+    for(var i=0;i<list.length;i++){
+        var x=list[i]||{},title=qfOfficialStrV410(x.N),url=qfOfficialStrV410(x.C),tm=qfOfficialStrV410(x.T);
+        if(qfOfficialBoolV410(x.Vo)){
+            volume=title;volumeCount++;
+            items.push({schema:QF_OFFICIAL_SCHEMA410.chapter,kind:"volume",id:"",bookId:bid,title:title,url:"",index:-1,isVip:false,isVolume:true,volume:title,updateTime:tm,source:""});
+            continue;
+        }
+        if(title==="版权信息"&&!/\/chapter\/\d+\/\d+/i.test(url)){
+            items.push({schema:QF_OFFICIAL_SCHEMA410.chapter,kind:"copyright",id:"",bookId:bid,title:title,url:url,index:-1,isVip:false,isVolume:false,volume:"",updateTime:tm,source:""});
+            continue;
+        }
+        var cm=url.match(/\/chapter\/(\d+)\/(\d+)/i),cid=cm&&cm[2]?String(cm[2]):"",ix=Number(qfOfficialUrlParamV410(url,"qfIndex"));
+        if(!isFinite(ix)||ix<0)ix=chapterIndex;
+        var src=qfOfficialUrlParamV410(url,"qfTocSrc");
+        items.push({schema:QF_OFFICIAL_SCHEMA410.chapter,kind:"chapter",id:cid,bookId:bid,title:title,url:url,index:ix,isVip:qfOfficialBoolV410(x.V),isVolume:false,volume:volume,updateTime:tm,source:src});
+        chapterIndex++;lastTitle=title||lastTitle;
+    }
+    return {schema:QF_OFFICIAL_SCHEMA410.toc,bookId:bid,items:items,chapterCount:chapterIndex,volumeCount:volumeCount,lastChapter:lastTitle};
+}
+function qfOfficialTocLegacyV410(model){
+    var items=model&&Array.isArray(model.items)?model.items:[],out=[];
+    for(var i=0;i<items.length;i++){
+        var x=items[i]||{},kind=String(x.kind||"");
+        if(kind==="volume")out.push({N:qfOfficialStrV410(x.title),C:"",V:false,Vo:true,T:qfOfficialStrV410(x.updateTime)});
+        else if(kind==="copyright")out.push({N:qfOfficialStrV410(x.title)||"版权信息",C:qfOfficialStrV410(x.url),V:false,Vo:false,T:qfOfficialStrV410(x.updateTime)});
+        else if(kind==="chapter")out.push({N:qfOfficialStrV410(x.title),C:qfOfficialStrV410(x.url),V:!!x.isVip,Vo:false,T:qfOfficialStrV410(x.updateTime)});
+    }
+    return out;
+}
+function qfOfficialMapContentV410(raw){
+    var text="",meta={};
+    if(raw&&typeof raw==="object"&&!Array.isArray(raw)){
+        text=String(raw.text!==undefined?raw.text:(raw.content!==undefined?raw.content:(raw.body!==undefined?raw.body:""))||"");
+        meta={ok:raw.ok!==undefined?!!raw.ok:!!text,source:String(raw.source||""),message:String(raw.message||"")};
+    }else text=String(raw==null?"":raw);
+    return {schema:QF_OFFICIAL_SCHEMA410.content,text:text,empty:!text,meta:meta};
+}
+function qfOfficialMapRichContentV410(raw){
+    raw=raw&&typeof raw==="object"?raw:{};
+    var text=String(raw.text!==undefined?raw.text:(raw.content!==undefined?raw.content:"")||"");
+    return {schema:QF_OFFICIAL_SCHEMA410.content,text:text,empty:!text,images:Array.isArray(raw.images)?raw.images:[],blocks:Array.isArray(raw.blocks)?raw.blocks:[],ok:raw.ok!==undefined?!!raw.ok:!!text,source:String(raw.source||""),message:String(raw.message||""),meta:raw};
+}
+function qfOfficialMapAuthorNoteV410(raw){
+    raw=raw&&typeof raw==="object"?raw:{text:String(raw==null?"":raw)};
+    var replies=raw.replyList||raw.replies||raw.ReplyList||raw.Replies||[];if(!Array.isArray(replies))replies=[];
+    return {schema:QF_OFFICIAL_SCHEMA410.authorNote,ok:raw.ok!==undefined?!!raw.ok:true,text:String(raw.text||raw.AuthorC
+
+### qfBookVar @502045
+Tier=QF_PROVIDER83[n]||{};
+                if(_spTier.policy&&_spTier.policy.bookVariableOnly)continue;
+                var t=String(_spTier.tier||"");
+                if(t&&out.indexOf(t)<0)out.push(t);
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierProvidersV310(tier){
+    tier=String(tier||"");
+    var base=(QF38_TIERS[tier]||[]),out=[];
+    for(var i=0;i<base.length;i++)if(out.indexOf(base[i])<0)out.push(base[i]);
+    try{
+        if(typeof QF_PROVIDER83!=="undefined"&&QF_PROVIDER83){
+            for(var n in QF_PROVIDER83){
+                if(!Object.prototype.hasOwnProperty.call(QF_PROVIDER83,n))continue;
+                var sp=QF_PROVIDER83[n]||{};
+                if(String(sp.tier||"")===tier&&out.indexOf(String(n))<0)out.push(String(n));
+            }
+        }
+    }catch(_e){}
+    return out;
+}
+function qfTierOrderKeyV310(tier){return String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfSetting.call(this,key,def)||def);}catch(_e){cfg=def;}
+    var out=qfRouteParseOrderV38(cfg,allow,def),sticky="";
+    try{sticky=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(_s){}
+    if(allow.indexOf(sticky)>=0){var ix=out.indexOf(sticky);if(ix>=0)out.splice(ix,1);out.unshift(sticky);}
+    return out;
+}
+
+/* ============================================================
+ * v4.0.0-alpha23 · Provider V1 Contract (qf.provider/1)
+ *
+ * 目标：今后新增正文源只实现独立 lazy module + 注册 Spec，不修改正文 Router。
+ * 必需能力：content(meta) -> string | {content,...}
+ * 可选能力：probe / resolveBook / resolveChapter / normalize / health / error
+ *
+ * Provider Spec:
+ *   {
+ *     id: "stable_id",
+ *     tier: "限免源|优选源|兜底源|自定义类别",
+ *     module: "lazy_module_name",
+ *     capabilities: {
+ *       content:{entry:"fn"},
+ *       probe:{entry:"fn"}, ...
+ *     },
+ *     policy:{verify:false},
+ *     ui:{label:"显示名", order:100}
+ *   }
+ *
+ * Canonical ContentResult:
+ *   {ok,provider,providerId,tier,bookId,chapterId,title,content,media,error,duration,ts}
+ * ============================================================ */
+var QF_PROVIDER_V1_520={
+    abi:"qf.provider/1",version:1,
+    required:["content"],
+    optional:["probe","resolveBook","resolveChapter","normalize","health","error"],
+    builtInTiers:["限免源","优选源","兜底源"]
+};
+function qfProviderV1CapV520(v){
+    if(typeof v==="string")return {entry:String(v)};
+    if(!v||typeof v!=="object")return null;
+    return v;
+}
+function qfProviderV1ValidateV520(name,spec){
+    name=String(name||"");spec=spec||{};var issues=[],caps=spec.capabilities||{};
+    if(!name)issues.push("name 为空");
+    if(!String(spec.id||""))issues.push("id 为空");
+    if(!String(spec.tier||""))issues.push("tier 为空");
+    var cc=qfProviderV1CapV520(caps.content);
+    if(!cc||!String(cc.entry||""))issues.push("缺少 content capability");
+    for(var k in caps){
+        if(!Object.prototype.hasOwnProperty.call(caps,k))continue;
+        var c=qfProviderV1CapV520(caps[k]);
+        if(!c||!String(c.entry||"")){issues.push("capability 无入口："+k);continue;}
+        if(!String(c.module||spec.module||"")&&!c.global)issues.push("capability 无 module："+k);
+    }
+    return {ok:issues.length===0,name:name,id:String(spec.id||""),tier:String(spec.tier||""),abi:String(spec.abi||QF_PROVIDER_V1_520.abi),issues:issues};
+}
+function qfProviderV1NormalizeSpecV520(name,spec){
+    name=String(name||"");spec=spec||{};var out={},k;
+    for(k in spec)if(Object.prototype.hasOwnProperty.call(spec,k))out[k]=spec[k];
+    out.id=String(out.id||name).trim();
+    out.name=name;
+    out.tier=String(out.tier||"").trim();
+    out.module=String(out.module||"").trim();
+    out.abi=QF_PROVIDER_V1_520.abi;
+    out.contractVersion=1;
+    out.capabilities=out.capabilities||{};
+    out.policy=out.policy||{};
+    out.ui=out.ui||{label:name};
+    if(!out.ui.label)out
+
+### qfBookVar @502925
+urn String(tier||"")+"顺序";}
+function qfRouteTierV38(){
+    var t="";try{t=String(qfSetting.call(this,"正文源类别","")||"");}catch(_e){}
+    if(t==="全源智能"||t==="STV源")return t;
+    if(qfTierNamesV310().indexOf(t)<0){
+        var old="否";try{old=String(qfSetting.call(this,"是否选择限免源","否")||"否");}catch(_o){}
+        t=old==="是"?"限免源":"优选源";
+    }
+    return t;
+}
+function qfRouteGlobalPickV38(tier){
+    if(tier==="全源智能")return "自动";
+    var key=tier==="限免源"?"限免源选择":(tier==="兜底源"?"兜底源选择":(tier==="优选源"?"优选源选择":String(tier||"")+"选择")),v="自动";
+    try{v=String(qfSetting.call(this,key,"自动")||"自动");}catch(_e){}
+    return qfTierProvidersV310(tier).indexOf(v)>=0?v:"自动";
+}
+function qfRouteBookV38(){
+    var raw="";try{raw=String(qfBookVarV09.call(this,"custom","")||"").trim();}catch(_e){}
+    if(raw==="null")raw="";
+    if(raw&&QF38_CODES[raw])return {tier:QF38_CODES[raw].tier,pick:QF38_CODES[raw].pick,raw:raw,fromBook:true};
+    if(raw){
+        var ts=qfTierNamesV310();
+        for(var i=0;i<ts.length;i++)if(qfTierProvidersV310(ts[i]).indexOf(raw)>=0)return {tier:ts[i],pick:raw,raw:raw,fromBook:true};
+    }
+    var tier=qfRouteTierV38.call(this);
+    return {tier:tier,pick:qfRouteGlobalPickV38.call(this,tier),raw:raw,fromBook:false};
+}
+function qfRouteOrderV38(route){
+    if(route.pick&&route.pick!=="自动")return [route.pick];
+    var tier=route.tier,allow=qfTierProvidersV310(tier),def=allow.join("→"),cfg=def,key=qfTierOrderKeyV310(tier);
+    try{cfg=String(qfSetting.call(this,key,def)||def);}catch(_e){cfg=def;}
+    var out=qfRouteParseOrderV38(cfg,allow,def),sticky="";
+    try{sticky=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(_s){}
+    if(allow.indexOf(sticky)>=0){var ix=out.indexOf(sticky);if(ix>=0)out.splice(ix,1);out.unshift(sticky);}
+    return out;
+}
+
+/* ============================================================
+ * v4.0.0-alpha23 · Provider V1 Contract (qf.provider/1)
+ *
+ * 目标：今后新增正文源只实现独立 lazy module + 注册 Spec，不修改正文 Router。
+ * 必需能力：content(meta) -> string | {content,...}
+ * 可选能力：probe / resolveBook / resolveChapter / normalize / health / error
+ *
+ * Provider Spec:
+ *   {
+ *     id: "stable_id",
+ *     tier: "限免源|优选源|兜底源|自定义类别",
+ *     module: "lazy_module_name",
+ *     capabilities: {
+ *       content:{entry:"fn"},
+ *       probe:{entry:"fn"}, ...
+ *     },
+ *     policy:{verify:false},
+ *     ui:{label:"显示名", order:100}
+ *   }
+ *
+ * Canonical ContentResult:
+ *   {ok,provider,providerId,tier,bookId,chapterId,title,content,media,error,duration,ts}
+ * ============================================================ */
+var QF_PROVIDER_V1_520={
+    abi:"qf.provider/1",version:1,
+    required:["content"],
+    optional:["probe","resolveBook","resolveChapter","normalize","health","error"],
+    builtInTiers:["限免源","优选源","兜底源"]
+};
+function qfProviderV1CapV520(v){
+    if(typeof v==="string")return {entry:String(v)};
+    if(!v||typeof v!=="object")return null;
+    return v;
+}
+function qfProviderV1ValidateV520(name,spec){
+    name=String(name||"");spec=spec||{};var issues=[],caps=spec.capabilities||{};
+    if(!name)issues.push("name 为空");
+    if(!String(spec.id||""))issues.push("id 为空");
+    if(!String(spec.tier||""))issues.push("tier 为空");
+    var cc=qfProviderV1CapV520(caps.content);
+    if(!cc||!String(cc.entry||""))issues.push("缺少 content capability");
+    for(var k in caps){
+        if(!Object.prototype.hasOwnProperty.call(caps,k))continue;
+        var c=qfProviderV1CapV520(caps[k]);
+        if(!c||!String(c.entry||"")){issues.push("capability 无入口："+k);continue;}
+        if(!String(c.module||spec.module||"")&&!c.global)issues.push("capability 无 module："+k);
+    }
+    return {ok:issues.length===0,name:name,id:String(spec.id||""),tier:String(spec.tier||""),abi:String(spec.abi||QF_PROVIDER_V1_520.abi),issues:issues};
+}
+function qfProviderV1NormalizeSpecV520(name,spec){
+    name=String(name||"");spec=spec||{};var out={},k;
+    for(k in spec)if(Object.prototype.hasOwnProperty.call(spec,k))out[k]=spec[k];
+    out.id=String(out.id||name).trim();
+    out.name=name;
+    out.tier=String(out.tier||"").trim();
+    out.module=String(out.module||"").trim();
+    out.abi=QF_PROVIDER_V1_520.abi;
+    out.contractVersion=1;
+    out.capabilities=out.capabilities||{};
+    out.policy=out.policy||{};
+    out.ui=out.ui||{label:name};
+    if(!out.ui.label)out.ui.label=name;
+    return out;
+}
+function qfProviderRegisterV1(name,spec){
+    var n=qfProviderV1NormalizeSpecV520(name,spec),v=qfProviderV1ValidateV520(name,n);
+    if(!v.ok)throw new Error("Provider V1 注册失败："+String(name||"")+" / "+v.issues.join("；"));
+    return qfProviderRegisterV400(String(name||""),n);
+}
+function qfProviderV1DescribeV520(name){
+    var sp=qfProviderSpecV39(name);if(!sp)return null;
+    var caps=[],cs=sp.capabilities||{};
+    for(var k in cs)if(Object.prototype.hasOwnProperty.call(cs,k))caps.push(String(k));
+    return {name:String(name||""),id:String(sp.id||""),tier:String(sp.tier||""),module:String(sp.module||""),abi:String(sp.abi||"legacy"),contractVersion:Number(sp.contractVersion||0),capabilities:caps,policy:sp.policy||{},ui:sp.ui||{}};
+}
+function qfProviderV1ResultV520(name,meta,content,error,duration,extra){
+    meta=meta||{};extra=extra|
+
+### qfBookVar @546574
+    try{
+        text=QF_ProviderExecutor.content(this,p,meta,sp);
+        if(!QF_ContentCleaner.valid(text))err=qfProviderErrorV39.call(this,p,"正文为空或过短",sp);
+        if(!err&&qfProviderPolicyV83(sp,"verify",false)){
+            var verify={ok:true};try{var va=qfModuleEnsureV38.call(this,"review_align");verify=va.qdV54VerifyBody.call(this,meta,p,text,3)||verify;}catch(_v){}
+            if(!verify.ok)err="正文锚点校验失败";
+        }
+        if(!err){
+            var nh=Number(h.hits||0)+1;qfProviderHotSet.call(this,meta,ptier,p,nh);
+            try{meta._qfHotEstablishedV360=p;meta._qfHotHitsV360=nh;}catch(_mh){}
+            qfDiagEventV85.call(this,"provider-hot",p,"content",true,Date.now()-st,"hit="+nh);
+            return {ok:true,text:String(text||""),provider:p,tier:ptier,hits:nh};
+        }
+    }catch(e){err=String(e&&e.message||e);}
+    qfProviderHotClear.call(this,meta,p);
+    qfDiagEventV85.call(this,"provider-hot",p,"content",false,Date.now()-st,err||"热路由失败");
+    return {ok:false,text:"",provider:p,tier:ptier,error:err||"正文为空或过短",hits:Number(h.hits||0)};
+}
+
+/* ============================================================
+ * v3.5 beta24 · 跨运行期 Provider 快速续接
+ * - beta20 的热路由只存在当前 JS 运行期；阅读重开/规则重载后第一章仍会进入完整 Router。
+ * - 本书最近成功 Provider 在 36h 内、且没有处于 health 冷却时，先直达一次。
+ * - 成功则无需加载 provider_runtime / health / learn；失败会交给原 Router 统一记账，且本章不重复请求。
+ * - 最近成功时间最多每小时持久化一次，避免每章写书籍变量。
+ * ============================================================ */
+function qfProviderStickyHint(route){
+    if(!route||String(route.pick||"")!=="自动")return null;
+    var p="",t="",ts=0;
+    try{p=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(_p){}
+    try{t=String(qfBookVarV09.call(this,"qf_last_tier_v307","")||"");}catch(_t){}
+    try{ts=Number(qfBookVarV09.call(this,"qf_last_provider_ts_v355","0")||0);}catch(_ts){}
+    if(!p||!t)return null;
+    var sp=qfProviderSpecV39(p);if(!sp||String(sp.tier||"")!==t)return null;
+    var rt=String(route.tier||"");if(rt!=="全源智能"&&rt!==t)return null;
+    /* 升级 beta24 的旧书可能还没有时间戳：允许首轮沿用一次；之后成功会补时间戳。 */
+    if(ts&&Date.now()-ts>36*60*60*1000)return null;
+    try{
+        var hr=String(qfBookVarV09.call(this,"qf_provider_health_v69","{}")||"{}"),ho=JSON.parse(hr)||{},hx=ho[p]||{};
+        if(Number(hx.until||0)>Date.now())return null;
+    }catch(_h){}
+    return {provider:p,tier:t,ts:ts,sp:sp};
+}
+function qfProviderStickyTry(meta,route){
+    var h=qfProviderStickyHint.call(this,route);if(!h)return null;
+    var p=String(h.provider||""),sp=h.sp||qfProviderSpecV39(p),st=Date.now(),text="",err="";
+    try{
+        text=QF_ProviderExecutor.content(this,p,meta,sp);
+        if(!QF_ContentCleaner.valid(text))err=qfProviderErrorV39.call(this,p,"正文为空或过短",sp);
+        if(!err&&qfProviderPolicyV83(sp,"verify",false)){
+            var verify={ok:true};try{var va=qfModuleEnsureV38.call(this,"review_align");verify=va.qdV54VerifyBody.call(this,meta,p,text,3)||verify;}catch(_v){}
+            if(!verify.ok)err="正文锚点校验失败";
+        }
+        if(!err){
+            qfProviderHotSet.call(this,meta,h.tier,p,1);
+            try{meta._qfHotEstablishedV360=p;meta._qfHotHitsV360=1;}catch(_mhs){}
+            qfDiagEventV85.call(this,"provider-sticky",p,"content",true,Date.now()-st,"cross-session");
+            return {ok:true,text:String(text||""),provider:p,tier:h.tier,hits:1,sticky:true};
+        }
+    }catch(e){err=String(e&&e.message||e);}
+    qfDiagEventV85.call(this,"provider-sticky",p,"content",false,Date.now()-st,err||"快速续接失败");
+    return {ok:false,text:"",provider:p,tier:h.tier,error:err||"正文为空或过短",hits:0,sticky:true};
+}
+
+function qfProviderRemember(tier,provider,meta){
+    /* alpha12：热路由已经在本章完成 RuntimeCache 更新时，不再每章读取/比较 3 个持久化书籍变量。
+       每 24 次连续热命中同步一次，兼顾跨运行期 sticky 时间戳新鲜度。 */
+    var p=String(provider||""),_hotSame=false,_hotHits=0;
+    try{qfAdjacentProviderWarm(meta,tier,p);}catch(_adj510){}
+    try{_hotSame=!!(meta&&String(meta._qfHotEstablishedV360||"")===p);_hotHits=Number(meta&&meta._qfHotHitsV360||0)||0;}catch(_hf){}
+    if(_hotSame&&_hotHits>0&&(_hotHits%24)!==0)return;
+    /* alpha69：值没变化就不写书籍变量，连续翻章减少无意义持久化。 */
+    var oldP="",changed=false;
+    try{oldP=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");if(oldP!==p){qfPutBookVarV09.call(this,"qf_last_provider_v307",p);changed=true;}}catch(_e0){}
+    try{var t=String(tier||""),ot=qfBookVarV09.call(this,"qf_last_tier_v307","");if(String(ot||"")!==t){qfPutBookVarV09.call(this,"qf_last_tier_v307",t);changed=true;}}catch(_e1){}
+    /* beta24：跨运行期快速续接只需要“最近成功时间”。最多每小时写一次，Provider 变化时立即写。 */
+    try{var now=Date.now(),ots=Number(qfBookVarV09.call(this,"qf_last_provider_ts_v355","0")||0);if(changed||!ots||now-ots>60*60*1000)qfPutBookVarV09.call(this,"qf_last_provider_ts_v355",String(now));}catch(_e2){}
+    /* beta20：正常成功后建立连续翻章运行期热路由。
+       alpha12：本章热路由/快速续接已经 set 过时不重复 Java putMemory。 */
+    var _already=false;try{_already=!!(meta&&String(meta._qfHotEstablishedV360||"")===p);}catch(_ha){}
+    if(meta&&meta.bookId&&!_already)try{qfProviderHotSet.call(this,meta,tier,provider);}catch(_h){}
+}
+/* ============================================================
+ * v3.1 beta1：全源智能正文路由
+ * - 原“限免/优选/兜底”严格隔离模式保持原样；
+ * - 只有用户主动选择“全源智能”
+
+### qfBookVar @546660
+entCleaner.valid(text))err=qfProviderErrorV39.call(this,p,"正文为空或过短",sp);
+        if(!err&&qfProviderPolicyV83(sp,"verify",false)){
+            var verify={ok:true};try{var va=qfModuleEnsureV38.call(this,"review_align");verify=va.qdV54VerifyBody.call(this,meta,p,text,3)||verify;}catch(_v){}
+            if(!verify.ok)err="正文锚点校验失败";
+        }
+        if(!err){
+            var nh=Number(h.hits||0)+1;qfProviderHotSet.call(this,meta,ptier,p,nh);
+            try{meta._qfHotEstablishedV360=p;meta._qfHotHitsV360=nh;}catch(_mh){}
+            qfDiagEventV85.call(this,"provider-hot",p,"content",true,Date.now()-st,"hit="+nh);
+            return {ok:true,text:String(text||""),provider:p,tier:ptier,hits:nh};
+        }
+    }catch(e){err=String(e&&e.message||e);}
+    qfProviderHotClear.call(this,meta,p);
+    qfDiagEventV85.call(this,"provider-hot",p,"content",false,Date.now()-st,err||"热路由失败");
+    return {ok:false,text:"",provider:p,tier:ptier,error:err||"正文为空或过短",hits:Number(h.hits||0)};
+}
+
+/* ============================================================
+ * v3.5 beta24 · 跨运行期 Provider 快速续接
+ * - beta20 的热路由只存在当前 JS 运行期；阅读重开/规则重载后第一章仍会进入完整 Router。
+ * - 本书最近成功 Provider 在 36h 内、且没有处于 health 冷却时，先直达一次。
+ * - 成功则无需加载 provider_runtime / health / learn；失败会交给原 Router 统一记账，且本章不重复请求。
+ * - 最近成功时间最多每小时持久化一次，避免每章写书籍变量。
+ * ============================================================ */
+function qfProviderStickyHint(route){
+    if(!route||String(route.pick||"")!=="自动")return null;
+    var p="",t="",ts=0;
+    try{p=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(_p){}
+    try{t=String(qfBookVarV09.call(this,"qf_last_tier_v307","")||"");}catch(_t){}
+    try{ts=Number(qfBookVarV09.call(this,"qf_last_provider_ts_v355","0")||0);}catch(_ts){}
+    if(!p||!t)return null;
+    var sp=qfProviderSpecV39(p);if(!sp||String(sp.tier||"")!==t)return null;
+    var rt=String(route.tier||"");if(rt!=="全源智能"&&rt!==t)return null;
+    /* 升级 beta24 的旧书可能还没有时间戳：允许首轮沿用一次；之后成功会补时间戳。 */
+    if(ts&&Date.now()-ts>36*60*60*1000)return null;
+    try{
+        var hr=String(qfBookVarV09.call(this,"qf_provider_health_v69","{}")||"{}"),ho=JSON.parse(hr)||{},hx=ho[p]||{};
+        if(Number(hx.until||0)>Date.now())return null;
+    }catch(_h){}
+    return {provider:p,tier:t,ts:ts,sp:sp};
+}
+function qfProviderStickyTry(meta,route){
+    var h=qfProviderStickyHint.call(this,route);if(!h)return null;
+    var p=String(h.provider||""),sp=h.sp||qfProviderSpecV39(p),st=Date.now(),text="",err="";
+    try{
+        text=QF_ProviderExecutor.content(this,p,meta,sp);
+        if(!QF_ContentCleaner.valid(text))err=qfProviderErrorV39.call(this,p,"正文为空或过短",sp);
+        if(!err&&qfProviderPolicyV83(sp,"verify",false)){
+            var verify={ok:true};try{var va=qfModuleEnsureV38.call(this,"review_align");verify=va.qdV54VerifyBody.call(this,meta,p,text,3)||verify;}catch(_v){}
+            if(!verify.ok)err="正文锚点校验失败";
+        }
+        if(!err){
+            qfProviderHotSet.call(this,meta,h.tier,p,1);
+            try{meta._qfHotEstablishedV360=p;meta._qfHotHitsV360=1;}catch(_mhs){}
+            qfDiagEventV85.call(this,"provider-sticky",p,"content",true,Date.now()-st,"cross-session");
+            return {ok:true,text:String(text||""),provider:p,tier:h.tier,hits:1,sticky:true};
+        }
+    }catch(e){err=String(e&&e.message||e);}
+    qfDiagEventV85.call(this,"provider-sticky",p,"content",false,Date.now()-st,err||"快速续接失败");
+    return {ok:false,text:"",provider:p,tier:h.tier,error:err||"正文为空或过短",hits:0,sticky:true};
+}
+
+function qfProviderRemember(tier,provider,meta){
+    /* alpha12：热路由已经在本章完成 RuntimeCache 更新时，不再每章读取/比较 3 个持久化书籍变量。
+       每 24 次连续热命中同步一次，兼顾跨运行期 sticky 时间戳新鲜度。 */
+    var p=String(provider||""),_hotSame=false,_hotHits=0;
+    try{qfAdjacentProviderWarm(meta,tier,p);}catch(_adj510){}
+    try{_hotSame=!!(meta&&String(meta._qfHotEstablishedV360||"")===p);_hotHits=Number(meta&&meta._qfHotHitsV360||0)||0;}catch(_hf){}
+    if(_hotSame&&_hotHits>0&&(_hotHits%24)!==0)return;
+    /* alpha69：值没变化就不写书籍变量，连续翻章减少无意义持久化。 */
+    var oldP="",changed=false;
+    try{oldP=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");if(oldP!==p){qfPutBookVarV09.call(this,"qf_last_provider_v307",p);changed=true;}}catch(_e0){}
+    try{var t=String(tier||""),ot=qfBookVarV09.call(this,"qf_last_tier_v307","");if(String(ot||"")!==t){qfPutBookVarV09.call(this,"qf_last_tier_v307",t);changed=true;}}catch(_e1){}
+    /* beta24：跨运行期快速续接只需要“最近成功时间”。最多每小时写一次，Provider 变化时立即写。 */
+    try{var now=Date.now(),ots=Number(qfBookVarV09.call(this,"qf_last_provider_ts_v355","0")||0);if(changed||!ots||now-ots>60*60*1000)qfPutBookVarV09.call(this,"qf_last_provider_ts_v355",String(now));}catch(_e2){}
+    /* beta20：正常成功后建立连续翻章运行期热路由。
+       alpha12：本章热路由/快速续接已经 set 过时不重复 Java putMemory。 */
+    var _already=false;try{_already=!!(meta&&String(meta._qfHotEstablishedV360||"")===p);}catch(_ha){}
+    if(meta&&meta.bookId&&!_already)try{qfProviderHotSet.call(this,meta,tier,provider);}catch(_h){}
+}
+/* ============================================================
+ * v3.1 beta1：全源智能正文路由
+ * - 原“限免/优选/兜底”严格隔离模式保持原样；
+ * - 只有用户主动选择“全源智能”或书籍变量=9时才跨类别；
+ * - 首章按配置的类别顺序尝试；成功后记住本书 tier + provider；
+ * - 后续章节把最近成功 tier 提到最前，再由该 
+
+### qfBookVar @546743
+(!err&&qfProviderPolicyV83(sp,"verify",false)){
+            var verify={ok:true};try{var va=qfModuleEnsureV38.call(this,"review_align");verify=va.qdV54VerifyBody.call(this,meta,p,text,3)||verify;}catch(_v){}
+            if(!verify.ok)err="正文锚点校验失败";
+        }
+        if(!err){
+            var nh=Number(h.hits||0)+1;qfProviderHotSet.call(this,meta,ptier,p,nh);
+            try{meta._qfHotEstablishedV360=p;meta._qfHotHitsV360=nh;}catch(_mh){}
+            qfDiagEventV85.call(this,"provider-hot",p,"content",true,Date.now()-st,"hit="+nh);
+            return {ok:true,text:String(text||""),provider:p,tier:ptier,hits:nh};
+        }
+    }catch(e){err=String(e&&e.message||e);}
+    qfProviderHotClear.call(this,meta,p);
+    qfDiagEventV85.call(this,"provider-hot",p,"content",false,Date.now()-st,err||"热路由失败");
+    return {ok:false,text:"",provider:p,tier:ptier,error:err||"正文为空或过短",hits:Number(h.hits||0)};
+}
+
+/* ============================================================
+ * v3.5 beta24 · 跨运行期 Provider 快速续接
+ * - beta20 的热路由只存在当前 JS 运行期；阅读重开/规则重载后第一章仍会进入完整 Router。
+ * - 本书最近成功 Provider 在 36h 内、且没有处于 health 冷却时，先直达一次。
+ * - 成功则无需加载 provider_runtime / health / learn；失败会交给原 Router 统一记账，且本章不重复请求。
+ * - 最近成功时间最多每小时持久化一次，避免每章写书籍变量。
+ * ============================================================ */
+function qfProviderStickyHint(route){
+    if(!route||String(route.pick||"")!=="自动")return null;
+    var p="",t="",ts=0;
+    try{p=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(_p){}
+    try{t=String(qfBookVarV09.call(this,"qf_last_tier_v307","")||"");}catch(_t){}
+    try{ts=Number(qfBookVarV09.call(this,"qf_last_provider_ts_v355","0")||0);}catch(_ts){}
+    if(!p||!t)return null;
+    var sp=qfProviderSpecV39(p);if(!sp||String(sp.tier||"")!==t)return null;
+    var rt=String(route.tier||"");if(rt!=="全源智能"&&rt!==t)return null;
+    /* 升级 beta24 的旧书可能还没有时间戳：允许首轮沿用一次；之后成功会补时间戳。 */
+    if(ts&&Date.now()-ts>36*60*60*1000)return null;
+    try{
+        var hr=String(qfBookVarV09.call(this,"qf_provider_health_v69","{}")||"{}"),ho=JSON.parse(hr)||{},hx=ho[p]||{};
+        if(Number(hx.until||0)>Date.now())return null;
+    }catch(_h){}
+    return {provider:p,tier:t,ts:ts,sp:sp};
+}
+function qfProviderStickyTry(meta,route){
+    var h=qfProviderStickyHint.call(this,route);if(!h)return null;
+    var p=String(h.provider||""),sp=h.sp||qfProviderSpecV39(p),st=Date.now(),text="",err="";
+    try{
+        text=QF_ProviderExecutor.content(this,p,meta,sp);
+        if(!QF_ContentCleaner.valid(text))err=qfProviderErrorV39.call(this,p,"正文为空或过短",sp);
+        if(!err&&qfProviderPolicyV83(sp,"verify",false)){
+            var verify={ok:true};try{var va=qfModuleEnsureV38.call(this,"review_align");verify=va.qdV54VerifyBody.call(this,meta,p,text,3)||verify;}catch(_v){}
+            if(!verify.ok)err="正文锚点校验失败";
+        }
+        if(!err){
+            qfProviderHotSet.call(this,meta,h.tier,p,1);
+            try{meta._qfHotEstablishedV360=p;meta._qfHotHitsV360=1;}catch(_mhs){}
+            qfDiagEventV85.call(this,"provider-sticky",p,"content",true,Date.now()-st,"cross-session");
+            return {ok:true,text:String(text||""),provider:p,tier:h.tier,hits:1,sticky:true};
+        }
+    }catch(e){err=String(e&&e.message||e);}
+    qfDiagEventV85.call(this,"provider-sticky",p,"content",false,Date.now()-st,err||"快速续接失败");
+    return {ok:false,text:"",provider:p,tier:h.tier,error:err||"正文为空或过短",hits:0,sticky:true};
+}
+
+function qfProviderRemember(tier,provider,meta){
+    /* alpha12：热路由已经在本章完成 RuntimeCache 更新时，不再每章读取/比较 3 个持久化书籍变量。
+       每 24 次连续热命中同步一次，兼顾跨运行期 sticky 时间戳新鲜度。 */
+    var p=String(provider||""),_hotSame=false,_hotHits=0;
+    try{qfAdjacentProviderWarm(meta,tier,p);}catch(_adj510){}
+    try{_hotSame=!!(meta&&String(meta._qfHotEstablishedV360||"")===p);_hotHits=Number(meta&&meta._qfHotHitsV360||0)||0;}catch(_hf){}
+    if(_hotSame&&_hotHits>0&&(_hotHits%24)!==0)return;
+    /* alpha69：值没变化就不写书籍变量，连续翻章减少无意义持久化。 */
+    var oldP="",changed=false;
+    try{oldP=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");if(oldP!==p){qfPutBookVarV09.call(this,"qf_last_provider_v307",p);changed=true;}}catch(_e0){}
+    try{var t=String(tier||""),ot=qfBookVarV09.call(this,"qf_last_tier_v307","");if(String(ot||"")!==t){qfPutBookVarV09.call(this,"qf_last_tier_v307",t);changed=true;}}catch(_e1){}
+    /* beta24：跨运行期快速续接只需要“最近成功时间”。最多每小时写一次，Provider 变化时立即写。 */
+    try{var now=Date.now(),ots=Number(qfBookVarV09.call(this,"qf_last_provider_ts_v355","0")||0);if(changed||!ots||now-ots>60*60*1000)qfPutBookVarV09.call(this,"qf_last_provider_ts_v355",String(now));}catch(_e2){}
+    /* beta20：正常成功后建立连续翻章运行期热路由。
+       alpha12：本章热路由/快速续接已经 set 过时不重复 Java putMemory。 */
+    var _already=false;try{_already=!!(meta&&String(meta._qfHotEstablishedV360||"")===p);}catch(_ha){}
+    if(meta&&meta.bookId&&!_already)try{qfProviderHotSet.call(this,meta,tier,provider);}catch(_h){}
+}
+/* ============================================================
+ * v3.1 beta1：全源智能正文路由
+ * - 原“限免/优选/兜底”严格隔离模式保持原样；
+ * - 只有用户主动选择“全源智能”或书籍变量=9时才跨类别；
+ * - 首章按配置的类别顺序尝试；成功后记住本书 tier + provider；
+ * - 后续章节把最近成功 tier 提到最前，再由该 tier 内 sticky provider 直达；
+ * - 某 tier 全部失败才进入下一 tier，Provider 健康熔断继续复用原 alpha69 逻辑
+
+### qfBookVar @547125
+._qfHotEstablishedV360=p;meta._qfHotHitsV360=nh;}catch(_mh){}
+            qfDiagEventV85.call(this,"provider-hot",p,"content",true,Date.now()-st,"hit="+nh);
+            return {ok:true,text:String(text||""),provider:p,tier:ptier,hits:nh};
+        }
+    }catch(e){err=String(e&&e.message||e);}
+    qfProviderHotClear.call(this,meta,p);
+    qfDiagEventV85.call(this,"provider-hot",p,"content",false,Date.now()-st,err||"热路由失败");
+    return {ok:false,text:"",provider:p,tier:ptier,error:err||"正文为空或过短",hits:Number(h.hits||0)};
+}
+
+/* ============================================================
+ * v3.5 beta24 · 跨运行期 Provider 快速续接
+ * - beta20 的热路由只存在当前 JS 运行期；阅读重开/规则重载后第一章仍会进入完整 Router。
+ * - 本书最近成功 Provider 在 36h 内、且没有处于 health 冷却时，先直达一次。
+ * - 成功则无需加载 provider_runtime / health / learn；失败会交给原 Router 统一记账，且本章不重复请求。
+ * - 最近成功时间最多每小时持久化一次，避免每章写书籍变量。
+ * ============================================================ */
+function qfProviderStickyHint(route){
+    if(!route||String(route.pick||"")!=="自动")return null;
+    var p="",t="",ts=0;
+    try{p=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");}catch(_p){}
+    try{t=String(qfBookVarV09.call(this,"qf_last_tier_v307","")||"");}catch(_t){}
+    try{ts=Number(qfBookVarV09.call(this,"qf_last_provider_ts_v355","0")||0);}catch(_ts){}
+    if(!p||!t)return null;
+    var sp=qfProviderSpecV39(p);if(!sp||String(sp.tier||"")!==t)return null;
+    var rt=String(route.tier||"");if(rt!=="全源智能"&&rt!==t)return null;
+    /* 升级 beta24 的旧书可能还没有时间戳：允许首轮沿用一次；之后成功会补时间戳。 */
+    if(ts&&Date.now()-ts>36*60*60*1000)return null;
+    try{
+        var hr=String(qfBookVarV09.call(this,"qf_provider_health_v69","{}")||"{}"),ho=JSON.parse(hr)||{},hx=ho[p]||{};
+        if(Number(hx.until||0)>Date.now())return null;
+    }catch(_h){}
+    return {provider:p,tier:t,ts:ts,sp:sp};
+}
+function qfProviderStickyTry(meta,route){
+    var h=qfProviderStickyHint.call(this,route);if(!h)return null;
+    var p=String(h.provider||""),sp=h.sp||qfProviderSpecV39(p),st=Date.now(),text="",err="";
+    try{
+        text=QF_ProviderExecutor.content(this,p,meta,sp);
+        if(!QF_ContentCleaner.valid(text))err=qfProviderErrorV39.call(this,p,"正文为空或过短",sp);
+        if(!err&&qfProviderPolicyV83(sp,"verify",false)){
+            var verify={ok:true};try{var va=qfModuleEnsureV38.call(this,"review_align");verify=va.qdV54VerifyBody.call(this,meta,p,text,3)||verify;}catch(_v){}
+            if(!verify.ok)err="正文锚点校验失败";
+        }
+        if(!err){
+            qfProviderHotSet.call(this,meta,h.tier,p,1);
+            try{meta._qfHotEstablishedV360=p;meta._qfHotHitsV360=1;}catch(_mhs){}
+            qfDiagEventV85.call(this,"provider-sticky",p,"content",true,Date.now()-st,"cross-session");
+            return {ok:true,text:String(text||""),provider:p,tier:h.tier,hits:1,sticky:true};
+        }
+    }catch(e){err=String(e&&e.message||e);}
+    qfDiagEventV85.call(this,"provider-sticky",p,"content",false,Date.now()-st,err||"快速续接失败");
+    return {ok:false,text:"",provider:p,tier:h.tier,error:err||"正文为空或过短",hits:0,sticky:true};
+}
+
+function qfProviderRemember(tier,provider,meta){
+    /* alpha12：热路由已经在本章完成 RuntimeCache 更新时，不再每章读取/比较 3 个持久化书籍变量。
+       每 24 次连续热命中同步一次，兼顾跨运行期 sticky 时间戳新鲜度。 */
+    var p=String(provider||""),_hotSame=false,_hotHits=0;
+    try{qfAdjacentProviderWarm(meta,tier,p);}catch(_adj510){}
+    try{_hotSame=!!(meta&&String(meta._qfHotEstablishedV360||"")===p);_hotHits=Number(meta&&meta._qfHotHitsV360||0)||0;}catch(_hf){}
+    if(_hotSame&&_hotHits>0&&(_hotHits%24)!==0)return;
+    /* alpha69：值没变化就不写书籍变量，连续翻章减少无意义持久化。 */
+    var oldP="",changed=false;
+    try{oldP=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");if(oldP!==p){qfPutBookVarV09.call(this,"qf_last_provider_v307",p);changed=true;}}catch(_e0){}
+    try{var t=String(tier||""),ot=qfBookVarV09.call(this,"qf_last_tier_v307","");if(String(ot||"")!==t){qfPutBookVarV09.call(this,"qf_last_tier_v307",t);changed=true;}}catch(_e1){}
+    /* beta24：跨运行期快速续接只需要“最近成功时间”。最多每小时写一次，Provider 变化时立即写。 */
+    try{var now=Date.now(),ots=Number(qfBookVarV09.call(this,"qf_last_provider_ts_v355","0")||0);if(changed||!ots||now-ots>60*60*1000)qfPutBookVarV09.call(this,"qf_last_provider_ts_v355",String(now));}catch(_e2){}
+    /* beta20：正常成功后建立连续翻章运行期热路由。
+       alpha12：本章热路由/快速续接已经 set 过时不重复 Java putMemory。 */
+    var _already=false;try{_already=!!(meta&&String(meta._qfHotEstablishedV360||"")===p);}catch(_ha){}
+    if(meta&&meta.bookId&&!_already)try{qfProviderHotSet.call(this,meta,tier,provider);}catch(_h){}
+}
+/* ============================================================
+ * v3.1 beta1：全源智能正文路由
+ * - 原“限免/优选/兜底”严格隔离模式保持原样；
+ * - 只有用户主动选择“全源智能”或书籍变量=9时才跨类别；
+ * - 首章按配置的类别顺序尝试；成功后记住本书 tier + provider；
+ * - 后续章节把最近成功 tier 提到最前，再由该 tier 内 sticky provider 直达；
+ * - 某 tier 全部失败才进入下一 tier，Provider 健康熔断继续复用原 alpha69 逻辑。
+ * ============================================================ */
+/* ============================================================
+ * v3.3 beta9：全源智能状态 / 自动切源反馈
+ * - 不改变 Provider 排序算法，只把 beta8 已有学习结果转成用户可理解的状态；
+ * - 只有“全源智能”真实从一个 Provider 切到另一个 Provider 时才提示；
+ * - 首次绑定不提示，同一章节刷新不重复提示；
+ * - 详情页状态摘要只读轻量书籍变量，用户主动点“源状态”时才加载 provider_runtime。
+ * =====================================
+
+### qfBookVar @549137
+="";
+    try{
+        text=QF_ProviderExecutor.content(this,p,meta,sp);
+        if(!QF_ContentCleaner.valid(text))err=qfProviderErrorV39.call(this,p,"正文为空或过短",sp);
+        if(!err&&qfProviderPolicyV83(sp,"verify",false)){
+            var verify={ok:true};try{var va=qfModuleEnsureV38.call(this,"review_align");verify=va.qdV54VerifyBody.call(this,meta,p,text,3)||verify;}catch(_v){}
+            if(!verify.ok)err="正文锚点校验失败";
+        }
+        if(!err){
+            qfProviderHotSet.call(this,meta,h.tier,p,1);
+            try{meta._qfHotEstablishedV360=p;meta._qfHotHitsV360=1;}catch(_mhs){}
+            qfDiagEventV85.call(this,"provider-sticky",p,"content",true,Date.now()-st,"cross-session");
+            return {ok:true,text:String(text||""),provider:p,tier:h.tier,hits:1,sticky:true};
+        }
+    }catch(e){err=String(e&&e.message||e);}
+    qfDiagEventV85.call(this,"provider-sticky",p,"content",false,Date.now()-st,err||"快速续接失败");
+    return {ok:false,text:"",provider:p,tier:h.tier,error:err||"正文为空或过短",hits:0,sticky:true};
+}
+
+function qfProviderRemember(tier,provider,meta){
+    /* alpha12：热路由已经在本章完成 RuntimeCache 更新时，不再每章读取/比较 3 个持久化书籍变量。
+       每 24 次连续热命中同步一次，兼顾跨运行期 sticky 时间戳新鲜度。 */
+    var p=String(provider||""),_hotSame=false,_hotHits=0;
+    try{qfAdjacentProviderWarm(meta,tier,p);}catch(_adj510){}
+    try{_hotSame=!!(meta&&String(meta._qfHotEstablishedV360||"")===p);_hotHits=Number(meta&&meta._qfHotHitsV360||0)||0;}catch(_hf){}
+    if(_hotSame&&_hotHits>0&&(_hotHits%24)!==0)return;
+    /* alpha69：值没变化就不写书籍变量，连续翻章减少无意义持久化。 */
+    var oldP="",changed=false;
+    try{oldP=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");if(oldP!==p){qfPutBookVarV09.call(this,"qf_last_provider_v307",p);changed=true;}}catch(_e0){}
+    try{var t=String(tier||""),ot=qfBookVarV09.call(this,"qf_last_tier_v307","");if(String(ot||"")!==t){qfPutBookVarV09.call(this,"qf_last_tier_v307",t);changed=true;}}catch(_e1){}
+    /* beta24：跨运行期快速续接只需要“最近成功时间”。最多每小时写一次，Provider 变化时立即写。 */
+    try{var now=Date.now(),ots=Number(qfBookVarV09.call(this,"qf_last_provider_ts_v355","0")||0);if(changed||!ots||now-ots>60*60*1000)qfPutBookVarV09.call(this,"qf_last_provider_ts_v355",String(now));}catch(_e2){}
+    /* beta20：正常成功后建立连续翻章运行期热路由。
+       alpha12：本章热路由/快速续接已经 set 过时不重复 Java putMemory。 */
+    var _already=false;try{_already=!!(meta&&String(meta._qfHotEstablishedV360||"")===p);}catch(_ha){}
+    if(meta&&meta.bookId&&!_already)try{qfProviderHotSet.call(this,meta,tier,provider);}catch(_h){}
+}
+/* ============================================================
+ * v3.1 beta1：全源智能正文路由
+ * - 原“限免/优选/兜底”严格隔离模式保持原样；
+ * - 只有用户主动选择“全源智能”或书籍变量=9时才跨类别；
+ * - 首章按配置的类别顺序尝试；成功后记住本书 tier + provider；
+ * - 后续章节把最近成功 tier 提到最前，再由该 tier 内 sticky provider 直达；
+ * - 某 tier 全部失败才进入下一 tier，Provider 健康熔断继续复用原 alpha69 逻辑。
+ * ============================================================ */
+/* ============================================================
+ * v3.3 beta9：全源智能状态 / 自动切源反馈
+ * - 不改变 Provider 排序算法，只把 beta8 已有学习结果转成用户可理解的状态；
+ * - 只有“全源智能”真实从一个 Provider 切到另一个 Provider 时才提示；
+ * - 首次绑定不提示，同一章节刷新不重复提示；
+ * - 详情页状态摘要只读轻量书籍变量，用户主动点“源状态”时才加载 provider_runtime。
+ * ============================================================ */
+function qfSmartSwitchMarkV330(meta,tier,provider){
+    provider=String(provider||"");tier=String(tier||"");if(!provider)return false;
+    var prev="",prevTier="";
+    try{prev=String(qfBookVarV09.call(this,"qf_smart_seen_v330","")||"");}catch(_p){}
+    try{prevTier=String(qfBookVarV09.call(this,"qf_smart_seen_tier_v330","")||"");}catch(_t){}
+    /* 第一次进入全源智能只建立基线，不制造“从未知源切换”的噪声。 */
+    if(!prev){
+        try{qfPutBookVarV09.call(this,"qf_smart_seen_v330",provider);}catch(_s0){}
+        try{qfPutBookVarV09.call(this,"qf_smart_seen_tier_v330",tier);}catch(_s1){}
+        return false;
+    }
+    if(prev===provider&&prevTier===tier)return false;
+    var cid=String(meta&&meta.chapterId||""),now=Date.now();
+    var rec={from:prev,to:provider,fromTier:prevTier,toTier:tier,cid:cid,ts:now};
+    try{qfPutBookVarV09.call(this,"qf_smart_switch_v330",JSON.stringify(rec));}catch(_r){}
+    try{qfPutBookVarV09.call(this,"qf_smart_seen_v330",provider);}catch(_s2){}
+    try{qfPutBookVarV09.call(this,"qf_smart_seen_tier_v330",tier);}catch(_s3){}
+    if(qfToggle.call(this,"智能切源提示",true)){
+        var noticed="";try{noticed=String(qfBookVarV09.call(this,"qf_smart_notice_cid_v330","")||"");}catch(_n0){}
+        if(!cid||noticed!==cid){
+            if(cid)try{qfPutBookVarV09.call(this,"qf_smart_notice_cid_v330",cid);}catch(_n1){}
+            var msg="全源智能已切换正文源："+prev+" → "+provider;
+            if(prevTier&&tier&&prevTier!==tier)msg+="（"+prevTier+" → "+tier+"）";
+            try{var j=qfJava(this);if(j&&j.toast)j.toast(msg);else if(j&&j.longToast)j.longToast(msg);}catch(_n2){}
+        }
+    }
+    return true;
+}
+function qfSmartStatusLineV330(){
+    var r=null;try{r=qfRouteBookV38.call(this);}catch(_r){}
+    if(!r||String(r.tier||"")!=="全源智能")return "";
+    var p="",t="";
+    try{p=String(qfBookVarV09.call(this,"qf_smart_seen_v330","")||"");}catch(_p){}
+    try{t=String(qfBookVarV09.call(this,"qf_smart_seen_tier_v330","")||"");}catch(_t){}
+    return p?("📡 全源智能 · 当前 "+p+(t?"
+
+### qfBookVar @549321
+roviderPolicyV83(sp,"verify",false)){
+            var verify={ok:true};try{var va=qfModuleEnsureV38.call(this,"review_align");verify=va.qdV54VerifyBody.call(this,meta,p,text,3)||verify;}catch(_v){}
+            if(!verify.ok)err="正文锚点校验失败";
+        }
+        if(!err){
+            qfProviderHotSet.call(this,meta,h.tier,p,1);
+            try{meta._qfHotEstablishedV360=p;meta._qfHotHitsV360=1;}catch(_mhs){}
+            qfDiagEventV85.call(this,"provider-sticky",p,"content",true,Date.now()-st,"cross-session");
+            return {ok:true,text:String(text||""),provider:p,tier:h.tier,hits:1,sticky:true};
+        }
+    }catch(e){err=String(e&&e.message||e);}
+    qfDiagEventV85.call(this,"provider-sticky",p,"content",false,Date.now()-st,err||"快速续接失败");
+    return {ok:false,text:"",provider:p,tier:h.tier,error:err||"正文为空或过短",hits:0,sticky:true};
+}
+
+function qfProviderRemember(tier,provider,meta){
+    /* alpha12：热路由已经在本章完成 RuntimeCache 更新时，不再每章读取/比较 3 个持久化书籍变量。
+       每 24 次连续热命中同步一次，兼顾跨运行期 sticky 时间戳新鲜度。 */
+    var p=String(provider||""),_hotSame=false,_hotHits=0;
+    try{qfAdjacentProviderWarm(meta,tier,p);}catch(_adj510){}
+    try{_hotSame=!!(meta&&String(meta._qfHotEstablishedV360||"")===p);_hotHits=Number(meta&&meta._qfHotHitsV360||0)||0;}catch(_hf){}
+    if(_hotSame&&_hotHits>0&&(_hotHits%24)!==0)return;
+    /* alpha69：值没变化就不写书籍变量，连续翻章减少无意义持久化。 */
+    var oldP="",changed=false;
+    try{oldP=String(qfBookVarV09.call(this,"qf_last_provider_v307","")||"");if(oldP!==p){qfPutBookVarV09.call(this,"qf_last_provider_v307",p);changed=true;}}catch(_e0){}
+    try{var t=String(tier||""),ot=qfBookVarV09.call(this,"qf_last_tier_v307","");if(String(ot||"")!==t){qfPutBookVarV09.call(this,"qf_last_tier_v307",t);changed=true;}}catch(_e1){}
+    /* beta24：跨运行期快速续接只需要“最近成功时间”。最多每小时写一次，Provider 变化时立即写。 */
+    try{var now=Date.now(),ots=Number(qfBookVarV09.call(this,"qf_last_provider_ts_v355","0")||0);if(changed||!ots||now-ots>60*60*1000)qfPutBookVarV09.call(this,"qf_last_provider_ts_v355",String(now));}catch(_e2){}
+    /* beta20：正常成功后建立连续翻章运行期热路由。
+       alpha12：本章热路由/快速续接已经 set 过时不重复 Java putMemory。 */
+    var _already=false;try{_already=!!(meta&&String(meta._qfHotEstablishedV360||"")===p);}catch(_ha){}
+    if(meta&&meta.bookId&&!_already)try{qfProviderHotSet.call(this,meta,tier,provider);}catch(_h){}
+}
+/* ============================================================
+ * v3.1 beta1：全源智能正文路由
+ * - 原“限免/优选/兜底”严格隔离模式保持原样；
+ * - 只有用户主动选择“全源智能”或书籍变量=9时才跨类别；
+ * - 首章按配置的类别顺序尝试；成功后记住本书 tier + provider；
+ * - 后续章节把最近成功 tier 提到最前，再由该 tier 内 sticky provider 直达；
+ * - 某 tier 全部失败才进入下一 tier，Provider 健康熔断继续复用原 alpha69 逻辑。
+ * ============================================================ */
+/* ============================================================
+ * v3.3 beta9：全源智能状态 / 自动切源反馈
+ * - 不改变 Provider 排序算法，只把 beta8 已有学习结果转成用户可理解的状态；
+ * - 只有“全源智能”真实从一个 Provider 切到另一个 Provider 时才提示；
+ * - 首次绑定不提示，同一章节刷新不重复提示；
+ * - 详情页状态摘要只读轻量书籍变量，用户主动点“源状态”时才加载 provider_runtime。
+ * ============================================================ */
+function qfSmartSwitchMarkV330(meta,tier,provider){
+    provider=String(provider||"");tier=String(tier||"");if(!provider)return false;
+    var prev="",prevTier="";
+    try{prev=String(qfBookVarV09.call(this,"qf_smart_seen_v330","")||"");}catch(_p){}
+    try{prevTier=String(qfBookVarV09.call(this,"qf_smart_seen_tier_v330","")||"");}catch(_t){}
+    /* 第一次进入全源智能只建立基线，不制造“从未知源切换”的噪声。 */
+    if(!prev){
+        try{qfPutBookVarV09.call(this,"qf_smart_seen_v330",provider);}catch(_s0){}
+        try{qfPutBookVarV09.call(this,"qf_smart_seen_tier_v330",tier);}catch(_s1){}
+        return false;
+    }
+    if(prev===provider&&prevTier===tier)return false;
+    var cid=String(meta&&meta.chapterId||""),now=Date.now();
+    var rec={from:prev,to:provider,fromTier:prevTier,toTier:tier,cid:cid,ts:now};
+    try{qfPutBookVarV09.call(this,"qf_smart_switch_v330",JSON.stringify(rec));}catch(_r){}
+    try{qfPutBookVarV09.call(this,"qf_smart_seen_v330",provider);}catch(_s2){}
+    try{qfPutBookVarV09.call(this,"qf_smart_seen_tier_v330",tier);}catch(_s3){}
+    if(qfToggle.call(this,"智能切源提示",true)){
+        var noticed="";try{noticed=String(qfBookVarV09.call(this,"qf_smart_notice_cid_v330","")||"");}catch(_n0){}
+        if(!cid||noticed!==cid){
+            if(cid)try{qfPutBookVarV09.call(this,"qf_smart_notice_cid_v330",cid);}catch(_n1){}
+            var msg="全源智能已切换正文源："+prev+" → "+provider;
+            if(prevTier&&tier&&prevTier!==tier)msg+="（"+prevTier+" → "+tier+"）";
+            try{var j=qfJava(this);if(j&&j.toast)j.toast(msg);else if(j&&j.longToast)j.longToast(msg);}catch(_n2){}
+        }
+    }
+    return true;
+}
+function qfSmartStatusLineV330(){
+    var r=null;try{r=qfRouteBookV38.call(this);}catch(_r){}
+    if(!r||String(r.tier||"")!=="全源智能")return "";
+    var p="",t="";
+    try{p=String(qfBookVarV09.call(this,"qf_smart_seen_v330","")||"");}catch(_p){}
+    try{t=String(qfBookVarV09.call(this,"qf_smart_seen_tier_v330","")||"");}catch(_t){}
+    return p?("📡 全源智能 · 当前 "+p+(t?" · "+t:"")):"📡 全源智能 · 尚未建立本书正文源画像
