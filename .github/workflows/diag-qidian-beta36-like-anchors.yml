@@ -1,0 +1,35 @@
+name: diag-qidian-beta36-like-anchors
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta36-like-anchors.trigger']
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Dump like anchors
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          arr=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text()); s=arr[0]
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b]); v=pack['review_local_ui']
+          z=v[3:]; z += '='*((4-len(z)%4)%4); code=gzip.decompress(base64.b64decode(z)).decode()
+          pats=['<div class="like">','<div class="rLike">','class="meta"','class="rMeta"']
+          out=[]
+          for pat in pats:
+            start=0;n=0
+            while True:
+              i=code.find(pat,start)
+              if i<0: break
+              n+=1;out.append(f'\n==== {pat} #{n} @ {i} ====\n'+code[max(0,i-650):min(len(code),i+900)])
+              start=i+1
+          Path('.staging/review-like-anchors-beta36.txt').write_text('\n'.join(out))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/review-like-anchors-beta36.txt
+          git commit -m 'chore: dump beta36 review like anchors'
+          git push origin main
