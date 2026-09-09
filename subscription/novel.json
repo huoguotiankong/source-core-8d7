@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "type": "novel",
   "name": "小说源",
-  "updatedAt": "2026-09-10T00:15:00+08:00",
+  "updatedAt": "2026-09-10T00:22:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -40,10 +40,10 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "Beta34：压缩评论页点赞列和右侧留白，让同一区域显示更多评论文字。",
+      "summary": "Beta35：把评论点赞移动到时间/地点元信息行，正文区域不再被点赞占位。",
       "icon": "",
       "channel": "beta",
-      "version": "1.1.0-beta34",
+      "version": "1.1.0-beta35",
       "updatedAt": "2026-09-10",
       "tags": [
         "起点",
@@ -56,18 +56,18 @@
         "X-QD"
       ],
       "changelog": [
-        "根评论点赞区由宽侧栏改为紧凑右侧图标+数字，正文可用宽度增加",
-        "楼中楼点赞列同步缩窄，减少每条回复右侧空白",
-        "轻微收紧评论卡片横向/纵向内边距，保持头像、标签、时间、楼层、图片与回复功能",
-        "仅修改 review_local_ui 视觉层；评论数据/请求/分页、X限免 Provider及其它域冻结"
+        "根评论点赞从评论正文右侧移动到时间/IP/楼层元信息行右侧",
+        "点赞改为紧凑横向“图标 + 数字”，正文行获得完整可用宽度",
+        "楼中楼点赞同步移动到回复时间/地点行，减少回复正文换行",
+        "仅修改 review_local_ui 视觉层；评论数据、请求、分页、身份标签、X限免及其它域冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11034",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11034",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11034",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11035",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11035",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11035",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
       "type": "novel",
-      "versionCode": 11034
+      "versionCode": 11035
     }
   ],
-  "generatedAt": "2026-09-10T00:15:00+08:00"
+  "generatedAt": "2026-09-10T00:22:00+08:00"
 }

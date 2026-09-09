@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-10T00:15:00+08:00",
+  "updatedAt": "2026-09-10T00:22:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -80,13 +80,13 @@
       "name": "🌈 起点增强 · Beta",
       "category": "novel",
       "channel": "beta",
-      "version": "1.1.0-beta34",
-      "versionCode": 11034,
-      "updatedAt": "2026-09-10T00:15:00+08:00",
+      "version": "1.1.0-beta35",
+      "versionCode": 11035,
+      "updatedAt": "2026-09-10T00:22:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11034",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11035",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "Beta34：压缩评论页点赞列和右侧留白，让同一区域显示更多评论文字。",
+      "summary": "Beta35：把评论点赞移动到时间/地点元信息行，正文区域不再被点赞占位。",
       "tags": [
         "起点",
         "测试版",
@@ -98,12 +98,12 @@
         "X-QD"
       ],
       "changelog": [
-        "根评论点赞区由宽侧栏改为紧凑右侧图标+数字，正文可用宽度增加",
-        "楼中楼点赞列同步缩窄，减少每条回复右侧空白",
-        "轻微收紧评论卡片横向/纵向内边距，保持头像、标签、时间、楼层、图片与回复功能",
-        "仅修改 review_local_ui 视觉层；评论数据/请求/分页、X限免 Provider及其它域冻结"
+        "根评论点赞从评论正文右侧移动到时间/IP/楼层元信息行右侧",
+        "点赞改为紧凑横向“图标 + 数字”，正文行获得完整可用宽度",
+        "楼中楼点赞同步移动到回复时间/地点行，减少回复正文换行",
+        "仅修改 review_local_ui 视觉层；评论数据、请求、分页、身份标签、X限免及其它域冻结"
       ],
-      "sha256": "8675d091285fede2b0c78c9552510edafd11601a00e68d353586d41043009a87"
+      "sha256": "6141ba40cfea14d298dc6cc88950a41fddcba856e512833b827c0056368e4ba1"
     },
     {
       "id": "picacg",
