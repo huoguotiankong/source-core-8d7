@@ -1,0 +1,31 @@
+name: diag-qidian-review-local-ui-css
+on:
+  push:
+    paths: ['.staging/diag-qidian-review-local-ui-css.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Extract review_local_ui render/CSS
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          a=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text()); s=a[0] if isinstance(a,list) else a
+          lib=s['jsLib']; x=lib.index('var QF_MOD38_PACK=')+len('var QF_MOD38_PACK='); y=lib.index(';\nvar QF_MOD38_EXPORTS=',x); pack=json.loads(lib[x:y])
+          v=pack['review_local_ui']; z=v[3:]; z+='='*((4-len(z)%4)%4); code=gzip.decompress(base64.b64decode(z)).decode()
+          kws=['<style','.like','like{','like-box','likeBox','digg','thumb','reply','楼','加载更多回复','收起回复','position','grid-template-columns','padding-right','margin-right','width:']
+          out=[]
+          for kw in kws:
+            for m in re.finditer(re.escape(kw),code,re.I):
+              out.append('### '+kw+' @'+str(m.start())+'\n'+code[max(0,m.start()-4200):min(len(code),m.start()+11000)])
+          Path('.staging/qidian-review-local-ui-css.txt').write_text('\n\n'.join(out)[:250000])
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-review-local-ui-css.txt
+          git commit -m 'chore: dump review_local_ui CSS'
+          git push origin main
