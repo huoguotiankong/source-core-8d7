@@ -1,35 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta33：修复 X-QD 在最终账号管理/正文设置页面未显示的问题。",
+  "summary": "Beta34：压缩评论页点赞列和右侧留白，让同一区域显示更多评论文字。",
   "badges": [
     "Beta",
-    "1.1.0-beta33",
-    "X UI 修复"
+    "1.1.0-beta34",
+    "评论密度"
   ],
   "sections": [
     {
       "title": "本版更新",
-      "text": "修复 Beta32 实际运行的精美账号管理/正文设置 UI 仍被旧四 Provider 配置覆盖的问题。"
+      "text": "点赞按钮改为紧凑右侧布局，根评论和楼中楼都减少点赞列占宽，让正文/回复获得更多横向空间。"
     },
     {
-      "title": "X 账号管理",
-      "text": "现在 Provider 标签包含 X；可网页登录自动获取 Token、检测 Token、清除 Token，也可直接填写 X 密钥。"
-    },
-    {
-      "title": "正文设置",
-      "text": "限免源 Provider 列表现在包含 X；书籍变量 15 仍可固定 X。"
+      "title": "保留范围",
+      "text": "头像、身份标签、图片/配音、时间/IP/楼层、楼中楼展开与继续加载均保留；评论请求与数据解析不改。"
     },
     {
       "title": "版本状态",
-      "text": "当前为 Beta / 测试通道，Stable 1.1.0 未修改。"
+      "text": "当前为 Beta / 测试通道，需真机确认后才会晋升正式版。"
     },
     {
       "title": "更新方式",
       "text": "从本订阅页重新导入/更新即可覆盖现有 🌈 起点增强 · Beta。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11033",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11033",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11033"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11034",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11034",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11034"
 }

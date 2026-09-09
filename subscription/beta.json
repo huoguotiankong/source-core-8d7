@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-09-08T15:58:00+08:00",
+  "updatedAt": "2026-09-10T00:15:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -38,32 +38,32 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "Beta33：修复 X-QD 在最终账号管理/正文设置页面未显示的问题。",
+      "summary": "Beta34：压缩评论页点赞列和右侧留白，让同一区域显示更多评论文字。",
       "icon": "",
       "channel": "beta",
-      "version": "1.1.0-beta33",
-      "updatedAt": "2026-09-08",
+      "version": "1.1.0-beta34",
+      "updatedAt": "2026-09-10",
       "tags": [
         "起点",
         "测试版",
-        "限免源",
-        "X-QD",
-        "账号管理",
-        "Provider",
-        "Token",
-        "正文路由"
+        "段评",
+        "评论页",
+        "UI优化",
+        "信息密度",
+        "楼中楼",
+        "X-QD"
       ],
       "changelog": [
-        "修复精美账号管理页仍只显示情无/神魔/晴天/同人四个标签的问题",
-        "新增 X 标签页：网页登录、Token 检测、清除、手工密钥",
-        "正文设置的限免 Provider 列表同步显示 X",
-        "X Provider 正文链和书籍变量 15 沿用 Beta32，其它域冻结"
+        "根评论点赞区由宽侧栏改为紧凑右侧图标+数字，正文可用宽度增加",
+        "楼中楼点赞列同步缩窄，减少每条回复右侧空白",
+        "轻微收紧评论卡片横向/纵向内边距，保持头像、标签、时间、楼层、图片与回复功能",
+        "仅修改 review_local_ui 视觉层；评论数据/请求/分页、X限免 Provider及其它域冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11033",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11033",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11033",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11034",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11034",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11034",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
-      "versionCode": 11033
+      "versionCode": 11034
     },
     {
       "id": "manwa",
@@ -97,5 +97,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-09-08T15:58:00+08:00"
+  "generatedAt": "2026-09-10T00:15:00+08:00"
 }
