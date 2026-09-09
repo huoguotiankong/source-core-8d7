@@ -1,0 +1,112 @@
+name: patch-qidian-beta35-review-like-meta
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta35-review-like-meta.trigger']
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Move review likes onto metadata row and publish Beta35
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re,hashlib
+          from pathlib import Path
+          SRC=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(SRC.read_text()); s=arr[0] if isinstance(arr,list) else arr
+          stable_hash=hashlib.sha256(Path('sources/novel/qidian-next/qidian-next.json').read_bytes()).hexdigest()
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+          def dec(v):
+            if not isinstance(v,str): return ''
+            if not v.startswith('gz:'): return v
+            z=v[3:]; z += '='*((4-len(z)%4)%4)
+            return gzip.decompress(base64.b64decode(z)).decode()
+          def enc(code):
+            return 'gz:'+base64.b64encode(gzip.compress(code.encode(),mtime=0)).decode().rstrip('=')
+          code=dec(pack['review_local_ui']); before=code
+          reps={
+            '.mainRow{display:flex;align-items:flex-start;padding-right:28px}':'.mainRow{display:flex;align-items:flex-start;padding-right:0}',
+            '.meta{font-size:12px;color:var(--sub);margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}':'.meta{font-size:12px;color:var(--sub);margin-top:8px;padding-right:58px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+            '.like{position:absolute;right:8px;top:72px;transform:none;width:24px;display:flex;flex-direction:column;align-items:center;color:var(--like);font-size:11px;line-height:1.15}':'.like{position:absolute;right:11px;bottom:15px;top:auto;transform:none;width:auto;display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:3px;color:var(--like);font-size:11px;line-height:18px;white-space:nowrap}',
+            '.like svg{width:20px;height:20px;display:block;margin-bottom:2px;stroke:currentColor;fill:none;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}':'.like svg{width:18px;height:18px;display:block;margin:0;stroke:currentColor;fill:none;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}',
+            '.reply{position:relative;padding:11px 23px 11px 11px;border-bottom:1px solid var(--line)}':'.reply{position:relative;padding:11px 11px 11px 11px;border-bottom:1px solid var(--line)}',
+            '.rMeta{font-size:10.5px;color:var(--muted);margin:6px 0 0 32px;white-space:normal;line-height:1.4}':'.rMeta{font-size:10.5px;color:var(--muted);margin:6px 0 0 32px;padding-right:42px;white-space:normal;line-height:1.4}',
+            '.rLike{position:absolute;right:3px;top:47px;transform:none;width:18px;display:flex;flex-direction:column;align-items:center;color:var(--muted);font-size:9px;line-height:1.1}':'.rLike{position:absolute;right:6px;bottom:10px;top:auto;transform:none;width:auto;display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:2px;color:var(--muted);font-size:9px;line-height:14px;white-space:nowrap}',
+            '.rLike svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;margin-bottom:1px}':'.rLike svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;margin:0}'
+          }
+          for old,new in reps.items():
+            assert old in code, 'review CSS anchor missing: '+old[:90]
+            code=code.replace(old,new,1)
+          assert code!=before
+          assert 'bottom:15px;top:auto' in code and 'padding-right:58px' in code and 'bottom:10px;top:auto' in code
+          pack['review_local_ui']=enc(code)
+          lib=lib[:a]+json.dumps(pack,ensure_ascii=False,separators=(',',':'))+lib[b:]
+          s['jsLib']=lib
+          s['bookSourceComment']='v1.1.0-beta35：段评点赞位置继续优化。根评论和楼中楼点赞改到时间/IP/楼层元信息同一行，正文行不再为点赞按钮让位；点赞改为紧凑横向图标+数字。仅改评论 UI，X限免及其它功能保持 beta34。'
+          SRC.write_text(json.dumps(arr,ensure_ascii=False,indent=2))
+          assert hashlib.sha256(Path('sources/novel/qidian-next/qidian-next.json').read_bytes()).hexdigest()==stable_hash
+
+          VERSION='1.1.0-beta35'; VC=11035; DATE='2026-09-10'; TS='2026-09-10T00:22:00+08:00'
+          summary='Beta35：把评论点赞移动到时间/地点元信息行，正文区域不再被点赞占位。'
+          tags=['起点','测试版','段评','评论页','UI优化','信息密度','楼中楼','X-QD']
+          changes=['根评论点赞从评论正文右侧移动到时间/IP/楼层元信息行右侧','点赞改为紧凑横向“图标 + 数字”，正文行获得完整可用宽度','楼中楼点赞同步移动到回复时间/地点行，减少回复正文换行','仅修改 review_local_ui 视觉层；评论数据、请求、分页、身份标签、X限免及其它域冻结']
+          raw=f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={VC}'
+          backup=f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v={VC}'
+          imp='legado://import/importonline?src='+raw
+          detail='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json'
+          sha=hashlib.sha256(SRC.read_bytes()).hexdigest()
+          def entry(base=None, include_type=False):
+            e=dict(base or {})
+            e.update({'id':'qidian-next-beta','name':'🌈 起点增强 · Beta','summary':summary,'icon':e.get('icon',''),'channel':'beta','version':VERSION,'updatedAt':DATE,'tags':tags,'changelog':changes,'sourceUrl':raw,'backupUrl':backup,'importUrl':imp,'detailUrl':detail,'versionCode':VC})
+            if include_type:e['type']='novel'
+            return e
+          mp=Path('manifest.json'); m=json.loads(mp.read_text()); m['updatedAt']=TS
+          for i,e in enumerate(m.get('sources',[])):
+            if e.get('id')=='qidian-next-beta':
+              ne=dict(e); ne.update({'name':'🌈 起点增强 · Beta','category':'novel','channel':'beta','version':VERSION,'versionCode':VC,'updatedAt':TS,'sourcePath':'sources/novel/qidian-next/qidian-next-beta.json','sourceUrl':raw,'bookSourceUrl':'https://m.qidian.com/?qf_source=qidian_next_8d7','summary':summary,'tags':tags,'changelog':changes,'sha256':sha}); m['sources'][i]=ne; break
+          else: raise AssertionError('manifest qidian-next-beta missing')
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2))
+          bp=Path('subscription/beta.json'); bj=json.loads(bp.read_text()); bj['updatedAt']=TS; bj['generatedAt']=TS
+          for i,e in enumerate(bj['items']):
+            if e.get('id')=='qidian-next-beta': bj['items'][i]=entry(e); break
+          else: bj['items'].append(entry())
+          bp.write_text(json.dumps(bj,ensure_ascii=False,indent=2))
+          np=Path('subscription/novel.json'); nj=json.loads(np.read_text()); nj['updatedAt']=TS; nj['generatedAt']=TS
+          for i,e in enumerate(nj['items']):
+            if e.get('id')=='qidian-next-beta': nj['items'][i]=entry(e,True); break
+          else: nj['items'].append(entry(include_type=True))
+          np.write_text(json.dumps(nj,ensure_ascii=False,indent=2))
+          dp=Path('rss/data/details/beta/qidian-next.json')
+          d={'kind':'source','title':'🌈 起点增强 · Beta','summary':summary,'badges':['Beta',VERSION,'点赞归位'],
+             'sections':[{'title':'本版更新','text':'点赞按钮不再悬在评论正文右侧，根评论与楼中楼都移动到时间/IP/楼层这一行，并改为紧凑横向图标+数字。'},
+                         {'title':'信息密度','text':'评论正文获得完整横向宽度；只有元信息行右侧为点赞保留少量空间，更接近起点原生的紧凑布局。'},
+                         {'title':'保留范围','text':'评论数据、排序、身份标签、图片/配音、楼中楼展开和继续加载均不改。'},
+                         {'title':'版本状态','text':'当前为 Beta / 测试通道，真机确认后再考虑进入 Stable。'}],
+             'sourceUrl':raw,'backupUrl':backup,'importUrl':imp}
+          dp.write_text(json.dumps(d,ensure_ascii=False,indent=2))
+          bund=Path('bundles/all-beta.json')
+          try: ba=json.loads(bund.read_text())
+          except Exception: ba=[]
+          if not isinstance(ba,list): ba=[]
+          src_obj=arr[0] if isinstance(arr,list) else arr; replaced=False
+          for i,o in enumerate(ba):
+            if isinstance(o,dict) and o.get('bookSourceUrl')==src_obj.get('bookSourceUrl'): ba[i]=src_obj; replaced=True; break
+          if not replaced: ba.append(src_obj)
+          dd={}; order=[]
+          for o in ba:
+            if not isinstance(o,dict): continue
+            k=str(o.get('bookSourceUrl') or o.get('bookSourceName') or len(order))
+            if k not in dd: order.append(k)
+            dd[k]=o
+          bund.write_text(json.dumps([dd[k] for k in order],ensure_ascii=False,indent=2))
+          rp=Path('docs/RELEASE_LOG.md'); old=rp.read_text()
+          head='## 2026-09-10 · 起点增强 1.1.0-beta35 — 点赞归位到元信息行\n\n- Stable 保持 1.1.0 不变。\n- 根评论点赞从正文右侧移动到时间/IP/楼层元信息行右侧，改为紧凑横向图标 + 数字。\n- 楼中楼 `rLike` 同步移动到回复元信息行，回复正文不再为点赞列预留空间。\n- 仅修改 lazy `review_local_ui` CSS；评论数据、接口、分页、身份标签、X-QD Provider 及其它域冻结。\n- 状态：Beta，等待真机确认。\n\n'
+          rp.write_text(head+old)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md
+          git commit -m 'feat: publish qidian-next beta35 align likes with metadata'
+          git push origin main
