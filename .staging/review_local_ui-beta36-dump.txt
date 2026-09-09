@@ -1,0 +1,523 @@
+
+===== class="comment =====
+;
+    }
+
+    for(var k in map){
+        if(Object.prototype.hasOwnProperty.call(map,k))out.push(map[k]);
+    }
+
+    out.sort(function(a,b){
+        var d=Number(b.count||0)-Number(a.count||0);
+        if(d)return d;
+        return String(a.label||'').localeCompare(String(b.label||''),'zh-Hans-CN');
+    });
+    return out;
+}
+
+function qfAudioRoleBarHtml(rows){
+    var stats=qfAudioRoleStats(rows);
+    if(!stats.length)return '';
+
+    var h='<div class="audioRoleBar">';
+    h+='<button class="audioRoleChip'+(audioRoleFilter==='all'?' active':'')+'" type="button" data-audiorole="all">全部配音<span class="count">'+rows.length+'</span></button>';
+
+    for(var i=0;i<stats.length&&i<12;i++){
+        var it=stats[i]||{};
+        h+='<button class="audioRoleChip'+(audioRoleFilter===it.key?' active':'')+'" type="button" data-audiorole="'+esc(it.key)+'">'+esc(it.label)+'<span class="count">'+esc(String(it.count||0))+'</span></button>';
+    }
+
+    return h+'</div>';
+}
+
+function qfAudioReplyPreviewHtml(c){
+    return replyHtml(c);
+}
+
+function qfAudioCommentHtml(c){
+    var b='';
+    for(var i=0;i<c.titles.length&&i<3;i++)b+=badgeHtml(c.titles[i]);
+
+    var role=qfAudioRoleLabel(c);
+    var h='<div class="comment audioComment '+(currentTab==='audio'?'audioTabCard':'allAudioCard')+'" data-id="'+esc(c.id)+'">'+
+        '<div class="mainRow"><div class="avatarWrap">'+
+        avHtml(c,false)+
+        '</div><div class="body"><div class="nameRow">'+
+        '<span class="name">'+esc(c.name)+'</span>'+
+        '<span class="badges">'+b+'</span></div>'+
+        (role?'<div class="audioRoleMini">'+esc(role)+'</div>':'')+
+        '<div class="content qfFoldable qfFolded">'+fmt(c.content)+'</div><button class="foldBtn hidden" type="button">展开全文</button>';
+
+    if(c.audioPage){
+        h+=qfAudioPlayerHtml(c);
+    }else if(c.audio){
+        h+='<audio class="audio qfAudioNative" src="'+esc(c.audio)+'" controls preload="metadata"></audio>';
+    }
+
+    h+='<div class="meta">'+esc(meta(c))+'</div></div></div>'+
+       '<div class="like">'+likeSvg()+'<span>'+c.like+'</span></div>';
+
+    var embedded=Array.isArray(c.embedded)?c.embedded:[];
+    var total=Math.max(Number(c.replies||0),embedded.length);
+
+    if(total>0){
+        h+='<div class="audioRepliesPreview" id="rp_'+esc(c.id)+'">';
+
+        var previewCount=Math.min(embedded.length,2);
+        for(var r=0;r<previewCount;r++){
+            h+=qfAudioReplyPreviewHtml(embedded[r]);
+        }
+
+        if(c.id){
+            var remain=Math.max(0,total-previewCount);
+            var ids=qfCommentRootIds(c);
+            h+='<div class="audioMoreReplies replyMoreLocal" data-root="'+esc(ids.primary||c.id)+'" data-root-alt="'+esc(ids.alt||'')+'" data-root-list="'+esc((ids.all||[]).join(','))+'" data-total="'+total+'">'+
+                (remain>0?'查看更多'+remain+'条回复':'查看全部'+total+'条回复')+
+                '</div>';
+        }
+
+        h+='</div>';
+    }
+
+    return h+'</div>';
+}
+
+function qfAudioRenderDirectPage(){
+    var rows=Array.isArray(audioDirectRows)?audioDirectRows:[];
+    var pack=audioDirectPack||{name:'',total:rows.length,list:rows,roles:[],log:[]};
+    var h='';
+
+    h+=qfAudioRoleBarHtml(rows);
+
+    h+='<details class="qfAudioDiagFold"><summary>'+
+        '已命中起点官方配音接口 · AudioCount='+esc(String(pack.total||rows.length||0))+' · 点此查看诊断'+
+        '</summary>'+qfDirectDiagHtml(pack)+'</details>';
+
+    var shown=0;
+
+    for(var i=0;i<rows.length;i++){
+        var c=adapt(rows[i]||{});
+        var key=qfAudioRoleKey(c);
+        if(audioRoleFilter!=='all'&&audioRoleFilter!==key)continue;
+        h+=commentHtml(c);
+        shown++;
+    }
+
+    if(!shown){
+        h+='<div class="empty" style="line-height:1.8">当前角色筛选下暂无配音评论。</div>';
+    }
+
+    listEl.innerHTML=h;
+    moreEl.classList.add('hidden');
+    setTimeout(function(){qfApplyFolds(listEl)},0);
+}
+
+function qfApplyFolds(root){
+    root=root||document;var ns=root.querySelectorAll('.qfFoldable');
+    for(var i=0;i<ns.length;i++){var el=ns[i];if(el.getAttribute('data-fold-ready')==='1')continue;el.setAttribute('data-fold-ready','1');var btn=el.nextElementSibling;if(!(btn&&btn.classList&&btn.classList.contains('foldBtn')))continue;var over=false;try{over=el.scrollHeight>el.clientHeight+4}catch(_e){}if(!over){el.classList.remove('qfFolded');btn.classList.add('hidden')}else btn.classList.remove('hidden')}
+}
+function qfToggleFold(btn){if(!btn)return;var el=btn.previousElementSibling;if(!(el&&el.classList&&el.classList.contains('qfFoldable')))return;var f=el.classList.contains('qfFolded');el.classList.toggle('qfFolded',!f);btn.textContent=f?'收起':'展开全文'}
+function commentHtml(c){
+    if(c.audioPage||c.audio)return qfAudioCommentHtml(c);
+
+    var b='';
+    fo
+
+===== class="mainRow =====
+nction(a,b){
+        var d=Number(b.count||0)-Number(a.count||0);
+        if(d)return d;
+        return String(a.label||'').localeCompare(String(b.label||''),'zh-Hans-CN');
+    });
+    return out;
+}
+
+function qfAudioRoleBarHtml(rows){
+    var stats=qfAudioRoleStats(rows);
+    if(!stats.length)return '';
+
+    var h='<div class="audioRoleBar">';
+    h+='<button class="audioRoleChip'+(audioRoleFilter==='all'?' active':'')+'" type="button" data-audiorole="all">全部配音<span class="count">'+rows.length+'</span></button>';
+
+    for(var i=0;i<stats.length&&i<12;i++){
+        var it=stats[i]||{};
+        h+='<button class="audioRoleChip'+(audioRoleFilter===it.key?' active':'')+'" type="button" data-audiorole="'+esc(it.key)+'">'+esc(it.label)+'<span class="count">'+esc(String(it.count||0))+'</span></button>';
+    }
+
+    return h+'</div>';
+}
+
+function qfAudioReplyPreviewHtml(c){
+    return replyHtml(c);
+}
+
+function qfAudioCommentHtml(c){
+    var b='';
+    for(var i=0;i<c.titles.length&&i<3;i++)b+=badgeHtml(c.titles[i]);
+
+    var role=qfAudioRoleLabel(c);
+    var h='<div class="comment audioComment '+(currentTab==='audio'?'audioTabCard':'allAudioCard')+'" data-id="'+esc(c.id)+'">'+
+        '<div class="mainRow"><div class="avatarWrap">'+
+        avHtml(c,false)+
+        '</div><div class="body"><div class="nameRow">'+
+        '<span class="name">'+esc(c.name)+'</span>'+
+        '<span class="badges">'+b+'</span></div>'+
+        (role?'<div class="audioRoleMini">'+esc(role)+'</div>':'')+
+        '<div class="content qfFoldable qfFolded">'+fmt(c.content)+'</div><button class="foldBtn hidden" type="button">展开全文</button>';
+
+    if(c.audioPage){
+        h+=qfAudioPlayerHtml(c);
+    }else if(c.audio){
+        h+='<audio class="audio qfAudioNative" src="'+esc(c.audio)+'" controls preload="metadata"></audio>';
+    }
+
+    h+='<div class="meta">'+esc(meta(c))+'</div></div></div>'+
+       '<div class="like">'+likeSvg()+'<span>'+c.like+'</span></div>';
+
+    var embedded=Array.isArray(c.embedded)?c.embedded:[];
+    var total=Math.max(Number(c.replies||0),embedded.length);
+
+    if(total>0){
+        h+='<div class="audioRepliesPreview" id="rp_'+esc(c.id)+'">';
+
+        var previewCount=Math.min(embedded.length,2);
+        for(var r=0;r<previewCount;r++){
+            h+=qfAudioReplyPreviewHtml(embedded[r]);
+        }
+
+        if(c.id){
+            var remain=Math.max(0,total-previewCount);
+            var ids=qfCommentRootIds(c);
+            h+='<div class="audioMoreReplies replyMoreLocal" data-root="'+esc(ids.primary||c.id)+'" data-root-alt="'+esc(ids.alt||'')+'" data-root-list="'+esc((ids.all||[]).join(','))+'" data-total="'+total+'">'+
+                (remain>0?'查看更多'+remain+'条回复':'查看全部'+total+'条回复')+
+                '</div>';
+        }
+
+        h+='</div>';
+    }
+
+    return h+'</div>';
+}
+
+function qfAudioRenderDirectPage(){
+    var rows=Array.isArray(audioDirectRows)?audioDirectRows:[];
+    var pack=audioDirectPack||{name:'',total:rows.length,list:rows,roles:[],log:[]};
+    var h='';
+
+    h+=qfAudioRoleBarHtml(rows);
+
+    h+='<details class="qfAudioDiagFold"><summary>'+
+        '已命中起点官方配音接口 · AudioCount='+esc(String(pack.total||rows.length||0))+' · 点此查看诊断'+
+        '</summary>'+qfDirectDiagHtml(pack)+'</details>';
+
+    var shown=0;
+
+    for(var i=0;i<rows.length;i++){
+        var c=adapt(rows[i]||{});
+        var key=qfAudioRoleKey(c);
+        if(audioRoleFilter!=='all'&&audioRoleFilter!==key)continue;
+        h+=commentHtml(c);
+        shown++;
+    }
+
+    if(!shown){
+        h+='<div class="empty" style="line-height:1.8">当前角色筛选下暂无配音评论。</div>';
+    }
+
+    listEl.innerHTML=h;
+    moreEl.classList.add('hidden');
+    setTimeout(function(){qfApplyFolds(listEl)},0);
+}
+
+function qfApplyFolds(root){
+    root=root||document;var ns=root.querySelectorAll('.qfFoldable');
+    for(var i=0;i<ns.length;i++){var el=ns[i];if(el.getAttribute('data-fold-ready')==='1')continue;el.setAttribute('data-fold-ready','1');var btn=el.nextElementSibling;if(!(btn&&btn.classList&&btn.classList.contains('foldBtn')))continue;var over=false;try{over=el.scrollHeight>el.clientHeight+4}catch(_e){}if(!over){el.classList.remove('qfFolded');btn.classList.add('hidden')}else btn.classList.remove('hidden')}
+}
+function qfToggleFold(btn){if(!btn)return;var el=btn.previousElementSibling;if(!(el&&el.classList&&el.classList.contains('qfFoldable')))return;var f=el.classList.contains('qfFolded');el.classList.toggle('qfFolded',!f);btn.textContent=f?'收起':'展开全文'}
+function commentHtml(c){
+    if(c.audioPage||c.audio)return qfAudioCommentHtml(c);
+
+    var b='';
+    for(var i=0;i<c.titles.length&&i<3;i++)b+=badgeHtml(c.titles[i]);
+
+    var h='<div class="comment" data-id="'+esc(c.id)+'">'+
+   
+
+===== class="meta =====
+oRoleFilter===it.key?' active':'')+'" type="button" data-audiorole="'+esc(it.key)+'">'+esc(it.label)+'<span class="count">'+esc(String(it.count||0))+'</span></button>';
+    }
+
+    return h+'</div>';
+}
+
+function qfAudioReplyPreviewHtml(c){
+    return replyHtml(c);
+}
+
+function qfAudioCommentHtml(c){
+    var b='';
+    for(var i=0;i<c.titles.length&&i<3;i++)b+=badgeHtml(c.titles[i]);
+
+    var role=qfAudioRoleLabel(c);
+    var h='<div class="comment audioComment '+(currentTab==='audio'?'audioTabCard':'allAudioCard')+'" data-id="'+esc(c.id)+'">'+
+        '<div class="mainRow"><div class="avatarWrap">'+
+        avHtml(c,false)+
+        '</div><div class="body"><div class="nameRow">'+
+        '<span class="name">'+esc(c.name)+'</span>'+
+        '<span class="badges">'+b+'</span></div>'+
+        (role?'<div class="audioRoleMini">'+esc(role)+'</div>':'')+
+        '<div class="content qfFoldable qfFolded">'+fmt(c.content)+'</div><button class="foldBtn hidden" type="button">展开全文</button>';
+
+    if(c.audioPage){
+        h+=qfAudioPlayerHtml(c);
+    }else if(c.audio){
+        h+='<audio class="audio qfAudioNative" src="'+esc(c.audio)+'" controls preload="metadata"></audio>';
+    }
+
+    h+='<div class="meta">'+esc(meta(c))+'</div></div></div>'+
+       '<div class="like">'+likeSvg()+'<span>'+c.like+'</span></div>';
+
+    var embedded=Array.isArray(c.embedded)?c.embedded:[];
+    var total=Math.max(Number(c.replies||0),embedded.length);
+
+    if(total>0){
+        h+='<div class="audioRepliesPreview" id="rp_'+esc(c.id)+'">';
+
+        var previewCount=Math.min(embedded.length,2);
+        for(var r=0;r<previewCount;r++){
+            h+=qfAudioReplyPreviewHtml(embedded[r]);
+        }
+
+        if(c.id){
+            var remain=Math.max(0,total-previewCount);
+            var ids=qfCommentRootIds(c);
+            h+='<div class="audioMoreReplies replyMoreLocal" data-root="'+esc(ids.primary||c.id)+'" data-root-alt="'+esc(ids.alt||'')+'" data-root-list="'+esc((ids.all||[]).join(','))+'" data-total="'+total+'">'+
+                (remain>0?'查看更多'+remain+'条回复':'查看全部'+total+'条回复')+
+                '</div>';
+        }
+
+        h+='</div>';
+    }
+
+    return h+'</div>';
+}
+
+function qfAudioRenderDirectPage(){
+    var rows=Array.isArray(audioDirectRows)?audioDirectRows:[];
+    var pack=audioDirectPack||{name:'',total:rows.length,list:rows,roles:[],log:[]};
+    var h='';
+
+    h+=qfAudioRoleBarHtml(rows);
+
+    h+='<details class="qfAudioDiagFold"><summary>'+
+        '已命中起点官方配音接口 · AudioCount='+esc(String(pack.total||rows.length||0))+' · 点此查看诊断'+
+        '</summary>'+qfDirectDiagHtml(pack)+'</details>';
+
+    var shown=0;
+
+    for(var i=0;i<rows.length;i++){
+        var c=adapt(rows[i]||{});
+        var key=qfAudioRoleKey(c);
+        if(audioRoleFilter!=='all'&&audioRoleFilter!==key)continue;
+        h+=commentHtml(c);
+        shown++;
+    }
+
+    if(!shown){
+        h+='<div class="empty" style="line-height:1.8">当前角色筛选下暂无配音评论。</div>';
+    }
+
+    listEl.innerHTML=h;
+    moreEl.classList.add('hidden');
+    setTimeout(function(){qfApplyFolds(listEl)},0);
+}
+
+function qfApplyFolds(root){
+    root=root||document;var ns=root.querySelectorAll('.qfFoldable');
+    for(var i=0;i<ns.length;i++){var el=ns[i];if(el.getAttribute('data-fold-ready')==='1')continue;el.setAttribute('data-fold-ready','1');var btn=el.nextElementSibling;if(!(btn&&btn.classList&&btn.classList.contains('foldBtn')))continue;var over=false;try{over=el.scrollHeight>el.clientHeight+4}catch(_e){}if(!over){el.classList.remove('qfFolded');btn.classList.add('hidden')}else btn.classList.remove('hidden')}
+}
+function qfToggleFold(btn){if(!btn)return;var el=btn.previousElementSibling;if(!(el&&el.classList&&el.classList.contains('qfFoldable')))return;var f=el.classList.contains('qfFolded');el.classList.toggle('qfFolded',!f);btn.textContent=f?'收起':'展开全文'}
+function commentHtml(c){
+    if(c.audioPage||c.audio)return qfAudioCommentHtml(c);
+
+    var b='';
+    for(var i=0;i<c.titles.length&&i<3;i++)b+=badgeHtml(c.titles[i]);
+
+    var h='<div class="comment" data-id="'+esc(c.id)+'">'+
+        '<div class="mainRow"><div class="avatarWrap">'+
+        avHtml(c,false)+
+        (c.frame?'<div class="frame"><img src="'+esc(c.frame)+'" referrerpolicy="no-referrer"></div>':'')+
+        '</div><div class="body"><div class="nameRow">'+
+        '<span class="name">'+esc(c.name)+'</span>'+
+        '<span class="badges">'+b+'</span></div>'+
+        '<div class="content">'+fmt(c.content)+'</div>';
+
+    if(c.image){
+        h+='<img class="mediaImg zoom" src="'+esc(c.image)+'" referrerpolicy="no-referrer" loading="lazy" decoding="async">';
+    }
+    /*
+     * 已经通过 reviewId 官方详情页确认是配音时，
+     * 优先让起点自己的详情页播放器处理真正的音频地址/签名/Cookie。
+  
+
+===== class="like =====
+ole="'+esc(it.key)+'">'+esc(it.label)+'<span class="count">'+esc(String(it.count||0))+'</span></button>';
+    }
+
+    return h+'</div>';
+}
+
+function qfAudioReplyPreviewHtml(c){
+    return replyHtml(c);
+}
+
+function qfAudioCommentHtml(c){
+    var b='';
+    for(var i=0;i<c.titles.length&&i<3;i++)b+=badgeHtml(c.titles[i]);
+
+    var role=qfAudioRoleLabel(c);
+    var h='<div class="comment audioComment '+(currentTab==='audio'?'audioTabCard':'allAudioCard')+'" data-id="'+esc(c.id)+'">'+
+        '<div class="mainRow"><div class="avatarWrap">'+
+        avHtml(c,false)+
+        '</div><div class="body"><div class="nameRow">'+
+        '<span class="name">'+esc(c.name)+'</span>'+
+        '<span class="badges">'+b+'</span></div>'+
+        (role?'<div class="audioRoleMini">'+esc(role)+'</div>':'')+
+        '<div class="content qfFoldable qfFolded">'+fmt(c.content)+'</div><button class="foldBtn hidden" type="button">展开全文</button>';
+
+    if(c.audioPage){
+        h+=qfAudioPlayerHtml(c);
+    }else if(c.audio){
+        h+='<audio class="audio qfAudioNative" src="'+esc(c.audio)+'" controls preload="metadata"></audio>';
+    }
+
+    h+='<div class="meta">'+esc(meta(c))+'</div></div></div>'+
+       '<div class="like">'+likeSvg()+'<span>'+c.like+'</span></div>';
+
+    var embedded=Array.isArray(c.embedded)?c.embedded:[];
+    var total=Math.max(Number(c.replies||0),embedded.length);
+
+    if(total>0){
+        h+='<div class="audioRepliesPreview" id="rp_'+esc(c.id)+'">';
+
+        var previewCount=Math.min(embedded.length,2);
+        for(var r=0;r<previewCount;r++){
+            h+=qfAudioReplyPreviewHtml(embedded[r]);
+        }
+
+        if(c.id){
+            var remain=Math.max(0,total-previewCount);
+            var ids=qfCommentRootIds(c);
+            h+='<div class="audioMoreReplies replyMoreLocal" data-root="'+esc(ids.primary||c.id)+'" data-root-alt="'+esc(ids.alt||'')+'" data-root-list="'+esc((ids.all||[]).join(','))+'" data-total="'+total+'">'+
+                (remain>0?'查看更多'+remain+'条回复':'查看全部'+total+'条回复')+
+                '</div>';
+        }
+
+        h+='</div>';
+    }
+
+    return h+'</div>';
+}
+
+function qfAudioRenderDirectPage(){
+    var rows=Array.isArray(audioDirectRows)?audioDirectRows:[];
+    var pack=audioDirectPack||{name:'',total:rows.length,list:rows,roles:[],log:[]};
+    var h='';
+
+    h+=qfAudioRoleBarHtml(rows);
+
+    h+='<details class="qfAudioDiagFold"><summary>'+
+        '已命中起点官方配音接口 · AudioCount='+esc(String(pack.total||rows.length||0))+' · 点此查看诊断'+
+        '</summary>'+qfDirectDiagHtml(pack)+'</details>';
+
+    var shown=0;
+
+    for(var i=0;i<rows.length;i++){
+        var c=adapt(rows[i]||{});
+        var key=qfAudioRoleKey(c);
+        if(audioRoleFilter!=='all'&&audioRoleFilter!==key)continue;
+        h+=commentHtml(c);
+        shown++;
+    }
+
+    if(!shown){
+        h+='<div class="empty" style="line-height:1.8">当前角色筛选下暂无配音评论。</div>';
+    }
+
+    listEl.innerHTML=h;
+    moreEl.classList.add('hidden');
+    setTimeout(function(){qfApplyFolds(listEl)},0);
+}
+
+function qfApplyFolds(root){
+    root=root||document;var ns=root.querySelectorAll('.qfFoldable');
+    for(var i=0;i<ns.length;i++){var el=ns[i];if(el.getAttribute('data-fold-ready')==='1')continue;el.setAttribute('data-fold-ready','1');var btn=el.nextElementSibling;if(!(btn&&btn.classList&&btn.classList.contains('foldBtn')))continue;var over=false;try{over=el.scrollHeight>el.clientHeight+4}catch(_e){}if(!over){el.classList.remove('qfFolded');btn.classList.add('hidden')}else btn.classList.remove('hidden')}
+}
+function qfToggleFold(btn){if(!btn)return;var el=btn.previousElementSibling;if(!(el&&el.classList&&el.classList.contains('qfFoldable')))return;var f=el.classList.contains('qfFolded');el.classList.toggle('qfFolded',!f);btn.textContent=f?'收起':'展开全文'}
+function commentHtml(c){
+    if(c.audioPage||c.audio)return qfAudioCommentHtml(c);
+
+    var b='';
+    for(var i=0;i<c.titles.length&&i<3;i++)b+=badgeHtml(c.titles[i]);
+
+    var h='<div class="comment" data-id="'+esc(c.id)+'">'+
+        '<div class="mainRow"><div class="avatarWrap">'+
+        avHtml(c,false)+
+        (c.frame?'<div class="frame"><img src="'+esc(c.frame)+'" referrerpolicy="no-referrer"></div>':'')+
+        '</div><div class="body"><div class="nameRow">'+
+        '<span class="name">'+esc(c.name)+'</span>'+
+        '<span class="badges">'+b+'</span></div>'+
+        '<div class="content">'+fmt(c.content)+'</div>';
+
+    if(c.image){
+        h+='<img class="mediaImg zoom" src="'+esc(c.image)+'" referrerpolicy="no-referrer" loading="lazy" decoding="async">';
+    }
+    /*
+     * 已经通过 reviewId 官方详情页确认是配音时，
+     * 优先让起点自己的详情页播放器处理真正的音频地址/签名/Cookie。
+     * 不再把从详情HTML里提取到但无法直接播放的URL优先塞给<audio>。
+     */
+    if(c.aud
+
+===== replies =====
+r:#f7c7cd}.badgeText.t3{color:#6d7da7;background:#f0f3fa;border-color:#cdd5e7}.badgeText.t4{color:#8f72c4;background:#f5f0fb;border-color:#dfd2f0}
+.content{font-size:15px;line-height:1.62;color:var(--text);margin-top:5px;white-space:normal;word-break:break-word}.mediaImg{display:block;max-width:min(64vw,390px);max-height:300px;width:auto;height:auto;border-radius:8px;margin-top:9px;background:#f2f2f2}.audio{width:min(64vw,390px);margin-top:9px}.meta{font-size:12px;color:var(--sub);margin-top:6px;padding-right:58px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.like{position:absolute;right:11px;bottom:15px;top:auto;transform:none;width:auto;display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:3px;color:var(--like);font-size:11px;line-height:18px;white-space:nowrap}.like svg{width:18px;height:18px;display:block;margin:0;stroke:currentColor;fill:none;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+.replyToggle{margin-left:53px;margin-top:9px;display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--sub);cursor:pointer;padding:2px 0}.replyToggle svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}.replies{margin:8px 0 0 53px;background:var(--reply);border-radius:9px;overflow:hidden}.reply{position:relative;padding:10px 10px 10px 10px;border-bottom:1px solid var(--line)}.reply:last-child{border-bottom:0}.replyHead{display:flex;align-items:center;min-width:0}.rAvatar{width:24px;height:24px;border-radius:50%;overflow:hidden;background:#e8e8e8;flex:0 0 24px;margin-right:6px}.rAvatar img{width:100%;height:100%;object-fit:cover}.rName{font-size:12.5px;font-weight:600;max-width:45vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rBadges{display:flex;gap:3px;margin-left:4px}.rContent{font-size:13px;line-height:1.58;margin:5px 0 0 30px;padding-right:2px;white-space:normal;word-break:break-word;overflow-wrap:anywhere}.replyTo{color:var(--sub)}.rMeta{font-size:10.5px;color:var(--muted);margin:5px 0 0 30px;padding-right:42px;white-space:normal;line-height:1.35}.rLike{position:absolute;right:6px;bottom:10px;top:auto;transform:none;width:auto;display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:2px;color:var(--muted);font-size:9px;line-height:14px;white-space:nowrap}.rLike svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;margin:0}.replyMore{padding:8px 12px 10px 44px;color:var(--sub);font-size:12px;cursor:pointer}
+.god{position:absolute;right:20px;top:13px;transform:rotate(12deg);border:1.3px solid #b8924d;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:#b8924d;font-size:9px;font-weight:700;opacity:.92;pointer-events:none}
+.loadMore{padding:15px;text-align:center;color:var(--muted);background:var(--panel);font-size:13px;cursor:pointer}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1000;display:flex;align-items:center;justify-content:center}.lightbox img{max-width:94vw;max-height:94vh;object-fit:contain}
+body.dark{--bg:#191919;--panel:#191919;--text:#ededed;--sub:#a7a7a7;--muted:#888;--line:#2c2c2c;--soft:#242424;--reply:#242424;--quote:#242424;--quote-line:#697281;--like:#8f8f8f}.dark .quoteCard{background:#202020;border-color:#333;color:#dedede;box-shadow:none}.dark .row2{border-top-color:#262626}.dark .sort+.sort:before{background:#333}.dark .badgeText{background:#242424;border-color:#6d5d35;color:#d8b65d}.dark .badgeText.rank{background:#24211b;border-color:#6a5934;color:#e1b95a}.dark .badgeText.official{background:#222936;border-color:#4d6694;color:#90aee9}.dark .badgeText.pink{background:#42282f;border-color:#5a3039;color:#f08ba0}.dark .badgeText.deepBlue{background:#334e6a;border-color:#334e6a;color:#eef6ff}.dark .badgeText.red{background:#743b3b;border-color:#743b3b;color:#fff}.dark .badgeText.level{background:#4c426a;border-color:#4c426a;color:#f7f3ff}.dark .badgeText.t2{background:#302326}.dark .badgeText.t3{background:#252936}.dark .badgeText.t4{background:#2d2735}.dark .content,.dark .rContent,.dark .rName{color:#ededed}.dark .tab,.dark .row2,.dark .sortLabel,.dark .sort,.dark .meta,.dark .replyToggle,.dark .replyTo,.dark .rMeta,.dark .rLike,.dark .replyMore,.dark .loadMore{color:#a7a7a7}.dark .tab.active,.dark .sort.active{color:var(--accent)}.dark .tab.active{color:#ededed}.dark .avatar{background:#2a2a2a;color:#aaa}.dark .rAvatar{background:#2a2a2a}.dark .mediaImg{background:#252525}
+.mediaEmptyCompact{padding:48px 14px!important;color:var(--muted)!important;font-size:14px!important}
+.toTop{position:fixed;right:18px;bottom:26px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(
+
+===== rMeta =====
+ont-size:11px;line-height:18px;white-space:nowrap}.like svg{width:18px;height:18px;display:block;margin:0;stroke:currentColor;fill:none;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+.replyToggle{margin-left:53px;margin-top:9px;display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--sub);cursor:pointer;padding:2px 0}.replyToggle svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}.replies{margin:8px 0 0 53px;background:var(--reply);border-radius:9px;overflow:hidden}.reply{position:relative;padding:10px 10px 10px 10px;border-bottom:1px solid var(--line)}.reply:last-child{border-bottom:0}.replyHead{display:flex;align-items:center;min-width:0}.rAvatar{width:24px;height:24px;border-radius:50%;overflow:hidden;background:#e8e8e8;flex:0 0 24px;margin-right:6px}.rAvatar img{width:100%;height:100%;object-fit:cover}.rName{font-size:12.5px;font-weight:600;max-width:45vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rBadges{display:flex;gap:3px;margin-left:4px}.rContent{font-size:13px;line-height:1.58;margin:5px 0 0 30px;padding-right:2px;white-space:normal;word-break:break-word;overflow-wrap:anywhere}.replyTo{color:var(--sub)}.rMeta{font-size:10.5px;color:var(--muted);margin:5px 0 0 30px;padding-right:42px;white-space:normal;line-height:1.35}.rLike{position:absolute;right:6px;bottom:10px;top:auto;transform:none;width:auto;display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:2px;color:var(--muted);font-size:9px;line-height:14px;white-space:nowrap}.rLike svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;margin:0}.replyMore{padding:8px 12px 10px 44px;color:var(--sub);font-size:12px;cursor:pointer}
+.god{position:absolute;right:20px;top:13px;transform:rotate(12deg);border:1.3px solid #b8924d;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:#b8924d;font-size:9px;font-weight:700;opacity:.92;pointer-events:none}
+.loadMore{padding:15px;text-align:center;color:var(--muted);background:var(--panel);font-size:13px;cursor:pointer}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1000;display:flex;align-items:center;justify-content:center}.lightbox img{max-width:94vw;max-height:94vh;object-fit:contain}
+body.dark{--bg:#191919;--panel:#191919;--text:#ededed;--sub:#a7a7a7;--muted:#888;--line:#2c2c2c;--soft:#242424;--reply:#242424;--quote:#242424;--quote-line:#697281;--like:#8f8f8f}.dark .quoteCard{background:#202020;border-color:#333;color:#dedede;box-shadow:none}.dark .row2{border-top-color:#262626}.dark .sort+.sort:before{background:#333}.dark .badgeText{background:#242424;border-color:#6d5d35;color:#d8b65d}.dark .badgeText.rank{background:#24211b;border-color:#6a5934;color:#e1b95a}.dark .badgeText.official{background:#222936;border-color:#4d6694;color:#90aee9}.dark .badgeText.pink{background:#42282f;border-color:#5a3039;color:#f08ba0}.dark .badgeText.deepBlue{background:#334e6a;border-color:#334e6a;color:#eef6ff}.dark .badgeText.red{background:#743b3b;border-color:#743b3b;color:#fff}.dark .badgeText.level{background:#4c426a;border-color:#4c426a;color:#f7f3ff}.dark .badgeText.t2{background:#302326}.dark .badgeText.t3{background:#252936}.dark .badgeText.t4{background:#2d2735}.dark .content,.dark .rContent,.dark .rName{color:#ededed}.dark .tab,.dark .row2,.dark .sortLabel,.dark .sort,.dark .meta,.dark .replyToggle,.dark .replyTo,.dark .rMeta,.dark .rLike,.dark .replyMore,.dark .loadMore{color:#a7a7a7}.dark .tab.active,.dark .sort.active{color:var(--accent)}.dark .tab.active{color:#ededed}.dark .avatar{background:#2a2a2a;color:#aaa}.dark .rAvatar{background:#2a2a2a}.dark .mediaImg{background:#252525}
+.mediaEmptyCompact{padding:48px 14px!important;color:var(--muted)!important;font-size:14px!important}
+.toTop{position:fixed;right:18px;bottom:26px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(30,30,30,.72);color:#fff;font-size:20px;z-index:35;box-shadow:0 4px 18px rgba(0,0,0,.18)}.dark .toTop{background:rgba(245,245,245,.18)}
+/* beta15：长评论折叠、回复入口和失败重试。 */
+.content.qfFoldable.qfFolded{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:6;overflow:hidden}
+.rContent.qfFoldable.qfFolded{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
+.foldBtn{display:inline-flex;align-items:center;margin:5px 0 0;padding:2px 0;border:0;background:transparent;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer}
+.reply .foldBtn{margin-left:32px;margin-top:4px;font-size:11.5px}
+.replyToggle{background:var(--soft);border-radius:15px;padding:6px 10px;margin-top:10px;transition:background .14s ease}.qfA
+
+===== rLike =====
+ntColor;fill:none;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+.replyToggle{margin-left:53px;margin-top:9px;display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--sub);cursor:pointer;padding:2px 0}.replyToggle svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}.replies{margin:8px 0 0 53px;background:var(--reply);border-radius:9px;overflow:hidden}.reply{position:relative;padding:10px 10px 10px 10px;border-bottom:1px solid var(--line)}.reply:last-child{border-bottom:0}.replyHead{display:flex;align-items:center;min-width:0}.rAvatar{width:24px;height:24px;border-radius:50%;overflow:hidden;background:#e8e8e8;flex:0 0 24px;margin-right:6px}.rAvatar img{width:100%;height:100%;object-fit:cover}.rName{font-size:12.5px;font-weight:600;max-width:45vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rBadges{display:flex;gap:3px;margin-left:4px}.rContent{font-size:13px;line-height:1.58;margin:5px 0 0 30px;padding-right:2px;white-space:normal;word-break:break-word;overflow-wrap:anywhere}.replyTo{color:var(--sub)}.rMeta{font-size:10.5px;color:var(--muted);margin:5px 0 0 30px;padding-right:42px;white-space:normal;line-height:1.35}.rLike{position:absolute;right:6px;bottom:10px;top:auto;transform:none;width:auto;display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:2px;color:var(--muted);font-size:9px;line-height:14px;white-space:nowrap}.rLike svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;margin:0}.replyMore{padding:8px 12px 10px 44px;color:var(--sub);font-size:12px;cursor:pointer}
+.god{position:absolute;right:20px;top:13px;transform:rotate(12deg);border:1.3px solid #b8924d;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:#b8924d;font-size:9px;font-weight:700;opacity:.92;pointer-events:none}
+.loadMore{padding:15px;text-align:center;color:var(--muted);background:var(--panel);font-size:13px;cursor:pointer}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1000;display:flex;align-items:center;justify-content:center}.lightbox img{max-width:94vw;max-height:94vh;object-fit:contain}
+body.dark{--bg:#191919;--panel:#191919;--text:#ededed;--sub:#a7a7a7;--muted:#888;--line:#2c2c2c;--soft:#242424;--reply:#242424;--quote:#242424;--quote-line:#697281;--like:#8f8f8f}.dark .quoteCard{background:#202020;border-color:#333;color:#dedede;box-shadow:none}.dark .row2{border-top-color:#262626}.dark .sort+.sort:before{background:#333}.dark .badgeText{background:#242424;border-color:#6d5d35;color:#d8b65d}.dark .badgeText.rank{background:#24211b;border-color:#6a5934;color:#e1b95a}.dark .badgeText.official{background:#222936;border-color:#4d6694;color:#90aee9}.dark .badgeText.pink{background:#42282f;border-color:#5a3039;color:#f08ba0}.dark .badgeText.deepBlue{background:#334e6a;border-color:#334e6a;color:#eef6ff}.dark .badgeText.red{background:#743b3b;border-color:#743b3b;color:#fff}.dark .badgeText.level{background:#4c426a;border-color:#4c426a;color:#f7f3ff}.dark .badgeText.t2{background:#302326}.dark .badgeText.t3{background:#252936}.dark .badgeText.t4{background:#2d2735}.dark .content,.dark .rContent,.dark .rName{color:#ededed}.dark .tab,.dark .row2,.dark .sortLabel,.dark .sort,.dark .meta,.dark .replyToggle,.dark .replyTo,.dark .rMeta,.dark .rLike,.dark .replyMore,.dark .loadMore{color:#a7a7a7}.dark .tab.active,.dark .sort.active{color:var(--accent)}.dark .tab.active{color:#ededed}.dark .avatar{background:#2a2a2a;color:#aaa}.dark .rAvatar{background:#2a2a2a}.dark .mediaImg{background:#252525}
+.mediaEmptyCompact{padding:48px 14px!important;color:var(--muted)!important;font-size:14px!important}
+.toTop{position:fixed;right:18px;bottom:26px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(30,30,30,.72);color:#fff;font-size:20px;z-index:35;box-shadow:0 4px 18px rgba(0,0,0,.18)}.dark .toTop{background:rgba(245,245,245,.18)}
+/* beta15：长评论折叠、回复入口和失败重试。 */
+.content.qfFoldable.qfFolded{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:6;overflow:hidden}
+.rContent.qfFoldable.qfFolded{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
+.foldBtn{display:inline-flex;align-items:center;margin:5px 0 0;padding:2px 0;border:0;background:transparent;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer}
+.reply .foldBtn{margin-left:32px;margin-top:4px;font-size:11.5px}
+.replyToggle{background:var(--soft);border-radius:15px;padding:6px 10px;margin-top:10px;transition:background .14s ease}.qfAuthorReplyToggle{background:transparent;border-radius:0;padding:5px 0;margin-top:9px;color:var(--sub);font-weight:600}
