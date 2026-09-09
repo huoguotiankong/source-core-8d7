@@ -1,0 +1,2351 @@
+### KW LikeCount FN qdV20CommentLike @4729
+0_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);}
+    return o;
+}
+function qdReviewSnapPutV460(key,body,titleCount,titleHot){
+    body=String(body==null?'':body);if(!key||!body||body.length>420000)return;
+    QF_REVIEW_SNAP460[key]={ts:Date.now(),body:body,titleCount:Number(titleCount||0)||0,titleHot:!!titleHot};
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0)QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);
+    while(QF_REVIEW_SNAP460_ORDER.length>QF_REVIEW_SNAP460_MAX){var old=QF_REVIEW_SNAP460_ORDER.shift();delete QF_REVIEW_SNAP460[old];}
+}
+function qdReviewSnapRestoreTitleV460(bid,cid,showBubble,snap){
+    try{
+        var ch=qfChapter(this);if(!ch||!ch.putImgUrl)return;
+        if(showBubble&&snap&&Number(snap.titleCount||0)>0){
+            ch.putImgUrl(qdBubbleDataV20.call(this,Number(snap.titleCount||0),bid,cid,-1,0,!!snap.titleHot));
+        }else ch.putImgUrl(null);
+    }catch(_e){}
+}
+
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qdV20List(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e){}
+    return [];
+}
+function qdV20CommentText(c){
+    c=c||{};
+    var t=c.text||c.ReviewContent||c.reviewContent||c.Content||c.content||
+        c.Body||c.Subject||c.CommentContent||
+        (c.raw&&(c.raw.text||c.raw.ReviewContent||c.raw.Content||c.raw.content))||"";
+    if(typeof t==="object")t=t.Text||t.text||t.Content||t.content||"";
+    return qfEmojiV13(String(t||""));
+}
+function qdV20CleanCommentText(s){
+    return qfEmojiV13(String(s||""))
+        .replace(/https?:\/\/[^\s]+/g,"")
+        .replace(/qdd\.gg\/[^\s]+/g,"")
+        .replace(/<[^>]+>/g,"")
+        .trim();
+}
+function qdV20CommentUser(c){
+    c=c||{};
+    var u=c.user_info||c.UserInfo||c.User||c.user||c.raw||{};
+    return {
+        name:String(u.user_name||u.UserName||u.NickName||u.nickname||c.nickname||c.UserName||c.userName||"书友"),
+        avatar:String(u.user_avatar||u.UserHeadIcon||u.Avatar||u.avatar||c.avatar||c.UserHeadIcon||"")
+    };
+}
+function qdV20CommentLike(c){
+    c=c||{};
+    return Number(c.digg_count||c.like_count||c.LikeCount||c.likeCount||c.DiggCount||
+        c.AgreeAmount||c.Likes||(c.raw&&(c.raw.LikeCount||c.raw.DiggCount||c.raw.AgreeAmount))||0)||0;
+}
+function qdV20CommentReply(c){
+    c=c||{};
+    return Number(c.reply_count||c.ReplyCount||c.replyCount||c.CommentCount||c.commentCount||
+        (c.raw&&(c.raw.ReplyCount||c.raw.CommentCount))||0)||0;
+}
+/* alpha18：Decoration Plan 行对象池。
+ * 一章完成后立即归还；仅复用段落位置/quote 等瞬时装饰数据，不缓存评论实体。
+ * tuple: 0=item,1=pid,2=count,3=seg,4=lineIndex,5=quote,6=uriEncoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,seg,ix,quote,hot){
+    var r=QF_DECOR_ROW490_POOL.length?QF_DECOR_ROW490_POOL.pop():new Array(9);
+    r[0]=it;r[1]=pid;r[2]=cnt;r[3]=seg;r[4]=ix;r[5]=quote;r[6]=null;r[7]=null;r[8]=hot?1:0;return r;
+}
+function qdDecorRowQuoteV490(r){
+    if(r[6]===null){var q='';try{q=encodeURIComponent(String(r[5]||''));}catch(_qe490){q='';}r[6]=q;r[7]=qfEscJsV13(q);}return String(r[6]||'');
+}
+function qdDecorRowQuoteJsV490(r){if(r[7]===null)qdDecorRowQuoteV490(r);return String(r[7]||'');}
+function qdDecorRowsReleaseV490(plan){
+    if(!plan||!plan.length)return;
+    for(var i=0;i<plan.length&&QF_DECOR_ROW490_POOL.length<QF_DECOR_ROW490_MAX;i++){
+        var r=plan[i];if(!r)continue;for(var k=0;k<9;k++)r[k]=null;QF_DECOR_ROW490_POOL.push(r);
+    }
+}
+
+/* alpha19：低频正文卡片只缓存“视觉层”，绝不缓存 click / ReviewId / 评论实体。
+ * 同一作者说/本章说/热评在返回章节或快照失效后可直接复用 Base64，减少 SVG 拼接与 Java Bridge。
+ * 36 项 LRU 仅常驻很小的 data URI；业务内容变化会自然产生不同 key。 */
+var QF_CARD_VIS500={},QF_CARD_VIS500_ORDER=[],QF_CARD_VIS500_MAX=36;
+function qdCardVisKeyV500(kind,sig){return String(kind||'')+'\u001f'+String(sig||'');}
+function qdCardVisGetV500(kind,sig){
+    var key=qdCardVisKeyV500(kind,sig),v=QF_CARD_VIS500[key];if(!v)return '';
+    var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0){QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);}return v;
+}
+function qdCardVisPutV500(j,kind,sig,svg){
+    if(!j||!svg)return '';
+    var key=qdCardVisKeyV500(kind,sig),base='';try{base='data:image/svg+xml;base64,'+j.base64Encode(svg);}catch(_e){return '';}
+    if(!base)return '';
+    QF_CARD_VIS500[key]=base;var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0)QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);
+    while(QF_CARD_VIS500_ORDER.length>QF_CARD_VIS500_MAX){var old=QF_CARD_VIS500_ORDER.shift();delete QF_CARD_VIS500[old];}
+    return base;
+}
+
+function qdHotHtmlV20(c,bid,cid,pid,seg,quote,quoteEncoded,quoteJsEncoded){
+    if(!c||!c.content)return "";
+    var t=String(c.content||"").replace(/\s+/g," ").trim();if(t.length>22)t=t.substring(0,22)+"…";
+    var like=Number(c.like||0)||0,meta=like>0?("♡ "+(like>999?"999+":like)):"查看段评 ›";
+    var visualSig=t+'\u001f'+meta,base=qdCardVisGetV500('hot',visualSig);
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var svg='<svg width="1000" height="122" xmlns="http://www.w3.org/2000/svg">'+
+            '<rect x="2" y="5" width="996" height="104" fill="rgba(255,250,248,0.72)" rx="30" stroke="#F0D9D3" stroke-width="1"/>'+
+            '<rect x="27" y="28" width="122" height="50" rx="25" fill="#EF5B50"/>'+
+            '<text x="88" y="62" font-size="28" fill="#FFF" text-anchor="middle" font-weight="700">热评</text>'+
+            '<text x="174" y="63" font-size="33" fill="#252525" font-weight="600">'+qfEscV13(t)+'</text>'+
+            '<text x="962" y="63" font-size="25" fill="#9A8B87" text-anchor="end">'+qfEscV13(meta)+'</text></svg>';
+        base=qdCardVisPutV500(j,'hot',visualSig,svg);if(!base)return "";
+    }
+    var qe=quoteEncoded==null?"":String(quoteEncoded),qj=quoteJsEncoded==null?"":String(quoteJsEncoded);
+    if(quoteEncoded==null){try{qe=encodeURIComponent(String(quote||""));}catch(_qe){qe="";}}
+    if(quoteJsEncoded==null)qj=qfEscJsV13(qe);
+    var click="showCmtV20('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+pid+"','"+seg+"','dp','"+qj+"','"+String(Number(c.total||c.replyCount||0)||0)+"')";
+    var d=base+',{"style":"FULL","type":"qd","click":'+JSON.stringify(click)+'}';
+    return '<img src="'+d.replace(/"/g,"&quot;")+'">';
+}
+function qdAuthorSayCardV20(text,bid,cid,provider){
+    text=String(text||"").trim();if(!qfAuthorSayRealV327(text))return "";
+    provider=String(provider||"");
+    var clickable=(provider===""||provider==="晴天");
+    var author=qfBookVarV09.call(this,"qf_author","作者"),w=1080,lp=62,rp=62,font="system-ui,Arial,sans-serif";
+    /* alpha3.6：旧版固定 slice(27) 没考虑汉字/英文实际宽度，38px 字号下 27 个汉字会超过正文宽度。
+       改按视觉宽度估算换行；保留原文换行，同时避免标点单独掉到下一行。 */
+    function unit(ch){
+        if(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch))return 1;
+        if(/[A-Z0-9]/.test(ch))return .68;
+        if(/[a-z]/.test(ch))return .56;
+        if(/\s/.test(ch))return .32;
+        return .52;
+    }
+    function wrap(src,limit,maxRows){
+        var out=[],paras=String(src||'').replace(/\r/g,'').split('\n');
+        for(var p=0;p<paras.length&&out.length<maxRows;p++){
+            var ss=paras[p],line='',u=0;
+            if(!ss){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+            for(var i=0;i<ss.lengt
+
+### KW LikeCount FN qdV20CommentLike @4742
+e(i,1);QF_REVIEW_SNAP460_ORDER.push(key);}
+    return o;
+}
+function qdReviewSnapPutV460(key,body,titleCount,titleHot){
+    body=String(body==null?'':body);if(!key||!body||body.length>420000)return;
+    QF_REVIEW_SNAP460[key]={ts:Date.now(),body:body,titleCount:Number(titleCount||0)||0,titleHot:!!titleHot};
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0)QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);
+    while(QF_REVIEW_SNAP460_ORDER.length>QF_REVIEW_SNAP460_MAX){var old=QF_REVIEW_SNAP460_ORDER.shift();delete QF_REVIEW_SNAP460[old];}
+}
+function qdReviewSnapRestoreTitleV460(bid,cid,showBubble,snap){
+    try{
+        var ch=qfChapter(this);if(!ch||!ch.putImgUrl)return;
+        if(showBubble&&snap&&Number(snap.titleCount||0)>0){
+            ch.putImgUrl(qdBubbleDataV20.call(this,Number(snap.titleCount||0),bid,cid,-1,0,!!snap.titleHot));
+        }else ch.putImgUrl(null);
+    }catch(_e){}
+}
+
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qdV20List(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e){}
+    return [];
+}
+function qdV20CommentText(c){
+    c=c||{};
+    var t=c.text||c.ReviewContent||c.reviewContent||c.Content||c.content||
+        c.Body||c.Subject||c.CommentContent||
+        (c.raw&&(c.raw.text||c.raw.ReviewContent||c.raw.Content||c.raw.content))||"";
+    if(typeof t==="object")t=t.Text||t.text||t.Content||t.content||"";
+    return qfEmojiV13(String(t||""));
+}
+function qdV20CleanCommentText(s){
+    return qfEmojiV13(String(s||""))
+        .replace(/https?:\/\/[^\s]+/g,"")
+        .replace(/qdd\.gg\/[^\s]+/g,"")
+        .replace(/<[^>]+>/g,"")
+        .trim();
+}
+function qdV20CommentUser(c){
+    c=c||{};
+    var u=c.user_info||c.UserInfo||c.User||c.user||c.raw||{};
+    return {
+        name:String(u.user_name||u.UserName||u.NickName||u.nickname||c.nickname||c.UserName||c.userName||"书友"),
+        avatar:String(u.user_avatar||u.UserHeadIcon||u.Avatar||u.avatar||c.avatar||c.UserHeadIcon||"")
+    };
+}
+function qdV20CommentLike(c){
+    c=c||{};
+    return Number(c.digg_count||c.like_count||c.LikeCount||c.likeCount||c.DiggCount||
+        c.AgreeAmount||c.Likes||(c.raw&&(c.raw.LikeCount||c.raw.DiggCount||c.raw.AgreeAmount))||0)||0;
+}
+function qdV20CommentReply(c){
+    c=c||{};
+    return Number(c.reply_count||c.ReplyCount||c.replyCount||c.CommentCount||c.commentCount||
+        (c.raw&&(c.raw.ReplyCount||c.raw.CommentCount))||0)||0;
+}
+/* alpha18：Decoration Plan 行对象池。
+ * 一章完成后立即归还；仅复用段落位置/quote 等瞬时装饰数据，不缓存评论实体。
+ * tuple: 0=item,1=pid,2=count,3=seg,4=lineIndex,5=quote,6=uriEncoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,seg,ix,quote,hot){
+    var r=QF_DECOR_ROW490_POOL.length?QF_DECOR_ROW490_POOL.pop():new Array(9);
+    r[0]=it;r[1]=pid;r[2]=cnt;r[3]=seg;r[4]=ix;r[5]=quote;r[6]=null;r[7]=null;r[8]=hot?1:0;return r;
+}
+function qdDecorRowQuoteV490(r){
+    if(r[6]===null){var q='';try{q=encodeURIComponent(String(r[5]||''));}catch(_qe490){q='';}r[6]=q;r[7]=qfEscJsV13(q);}return String(r[6]||'');
+}
+function qdDecorRowQuoteJsV490(r){if(r[7]===null)qdDecorRowQuoteV490(r);return String(r[7]||'');}
+function qdDecorRowsReleaseV490(plan){
+    if(!plan||!plan.length)return;
+    for(var i=0;i<plan.length&&QF_DECOR_ROW490_POOL.length<QF_DECOR_ROW490_MAX;i++){
+        var r=plan[i];if(!r)continue;for(var k=0;k<9;k++)r[k]=null;QF_DECOR_ROW490_POOL.push(r);
+    }
+}
+
+/* alpha19：低频正文卡片只缓存“视觉层”，绝不缓存 click / ReviewId / 评论实体。
+ * 同一作者说/本章说/热评在返回章节或快照失效后可直接复用 Base64，减少 SVG 拼接与 Java Bridge。
+ * 36 项 LRU 仅常驻很小的 data URI；业务内容变化会自然产生不同 key。 */
+var QF_CARD_VIS500={},QF_CARD_VIS500_ORDER=[],QF_CARD_VIS500_MAX=36;
+function qdCardVisKeyV500(kind,sig){return String(kind||'')+'\u001f'+String(sig||'');}
+function qdCardVisGetV500(kind,sig){
+    var key=qdCardVisKeyV500(kind,sig),v=QF_CARD_VIS500[key];if(!v)return '';
+    var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0){QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);}return v;
+}
+function qdCardVisPutV500(j,kind,sig,svg){
+    if(!j||!svg)return '';
+    var key=qdCardVisKeyV500(kind,sig),base='';try{base='data:image/svg+xml;base64,'+j.base64Encode(svg);}catch(_e){return '';}
+    if(!base)return '';
+    QF_CARD_VIS500[key]=base;var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0)QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);
+    while(QF_CARD_VIS500_ORDER.length>QF_CARD_VIS500_MAX){var old=QF_CARD_VIS500_ORDER.shift();delete QF_CARD_VIS500[old];}
+    return base;
+}
+
+function qdHotHtmlV20(c,bid,cid,pid,seg,quote,quoteEncoded,quoteJsEncoded){
+    if(!c||!c.content)return "";
+    var t=String(c.content||"").replace(/\s+/g," ").trim();if(t.length>22)t=t.substring(0,22)+"…";
+    var like=Number(c.like||0)||0,meta=like>0?("♡ "+(like>999?"999+":like)):"查看段评 ›";
+    var visualSig=t+'\u001f'+meta,base=qdCardVisGetV500('hot',visualSig);
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var svg='<svg width="1000" height="122" xmlns="http://www.w3.org/2000/svg">'+
+            '<rect x="2" y="5" width="996" height="104" fill="rgba(255,250,248,0.72)" rx="30" stroke="#F0D9D3" stroke-width="1"/>'+
+            '<rect x="27" y="28" width="122" height="50" rx="25" fill="#EF5B50"/>'+
+            '<text x="88" y="62" font-size="28" fill="#FFF" text-anchor="middle" font-weight="700">热评</text>'+
+            '<text x="174" y="63" font-size="33" fill="#252525" font-weight="600">'+qfEscV13(t)+'</text>'+
+            '<text x="962" y="63" font-size="25" fill="#9A8B87" text-anchor="end">'+qfEscV13(meta)+'</text></svg>';
+        base=qdCardVisPutV500(j,'hot',visualSig,svg);if(!base)return "";
+    }
+    var qe=quoteEncoded==null?"":String(quoteEncoded),qj=quoteJsEncoded==null?"":String(quoteJsEncoded);
+    if(quoteEncoded==null){try{qe=encodeURIComponent(String(quote||""));}catch(_qe){qe="";}}
+    if(quoteJsEncoded==null)qj=qfEscJsV13(qe);
+    var click="showCmtV20('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+pid+"','"+seg+"','dp','"+qj+"','"+String(Number(c.total||c.replyCount||0)||0)+"')";
+    var d=base+',{"style":"FULL","type":"qd","click":'+JSON.stringify(click)+'}';
+    return '<img src="'+d.replace(/"/g,"&quot;")+'">';
+}
+function qdAuthorSayCardV20(text,bid,cid,provider){
+    text=String(text||"").trim();if(!qfAuthorSayRealV327(text))return "";
+    provider=String(provider||"");
+    var clickable=(provider===""||provider==="晴天");
+    var author=qfBookVarV09.call(this,"qf_author","作者"),w=1080,lp=62,rp=62,font="system-ui,Arial,sans-serif";
+    /* alpha3.6：旧版固定 slice(27) 没考虑汉字/英文实际宽度，38px 字号下 27 个汉字会超过正文宽度。
+       改按视觉宽度估算换行；保留原文换行，同时避免标点单独掉到下一行。 */
+    function unit(ch){
+        if(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch))return 1;
+        if(/[A-Z0-9]/.test(ch))return .68;
+        if(/[a-z]/.test(ch))return .56;
+        if(/\s/.test(ch))return .32;
+        return .52;
+    }
+    function wrap(src,limit,maxRows){
+        var out=[],paras=String(src||'').replace(/\r/g,'').split('\n');
+        for(var p=0;p<paras.length&&out.length<maxRows;p++){
+            var ss=paras[p],line='',u=0;
+            if(!ss){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+            for(var i=0;i<ss.length&&out.length
+
+### KW LikeCount FN qdV20CommentLike @4814
+viewSnapPutV460(key,body,titleCount,titleHot){
+    body=String(body==null?'':body);if(!key||!body||body.length>420000)return;
+    QF_REVIEW_SNAP460[key]={ts:Date.now(),body:body,titleCount:Number(titleCount||0)||0,titleHot:!!titleHot};
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0)QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);
+    while(QF_REVIEW_SNAP460_ORDER.length>QF_REVIEW_SNAP460_MAX){var old=QF_REVIEW_SNAP460_ORDER.shift();delete QF_REVIEW_SNAP460[old];}
+}
+function qdReviewSnapRestoreTitleV460(bid,cid,showBubble,snap){
+    try{
+        var ch=qfChapter(this);if(!ch||!ch.putImgUrl)return;
+        if(showBubble&&snap&&Number(snap.titleCount||0)>0){
+            ch.putImgUrl(qdBubbleDataV20.call(this,Number(snap.titleCount||0),bid,cid,-1,0,!!snap.titleHot));
+        }else ch.putImgUrl(null);
+    }catch(_e){}
+}
+
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qdV20List(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e){}
+    return [];
+}
+function qdV20CommentText(c){
+    c=c||{};
+    var t=c.text||c.ReviewContent||c.reviewContent||c.Content||c.content||
+        c.Body||c.Subject||c.CommentContent||
+        (c.raw&&(c.raw.text||c.raw.ReviewContent||c.raw.Content||c.raw.content))||"";
+    if(typeof t==="object")t=t.Text||t.text||t.Content||t.content||"";
+    return qfEmojiV13(String(t||""));
+}
+function qdV20CleanCommentText(s){
+    return qfEmojiV13(String(s||""))
+        .replace(/https?:\/\/[^\s]+/g,"")
+        .replace(/qdd\.gg\/[^\s]+/g,"")
+        .replace(/<[^>]+>/g,"")
+        .trim();
+}
+function qdV20CommentUser(c){
+    c=c||{};
+    var u=c.user_info||c.UserInfo||c.User||c.user||c.raw||{};
+    return {
+        name:String(u.user_name||u.UserName||u.NickName||u.nickname||c.nickname||c.UserName||c.userName||"书友"),
+        avatar:String(u.user_avatar||u.UserHeadIcon||u.Avatar||u.avatar||c.avatar||c.UserHeadIcon||"")
+    };
+}
+function qdV20CommentLike(c){
+    c=c||{};
+    return Number(c.digg_count||c.like_count||c.LikeCount||c.likeCount||c.DiggCount||
+        c.AgreeAmount||c.Likes||(c.raw&&(c.raw.LikeCount||c.raw.DiggCount||c.raw.AgreeAmount))||0)||0;
+}
+function qdV20CommentReply(c){
+    c=c||{};
+    return Number(c.reply_count||c.ReplyCount||c.replyCount||c.CommentCount||c.commentCount||
+        (c.raw&&(c.raw.ReplyCount||c.raw.CommentCount))||0)||0;
+}
+/* alpha18：Decoration Plan 行对象池。
+ * 一章完成后立即归还；仅复用段落位置/quote 等瞬时装饰数据，不缓存评论实体。
+ * tuple: 0=item,1=pid,2=count,3=seg,4=lineIndex,5=quote,6=uriEncoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,seg,ix,quote,hot){
+    var r=QF_DECOR_ROW490_POOL.length?QF_DECOR_ROW490_POOL.pop():new Array(9);
+    r[0]=it;r[1]=pid;r[2]=cnt;r[3]=seg;r[4]=ix;r[5]=quote;r[6]=null;r[7]=null;r[8]=hot?1:0;return r;
+}
+function qdDecorRowQuoteV490(r){
+    if(r[6]===null){var q='';try{q=encodeURIComponent(String(r[5]||''));}catch(_qe490){q='';}r[6]=q;r[7]=qfEscJsV13(q);}return String(r[6]||'');
+}
+function qdDecorRowQuoteJsV490(r){if(r[7]===null)qdDecorRowQuoteV490(r);return String(r[7]||'');}
+function qdDecorRowsReleaseV490(plan){
+    if(!plan||!plan.length)return;
+    for(var i=0;i<plan.length&&QF_DECOR_ROW490_POOL.length<QF_DECOR_ROW490_MAX;i++){
+        var r=plan[i];if(!r)continue;for(var k=0;k<9;k++)r[k]=null;QF_DECOR_ROW490_POOL.push(r);
+    }
+}
+
+/* alpha19：低频正文卡片只缓存“视觉层”，绝不缓存 click / ReviewId / 评论实体。
+ * 同一作者说/本章说/热评在返回章节或快照失效后可直接复用 Base64，减少 SVG 拼接与 Java Bridge。
+ * 36 项 LRU 仅常驻很小的 data URI；业务内容变化会自然产生不同 key。 */
+var QF_CARD_VIS500={},QF_CARD_VIS500_ORDER=[],QF_CARD_VIS500_MAX=36;
+function qdCardVisKeyV500(kind,sig){return String(kind||'')+'\u001f'+String(sig||'');}
+function qdCardVisGetV500(kind,sig){
+    var key=qdCardVisKeyV500(kind,sig),v=QF_CARD_VIS500[key];if(!v)return '';
+    var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0){QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);}return v;
+}
+function qdCardVisPutV500(j,kind,sig,svg){
+    if(!j||!svg)return '';
+    var key=qdCardVisKeyV500(kind,sig),base='';try{base='data:image/svg+xml;base64,'+j.base64Encode(svg);}catch(_e){return '';}
+    if(!base)return '';
+    QF_CARD_VIS500[key]=base;var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0)QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);
+    while(QF_CARD_VIS500_ORDER.length>QF_CARD_VIS500_MAX){var old=QF_CARD_VIS500_ORDER.shift();delete QF_CARD_VIS500[old];}
+    return base;
+}
+
+function qdHotHtmlV20(c,bid,cid,pid,seg,quote,quoteEncoded,quoteJsEncoded){
+    if(!c||!c.content)return "";
+    var t=String(c.content||"").replace(/\s+/g," ").trim();if(t.length>22)t=t.substring(0,22)+"…";
+    var like=Number(c.like||0)||0,meta=like>0?("♡ "+(like>999?"999+":like)):"查看段评 ›";
+    var visualSig=t+'\u001f'+meta,base=qdCardVisGetV500('hot',visualSig);
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var svg='<svg width="1000" height="122" xmlns="http://www.w3.org/2000/svg">'+
+            '<rect x="2" y="5" width="996" height="104" fill="rgba(255,250,248,0.72)" rx="30" stroke="#F0D9D3" stroke-width="1"/>'+
+            '<rect x="27" y="28" width="122" height="50" rx="25" fill="#EF5B50"/>'+
+            '<text x="88" y="62" font-size="28" fill="#FFF" text-anchor="middle" font-weight="700">热评</text>'+
+            '<text x="174" y="63" font-size="33" fill="#252525" font-weight="600">'+qfEscV13(t)+'</text>'+
+            '<text x="962" y="63" font-size="25" fill="#9A8B87" text-anchor="end">'+qfEscV13(meta)+'</text></svg>';
+        base=qdCardVisPutV500(j,'hot',visualSig,svg);if(!base)return "";
+    }
+    var qe=quoteEncoded==null?"":String(quoteEncoded),qj=quoteJsEncoded==null?"":String(quoteJsEncoded);
+    if(quoteEncoded==null){try{qe=encodeURIComponent(String(quote||""));}catch(_qe){qe="";}}
+    if(quoteJsEncoded==null)qj=qfEscJsV13(qe);
+    var click="showCmtV20('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+pid+"','"+seg+"','dp','"+qj+"','"+String(Number(c.total||c.replyCount||0)||0)+"')";
+    var d=base+',{"style":"FULL","type":"qd","click":'+JSON.stringify(click)+'}';
+    return '<img src="'+d.replace(/"/g,"&quot;")+'">';
+}
+function qdAuthorSayCardV20(text,bid,cid,provider){
+    text=String(text||"").trim();if(!qfAuthorSayRealV327(text))return "";
+    provider=String(provider||"");
+    var clickable=(provider===""||provider==="晴天");
+    var author=qfBookVarV09.call(this,"qf_author","作者"),w=1080,lp=62,rp=62,font="system-ui,Arial,sans-serif";
+    /* alpha3.6：旧版固定 slice(27) 没考虑汉字/英文实际宽度，38px 字号下 27 个汉字会超过正文宽度。
+       改按视觉宽度估算换行；保留原文换行，同时避免标点单独掉到下一行。 */
+    function unit(ch){
+        if(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch))return 1;
+        if(/[A-Z0-9]/.test(ch))return .68;
+        if(/[a-z]/.test(ch))return .56;
+        if(/\s/.test(ch))return .32;
+        return .52;
+    }
+    function wrap(src,limit,maxRows){
+        var out=[],paras=String(src||'').replace(/\r/g,'').split('\n');
+        for(var p=0;p<paras.length&&out.length<maxRows;p++){
+            var ss=paras[p],line='',u=0;
+            if(!ss){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+            for(var i=0;i<ss.length&&out.length<maxRows;i++){
+                var ch=ss.charAt(i),cu=unit(ch);
+        
+
+### KW likeCount FN qdV20CommentLike @4729
+0_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);}
+    return o;
+}
+function qdReviewSnapPutV460(key,body,titleCount,titleHot){
+    body=String(body==null?'':body);if(!key||!body||body.length>420000)return;
+    QF_REVIEW_SNAP460[key]={ts:Date.now(),body:body,titleCount:Number(titleCount||0)||0,titleHot:!!titleHot};
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0)QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);
+    while(QF_REVIEW_SNAP460_ORDER.length>QF_REVIEW_SNAP460_MAX){var old=QF_REVIEW_SNAP460_ORDER.shift();delete QF_REVIEW_SNAP460[old];}
+}
+function qdReviewSnapRestoreTitleV460(bid,cid,showBubble,snap){
+    try{
+        var ch=qfChapter(this);if(!ch||!ch.putImgUrl)return;
+        if(showBubble&&snap&&Number(snap.titleCount||0)>0){
+            ch.putImgUrl(qdBubbleDataV20.call(this,Number(snap.titleCount||0),bid,cid,-1,0,!!snap.titleHot));
+        }else ch.putImgUrl(null);
+    }catch(_e){}
+}
+
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qdV20List(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e){}
+    return [];
+}
+function qdV20CommentText(c){
+    c=c||{};
+    var t=c.text||c.ReviewContent||c.reviewContent||c.Content||c.content||
+        c.Body||c.Subject||c.CommentContent||
+        (c.raw&&(c.raw.text||c.raw.ReviewContent||c.raw.Content||c.raw.content))||"";
+    if(typeof t==="object")t=t.Text||t.text||t.Content||t.content||"";
+    return qfEmojiV13(String(t||""));
+}
+function qdV20CleanCommentText(s){
+    return qfEmojiV13(String(s||""))
+        .replace(/https?:\/\/[^\s]+/g,"")
+        .replace(/qdd\.gg\/[^\s]+/g,"")
+        .replace(/<[^>]+>/g,"")
+        .trim();
+}
+function qdV20CommentUser(c){
+    c=c||{};
+    var u=c.user_info||c.UserInfo||c.User||c.user||c.raw||{};
+    return {
+        name:String(u.user_name||u.UserName||u.NickName||u.nickname||c.nickname||c.UserName||c.userName||"书友"),
+        avatar:String(u.user_avatar||u.UserHeadIcon||u.Avatar||u.avatar||c.avatar||c.UserHeadIcon||"")
+    };
+}
+function qdV20CommentLike(c){
+    c=c||{};
+    return Number(c.digg_count||c.like_count||c.LikeCount||c.likeCount||c.DiggCount||
+        c.AgreeAmount||c.Likes||(c.raw&&(c.raw.LikeCount||c.raw.DiggCount||c.raw.AgreeAmount))||0)||0;
+}
+function qdV20CommentReply(c){
+    c=c||{};
+    return Number(c.reply_count||c.ReplyCount||c.replyCount||c.CommentCount||c.commentCount||
+        (c.raw&&(c.raw.ReplyCount||c.raw.CommentCount))||0)||0;
+}
+/* alpha18：Decoration Plan 行对象池。
+ * 一章完成后立即归还；仅复用段落位置/quote 等瞬时装饰数据，不缓存评论实体。
+ * tuple: 0=item,1=pid,2=count,3=seg,4=lineIndex,5=quote,6=uriEncoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,seg,ix,quote,hot){
+    var r=QF_DECOR_ROW490_POOL.length?QF_DECOR_ROW490_POOL.pop():new Array(9);
+    r[0]=it;r[1]=pid;r[2]=cnt;r[3]=seg;r[4]=ix;r[5]=quote;r[6]=null;r[7]=null;r[8]=hot?1:0;return r;
+}
+function qdDecorRowQuoteV490(r){
+    if(r[6]===null){var q='';try{q=encodeURIComponent(String(r[5]||''));}catch(_qe490){q='';}r[6]=q;r[7]=qfEscJsV13(q);}return String(r[6]||'');
+}
+function qdDecorRowQuoteJsV490(r){if(r[7]===null)qdDecorRowQuoteV490(r);return String(r[7]||'');}
+function qdDecorRowsReleaseV490(plan){
+    if(!plan||!plan.length)return;
+    for(var i=0;i<plan.length&&QF_DECOR_ROW490_POOL.length<QF_DECOR_ROW490_MAX;i++){
+        var r=plan[i];if(!r)continue;for(var k=0;k<9;k++)r[k]=null;QF_DECOR_ROW490_POOL.push(r);
+    }
+}
+
+/* alpha19：低频正文卡片只缓存“视觉层”，绝不缓存 click / ReviewId / 评论实体。
+ * 同一作者说/本章说/热评在返回章节或快照失效后可直接复用 Base64，减少 SVG 拼接与 Java Bridge。
+ * 36 项 LRU 仅常驻很小的 data URI；业务内容变化会自然产生不同 key。 */
+var QF_CARD_VIS500={},QF_CARD_VIS500_ORDER=[],QF_CARD_VIS500_MAX=36;
+function qdCardVisKeyV500(kind,sig){return String(kind||'')+'\u001f'+String(sig||'');}
+function qdCardVisGetV500(kind,sig){
+    var key=qdCardVisKeyV500(kind,sig),v=QF_CARD_VIS500[key];if(!v)return '';
+    var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0){QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);}return v;
+}
+function qdCardVisPutV500(j,kind,sig,svg){
+    if(!j||!svg)return '';
+    var key=qdCardVisKeyV500(kind,sig),base='';try{base='data:image/svg+xml;base64,'+j.base64Encode(svg);}catch(_e){return '';}
+    if(!base)return '';
+    QF_CARD_VIS500[key]=base;var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0)QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);
+    while(QF_CARD_VIS500_ORDER.length>QF_CARD_VIS500_MAX){var old=QF_CARD_VIS500_ORDER.shift();delete QF_CARD_VIS500[old];}
+    return base;
+}
+
+function qdHotHtmlV20(c,bid,cid,pid,seg,quote,quoteEncoded,quoteJsEncoded){
+    if(!c||!c.content)return "";
+    var t=String(c.content||"").replace(/\s+/g," ").trim();if(t.length>22)t=t.substring(0,22)+"…";
+    var like=Number(c.like||0)||0,meta=like>0?("♡ "+(like>999?"999+":like)):"查看段评 ›";
+    var visualSig=t+'\u001f'+meta,base=qdCardVisGetV500('hot',visualSig);
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var svg='<svg width="1000" height="122" xmlns="http://www.w3.org/2000/svg">'+
+            '<rect x="2" y="5" width="996" height="104" fill="rgba(255,250,248,0.72)" rx="30" stroke="#F0D9D3" stroke-width="1"/>'+
+            '<rect x="27" y="28" width="122" height="50" rx="25" fill="#EF5B50"/>'+
+            '<text x="88" y="62" font-size="28" fill="#FFF" text-anchor="middle" font-weight="700">热评</text>'+
+            '<text x="174" y="63" font-size="33" fill="#252525" font-weight="600">'+qfEscV13(t)+'</text>'+
+            '<text x="962" y="63" font-size="25" fill="#9A8B87" text-anchor="end">'+qfEscV13(meta)+'</text></svg>';
+        base=qdCardVisPutV500(j,'hot',visualSig,svg);if(!base)return "";
+    }
+    var qe=quoteEncoded==null?"":String(quoteEncoded),qj=quoteJsEncoded==null?"":String(quoteJsEncoded);
+    if(quoteEncoded==null){try{qe=encodeURIComponent(String(quote||""));}catch(_qe){qe="";}}
+    if(quoteJsEncoded==null)qj=qfEscJsV13(qe);
+    var click="showCmtV20('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+pid+"','"+seg+"','dp','"+qj+"','"+String(Number(c.total||c.replyCount||0)||0)+"')";
+    var d=base+',{"style":"FULL","type":"qd","click":'+JSON.stringify(click)+'}';
+    return '<img src="'+d.replace(/"/g,"&quot;")+'">';
+}
+function qdAuthorSayCardV20(text,bid,cid,provider){
+    text=String(text||"").trim();if(!qfAuthorSayRealV327(text))return "";
+    provider=String(provider||"");
+    var clickable=(provider===""||provider==="晴天");
+    var author=qfBookVarV09.call(this,"qf_author","作者"),w=1080,lp=62,rp=62,font="system-ui,Arial,sans-serif";
+    /* alpha3.6：旧版固定 slice(27) 没考虑汉字/英文实际宽度，38px 字号下 27 个汉字会超过正文宽度。
+       改按视觉宽度估算换行；保留原文换行，同时避免标点单独掉到下一行。 */
+    function unit(ch){
+        if(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch))return 1;
+        if(/[A-Z0-9]/.test(ch))return .68;
+        if(/[a-z]/.test(ch))return .56;
+        if(/\s/.test(ch))return .32;
+        return .52;
+    }
+    function wrap(src,limit,maxRows){
+        var out=[],paras=String(src||'').replace(/\r/g,'').split('\n');
+        for(var p=0;p<paras.length&&out.length<maxRows;p++){
+            var ss=paras[p],line='',u=0;
+            if(!ss){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+            for(var i=0;i<ss.lengt
+
+### KW likeCount FN qdV20CommentLike @4742
+e(i,1);QF_REVIEW_SNAP460_ORDER.push(key);}
+    return o;
+}
+function qdReviewSnapPutV460(key,body,titleCount,titleHot){
+    body=String(body==null?'':body);if(!key||!body||body.length>420000)return;
+    QF_REVIEW_SNAP460[key]={ts:Date.now(),body:body,titleCount:Number(titleCount||0)||0,titleHot:!!titleHot};
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0)QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);
+    while(QF_REVIEW_SNAP460_ORDER.length>QF_REVIEW_SNAP460_MAX){var old=QF_REVIEW_SNAP460_ORDER.shift();delete QF_REVIEW_SNAP460[old];}
+}
+function qdReviewSnapRestoreTitleV460(bid,cid,showBubble,snap){
+    try{
+        var ch=qfChapter(this);if(!ch||!ch.putImgUrl)return;
+        if(showBubble&&snap&&Number(snap.titleCount||0)>0){
+            ch.putImgUrl(qdBubbleDataV20.call(this,Number(snap.titleCount||0),bid,cid,-1,0,!!snap.titleHot));
+        }else ch.putImgUrl(null);
+    }catch(_e){}
+}
+
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qdV20List(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e){}
+    return [];
+}
+function qdV20CommentText(c){
+    c=c||{};
+    var t=c.text||c.ReviewContent||c.reviewContent||c.Content||c.content||
+        c.Body||c.Subject||c.CommentContent||
+        (c.raw&&(c.raw.text||c.raw.ReviewContent||c.raw.Content||c.raw.content))||"";
+    if(typeof t==="object")t=t.Text||t.text||t.Content||t.content||"";
+    return qfEmojiV13(String(t||""));
+}
+function qdV20CleanCommentText(s){
+    return qfEmojiV13(String(s||""))
+        .replace(/https?:\/\/[^\s]+/g,"")
+        .replace(/qdd\.gg\/[^\s]+/g,"")
+        .replace(/<[^>]+>/g,"")
+        .trim();
+}
+function qdV20CommentUser(c){
+    c=c||{};
+    var u=c.user_info||c.UserInfo||c.User||c.user||c.raw||{};
+    return {
+        name:String(u.user_name||u.UserName||u.NickName||u.nickname||c.nickname||c.UserName||c.userName||"书友"),
+        avatar:String(u.user_avatar||u.UserHeadIcon||u.Avatar||u.avatar||c.avatar||c.UserHeadIcon||"")
+    };
+}
+function qdV20CommentLike(c){
+    c=c||{};
+    return Number(c.digg_count||c.like_count||c.LikeCount||c.likeCount||c.DiggCount||
+        c.AgreeAmount||c.Likes||(c.raw&&(c.raw.LikeCount||c.raw.DiggCount||c.raw.AgreeAmount))||0)||0;
+}
+function qdV20CommentReply(c){
+    c=c||{};
+    return Number(c.reply_count||c.ReplyCount||c.replyCount||c.CommentCount||c.commentCount||
+        (c.raw&&(c.raw.ReplyCount||c.raw.CommentCount))||0)||0;
+}
+/* alpha18：Decoration Plan 行对象池。
+ * 一章完成后立即归还；仅复用段落位置/quote 等瞬时装饰数据，不缓存评论实体。
+ * tuple: 0=item,1=pid,2=count,3=seg,4=lineIndex,5=quote,6=uriEncoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,seg,ix,quote,hot){
+    var r=QF_DECOR_ROW490_POOL.length?QF_DECOR_ROW490_POOL.pop():new Array(9);
+    r[0]=it;r[1]=pid;r[2]=cnt;r[3]=seg;r[4]=ix;r[5]=quote;r[6]=null;r[7]=null;r[8]=hot?1:0;return r;
+}
+function qdDecorRowQuoteV490(r){
+    if(r[6]===null){var q='';try{q=encodeURIComponent(String(r[5]||''));}catch(_qe490){q='';}r[6]=q;r[7]=qfEscJsV13(q);}return String(r[6]||'');
+}
+function qdDecorRowQuoteJsV490(r){if(r[7]===null)qdDecorRowQuoteV490(r);return String(r[7]||'');}
+function qdDecorRowsReleaseV490(plan){
+    if(!plan||!plan.length)return;
+    for(var i=0;i<plan.length&&QF_DECOR_ROW490_POOL.length<QF_DECOR_ROW490_MAX;i++){
+        var r=plan[i];if(!r)continue;for(var k=0;k<9;k++)r[k]=null;QF_DECOR_ROW490_POOL.push(r);
+    }
+}
+
+/* alpha19：低频正文卡片只缓存“视觉层”，绝不缓存 click / ReviewId / 评论实体。
+ * 同一作者说/本章说/热评在返回章节或快照失效后可直接复用 Base64，减少 SVG 拼接与 Java Bridge。
+ * 36 项 LRU 仅常驻很小的 data URI；业务内容变化会自然产生不同 key。 */
+var QF_CARD_VIS500={},QF_CARD_VIS500_ORDER=[],QF_CARD_VIS500_MAX=36;
+function qdCardVisKeyV500(kind,sig){return String(kind||'')+'\u001f'+String(sig||'');}
+function qdCardVisGetV500(kind,sig){
+    var key=qdCardVisKeyV500(kind,sig),v=QF_CARD_VIS500[key];if(!v)return '';
+    var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0){QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);}return v;
+}
+function qdCardVisPutV500(j,kind,sig,svg){
+    if(!j||!svg)return '';
+    var key=qdCardVisKeyV500(kind,sig),base='';try{base='data:image/svg+xml;base64,'+j.base64Encode(svg);}catch(_e){return '';}
+    if(!base)return '';
+    QF_CARD_VIS500[key]=base;var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0)QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);
+    while(QF_CARD_VIS500_ORDER.length>QF_CARD_VIS500_MAX){var old=QF_CARD_VIS500_ORDER.shift();delete QF_CARD_VIS500[old];}
+    return base;
+}
+
+function qdHotHtmlV20(c,bid,cid,pid,seg,quote,quoteEncoded,quoteJsEncoded){
+    if(!c||!c.content)return "";
+    var t=String(c.content||"").replace(/\s+/g," ").trim();if(t.length>22)t=t.substring(0,22)+"…";
+    var like=Number(c.like||0)||0,meta=like>0?("♡ "+(like>999?"999+":like)):"查看段评 ›";
+    var visualSig=t+'\u001f'+meta,base=qdCardVisGetV500('hot',visualSig);
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var svg='<svg width="1000" height="122" xmlns="http://www.w3.org/2000/svg">'+
+            '<rect x="2" y="5" width="996" height="104" fill="rgba(255,250,248,0.72)" rx="30" stroke="#F0D9D3" stroke-width="1"/>'+
+            '<rect x="27" y="28" width="122" height="50" rx="25" fill="#EF5B50"/>'+
+            '<text x="88" y="62" font-size="28" fill="#FFF" text-anchor="middle" font-weight="700">热评</text>'+
+            '<text x="174" y="63" font-size="33" fill="#252525" font-weight="600">'+qfEscV13(t)+'</text>'+
+            '<text x="962" y="63" font-size="25" fill="#9A8B87" text-anchor="end">'+qfEscV13(meta)+'</text></svg>';
+        base=qdCardVisPutV500(j,'hot',visualSig,svg);if(!base)return "";
+    }
+    var qe=quoteEncoded==null?"":String(quoteEncoded),qj=quoteJsEncoded==null?"":String(quoteJsEncoded);
+    if(quoteEncoded==null){try{qe=encodeURIComponent(String(quote||""));}catch(_qe){qe="";}}
+    if(quoteJsEncoded==null)qj=qfEscJsV13(qe);
+    var click="showCmtV20('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+pid+"','"+seg+"','dp','"+qj+"','"+String(Number(c.total||c.replyCount||0)||0)+"')";
+    var d=base+',{"style":"FULL","type":"qd","click":'+JSON.stringify(click)+'}';
+    return '<img src="'+d.replace(/"/g,"&quot;")+'">';
+}
+function qdAuthorSayCardV20(text,bid,cid,provider){
+    text=String(text||"").trim();if(!qfAuthorSayRealV327(text))return "";
+    provider=String(provider||"");
+    var clickable=(provider===""||provider==="晴天");
+    var author=qfBookVarV09.call(this,"qf_author","作者"),w=1080,lp=62,rp=62,font="system-ui,Arial,sans-serif";
+    /* alpha3.6：旧版固定 slice(27) 没考虑汉字/英文实际宽度，38px 字号下 27 个汉字会超过正文宽度。
+       改按视觉宽度估算换行；保留原文换行，同时避免标点单独掉到下一行。 */
+    function unit(ch){
+        if(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch))return 1;
+        if(/[A-Z0-9]/.test(ch))return .68;
+        if(/[a-z]/.test(ch))return .56;
+        if(/\s/.test(ch))return .32;
+        return .52;
+    }
+    function wrap(src,limit,maxRows){
+        var out=[],paras=String(src||'').replace(/\r/g,'').split('\n');
+        for(var p=0;p<paras.length&&out.length<maxRows;p++){
+            var ss=paras[p],line='',u=0;
+            if(!ss){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+            for(var i=0;i<ss.length&&out.length
+
+### KW likeCount FN qdV20CommentLike @4814
+viewSnapPutV460(key,body,titleCount,titleHot){
+    body=String(body==null?'':body);if(!key||!body||body.length>420000)return;
+    QF_REVIEW_SNAP460[key]={ts:Date.now(),body:body,titleCount:Number(titleCount||0)||0,titleHot:!!titleHot};
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0)QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);
+    while(QF_REVIEW_SNAP460_ORDER.length>QF_REVIEW_SNAP460_MAX){var old=QF_REVIEW_SNAP460_ORDER.shift();delete QF_REVIEW_SNAP460[old];}
+}
+function qdReviewSnapRestoreTitleV460(bid,cid,showBubble,snap){
+    try{
+        var ch=qfChapter(this);if(!ch||!ch.putImgUrl)return;
+        if(showBubble&&snap&&Number(snap.titleCount||0)>0){
+            ch.putImgUrl(qdBubbleDataV20.call(this,Number(snap.titleCount||0),bid,cid,-1,0,!!snap.titleHot));
+        }else ch.putImgUrl(null);
+    }catch(_e){}
+}
+
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qdV20List(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e){}
+    return [];
+}
+function qdV20CommentText(c){
+    c=c||{};
+    var t=c.text||c.ReviewContent||c.reviewContent||c.Content||c.content||
+        c.Body||c.Subject||c.CommentContent||
+        (c.raw&&(c.raw.text||c.raw.ReviewContent||c.raw.Content||c.raw.content))||"";
+    if(typeof t==="object")t=t.Text||t.text||t.Content||t.content||"";
+    return qfEmojiV13(String(t||""));
+}
+function qdV20CleanCommentText(s){
+    return qfEmojiV13(String(s||""))
+        .replace(/https?:\/\/[^\s]+/g,"")
+        .replace(/qdd\.gg\/[^\s]+/g,"")
+        .replace(/<[^>]+>/g,"")
+        .trim();
+}
+function qdV20CommentUser(c){
+    c=c||{};
+    var u=c.user_info||c.UserInfo||c.User||c.user||c.raw||{};
+    return {
+        name:String(u.user_name||u.UserName||u.NickName||u.nickname||c.nickname||c.UserName||c.userName||"书友"),
+        avatar:String(u.user_avatar||u.UserHeadIcon||u.Avatar||u.avatar||c.avatar||c.UserHeadIcon||"")
+    };
+}
+function qdV20CommentLike(c){
+    c=c||{};
+    return Number(c.digg_count||c.like_count||c.LikeCount||c.likeCount||c.DiggCount||
+        c.AgreeAmount||c.Likes||(c.raw&&(c.raw.LikeCount||c.raw.DiggCount||c.raw.AgreeAmount))||0)||0;
+}
+function qdV20CommentReply(c){
+    c=c||{};
+    return Number(c.reply_count||c.ReplyCount||c.replyCount||c.CommentCount||c.commentCount||
+        (c.raw&&(c.raw.ReplyCount||c.raw.CommentCount))||0)||0;
+}
+/* alpha18：Decoration Plan 行对象池。
+ * 一章完成后立即归还；仅复用段落位置/quote 等瞬时装饰数据，不缓存评论实体。
+ * tuple: 0=item,1=pid,2=count,3=seg,4=lineIndex,5=quote,6=uriEncoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,seg,ix,quote,hot){
+    var r=QF_DECOR_ROW490_POOL.length?QF_DECOR_ROW490_POOL.pop():new Array(9);
+    r[0]=it;r[1]=pid;r[2]=cnt;r[3]=seg;r[4]=ix;r[5]=quote;r[6]=null;r[7]=null;r[8]=hot?1:0;return r;
+}
+function qdDecorRowQuoteV490(r){
+    if(r[6]===null){var q='';try{q=encodeURIComponent(String(r[5]||''));}catch(_qe490){q='';}r[6]=q;r[7]=qfEscJsV13(q);}return String(r[6]||'');
+}
+function qdDecorRowQuoteJsV490(r){if(r[7]===null)qdDecorRowQuoteV490(r);return String(r[7]||'');}
+function qdDecorRowsReleaseV490(plan){
+    if(!plan||!plan.length)return;
+    for(var i=0;i<plan.length&&QF_DECOR_ROW490_POOL.length<QF_DECOR_ROW490_MAX;i++){
+        var r=plan[i];if(!r)continue;for(var k=0;k<9;k++)r[k]=null;QF_DECOR_ROW490_POOL.push(r);
+    }
+}
+
+/* alpha19：低频正文卡片只缓存“视觉层”，绝不缓存 click / ReviewId / 评论实体。
+ * 同一作者说/本章说/热评在返回章节或快照失效后可直接复用 Base64，减少 SVG 拼接与 Java Bridge。
+ * 36 项 LRU 仅常驻很小的 data URI；业务内容变化会自然产生不同 key。 */
+var QF_CARD_VIS500={},QF_CARD_VIS500_ORDER=[],QF_CARD_VIS500_MAX=36;
+function qdCardVisKeyV500(kind,sig){return String(kind||'')+'\u001f'+String(sig||'');}
+function qdCardVisGetV500(kind,sig){
+    var key=qdCardVisKeyV500(kind,sig),v=QF_CARD_VIS500[key];if(!v)return '';
+    var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0){QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);}return v;
+}
+function qdCardVisPutV500(j,kind,sig,svg){
+    if(!j||!svg)return '';
+    var key=qdCardVisKeyV500(kind,sig),base='';try{base='data:image/svg+xml;base64,'+j.base64Encode(svg);}catch(_e){return '';}
+    if(!base)return '';
+    QF_CARD_VIS500[key]=base;var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0)QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);
+    while(QF_CARD_VIS500_ORDER.length>QF_CARD_VIS500_MAX){var old=QF_CARD_VIS500_ORDER.shift();delete QF_CARD_VIS500[old];}
+    return base;
+}
+
+function qdHotHtmlV20(c,bid,cid,pid,seg,quote,quoteEncoded,quoteJsEncoded){
+    if(!c||!c.content)return "";
+    var t=String(c.content||"").replace(/\s+/g," ").trim();if(t.length>22)t=t.substring(0,22)+"…";
+    var like=Number(c.like||0)||0,meta=like>0?("♡ "+(like>999?"999+":like)):"查看段评 ›";
+    var visualSig=t+'\u001f'+meta,base=qdCardVisGetV500('hot',visualSig);
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var svg='<svg width="1000" height="122" xmlns="http://www.w3.org/2000/svg">'+
+            '<rect x="2" y="5" width="996" height="104" fill="rgba(255,250,248,0.72)" rx="30" stroke="#F0D9D3" stroke-width="1"/>'+
+            '<rect x="27" y="28" width="122" height="50" rx="25" fill="#EF5B50"/>'+
+            '<text x="88" y="62" font-size="28" fill="#FFF" text-anchor="middle" font-weight="700">热评</text>'+
+            '<text x="174" y="63" font-size="33" fill="#252525" font-weight="600">'+qfEscV13(t)+'</text>'+
+            '<text x="962" y="63" font-size="25" fill="#9A8B87" text-anchor="end">'+qfEscV13(meta)+'</text></svg>';
+        base=qdCardVisPutV500(j,'hot',visualSig,svg);if(!base)return "";
+    }
+    var qe=quoteEncoded==null?"":String(quoteEncoded),qj=quoteJsEncoded==null?"":String(quoteJsEncoded);
+    if(quoteEncoded==null){try{qe=encodeURIComponent(String(quote||""));}catch(_qe){qe="";}}
+    if(quoteJsEncoded==null)qj=qfEscJsV13(qe);
+    var click="showCmtV20('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+pid+"','"+seg+"','dp','"+qj+"','"+String(Number(c.total||c.replyCount||0)||0)+"')";
+    var d=base+',{"style":"FULL","type":"qd","click":'+JSON.stringify(click)+'}';
+    return '<img src="'+d.replace(/"/g,"&quot;")+'">';
+}
+function qdAuthorSayCardV20(text,bid,cid,provider){
+    text=String(text||"").trim();if(!qfAuthorSayRealV327(text))return "";
+    provider=String(provider||"");
+    var clickable=(provider===""||provider==="晴天");
+    var author=qfBookVarV09.call(this,"qf_author","作者"),w=1080,lp=62,rp=62,font="system-ui,Arial,sans-serif";
+    /* alpha3.6：旧版固定 slice(27) 没考虑汉字/英文实际宽度，38px 字号下 27 个汉字会超过正文宽度。
+       改按视觉宽度估算换行；保留原文换行，同时避免标点单独掉到下一行。 */
+    function unit(ch){
+        if(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch))return 1;
+        if(/[A-Z0-9]/.test(ch))return .68;
+        if(/[a-z]/.test(ch))return .56;
+        if(/\s/.test(ch))return .32;
+        return .52;
+    }
+    function wrap(src,limit,maxRows){
+        var out=[],paras=String(src||'').replace(/\r/g,'').split('\n');
+        for(var p=0;p<paras.length&&out.length<maxRows;p++){
+            var ss=paras[p],line='',u=0;
+            if(!ss){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+            for(var i=0;i<ss.length&&out.length<maxRows;i++){
+                var ch=ss.charAt(i),cu=unit(ch);
+        
+
+### KW digg_count FN qdV20CommentLike @4701
+y);if(i>=0){QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);}
+    return o;
+}
+function qdReviewSnapPutV460(key,body,titleCount,titleHot){
+    body=String(body==null?'':body);if(!key||!body||body.length>420000)return;
+    QF_REVIEW_SNAP460[key]={ts:Date.now(),body:body,titleCount:Number(titleCount||0)||0,titleHot:!!titleHot};
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0)QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);
+    while(QF_REVIEW_SNAP460_ORDER.length>QF_REVIEW_SNAP460_MAX){var old=QF_REVIEW_SNAP460_ORDER.shift();delete QF_REVIEW_SNAP460[old];}
+}
+function qdReviewSnapRestoreTitleV460(bid,cid,showBubble,snap){
+    try{
+        var ch=qfChapter(this);if(!ch||!ch.putImgUrl)return;
+        if(showBubble&&snap&&Number(snap.titleCount||0)>0){
+            ch.putImgUrl(qdBubbleDataV20.call(this,Number(snap.titleCount||0),bid,cid,-1,0,!!snap.titleHot));
+        }else ch.putImgUrl(null);
+    }catch(_e){}
+}
+
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qdV20List(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e){}
+    return [];
+}
+function qdV20CommentText(c){
+    c=c||{};
+    var t=c.text||c.ReviewContent||c.reviewContent||c.Content||c.content||
+        c.Body||c.Subject||c.CommentContent||
+        (c.raw&&(c.raw.text||c.raw.ReviewContent||c.raw.Content||c.raw.content))||"";
+    if(typeof t==="object")t=t.Text||t.text||t.Content||t.content||"";
+    return qfEmojiV13(String(t||""));
+}
+function qdV20CleanCommentText(s){
+    return qfEmojiV13(String(s||""))
+        .replace(/https?:\/\/[^\s]+/g,"")
+        .replace(/qdd\.gg\/[^\s]+/g,"")
+        .replace(/<[^>]+>/g,"")
+        .trim();
+}
+function qdV20CommentUser(c){
+    c=c||{};
+    var u=c.user_info||c.UserInfo||c.User||c.user||c.raw||{};
+    return {
+        name:String(u.user_name||u.UserName||u.NickName||u.nickname||c.nickname||c.UserName||c.userName||"书友"),
+        avatar:String(u.user_avatar||u.UserHeadIcon||u.Avatar||u.avatar||c.avatar||c.UserHeadIcon||"")
+    };
+}
+function qdV20CommentLike(c){
+    c=c||{};
+    return Number(c.digg_count||c.like_count||c.LikeCount||c.likeCount||c.DiggCount||
+        c.AgreeAmount||c.Likes||(c.raw&&(c.raw.LikeCount||c.raw.DiggCount||c.raw.AgreeAmount))||0)||0;
+}
+function qdV20CommentReply(c){
+    c=c||{};
+    return Number(c.reply_count||c.ReplyCount||c.replyCount||c.CommentCount||c.commentCount||
+        (c.raw&&(c.raw.ReplyCount||c.raw.CommentCount))||0)||0;
+}
+/* alpha18：Decoration Plan 行对象池。
+ * 一章完成后立即归还；仅复用段落位置/quote 等瞬时装饰数据，不缓存评论实体。
+ * tuple: 0=item,1=pid,2=count,3=seg,4=lineIndex,5=quote,6=uriEncoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,seg,ix,quote,hot){
+    var r=QF_DECOR_ROW490_POOL.length?QF_DECOR_ROW490_POOL.pop():new Array(9);
+    r[0]=it;r[1]=pid;r[2]=cnt;r[3]=seg;r[4]=ix;r[5]=quote;r[6]=null;r[7]=null;r[8]=hot?1:0;return r;
+}
+function qdDecorRowQuoteV490(r){
+    if(r[6]===null){var q='';try{q=encodeURIComponent(String(r[5]||''));}catch(_qe490){q='';}r[6]=q;r[7]=qfEscJsV13(q);}return String(r[6]||'');
+}
+function qdDecorRowQuoteJsV490(r){if(r[7]===null)qdDecorRowQuoteV490(r);return String(r[7]||'');}
+function qdDecorRowsReleaseV490(plan){
+    if(!plan||!plan.length)return;
+    for(var i=0;i<plan.length&&QF_DECOR_ROW490_POOL.length<QF_DECOR_ROW490_MAX;i++){
+        var r=plan[i];if(!r)continue;for(var k=0;k<9;k++)r[k]=null;QF_DECOR_ROW490_POOL.push(r);
+    }
+}
+
+/* alpha19：低频正文卡片只缓存“视觉层”，绝不缓存 click / ReviewId / 评论实体。
+ * 同一作者说/本章说/热评在返回章节或快照失效后可直接复用 Base64，减少 SVG 拼接与 Java Bridge。
+ * 36 项 LRU 仅常驻很小的 data URI；业务内容变化会自然产生不同 key。 */
+var QF_CARD_VIS500={},QF_CARD_VIS500_ORDER=[],QF_CARD_VIS500_MAX=36;
+function qdCardVisKeyV500(kind,sig){return String(kind||'')+'\u001f'+String(sig||'');}
+function qdCardVisGetV500(kind,sig){
+    var key=qdCardVisKeyV500(kind,sig),v=QF_CARD_VIS500[key];if(!v)return '';
+    var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0){QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);}return v;
+}
+function qdCardVisPutV500(j,kind,sig,svg){
+    if(!j||!svg)return '';
+    var key=qdCardVisKeyV500(kind,sig),base='';try{base='data:image/svg+xml;base64,'+j.base64Encode(svg);}catch(_e){return '';}
+    if(!base)return '';
+    QF_CARD_VIS500[key]=base;var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0)QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);
+    while(QF_CARD_VIS500_ORDER.length>QF_CARD_VIS500_MAX){var old=QF_CARD_VIS500_ORDER.shift();delete QF_CARD_VIS500[old];}
+    return base;
+}
+
+function qdHotHtmlV20(c,bid,cid,pid,seg,quote,quoteEncoded,quoteJsEncoded){
+    if(!c||!c.content)return "";
+    var t=String(c.content||"").replace(/\s+/g," ").trim();if(t.length>22)t=t.substring(0,22)+"…";
+    var like=Number(c.like||0)||0,meta=like>0?("♡ "+(like>999?"999+":like)):"查看段评 ›";
+    var visualSig=t+'\u001f'+meta,base=qdCardVisGetV500('hot',visualSig);
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var svg='<svg width="1000" height="122" xmlns="http://www.w3.org/2000/svg">'+
+            '<rect x="2" y="5" width="996" height="104" fill="rgba(255,250,248,0.72)" rx="30" stroke="#F0D9D3" stroke-width="1"/>'+
+            '<rect x="27" y="28" width="122" height="50" rx="25" fill="#EF5B50"/>'+
+            '<text x="88" y="62" font-size="28" fill="#FFF" text-anchor="middle" font-weight="700">热评</text>'+
+            '<text x="174" y="63" font-size="33" fill="#252525" font-weight="600">'+qfEscV13(t)+'</text>'+
+            '<text x="962" y="63" font-size="25" fill="#9A8B87" text-anchor="end">'+qfEscV13(meta)+'</text></svg>';
+        base=qdCardVisPutV500(j,'hot',visualSig,svg);if(!base)return "";
+    }
+    var qe=quoteEncoded==null?"":String(quoteEncoded),qj=quoteJsEncoded==null?"":String(quoteJsEncoded);
+    if(quoteEncoded==null){try{qe=encodeURIComponent(String(quote||""));}catch(_qe){qe="";}}
+    if(quoteJsEncoded==null)qj=qfEscJsV13(qe);
+    var click="showCmtV20('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+pid+"','"+seg+"','dp','"+qj+"','"+String(Number(c.total||c.replyCount||0)||0)+"')";
+    var d=base+',{"style":"FULL","type":"qd","click":'+JSON.stringify(click)+'}';
+    return '<img src="'+d.replace(/"/g,"&quot;")+'">';
+}
+function qdAuthorSayCardV20(text,bid,cid,provider){
+    text=String(text||"").trim();if(!qfAuthorSayRealV327(text))return "";
+    provider=String(provider||"");
+    var clickable=(provider===""||provider==="晴天");
+    var author=qfBookVarV09.call(this,"qf_author","作者"),w=1080,lp=62,rp=62,font="system-ui,Arial,sans-serif";
+    /* alpha3.6：旧版固定 slice(27) 没考虑汉字/英文实际宽度，38px 字号下 27 个汉字会超过正文宽度。
+       改按视觉宽度估算换行；保留原文换行，同时避免标点单独掉到下一行。 */
+    function unit(ch){
+        if(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch))return 1;
+        if(/[A-Z0-9]/.test(ch))return .68;
+        if(/[a-z]/.test(ch))return .56;
+        if(/\s/.test(ch))return .32;
+        return .52;
+    }
+    function wrap(src,limit,maxRows){
+        var out=[],paras=String(src||'').replace(/\r/g,'').split('\n');
+        for(var p=0;p<paras.length&&out.length<maxRows;p++){
+            var ss=paras[p],line='',u=0;
+            if(!ss){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+      
+
+### KW 点赞 FN pushLineExtra480 @38206
+bubbleHtml541);}
+        }
+
+        if(showHot&&x.hot&&hotN<2){
+            var dk=String(pid)+"|"+String(seg),pack=detailCache[dk];
+            if(!pack){
+                /* alpha9.7：热路径先复用本章说/章末已存在的同 PID 评论。
+                 * 只有本地无可用 rows 时才调用专用 getparagraphshotcomments。
+                 * 数据源优先级变化仅用于减少重复网络，不改变最终热评卡选择逻辑。 */
+                var _reuse537=hotPackByPid[String(pid)]||hotPackByPid[String(seg)]||null;
+                var _reuseRows537=_reuse537&&Array.isArray(_reuse537.rows)?_reuse537.rows:[];
+                if(_reuseRows537.length){
+                    pack=_reuse537;
+                    try{qfChapterHotTraceV535({stage:"local-reuse",pid:String(pid),profile:String(pack.source||""),transport:"decorate",cache:"local",ok:true,rows:_reuseRows537.length,ms:0,detail:_localFull538?"local-full":"reuse-first"});}catch(_lr537){}
+                }else if(_localFull538){
+                    pack=null;
+                    try{qfChapterHotTraceV535({stage:"local-full-skip",pid:String(pid),profile:"",transport:"decorate",cache:"local",ok:true,rows:0,ms:0,detail:"dedicated-api-skipped"});}catch(_lfs538){}
+                }else if(!serverProvider){
+                    try{pack=qdFetchParagraphHotV402.call(this,bid,cid,pid,1,3);}catch(_hot402){pack=null;}
+                    if(!pack||!pack.rows||!pack.rows.length)pack=_reuse537||pack;
+                }else{
+                    pack=_reuse537||null;
+                }
+                if(!pack&&hotFallbackBudget>0){
+                    hotFallbackBudget--;
+                    pack=serverProvider?qfServerCommentPackV315.call(this,serverProvider,bid,cid,Number(x.serverParaId||pid),1,10,false):null;
+                }
+                detailCache[dk]=pack;
+            }
+            var arr=(pack&&pack.rows)||[];
+            try{
+                qfChapterHotTraceV535({
+                    stage:"candidate-result",pid:String(pid||""),profile:String(pack&&pack.source||""),
+                    transport:"decorate",cache:"",ok:!!(pack&&pack.ok),rows:arr.length,ms:0,
+                    detail:arr.length?"rows":"empty"
+                });
+            }catch(_hr536){}
+            if(arr.length){
+                /* alpha15：这里只需要点赞最高的一条，不再为了最多 3 条数据原地 sort 并修改共享缓存顺序。 */
+                var _hotRow=null,_hotLike=-1;for(var _hr470=0;_hr470<arr.length;_hr470++){var _hc470=arr[_hr470];if(!_hc470||!_hc470.content)continue;var _hl470=Number(_hc470.like||0)||0;if(_hotRow===null||_hl470>_hotLike){_hotRow=_hc470;_hotLike=_hl470;}}
+                if(_hotRow&&_hotRow.content){
+                    /* alpha10：热评卡本身携带段落引用，不再依赖正文阶段逐段写 Java memory。 */
+                    try{_hotRow.total=Number(pack&&pack.total||0)||0;}catch(_ht){}
+                    /* 热评单开且接口最终无评论时，整章不会为这些段落生成 quote 点击参数。 */
+                    var _hq490=qdDecorRowQuoteV490(pp470),_hjs490=qdDecorRowQuoteJsV490(pp470);
+                    var hh=qdHotHtmlV20.call(
+                        this,_hotRow,bid,cid,pid,seg,localQuote,_hq490,_hjs490
+                    );
+                    if(hh){pushLineExtra480(ix,"\n"+hh);hotN++;_renderHot541++;try{qfChapterHotRenderedV536(pid,arr.length,_hotLike);}catch(_rend536){}}
+                }
+            }
+        }
+    }
+
+    qfChapterSubStage("decorate.bubble-hot-render",Date.now()-_dStage,"hot="+String(hotN));_dStage=Date.now();
+    var _snapTitleCount460=(showBubble&&titleItem&&Number(titleItem.count||0)>0)?Number(titleItem.count||0):0;
+    var _snapTitleHot460=!!(titleItem&&titleItem.hot);
+    /* alpha15：章名 quote 只有存在章名气泡时才会在点击详情时读取；普通章节不再无条件写 Java memory。 */
+    if(_snapTitleCount460>0){
+        try{var _tc470=qfRuntimeCacheV13(this),_ch470=qfChapter(this),_tt470="";if(_ch470){_tt470=String(_ch470.title||"");if(!_tt470&&typeof _ch470.getTitle==="function")_tt470=String(_ch470.getTitle()||"");}if(_tt470&&_tc470&&qfCallableV13(_tc470,"putMemory"))_tc470.putMemory("qfv20-"+bid+"-"+cid+"-chapter-title",_tt470);}catch(_t470){}
+    }
+    try{
+        var ch2=qfChapter(this);
+        if(ch2&&ch2.putImgUrl){
+            if(_snapTitleCount460>0){
+                ch2.putImgUrl(
+                    qdBubbleDataV20.call(
+                        this,
+                        _snapTitleCount460,
+                        bid,cid,-1,0,_snapTitleHot460
+                    )
+                );
+            }else{
+                ch2.putImgUrl(null);
+            }
+        }
+    }catch(e3){}
+
+    qfChapterSubStage("decorate.title-meta",Date.now()-_dStage,"title="+String(_snapTitleCount460));_dStage=Date.now();
+    if(showAuthor){
+        /* beta14：作者说与“段评来源”解耦。正文实际来自晴天/情无/神魔时，
+           即使段评选择本地，也先读取该正文 Provider 的作者说；没有再退起点官方。 */
+        var as="",authorProvider="";
+        if(qfCommentIsServerV83(actualProvider)&&!(qwLocalMode&&actualProvider==="情无")){
+            try{as=qfCommentCallV83.call(this,actualProvider,"author",[bid,cid])||"";if(as)authorProvider=actualProvider;}catch(e4){as="";}
+        }
+        if(!as&&serverProvider&&serverProvider!==actualProvider){
+            try{as=qfCommentCallV83.call(this,serverProvider,"author",[bid,cid])||"";if(as)authorProvider=serverProvider;}catch(_as2){as="";}
+        }
+        if(!as){
+            /* alpha9：只有 Provider/服务器作者说都为空，才解析原始起点章节并准备官方作者说缓存。 */
+            try{if(hotCtx.authorRaw)qfPrimeAuthorSayV38.call(this,hotCtx.authorRaw,bid,cid);}catch(_primeA9){}
+            try{as=qdAuthorSayV20.call(this,bid,cid)||"";authorProvider="";}catch(_qa){as="";}
+        }
+        if(as){var _ac480=qdAuthorSayCardV20.call(this,as,bid,cid,authorProvider);if(_ac480){tail480.push(_ac480);_renderAuthor541++;}}
+    }
+
+    qfChapterSubStage("decorate.author-say",Date.now()-_dStage,showAuthor?"on":"off");_dStage=Date.now();
+    if(showTalk){
+        var cpv=chapterPreviewPack||{rows:[],total:0},pr=(cpv&&cpv.rows)||[],pt=Number(cpv&&cpv.total||0);
+        /* 起点章末接口至少有一条真实评论时才生成卡片；最多显示前两条。
+         * 不再用“章末讨论/点击后加载”占位图。 */
+        if(pr.length){
+            if(!(pt>0)&&titleItem&&Number(titleItem.count||0)>0)pt=Number(titleItem.count||0);
+            var _card22=qdChapterTalkCardV20.call(this,pr,pt>0?pt:pr.length,bid,cid);
+            if(_card22){tail480.push(_card22);_renderTalk541++;}
+        }
+    }
+
+    qfChapterSubStage("decorate.chapter-talk",Date.now()-_dStage,showTalk?"on":"off");_dStage=Date.now();
+    /* alpha17：最终正文只组装一次。
+       旧实现先 lines.join，再为作者说/本章说执行 body += 大字符串；
+       现在正文行、气泡/热评片段、尾卡统一进入 parts 后一次 join。 */
+    var parts480=[];
+    for(var _li480=0;_li480<lines.length;_li480++){
+        if(_li480>0)parts480.push("\n");
+        parts480.push(lines[_li480]);
+        var _le480=lineExtra480[_li480];
+        if(_le480)parts480.push(_le480);
+    }
+    for(var _ti480=0;_ti480<tail480.length;_ti480++){parts480.push("\n");parts480.push(tail480[_ti480]);}
+    var body=parts480.join("");
+    try{
+        qfReviewEdgeTrace({
+            stage:"renderer-final",
+            source:serverProvider||"local",
+            items:_renderBubble541,
+            total:_renderHot541,
+            segments:_renderTalk541,
+            rawLen:body.length,
+            valid:!!body,
+            detail:"bubble="+String(_renderBubble541)+
+                ",hot="+String(_renderHot541)+
+                ",talk="+String(_renderTalk541)+
+                ",author="+String(_renderAuthor541)+
+                ",plan="+String(plan470.length)+
+                ",tail="+String(tail480.length)
+        });
+    }catch(_edgeRF){}
+    /* plan 已经全部消费
+
+### KW 回复 FN qdChapterTalkCardV20 @14593
+text);authorPayload=encodeURIComponent(String(author||""));}catch(_ep){payload=String(text||"");authorPayload=String(author||"");}}
+    var ob={style:"FULL",type:"qd",click:"qfOpenAuthorSayV314('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+qfEscJsV13(openProvider)+"','"+qfEscJsV13(payload)+"','"+qfEscJsV13(authorPayload)+"')"};
+    return '<img src="'+(base+','+JSON.stringify(ob)).replace(/"/g,'&quot;')+'">';
+}
+
+function qdChapterTalkCardV20(rawList,total,bid,cid){
+    var src=qdV20List(rawList),list=[];
+    for(var i=0;i<src.length&&list.length<2;i++){var c=src[i]||{},txt=qdV20CleanCommentText(qdV20CommentText(c));if(!txt)continue;var u=qdV20CommentUser(c);list.push({name:u.name,content:txt,like:qdV20CommentLike(c),reply:qdV20CommentReply(c)});}
+    /* beta22：本章说卡只展示真实评论预览。没有任何可展示评论时不生成提示占位卡。 */
+    if(!list.length)return "";
+    var totalNum=Number(total);if(!isFinite(totalNum)||totalNum<1)totalNum=list.length;
+    var sigParts=[String(totalNum)];for(var si=0;si<list.length;si++){var sc=list[si];sigParts.push(String(sc.name||''),String(sc.content||''),String(sc.like||0),String(sc.reply||0));}
+    var visualSig=sigParts.join('\u001f'),base=qdCardVisGetV500('chapter',visualSig);
+    var w=1080,lp=58,rp=58,y=104,svg="",font="system-ui,Arial,sans-serif",rightText=totalNum+' 条评论 ›';
+    svg+='<rect x="34" y="28" width="178" height="58" rx="29" fill="#5E9A76"/>'+
+         '<text x="123" y="67" font-size="31" font-family="'+font+'" fill="#fff" font-weight="700" text-anchor="middle">本章说</text>'+
+         '<text x="'+(w-rp)+'" y="67" font-size="29" text-anchor="end" font-family="'+font+'" fill="#7D8D84">'+qfEscV13(rightText)+'</text>';
+    for(var k=0;k<list.length;k++){
+        var c2=list[k],tx=c2.content,rows=[],max=24;while(tx){rows.push(tx.slice(0,max));tx=tx.slice(max);}if(rows.length>2){rows=rows.slice(0,2);rows[1]=rows[1].slice(0,max-1)+"…";}
+        y+=32;svg+='<line x1="'+lp+'" y1="'+y+'" x2="'+(w-rp)+'" y2="'+y+'" stroke="#E7ECE9" stroke-width="1"/>';y+=54;
+        svg+='<text x="'+lp+'" y="'+y+'" font-size="34" font-family="'+font+'" fill="#4F5B54" font-weight="700">'+qfEscV13(c2.name||"书友")+'</text>';
+        var meta=[];if(c2.reply>0)meta.push(c2.reply+"回复");if(c2.like>0)meta.push("♡ "+c2.like);if(meta.length)svg+='<text x="'+(w-rp)+'" y="'+y+'" font-size="27" text-anchor="end" font-family="'+font+'" fill="#9AA39E">'+meta.join(" · ")+'</text>';
+        y+=56;for(var rr=0;rr<rows.length;rr++){svg+='<text x="'+lp+'" y="'+y+'" font-size="38" font-family="'+font+'" fill="#222">'+qfEscV13(rows[rr])+'</text>';y+=55;}y+=12;
+    }
+    y+=28;
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var final='<svg width="'+w+'" height="'+y+'" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="'+(w-4)+'" height="'+(y-4)+'" rx="44" fill="rgba(250,253,251,0.38)" stroke="#D9E4DD" stroke-width="1"/>'+svg+'</svg>';
+        base=qdCardVisPutV500(j,'chapter',visualSig,final);if(!base)return "";
+    }
+    var ob={style:"FULL",type:"qd",click:"showCmtV20('"+String(bid)+"','"+String(cid)+"','-1','0','zp','','"+String(totalNum)+"')"};
+    return '<img src="'+base+','+JSON.stringify(ob)+'">';
+}
+
+/* ---------- 作者说 ---------- */
+
+function qdBubbleImageV20(count,bid,cid,pid,seg,hot,quote,quoteEncoded,quoteJsEncoded){
+    var u=qdBubbleDataV20.call(this,count,bid,cid,pid,seg,hot,quote,quoteEncoded,quoteJsEncoded);
+    return u?'<img src="'+u.replace(/"/g,"&quot;")+'">':"";
+}
+/* ---------- 热评 ---------- */
+
+/* alpha15：旧流程先 split/filter 一遍正文，再单独扫描 lines 建 textIdx。
+ * 这里把两次 O(n) 遍历合并；lines 的输出语义保持不变。 */
+function qdV22BuildLinesV470(content,needTextIdx){
+    var src=String(content||"");if(src.indexOf("\r")>=0)src=src.replace(/\r/g,"");
+    var raw=src.split("\n"),lines=[],idx=[],needIdx=(needTextIdx!==false),hasMedia=false;
+    /* alpha17：只显示作者说/本章说时最终输出仍保持旧版 trim/去空行语义，
+       但不再建立完全用不到的 textIdx，也不再执行媒体判定。 */
+    if(needIdx)hasMedia=(src.indexOf("data:image/")>=0)||(src.indexOf("<")>=0&&/<\s*img\b/i.test(src));
+    for(var i=0;i<raw.length;i++){
+        var t=String(raw[i]||"").trim();if(!t)continue;
+        var pos=lines.length;lines.push(t);
+        if(needIdx&&(!hasMedia||(!/^<\s*img\b/i.test(t)&&t.indexOf("data:image/")<0)))idx.push(pos);
+    }
+    return {lines:lines,textIdx:idx};
+}
+
+
+
+/* ============================================================
+ * v2.9.4 基础运行时恢复
+ * 只恢复被误删的通用 helper，不恢复任何私人服务器。
+ * ============================================================ */
+
+function qdFetchCommentsV20(bid,cid,pid,seg,quote){
+    return qdFetchOfficialCommentsV20.call(this,bid,cid,pid,seg,quote);
+}
+/* ---------- 起点源附件同款 官方章评 ---------- */
+
+function qfTextKeepMediaV323(v){
+    var src=String(v==null?"":v),hint=0;
+    /* alpha16：普通小说正文几乎从不含“<”或“![”，先用 indexOf 过滤掉全局媒体 regex。 */
+    if(src.indexOf("<")>=0&&/<img\b/i.test(src))hint|=1;
+    if(src.indexOf("![")>=0&&src.indexOf("](")>=0&&/!\[[^\]]*\]\(https?:\/\//i.test(src))hint|=2;
+    if(!(hint&3))return qfText(src);
+    var imgs=[];
+    if(hint&2){
+        src=src.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/gi,function(_m,alt,url){
+            return '<img src="'+String(url||'').replace(/"/g,'&quot;')+'" alt="'+String(alt||'').replace(/"/g,'&quot;')+'">';
+        });
+        hint|=1;
+    }
+    if(hint&1){
+        src=src.replace(/<img\b[^>]*>/gi,function(tag){
+            var t=String(tag||'');
+            t=t.replace(/(\bsrc\s*=\s*["'])\/\//i,'$1https://');
+            imgs.push(t);
+            return "\nQFIMGV323_"+(imgs.length-1)+"_END\n";
+        });
+    }
+    var out=qfText(src);
+    if(imgs.length){
+        out=out.replace(/QFIMGV323_(\d+)_END/g,function(_m,n){n=Number(n);return n>=0&&n<imgs.length?imgs[n]:"";});
+        out=out.replace(/(^|\n)\s*我的彩蛋章\s*-?\s*\d{8,}\s*-\s*\d+\s*插图\s*(?=\n|$)/g,'$1');
+        out=out.replace(/\n{3,}/g,'\n\n').trim();
+    }
+    return out;
+}
+
+/* alpha35：晴天评论轻量路径。
+ * 正文只读取 /api/comments 的数量索引来画气泡；不读取 /comments、/chapterComments 详情。
+ * 热评排序/列表交给晴天原生页面，不再在正文阶段做任何评论详情请求。
+ */
+
+/* beta17.2：情无正文 + 起点本地段评的快速索引。
+ * 情无正文服务器本身已经提供 comments.php?action=summary，ParagraphId 与情无正文天然对齐。
+ * 本地模式只借它画气泡/判断热段；真正点击段评仍进入起点本地评论页。
+ * 这样避免每章正文阶段都串行执行起点 PC+移动 reviewSummary 双兜底。 */
+function qfQwLocalFastIndexV3172(bid,cid){
+    var cacheObj=qfRuntimeCacheV13(this),key="qf-qw-local-fast-index-v3172-"+String(bid)+"-"+String(cid),now=Date.now();
+    try{
+        if(cacheObj&&qfCallableV13(cacheObj,"getFromMemory")){
+            var old=String(cacheObj.getFromMemory(key)||"");
+            if(old){var co=JSON.parse(old);if(co&&co.ts&&now-Number(co.ts)<120000&&Array.isArray(co.items))return co.items;}
+        }
+    }catch(_c0){}
+    var out=[];
+    try{
+        var fn=qfModuleFnV38.call(this,"review_server_core","qfQwCommentApiV315");
+        if(typeof fn!=="function")return out;
+        var r=fn.call(this,"summary",{book_id:bid,chapter_id:cid})||{},d=r.Data||r.data||{},box=d.Getparagraphscommentcounts||d.getparagraphscommentcounts||d.GetParagraphsCommentCounts||{},list=box.DataList||box.dataList||box.List||box.list||[];
+        if(!Array.isArray(list)){try{list=Java.from(list);}catch(_ja){list=[];}}
+        var seen={},title=null;
+        for(var i=0;i<list.length;i++){
+            var x=list[i]||{},pid=Number(x.ParagraphId!==undefined?x.ParagraphId:(x.paragraphId!==undefined?x.paragraphId:(x.ParagraphsId!==undefined?x.ParagraphsId:
+
+### KW replyCount FN qdV20CommentReply @4951
+EW_SNAP460[key]={ts:Date.now(),body:body,titleCount:Number(titleCount||0)||0,titleHot:!!titleHot};
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0)QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);
+    while(QF_REVIEW_SNAP460_ORDER.length>QF_REVIEW_SNAP460_MAX){var old=QF_REVIEW_SNAP460_ORDER.shift();delete QF_REVIEW_SNAP460[old];}
+}
+function qdReviewSnapRestoreTitleV460(bid,cid,showBubble,snap){
+    try{
+        var ch=qfChapter(this);if(!ch||!ch.putImgUrl)return;
+        if(showBubble&&snap&&Number(snap.titleCount||0)>0){
+            ch.putImgUrl(qdBubbleDataV20.call(this,Number(snap.titleCount||0),bid,cid,-1,0,!!snap.titleHot));
+        }else ch.putImgUrl(null);
+    }catch(_e){}
+}
+
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qdV20List(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e){}
+    return [];
+}
+function qdV20CommentText(c){
+    c=c||{};
+    var t=c.text||c.ReviewContent||c.reviewContent||c.Content||c.content||
+        c.Body||c.Subject||c.CommentContent||
+        (c.raw&&(c.raw.text||c.raw.ReviewContent||c.raw.Content||c.raw.content))||"";
+    if(typeof t==="object")t=t.Text||t.text||t.Content||t.content||"";
+    return qfEmojiV13(String(t||""));
+}
+function qdV20CleanCommentText(s){
+    return qfEmojiV13(String(s||""))
+        .replace(/https?:\/\/[^\s]+/g,"")
+        .replace(/qdd\.gg\/[^\s]+/g,"")
+        .replace(/<[^>]+>/g,"")
+        .trim();
+}
+function qdV20CommentUser(c){
+    c=c||{};
+    var u=c.user_info||c.UserInfo||c.User||c.user||c.raw||{};
+    return {
+        name:String(u.user_name||u.UserName||u.NickName||u.nickname||c.nickname||c.UserName||c.userName||"书友"),
+        avatar:String(u.user_avatar||u.UserHeadIcon||u.Avatar||u.avatar||c.avatar||c.UserHeadIcon||"")
+    };
+}
+function qdV20CommentLike(c){
+    c=c||{};
+    return Number(c.digg_count||c.like_count||c.LikeCount||c.likeCount||c.DiggCount||
+        c.AgreeAmount||c.Likes||(c.raw&&(c.raw.LikeCount||c.raw.DiggCount||c.raw.AgreeAmount))||0)||0;
+}
+function qdV20CommentReply(c){
+    c=c||{};
+    return Number(c.reply_count||c.ReplyCount||c.replyCount||c.CommentCount||c.commentCount||
+        (c.raw&&(c.raw.ReplyCount||c.raw.CommentCount))||0)||0;
+}
+/* alpha18：Decoration Plan 行对象池。
+ * 一章完成后立即归还；仅复用段落位置/quote 等瞬时装饰数据，不缓存评论实体。
+ * tuple: 0=item,1=pid,2=count,3=seg,4=lineIndex,5=quote,6=uriEncoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,seg,ix,quote,hot){
+    var r=QF_DECOR_ROW490_POOL.length?QF_DECOR_ROW490_POOL.pop():new Array(9);
+    r[0]=it;r[1]=pid;r[2]=cnt;r[3]=seg;r[4]=ix;r[5]=quote;r[6]=null;r[7]=null;r[8]=hot?1:0;return r;
+}
+function qdDecorRowQuoteV490(r){
+    if(r[6]===null){var q='';try{q=encodeURIComponent(String(r[5]||''));}catch(_qe490){q='';}r[6]=q;r[7]=qfEscJsV13(q);}return String(r[6]||'');
+}
+function qdDecorRowQuoteJsV490(r){if(r[7]===null)qdDecorRowQuoteV490(r);return String(r[7]||'');}
+function qdDecorRowsReleaseV490(plan){
+    if(!plan||!plan.length)return;
+    for(var i=0;i<plan.length&&QF_DECOR_ROW490_POOL.length<QF_DECOR_ROW490_MAX;i++){
+        var r=plan[i];if(!r)continue;for(var k=0;k<9;k++)r[k]=null;QF_DECOR_ROW490_POOL.push(r);
+    }
+}
+
+/* alpha19：低频正文卡片只缓存“视觉层”，绝不缓存 click / ReviewId / 评论实体。
+ * 同一作者说/本章说/热评在返回章节或快照失效后可直接复用 Base64，减少 SVG 拼接与 Java Bridge。
+ * 36 项 LRU 仅常驻很小的 data URI；业务内容变化会自然产生不同 key。 */
+var QF_CARD_VIS500={},QF_CARD_VIS500_ORDER=[],QF_CARD_VIS500_MAX=36;
+function qdCardVisKeyV500(kind,sig){return String(kind||'')+'\u001f'+String(sig||'');}
+function qdCardVisGetV500(kind,sig){
+    var key=qdCardVisKeyV500(kind,sig),v=QF_CARD_VIS500[key];if(!v)return '';
+    var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0){QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);}return v;
+}
+function qdCardVisPutV500(j,kind,sig,svg){
+    if(!j||!svg)return '';
+    var key=qdCardVisKeyV500(kind,sig),base='';try{base='data:image/svg+xml;base64,'+j.base64Encode(svg);}catch(_e){return '';}
+    if(!base)return '';
+    QF_CARD_VIS500[key]=base;var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0)QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);
+    while(QF_CARD_VIS500_ORDER.length>QF_CARD_VIS500_MAX){var old=QF_CARD_VIS500_ORDER.shift();delete QF_CARD_VIS500[old];}
+    return base;
+}
+
+function qdHotHtmlV20(c,bid,cid,pid,seg,quote,quoteEncoded,quoteJsEncoded){
+    if(!c||!c.content)return "";
+    var t=String(c.content||"").replace(/\s+/g," ").trim();if(t.length>22)t=t.substring(0,22)+"…";
+    var like=Number(c.like||0)||0,meta=like>0?("♡ "+(like>999?"999+":like)):"查看段评 ›";
+    var visualSig=t+'\u001f'+meta,base=qdCardVisGetV500('hot',visualSig);
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var svg='<svg width="1000" height="122" xmlns="http://www.w3.org/2000/svg">'+
+            '<rect x="2" y="5" width="996" height="104" fill="rgba(255,250,248,0.72)" rx="30" stroke="#F0D9D3" stroke-width="1"/>'+
+            '<rect x="27" y="28" width="122" height="50" rx="25" fill="#EF5B50"/>'+
+            '<text x="88" y="62" font-size="28" fill="#FFF" text-anchor="middle" font-weight="700">热评</text>'+
+            '<text x="174" y="63" font-size="33" fill="#252525" font-weight="600">'+qfEscV13(t)+'</text>'+
+            '<text x="962" y="63" font-size="25" fill="#9A8B87" text-anchor="end">'+qfEscV13(meta)+'</text></svg>';
+        base=qdCardVisPutV500(j,'hot',visualSig,svg);if(!base)return "";
+    }
+    var qe=quoteEncoded==null?"":String(quoteEncoded),qj=quoteJsEncoded==null?"":String(quoteJsEncoded);
+    if(quoteEncoded==null){try{qe=encodeURIComponent(String(quote||""));}catch(_qe){qe="";}}
+    if(quoteJsEncoded==null)qj=qfEscJsV13(qe);
+    var click="showCmtV20('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+pid+"','"+seg+"','dp','"+qj+"','"+String(Number(c.total||c.replyCount||0)||0)+"')";
+    var d=base+',{"style":"FULL","type":"qd","click":'+JSON.stringify(click)+'}';
+    return '<img src="'+d.replace(/"/g,"&quot;")+'">';
+}
+function qdAuthorSayCardV20(text,bid,cid,provider){
+    text=String(text||"").trim();if(!qfAuthorSayRealV327(text))return "";
+    provider=String(provider||"");
+    var clickable=(provider===""||provider==="晴天");
+    var author=qfBookVarV09.call(this,"qf_author","作者"),w=1080,lp=62,rp=62,font="system-ui,Arial,sans-serif";
+    /* alpha3.6：旧版固定 slice(27) 没考虑汉字/英文实际宽度，38px 字号下 27 个汉字会超过正文宽度。
+       改按视觉宽度估算换行；保留原文换行，同时避免标点单独掉到下一行。 */
+    function unit(ch){
+        if(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch))return 1;
+        if(/[A-Z0-9]/.test(ch))return .68;
+        if(/[a-z]/.test(ch))return .56;
+        if(/\s/.test(ch))return .32;
+        return .52;
+    }
+    function wrap(src,limit,maxRows){
+        var out=[],paras=String(src||'').replace(/\r/g,'').split('\n');
+        for(var p=0;p<paras.length&&out.length<maxRows;p++){
+            var ss=paras[p],line='',u=0;
+            if(!ss){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+            for(var i=0;i<ss.length&&out.length<maxRows;i++){
+                var ch=ss.charAt(i),cu=unit(ch);
+                if(line&&u+cu>limit){
+                    /* 句号/逗号等不要单独成为下一行首字符。 */
+                    if(/[，。！？；：、,.!?;:）】》”’]/.test(ch)){line+
+
+### KW replyCount FN qdV20CommentReply @4965
+]={ts:Date.now(),body:body,titleCount:Number(titleCount||0)||0,titleHot:!!titleHot};
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0)QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);
+    while(QF_REVIEW_SNAP460_ORDER.length>QF_REVIEW_SNAP460_MAX){var old=QF_REVIEW_SNAP460_ORDER.shift();delete QF_REVIEW_SNAP460[old];}
+}
+function qdReviewSnapRestoreTitleV460(bid,cid,showBubble,snap){
+    try{
+        var ch=qfChapter(this);if(!ch||!ch.putImgUrl)return;
+        if(showBubble&&snap&&Number(snap.titleCount||0)>0){
+            ch.putImgUrl(qdBubbleDataV20.call(this,Number(snap.titleCount||0),bid,cid,-1,0,!!snap.titleHot));
+        }else ch.putImgUrl(null);
+    }catch(_e){}
+}
+
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qdV20List(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e){}
+    return [];
+}
+function qdV20CommentText(c){
+    c=c||{};
+    var t=c.text||c.ReviewContent||c.reviewContent||c.Content||c.content||
+        c.Body||c.Subject||c.CommentContent||
+        (c.raw&&(c.raw.text||c.raw.ReviewContent||c.raw.Content||c.raw.content))||"";
+    if(typeof t==="object")t=t.Text||t.text||t.Content||t.content||"";
+    return qfEmojiV13(String(t||""));
+}
+function qdV20CleanCommentText(s){
+    return qfEmojiV13(String(s||""))
+        .replace(/https?:\/\/[^\s]+/g,"")
+        .replace(/qdd\.gg\/[^\s]+/g,"")
+        .replace(/<[^>]+>/g,"")
+        .trim();
+}
+function qdV20CommentUser(c){
+    c=c||{};
+    var u=c.user_info||c.UserInfo||c.User||c.user||c.raw||{};
+    return {
+        name:String(u.user_name||u.UserName||u.NickName||u.nickname||c.nickname||c.UserName||c.userName||"书友"),
+        avatar:String(u.user_avatar||u.UserHeadIcon||u.Avatar||u.avatar||c.avatar||c.UserHeadIcon||"")
+    };
+}
+function qdV20CommentLike(c){
+    c=c||{};
+    return Number(c.digg_count||c.like_count||c.LikeCount||c.likeCount||c.DiggCount||
+        c.AgreeAmount||c.Likes||(c.raw&&(c.raw.LikeCount||c.raw.DiggCount||c.raw.AgreeAmount))||0)||0;
+}
+function qdV20CommentReply(c){
+    c=c||{};
+    return Number(c.reply_count||c.ReplyCount||c.replyCount||c.CommentCount||c.commentCount||
+        (c.raw&&(c.raw.ReplyCount||c.raw.CommentCount))||0)||0;
+}
+/* alpha18：Decoration Plan 行对象池。
+ * 一章完成后立即归还；仅复用段落位置/quote 等瞬时装饰数据，不缓存评论实体。
+ * tuple: 0=item,1=pid,2=count,3=seg,4=lineIndex,5=quote,6=uriEncoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,seg,ix,quote,hot){
+    var r=QF_DECOR_ROW490_POOL.length?QF_DECOR_ROW490_POOL.pop():new Array(9);
+    r[0]=it;r[1]=pid;r[2]=cnt;r[3]=seg;r[4]=ix;r[5]=quote;r[6]=null;r[7]=null;r[8]=hot?1:0;return r;
+}
+function qdDecorRowQuoteV490(r){
+    if(r[6]===null){var q='';try{q=encodeURIComponent(String(r[5]||''));}catch(_qe490){q='';}r[6]=q;r[7]=qfEscJsV13(q);}return String(r[6]||'');
+}
+function qdDecorRowQuoteJsV490(r){if(r[7]===null)qdDecorRowQuoteV490(r);return String(r[7]||'');}
+function qdDecorRowsReleaseV490(plan){
+    if(!plan||!plan.length)return;
+    for(var i=0;i<plan.length&&QF_DECOR_ROW490_POOL.length<QF_DECOR_ROW490_MAX;i++){
+        var r=plan[i];if(!r)continue;for(var k=0;k<9;k++)r[k]=null;QF_DECOR_ROW490_POOL.push(r);
+    }
+}
+
+/* alpha19：低频正文卡片只缓存“视觉层”，绝不缓存 click / ReviewId / 评论实体。
+ * 同一作者说/本章说/热评在返回章节或快照失效后可直接复用 Base64，减少 SVG 拼接与 Java Bridge。
+ * 36 项 LRU 仅常驻很小的 data URI；业务内容变化会自然产生不同 key。 */
+var QF_CARD_VIS500={},QF_CARD_VIS500_ORDER=[],QF_CARD_VIS500_MAX=36;
+function qdCardVisKeyV500(kind,sig){return String(kind||'')+'\u001f'+String(sig||'');}
+function qdCardVisGetV500(kind,sig){
+    var key=qdCardVisKeyV500(kind,sig),v=QF_CARD_VIS500[key];if(!v)return '';
+    var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0){QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);}return v;
+}
+function qdCardVisPutV500(j,kind,sig,svg){
+    if(!j||!svg)return '';
+    var key=qdCardVisKeyV500(kind,sig),base='';try{base='data:image/svg+xml;base64,'+j.base64Encode(svg);}catch(_e){return '';}
+    if(!base)return '';
+    QF_CARD_VIS500[key]=base;var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0)QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);
+    while(QF_CARD_VIS500_ORDER.length>QF_CARD_VIS500_MAX){var old=QF_CARD_VIS500_ORDER.shift();delete QF_CARD_VIS500[old];}
+    return base;
+}
+
+function qdHotHtmlV20(c,bid,cid,pid,seg,quote,quoteEncoded,quoteJsEncoded){
+    if(!c||!c.content)return "";
+    var t=String(c.content||"").replace(/\s+/g," ").trim();if(t.length>22)t=t.substring(0,22)+"…";
+    var like=Number(c.like||0)||0,meta=like>0?("♡ "+(like>999?"999+":like)):"查看段评 ›";
+    var visualSig=t+'\u001f'+meta,base=qdCardVisGetV500('hot',visualSig);
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var svg='<svg width="1000" height="122" xmlns="http://www.w3.org/2000/svg">'+
+            '<rect x="2" y="5" width="996" height="104" fill="rgba(255,250,248,0.72)" rx="30" stroke="#F0D9D3" stroke-width="1"/>'+
+            '<rect x="27" y="28" width="122" height="50" rx="25" fill="#EF5B50"/>'+
+            '<text x="88" y="62" font-size="28" fill="#FFF" text-anchor="middle" font-weight="700">热评</text>'+
+            '<text x="174" y="63" font-size="33" fill="#252525" font-weight="600">'+qfEscV13(t)+'</text>'+
+            '<text x="962" y="63" font-size="25" fill="#9A8B87" text-anchor="end">'+qfEscV13(meta)+'</text></svg>';
+        base=qdCardVisPutV500(j,'hot',visualSig,svg);if(!base)return "";
+    }
+    var qe=quoteEncoded==null?"":String(quoteEncoded),qj=quoteJsEncoded==null?"":String(quoteJsEncoded);
+    if(quoteEncoded==null){try{qe=encodeURIComponent(String(quote||""));}catch(_qe){qe="";}}
+    if(quoteJsEncoded==null)qj=qfEscJsV13(qe);
+    var click="showCmtV20('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+pid+"','"+seg+"','dp','"+qj+"','"+String(Number(c.total||c.replyCount||0)||0)+"')";
+    var d=base+',{"style":"FULL","type":"qd","click":'+JSON.stringify(click)+'}';
+    return '<img src="'+d.replace(/"/g,"&quot;")+'">';
+}
+function qdAuthorSayCardV20(text,bid,cid,provider){
+    text=String(text||"").trim();if(!qfAuthorSayRealV327(text))return "";
+    provider=String(provider||"");
+    var clickable=(provider===""||provider==="晴天");
+    var author=qfBookVarV09.call(this,"qf_author","作者"),w=1080,lp=62,rp=62,font="system-ui,Arial,sans-serif";
+    /* alpha3.6：旧版固定 slice(27) 没考虑汉字/英文实际宽度，38px 字号下 27 个汉字会超过正文宽度。
+       改按视觉宽度估算换行；保留原文换行，同时避免标点单独掉到下一行。 */
+    function unit(ch){
+        if(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch))return 1;
+        if(/[A-Z0-9]/.test(ch))return .68;
+        if(/[a-z]/.test(ch))return .56;
+        if(/\s/.test(ch))return .32;
+        return .52;
+    }
+    function wrap(src,limit,maxRows){
+        var out=[],paras=String(src||'').replace(/\r/g,'').split('\n');
+        for(var p=0;p<paras.length&&out.length<maxRows;p++){
+            var ss=paras[p],line='',u=0;
+            if(!ss){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+            for(var i=0;i<ss.length&&out.length<maxRows;i++){
+                var ch=ss.charAt(i),cu=unit(ch);
+                if(line&&u+cu>limit){
+                    /* 句号/逗号等不要单独成为下一行首字符。 */
+                    if(/[，。！？；：、,.!?;:）】》”’]/.test(ch)){line+=ch;out.push(l
+
+### KW replyCount FN qdV20CommentReply @5033
+Hot:!!titleHot};
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0)QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);
+    while(QF_REVIEW_SNAP460_ORDER.length>QF_REVIEW_SNAP460_MAX){var old=QF_REVIEW_SNAP460_ORDER.shift();delete QF_REVIEW_SNAP460[old];}
+}
+function qdReviewSnapRestoreTitleV460(bid,cid,showBubble,snap){
+    try{
+        var ch=qfChapter(this);if(!ch||!ch.putImgUrl)return;
+        if(showBubble&&snap&&Number(snap.titleCount||0)>0){
+            ch.putImgUrl(qdBubbleDataV20.call(this,Number(snap.titleCount||0),bid,cid,-1,0,!!snap.titleHot));
+        }else ch.putImgUrl(null);
+    }catch(_e){}
+}
+
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qdV20List(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e){}
+    return [];
+}
+function qdV20CommentText(c){
+    c=c||{};
+    var t=c.text||c.ReviewContent||c.reviewContent||c.Content||c.content||
+        c.Body||c.Subject||c.CommentContent||
+        (c.raw&&(c.raw.text||c.raw.ReviewContent||c.raw.Content||c.raw.content))||"";
+    if(typeof t==="object")t=t.Text||t.text||t.Content||t.content||"";
+    return qfEmojiV13(String(t||""));
+}
+function qdV20CleanCommentText(s){
+    return qfEmojiV13(String(s||""))
+        .replace(/https?:\/\/[^\s]+/g,"")
+        .replace(/qdd\.gg\/[^\s]+/g,"")
+        .replace(/<[^>]+>/g,"")
+        .trim();
+}
+function qdV20CommentUser(c){
+    c=c||{};
+    var u=c.user_info||c.UserInfo||c.User||c.user||c.raw||{};
+    return {
+        name:String(u.user_name||u.UserName||u.NickName||u.nickname||c.nickname||c.UserName||c.userName||"书友"),
+        avatar:String(u.user_avatar||u.UserHeadIcon||u.Avatar||u.avatar||c.avatar||c.UserHeadIcon||"")
+    };
+}
+function qdV20CommentLike(c){
+    c=c||{};
+    return Number(c.digg_count||c.like_count||c.LikeCount||c.likeCount||c.DiggCount||
+        c.AgreeAmount||c.Likes||(c.raw&&(c.raw.LikeCount||c.raw.DiggCount||c.raw.AgreeAmount))||0)||0;
+}
+function qdV20CommentReply(c){
+    c=c||{};
+    return Number(c.reply_count||c.ReplyCount||c.replyCount||c.CommentCount||c.commentCount||
+        (c.raw&&(c.raw.ReplyCount||c.raw.CommentCount))||0)||0;
+}
+/* alpha18：Decoration Plan 行对象池。
+ * 一章完成后立即归还；仅复用段落位置/quote 等瞬时装饰数据，不缓存评论实体。
+ * tuple: 0=item,1=pid,2=count,3=seg,4=lineIndex,5=quote,6=uriEncoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,seg,ix,quote,hot){
+    var r=QF_DECOR_ROW490_POOL.length?QF_DECOR_ROW490_POOL.pop():new Array(9);
+    r[0]=it;r[1]=pid;r[2]=cnt;r[3]=seg;r[4]=ix;r[5]=quote;r[6]=null;r[7]=null;r[8]=hot?1:0;return r;
+}
+function qdDecorRowQuoteV490(r){
+    if(r[6]===null){var q='';try{q=encodeURIComponent(String(r[5]||''));}catch(_qe490){q='';}r[6]=q;r[7]=qfEscJsV13(q);}return String(r[6]||'');
+}
+function qdDecorRowQuoteJsV490(r){if(r[7]===null)qdDecorRowQuoteV490(r);return String(r[7]||'');}
+function qdDecorRowsReleaseV490(plan){
+    if(!plan||!plan.length)return;
+    for(var i=0;i<plan.length&&QF_DECOR_ROW490_POOL.length<QF_DECOR_ROW490_MAX;i++){
+        var r=plan[i];if(!r)continue;for(var k=0;k<9;k++)r[k]=null;QF_DECOR_ROW490_POOL.push(r);
+    }
+}
+
+/* alpha19：低频正文卡片只缓存“视觉层”，绝不缓存 click / ReviewId / 评论实体。
+ * 同一作者说/本章说/热评在返回章节或快照失效后可直接复用 Base64，减少 SVG 拼接与 Java Bridge。
+ * 36 项 LRU 仅常驻很小的 data URI；业务内容变化会自然产生不同 key。 */
+var QF_CARD_VIS500={},QF_CARD_VIS500_ORDER=[],QF_CARD_VIS500_MAX=36;
+function qdCardVisKeyV500(kind,sig){return String(kind||'')+'\u001f'+String(sig||'');}
+function qdCardVisGetV500(kind,sig){
+    var key=qdCardVisKeyV500(kind,sig),v=QF_CARD_VIS500[key];if(!v)return '';
+    var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0){QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);}return v;
+}
+function qdCardVisPutV500(j,kind,sig,svg){
+    if(!j||!svg)return '';
+    var key=qdCardVisKeyV500(kind,sig),base='';try{base='data:image/svg+xml;base64,'+j.base64Encode(svg);}catch(_e){return '';}
+    if(!base)return '';
+    QF_CARD_VIS500[key]=base;var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0)QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);
+    while(QF_CARD_VIS500_ORDER.length>QF_CARD_VIS500_MAX){var old=QF_CARD_VIS500_ORDER.shift();delete QF_CARD_VIS500[old];}
+    return base;
+}
+
+function qdHotHtmlV20(c,bid,cid,pid,seg,quote,quoteEncoded,quoteJsEncoded){
+    if(!c||!c.content)return "";
+    var t=String(c.content||"").replace(/\s+/g," ").trim();if(t.length>22)t=t.substring(0,22)+"…";
+    var like=Number(c.like||0)||0,meta=like>0?("♡ "+(like>999?"999+":like)):"查看段评 ›";
+    var visualSig=t+'\u001f'+meta,base=qdCardVisGetV500('hot',visualSig);
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var svg='<svg width="1000" height="122" xmlns="http://www.w3.org/2000/svg">'+
+            '<rect x="2" y="5" width="996" height="104" fill="rgba(255,250,248,0.72)" rx="30" stroke="#F0D9D3" stroke-width="1"/>'+
+            '<rect x="27" y="28" width="122" height="50" rx="25" fill="#EF5B50"/>'+
+            '<text x="88" y="62" font-size="28" fill="#FFF" text-anchor="middle" font-weight="700">热评</text>'+
+            '<text x="174" y="63" font-size="33" fill="#252525" font-weight="600">'+qfEscV13(t)+'</text>'+
+            '<text x="962" y="63" font-size="25" fill="#9A8B87" text-anchor="end">'+qfEscV13(meta)+'</text></svg>';
+        base=qdCardVisPutV500(j,'hot',visualSig,svg);if(!base)return "";
+    }
+    var qe=quoteEncoded==null?"":String(quoteEncoded),qj=quoteJsEncoded==null?"":String(quoteJsEncoded);
+    if(quoteEncoded==null){try{qe=encodeURIComponent(String(quote||""));}catch(_qe){qe="";}}
+    if(quoteJsEncoded==null)qj=qfEscJsV13(qe);
+    var click="showCmtV20('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+pid+"','"+seg+"','dp','"+qj+"','"+String(Number(c.total||c.replyCount||0)||0)+"')";
+    var d=base+',{"style":"FULL","type":"qd","click":'+JSON.stringify(click)+'}';
+    return '<img src="'+d.replace(/"/g,"&quot;")+'">';
+}
+function qdAuthorSayCardV20(text,bid,cid,provider){
+    text=String(text||"").trim();if(!qfAuthorSayRealV327(text))return "";
+    provider=String(provider||"");
+    var clickable=(provider===""||provider==="晴天");
+    var author=qfBookVarV09.call(this,"qf_author","作者"),w=1080,lp=62,rp=62,font="system-ui,Arial,sans-serif";
+    /* alpha3.6：旧版固定 slice(27) 没考虑汉字/英文实际宽度，38px 字号下 27 个汉字会超过正文宽度。
+       改按视觉宽度估算换行；保留原文换行，同时避免标点单独掉到下一行。 */
+    function unit(ch){
+        if(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch))return 1;
+        if(/[A-Z0-9]/.test(ch))return .68;
+        if(/[a-z]/.test(ch))return .56;
+        if(/\s/.test(ch))return .32;
+        return .52;
+    }
+    function wrap(src,limit,maxRows){
+        var out=[],paras=String(src||'').replace(/\r/g,'').split('\n');
+        for(var p=0;p<paras.length&&out.length<maxRows;p++){
+            var ss=paras[p],line='',u=0;
+            if(!ss){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+            for(var i=0;i<ss.length&&out.length<maxRows;i++){
+                var ch=ss.charAt(i),cu=unit(ch);
+                if(line&&u+cu>limit){
+                    /* 句号/逗号等不要单独成为下一行首字符。 */
+                    if(/[，。！？；：、,.!?;:）】》”’]/.test(ch)){line+=ch;out.push(line);line='';u=0;continue;}
+                    out.push(line);line=
+
+### KW replyCount FN qdHotHtmlV20 @8760
+key);if(i>=0){QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);}return v;
+}
+function qdCardVisPutV500(j,kind,sig,svg){
+    if(!j||!svg)return '';
+    var key=qdCardVisKeyV500(kind,sig),base='';try{base='data:image/svg+xml;base64,'+j.base64Encode(svg);}catch(_e){return '';}
+    if(!base)return '';
+    QF_CARD_VIS500[key]=base;var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0)QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);
+    while(QF_CARD_VIS500_ORDER.length>QF_CARD_VIS500_MAX){var old=QF_CARD_VIS500_ORDER.shift();delete QF_CARD_VIS500[old];}
+    return base;
+}
+
+function qdHotHtmlV20(c,bid,cid,pid,seg,quote,quoteEncoded,quoteJsEncoded){
+    if(!c||!c.content)return "";
+    var t=String(c.content||"").replace(/\s+/g," ").trim();if(t.length>22)t=t.substring(0,22)+"…";
+    var like=Number(c.like||0)||0,meta=like>0?("♡ "+(like>999?"999+":like)):"查看段评 ›";
+    var visualSig=t+'\u001f'+meta,base=qdCardVisGetV500('hot',visualSig);
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var svg='<svg width="1000" height="122" xmlns="http://www.w3.org/2000/svg">'+
+            '<rect x="2" y="5" width="996" height="104" fill="rgba(255,250,248,0.72)" rx="30" stroke="#F0D9D3" stroke-width="1"/>'+
+            '<rect x="27" y="28" width="122" height="50" rx="25" fill="#EF5B50"/>'+
+            '<text x="88" y="62" font-size="28" fill="#FFF" text-anchor="middle" font-weight="700">热评</text>'+
+            '<text x="174" y="63" font-size="33" fill="#252525" font-weight="600">'+qfEscV13(t)+'</text>'+
+            '<text x="962" y="63" font-size="25" fill="#9A8B87" text-anchor="end">'+qfEscV13(meta)+'</text></svg>';
+        base=qdCardVisPutV500(j,'hot',visualSig,svg);if(!base)return "";
+    }
+    var qe=quoteEncoded==null?"":String(quoteEncoded),qj=quoteJsEncoded==null?"":String(quoteJsEncoded);
+    if(quoteEncoded==null){try{qe=encodeURIComponent(String(quote||""));}catch(_qe){qe="";}}
+    if(quoteJsEncoded==null)qj=qfEscJsV13(qe);
+    var click="showCmtV20('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+pid+"','"+seg+"','dp','"+qj+"','"+String(Number(c.total||c.replyCount||0)||0)+"')";
+    var d=base+',{"style":"FULL","type":"qd","click":'+JSON.stringify(click)+'}';
+    return '<img src="'+d.replace(/"/g,"&quot;")+'">';
+}
+function qdAuthorSayCardV20(text,bid,cid,provider){
+    text=String(text||"").trim();if(!qfAuthorSayRealV327(text))return "";
+    provider=String(provider||"");
+    var clickable=(provider===""||provider==="晴天");
+    var author=qfBookVarV09.call(this,"qf_author","作者"),w=1080,lp=62,rp=62,font="system-ui,Arial,sans-serif";
+    /* alpha3.6：旧版固定 slice(27) 没考虑汉字/英文实际宽度，38px 字号下 27 个汉字会超过正文宽度。
+       改按视觉宽度估算换行；保留原文换行，同时避免标点单独掉到下一行。 */
+    function unit(ch){
+        if(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch))return 1;
+        if(/[A-Z0-9]/.test(ch))return .68;
+        if(/[a-z]/.test(ch))return .56;
+        if(/\s/.test(ch))return .32;
+        return .52;
+    }
+    function wrap(src,limit,maxRows){
+        var out=[],paras=String(src||'').replace(/\r/g,'').split('\n');
+        for(var p=0;p<paras.length&&out.length<maxRows;p++){
+            var ss=paras[p],line='',u=0;
+            if(!ss){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+            for(var i=0;i<ss.length&&out.length<maxRows;i++){
+                var ch=ss.charAt(i),cu=unit(ch);
+                if(line&&u+cu>limit){
+                    /* 句号/逗号等不要单独成为下一行首字符。 */
+                    if(/[，。！？；：、,.!?;:）】》”’]/.test(ch)){line+=ch;out.push(line);line='';u=0;continue;}
+                    out.push(line);line=ch;u=cu;
+                }else{line+=ch;u+=cu;}
+            }
+            if(line&&out.length<maxRows)out.push(line);
+        }
+        if(out.length>maxRows)out=out.slice(0,maxRows);
+        var consumed=out.join('').replace(/\s/g,'').length,full=String(src||'').replace(/\s/g,'').length;
+        if(out.length&&consumed<full){var last=out.length-1;out[last]=out[last].replace(/[，。！？；：、,.!?;:\s]+$/,'');if(out[last].length>1)out[last]=out[last].slice(0,-1)+'…';else out[last]+='…';}
+        return out;
+    }
+    var rows=wrap(text,29.0,4),right=provider==="晴天"?"晴天 · 查看 ›":(!provider?"起点官方 · 查看 ›":provider+"服务器");
+    var visualSig=String(author)+'\u001f'+right+'\u001f'+rows.join('\n'),base=qdCardVisGetV500('author',visualSig),y=96,svg='';
+    svg+='<rect x="34" y="25" width="164" height="52" rx="26" fill="#4A74E4"/>'+ 
+         '<text x="116" y="60" font-size="28" font-family="'+font+'" fill="#fff" font-weight="700" text-anchor="middle">作者说</text>'+ 
+         '<text x="'+(w-rp)+'" y="59" font-size="24" text-anchor="end" font-family="'+font+'" fill="#8992A2">'+qfEscV13(right)+'</text>';
+    y+=30;
+    svg+='<text x="'+lp+'" y="'+y+'" font-size="28" font-family="'+font+'" fill="#4A5570" font-weight="650">'+qfEscV13(author||"作者")+'</text>';y+=48;
+    for(var i=0;i<rows.length;i++){
+        if(rows[i]===''){y+=20;continue;}
+        svg+='<text x="'+lp+'" y="'+y+'" font-size="31" font-family="'+font+'" fill="#27282B" font-weight="400">'+qfEscV13(rows[i])+'</text>';y+=47;
+    }
+    y+=25;
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var final='<svg width="'+w+'" height="'+y+'" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="'+(w-4)+'" height="'+(y-4)+'" rx="38" fill="rgba(249,250,255,0.34)" stroke="#DDE2ED" stroke-width="1"/>'+svg+'</svg>';
+        base=qdCardVisPutV500(j,'author',visualSig,final);if(!base)return "";
+    }
+    if(!clickable)return '<img src="'+base.replace(/"/g,'&quot;')+'">';
+    var openProvider=provider==="晴天"?"晴天":"",payload="",authorPayload="";
+    if(!openProvider){try{payload=encodeURIComponent(text);authorPayload=encodeURIComponent(String(author||""));}catch(_ep){payload=String(text||"");authorPayload=String(author||"");}}
+    var ob={style:"FULL",type:"qd",click:"qfOpenAuthorSayV314('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+qfEscJsV13(openProvider)+"','"+qfEscJsV13(payload)+"','"+qfEscJsV13(authorPayload)+"')"};
+    return '<img src="'+(base+','+JSON.stringify(ob)).replace(/"/g,'&quot;')+'">';
+}
+
+function qdChapterTalkCardV20(rawList,total,bid,cid){
+    var src=qdV20List(rawList),list=[];
+    for(var i=0;i<src.length&&list.length<2;i++){var c=src[i]||{},txt=qdV20CleanCommentText(qdV20CommentText(c));if(!txt)continue;var u=qdV20CommentUser(c);list.push({name:u.name,content:txt,like:qdV20CommentLike(c),reply:qdV20CommentReply(c)});}
+    /* beta22：本章说卡只展示真实评论预览。没有任何可展示评论时不生成提示占位卡。 */
+    if(!list.length)return "";
+    var totalNum=Number(total);if(!isFinite(totalNum)||totalNum<1)totalNum=list.length;
+    var sigParts=[String(totalNum)];for(var si=0;si<list.length;si++){var sc=list[si];sigParts.push(String(sc.name||''),String(sc.content||''),String(sc.like||0),String(sc.reply||0));}
+    var visualSig=sigParts.join('\u001f'),base=qdCardVisGetV500('chapter',visualSig);
+    var w=1080,lp=58,rp=58,y=104,svg="",font="system-ui,Arial,sans-serif",rightText=totalNum+' 条评论 ›';
+    svg+='<rect x="34" y="28" width="178" height="58" rx="29" fill="#5E9A76"/>'+
+         '<text x="123" y="67" font-size="31" font-family="'+font+'" fill="#fff" font-weight="700" text-anchor="middle">本章说</text>'+
+         '<text x="'+(w-rp)+'" y="67" font-size="29
+
+### KW reply_count FN qdV20CommentReply @4936
+rn;
+    QF_REVIEW_SNAP460[key]={ts:Date.now(),body:body,titleCount:Number(titleCount||0)||0,titleHot:!!titleHot};
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0)QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);
+    while(QF_REVIEW_SNAP460_ORDER.length>QF_REVIEW_SNAP460_MAX){var old=QF_REVIEW_SNAP460_ORDER.shift();delete QF_REVIEW_SNAP460[old];}
+}
+function qdReviewSnapRestoreTitleV460(bid,cid,showBubble,snap){
+    try{
+        var ch=qfChapter(this);if(!ch||!ch.putImgUrl)return;
+        if(showBubble&&snap&&Number(snap.titleCount||0)>0){
+            ch.putImgUrl(qdBubbleDataV20.call(this,Number(snap.titleCount||0),bid,cid,-1,0,!!snap.titleHot));
+        }else ch.putImgUrl(null);
+    }catch(_e){}
+}
+
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qdV20List(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e){}
+    return [];
+}
+function qdV20CommentText(c){
+    c=c||{};
+    var t=c.text||c.ReviewContent||c.reviewContent||c.Content||c.content||
+        c.Body||c.Subject||c.CommentContent||
+        (c.raw&&(c.raw.text||c.raw.ReviewContent||c.raw.Content||c.raw.content))||"";
+    if(typeof t==="object")t=t.Text||t.text||t.Content||t.content||"";
+    return qfEmojiV13(String(t||""));
+}
+function qdV20CleanCommentText(s){
+    return qfEmojiV13(String(s||""))
+        .replace(/https?:\/\/[^\s]+/g,"")
+        .replace(/qdd\.gg\/[^\s]+/g,"")
+        .replace(/<[^>]+>/g,"")
+        .trim();
+}
+function qdV20CommentUser(c){
+    c=c||{};
+    var u=c.user_info||c.UserInfo||c.User||c.user||c.raw||{};
+    return {
+        name:String(u.user_name||u.UserName||u.NickName||u.nickname||c.nickname||c.UserName||c.userName||"书友"),
+        avatar:String(u.user_avatar||u.UserHeadIcon||u.Avatar||u.avatar||c.avatar||c.UserHeadIcon||"")
+    };
+}
+function qdV20CommentLike(c){
+    c=c||{};
+    return Number(c.digg_count||c.like_count||c.LikeCount||c.likeCount||c.DiggCount||
+        c.AgreeAmount||c.Likes||(c.raw&&(c.raw.LikeCount||c.raw.DiggCount||c.raw.AgreeAmount))||0)||0;
+}
+function qdV20CommentReply(c){
+    c=c||{};
+    return Number(c.reply_count||c.ReplyCount||c.replyCount||c.CommentCount||c.commentCount||
+        (c.raw&&(c.raw.ReplyCount||c.raw.CommentCount))||0)||0;
+}
+/* alpha18：Decoration Plan 行对象池。
+ * 一章完成后立即归还；仅复用段落位置/quote 等瞬时装饰数据，不缓存评论实体。
+ * tuple: 0=item,1=pid,2=count,3=seg,4=lineIndex,5=quote,6=uriEncoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,seg,ix,quote,hot){
+    var r=QF_DECOR_ROW490_POOL.length?QF_DECOR_ROW490_POOL.pop():new Array(9);
+    r[0]=it;r[1]=pid;r[2]=cnt;r[3]=seg;r[4]=ix;r[5]=quote;r[6]=null;r[7]=null;r[8]=hot?1:0;return r;
+}
+function qdDecorRowQuoteV490(r){
+    if(r[6]===null){var q='';try{q=encodeURIComponent(String(r[5]||''));}catch(_qe490){q='';}r[6]=q;r[7]=qfEscJsV13(q);}return String(r[6]||'');
+}
+function qdDecorRowQuoteJsV490(r){if(r[7]===null)qdDecorRowQuoteV490(r);return String(r[7]||'');}
+function qdDecorRowsReleaseV490(plan){
+    if(!plan||!plan.length)return;
+    for(var i=0;i<plan.length&&QF_DECOR_ROW490_POOL.length<QF_DECOR_ROW490_MAX;i++){
+        var r=plan[i];if(!r)continue;for(var k=0;k<9;k++)r[k]=null;QF_DECOR_ROW490_POOL.push(r);
+    }
+}
+
+/* alpha19：低频正文卡片只缓存“视觉层”，绝不缓存 click / ReviewId / 评论实体。
+ * 同一作者说/本章说/热评在返回章节或快照失效后可直接复用 Base64，减少 SVG 拼接与 Java Bridge。
+ * 36 项 LRU 仅常驻很小的 data URI；业务内容变化会自然产生不同 key。 */
+var QF_CARD_VIS500={},QF_CARD_VIS500_ORDER=[],QF_CARD_VIS500_MAX=36;
+function qdCardVisKeyV500(kind,sig){return String(kind||'')+'\u001f'+String(sig||'');}
+function qdCardVisGetV500(kind,sig){
+    var key=qdCardVisKeyV500(kind,sig),v=QF_CARD_VIS500[key];if(!v)return '';
+    var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0){QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);}return v;
+}
+function qdCardVisPutV500(j,kind,sig,svg){
+    if(!j||!svg)return '';
+    var key=qdCardVisKeyV500(kind,sig),base='';try{base='data:image/svg+xml;base64,'+j.base64Encode(svg);}catch(_e){return '';}
+    if(!base)return '';
+    QF_CARD_VIS500[key]=base;var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0)QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);
+    while(QF_CARD_VIS500_ORDER.length>QF_CARD_VIS500_MAX){var old=QF_CARD_VIS500_ORDER.shift();delete QF_CARD_VIS500[old];}
+    return base;
+}
+
+function qdHotHtmlV20(c,bid,cid,pid,seg,quote,quoteEncoded,quoteJsEncoded){
+    if(!c||!c.content)return "";
+    var t=String(c.content||"").replace(/\s+/g," ").trim();if(t.length>22)t=t.substring(0,22)+"…";
+    var like=Number(c.like||0)||0,meta=like>0?("♡ "+(like>999?"999+":like)):"查看段评 ›";
+    var visualSig=t+'\u001f'+meta,base=qdCardVisGetV500('hot',visualSig);
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var svg='<svg width="1000" height="122" xmlns="http://www.w3.org/2000/svg">'+
+            '<rect x="2" y="5" width="996" height="104" fill="rgba(255,250,248,0.72)" rx="30" stroke="#F0D9D3" stroke-width="1"/>'+
+            '<rect x="27" y="28" width="122" height="50" rx="25" fill="#EF5B50"/>'+
+            '<text x="88" y="62" font-size="28" fill="#FFF" text-anchor="middle" font-weight="700">热评</text>'+
+            '<text x="174" y="63" font-size="33" fill="#252525" font-weight="600">'+qfEscV13(t)+'</text>'+
+            '<text x="962" y="63" font-size="25" fill="#9A8B87" text-anchor="end">'+qfEscV13(meta)+'</text></svg>';
+        base=qdCardVisPutV500(j,'hot',visualSig,svg);if(!base)return "";
+    }
+    var qe=quoteEncoded==null?"":String(quoteEncoded),qj=quoteJsEncoded==null?"":String(quoteJsEncoded);
+    if(quoteEncoded==null){try{qe=encodeURIComponent(String(quote||""));}catch(_qe){qe="";}}
+    if(quoteJsEncoded==null)qj=qfEscJsV13(qe);
+    var click="showCmtV20('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+pid+"','"+seg+"','dp','"+qj+"','"+String(Number(c.total||c.replyCount||0)||0)+"')";
+    var d=base+',{"style":"FULL","type":"qd","click":'+JSON.stringify(click)+'}';
+    return '<img src="'+d.replace(/"/g,"&quot;")+'">';
+}
+function qdAuthorSayCardV20(text,bid,cid,provider){
+    text=String(text||"").trim();if(!qfAuthorSayRealV327(text))return "";
+    provider=String(provider||"");
+    var clickable=(provider===""||provider==="晴天");
+    var author=qfBookVarV09.call(this,"qf_author","作者"),w=1080,lp=62,rp=62,font="system-ui,Arial,sans-serif";
+    /* alpha3.6：旧版固定 slice(27) 没考虑汉字/英文实际宽度，38px 字号下 27 个汉字会超过正文宽度。
+       改按视觉宽度估算换行；保留原文换行，同时避免标点单独掉到下一行。 */
+    function unit(ch){
+        if(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch))return 1;
+        if(/[A-Z0-9]/.test(ch))return .68;
+        if(/[a-z]/.test(ch))return .56;
+        if(/\s/.test(ch))return .32;
+        return .52;
+    }
+    function wrap(src,limit,maxRows){
+        var out=[],paras=String(src||'').replace(/\r/g,'').split('\n');
+        for(var p=0;p<paras.length&&out.length<maxRows;p++){
+            var ss=paras[p],line='',u=0;
+            if(!ss){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+            for(var i=0;i<ss.length&&out.length<maxRows;i++){
+                var ch=ss.charAt(i),cu=unit(ch);
+                if(line&&u+cu>limit){
+                    /* 句号/逗号等不要单独成为下一行首字符。 */
+                    if(/[，。！？；：、,.!?;:）】》”’]/.
+
+### KW ♡ FN qdHotHtmlV20 @7415
+Encoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,seg,ix,quote,hot){
+    var r=QF_DECOR_ROW490_POOL.length?QF_DECOR_ROW490_POOL.pop():new Array(9);
+    r[0]=it;r[1]=pid;r[2]=cnt;r[3]=seg;r[4]=ix;r[5]=quote;r[6]=null;r[7]=null;r[8]=hot?1:0;return r;
+}
+function qdDecorRowQuoteV490(r){
+    if(r[6]===null){var q='';try{q=encodeURIComponent(String(r[5]||''));}catch(_qe490){q='';}r[6]=q;r[7]=qfEscJsV13(q);}return String(r[6]||'');
+}
+function qdDecorRowQuoteJsV490(r){if(r[7]===null)qdDecorRowQuoteV490(r);return String(r[7]||'');}
+function qdDecorRowsReleaseV490(plan){
+    if(!plan||!plan.length)return;
+    for(var i=0;i<plan.length&&QF_DECOR_ROW490_POOL.length<QF_DECOR_ROW490_MAX;i++){
+        var r=plan[i];if(!r)continue;for(var k=0;k<9;k++)r[k]=null;QF_DECOR_ROW490_POOL.push(r);
+    }
+}
+
+/* alpha19：低频正文卡片只缓存“视觉层”，绝不缓存 click / ReviewId / 评论实体。
+ * 同一作者说/本章说/热评在返回章节或快照失效后可直接复用 Base64，减少 SVG 拼接与 Java Bridge。
+ * 36 项 LRU 仅常驻很小的 data URI；业务内容变化会自然产生不同 key。 */
+var QF_CARD_VIS500={},QF_CARD_VIS500_ORDER=[],QF_CARD_VIS500_MAX=36;
+function qdCardVisKeyV500(kind,sig){return String(kind||'')+'\u001f'+String(sig||'');}
+function qdCardVisGetV500(kind,sig){
+    var key=qdCardVisKeyV500(kind,sig),v=QF_CARD_VIS500[key];if(!v)return '';
+    var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0){QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);}return v;
+}
+function qdCardVisPutV500(j,kind,sig,svg){
+    if(!j||!svg)return '';
+    var key=qdCardVisKeyV500(kind,sig),base='';try{base='data:image/svg+xml;base64,'+j.base64Encode(svg);}catch(_e){return '';}
+    if(!base)return '';
+    QF_CARD_VIS500[key]=base;var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0)QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);
+    while(QF_CARD_VIS500_ORDER.length>QF_CARD_VIS500_MAX){var old=QF_CARD_VIS500_ORDER.shift();delete QF_CARD_VIS500[old];}
+    return base;
+}
+
+function qdHotHtmlV20(c,bid,cid,pid,seg,quote,quoteEncoded,quoteJsEncoded){
+    if(!c||!c.content)return "";
+    var t=String(c.content||"").replace(/\s+/g," ").trim();if(t.length>22)t=t.substring(0,22)+"…";
+    var like=Number(c.like||0)||0,meta=like>0?("♡ "+(like>999?"999+":like)):"查看段评 ›";
+    var visualSig=t+'\u001f'+meta,base=qdCardVisGetV500('hot',visualSig);
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var svg='<svg width="1000" height="122" xmlns="http://www.w3.org/2000/svg">'+
+            '<rect x="2" y="5" width="996" height="104" fill="rgba(255,250,248,0.72)" rx="30" stroke="#F0D9D3" stroke-width="1"/>'+
+            '<rect x="27" y="28" width="122" height="50" rx="25" fill="#EF5B50"/>'+
+            '<text x="88" y="62" font-size="28" fill="#FFF" text-anchor="middle" font-weight="700">热评</text>'+
+            '<text x="174" y="63" font-size="33" fill="#252525" font-weight="600">'+qfEscV13(t)+'</text>'+
+            '<text x="962" y="63" font-size="25" fill="#9A8B87" text-anchor="end">'+qfEscV13(meta)+'</text></svg>';
+        base=qdCardVisPutV500(j,'hot',visualSig,svg);if(!base)return "";
+    }
+    var qe=quoteEncoded==null?"":String(quoteEncoded),qj=quoteJsEncoded==null?"":String(quoteJsEncoded);
+    if(quoteEncoded==null){try{qe=encodeURIComponent(String(quote||""));}catch(_qe){qe="";}}
+    if(quoteJsEncoded==null)qj=qfEscJsV13(qe);
+    var click="showCmtV20('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+pid+"','"+seg+"','dp','"+qj+"','"+String(Number(c.total||c.replyCount||0)||0)+"')";
+    var d=base+',{"style":"FULL","type":"qd","click":'+JSON.stringify(click)+'}';
+    return '<img src="'+d.replace(/"/g,"&quot;")+'">';
+}
+function qdAuthorSayCardV20(text,bid,cid,provider){
+    text=String(text||"").trim();if(!qfAuthorSayRealV327(text))return "";
+    provider=String(provider||"");
+    var clickable=(provider===""||provider==="晴天");
+    var author=qfBookVarV09.call(this,"qf_author","作者"),w=1080,lp=62,rp=62,font="system-ui,Arial,sans-serif";
+    /* alpha3.6：旧版固定 slice(27) 没考虑汉字/英文实际宽度，38px 字号下 27 个汉字会超过正文宽度。
+       改按视觉宽度估算换行；保留原文换行，同时避免标点单独掉到下一行。 */
+    function unit(ch){
+        if(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch))return 1;
+        if(/[A-Z0-9]/.test(ch))return .68;
+        if(/[a-z]/.test(ch))return .56;
+        if(/\s/.test(ch))return .32;
+        return .52;
+    }
+    function wrap(src,limit,maxRows){
+        var out=[],paras=String(src||'').replace(/\r/g,'').split('\n');
+        for(var p=0;p<paras.length&&out.length<maxRows;p++){
+            var ss=paras[p],line='',u=0;
+            if(!ss){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+            for(var i=0;i<ss.length&&out.length<maxRows;i++){
+                var ch=ss.charAt(i),cu=unit(ch);
+                if(line&&u+cu>limit){
+                    /* 句号/逗号等不要单独成为下一行首字符。 */
+                    if(/[，。！？；：、,.!?;:）】》”’]/.test(ch)){line+=ch;out.push(line);line='';u=0;continue;}
+                    out.push(line);line=ch;u=cu;
+                }else{line+=ch;u+=cu;}
+            }
+            if(line&&out.length<maxRows)out.push(line);
+        }
+        if(out.length>maxRows)out=out.slice(0,maxRows);
+        var consumed=out.join('').replace(/\s/g,'').length,full=String(src||'').replace(/\s/g,'').length;
+        if(out.length&&consumed<full){var last=out.length-1;out[last]=out[last].replace(/[，。！？；：、,.!?;:\s]+$/,'');if(out[last].length>1)out[last]=out[last].slice(0,-1)+'…';else out[last]+='…';}
+        return out;
+    }
+    var rows=wrap(text,29.0,4),right=provider==="晴天"?"晴天 · 查看 ›":(!provider?"起点官方 · 查看 ›":provider+"服务器");
+    var visualSig=String(author)+'\u001f'+right+'\u001f'+rows.join('\n'),base=qdCardVisGetV500('author',visualSig),y=96,svg='';
+    svg+='<rect x="34" y="25" width="164" height="52" rx="26" fill="#4A74E4"/>'+ 
+         '<text x="116" y="60" font-size="28" font-family="'+font+'" fill="#fff" font-weight="700" text-anchor="middle">作者说</text>'+ 
+         '<text x="'+(w-rp)+'" y="59" font-size="24" text-anchor="end" font-family="'+font+'" fill="#8992A2">'+qfEscV13(right)+'</text>';
+    y+=30;
+    svg+='<text x="'+lp+'" y="'+y+'" font-size="28" font-family="'+font+'" fill="#4A5570" font-weight="650">'+qfEscV13(author||"作者")+'</text>';y+=48;
+    for(var i=0;i<rows.length;i++){
+        if(rows[i]===''){y+=20;continue;}
+        svg+='<text x="'+lp+'" y="'+y+'" font-size="31" font-family="'+font+'" fill="#27282B" font-weight="400">'+qfEscV13(rows[i])+'</text>';y+=47;
+    }
+    y+=25;
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var final='<svg width="'+w+'" height="'+y+'" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="'+(w-4)+'" height="'+(y-4)+'" rx="38" fill="rgba(249,250,255,0.34)" stroke="#DDE2ED" stroke-width="1"/>'+svg+'</svg>';
+        base=qdCardVisPutV500(j,'author',visualSig,final);if(!base)return "";
+    }
+    if(!clickable)return '<img src="'+base.replace(/"/g,'&quot;')+'">';
+    var openProvider=provider==="晴天"?"晴天":"",payload="",authorPayload="";
+    if(!openProvider){try{payload=encodeURIComponent(text);authorPayload=encodeURIComponent(String(author||""));}catch(_ep){payload=String(text||"");authorPayload=String(author||"");}}
+    var ob={style:"FULL",type:"qd",click:"qfOpenAuthorSayV314('"+qfEscJsV13(bid)+"','"+qfE
+
+### KW ♡ FN qdChapterTalkCardV20 @14622
+Component(String(author||""));}catch(_ep){payload=String(text||"");authorPayload=String(author||"");}}
+    var ob={style:"FULL",type:"qd",click:"qfOpenAuthorSayV314('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+qfEscJsV13(openProvider)+"','"+qfEscJsV13(payload)+"','"+qfEscJsV13(authorPayload)+"')"};
+    return '<img src="'+(base+','+JSON.stringify(ob)).replace(/"/g,'&quot;')+'">';
+}
+
+function qdChapterTalkCardV20(rawList,total,bid,cid){
+    var src=qdV20List(rawList),list=[];
+    for(var i=0;i<src.length&&list.length<2;i++){var c=src[i]||{},txt=qdV20CleanCommentText(qdV20CommentText(c));if(!txt)continue;var u=qdV20CommentUser(c);list.push({name:u.name,content:txt,like:qdV20CommentLike(c),reply:qdV20CommentReply(c)});}
+    /* beta22：本章说卡只展示真实评论预览。没有任何可展示评论时不生成提示占位卡。 */
+    if(!list.length)return "";
+    var totalNum=Number(total);if(!isFinite(totalNum)||totalNum<1)totalNum=list.length;
+    var sigParts=[String(totalNum)];for(var si=0;si<list.length;si++){var sc=list[si];sigParts.push(String(sc.name||''),String(sc.content||''),String(sc.like||0),String(sc.reply||0));}
+    var visualSig=sigParts.join('\u001f'),base=qdCardVisGetV500('chapter',visualSig);
+    var w=1080,lp=58,rp=58,y=104,svg="",font="system-ui,Arial,sans-serif",rightText=totalNum+' 条评论 ›';
+    svg+='<rect x="34" y="28" width="178" height="58" rx="29" fill="#5E9A76"/>'+
+         '<text x="123" y="67" font-size="31" font-family="'+font+'" fill="#fff" font-weight="700" text-anchor="middle">本章说</text>'+
+         '<text x="'+(w-rp)+'" y="67" font-size="29" text-anchor="end" font-family="'+font+'" fill="#7D8D84">'+qfEscV13(rightText)+'</text>';
+    for(var k=0;k<list.length;k++){
+        var c2=list[k],tx=c2.content,rows=[],max=24;while(tx){rows.push(tx.slice(0,max));tx=tx.slice(max);}if(rows.length>2){rows=rows.slice(0,2);rows[1]=rows[1].slice(0,max-1)+"…";}
+        y+=32;svg+='<line x1="'+lp+'" y1="'+y+'" x2="'+(w-rp)+'" y2="'+y+'" stroke="#E7ECE9" stroke-width="1"/>';y+=54;
+        svg+='<text x="'+lp+'" y="'+y+'" font-size="34" font-family="'+font+'" fill="#4F5B54" font-weight="700">'+qfEscV13(c2.name||"书友")+'</text>';
+        var meta=[];if(c2.reply>0)meta.push(c2.reply+"回复");if(c2.like>0)meta.push("♡ "+c2.like);if(meta.length)svg+='<text x="'+(w-rp)+'" y="'+y+'" font-size="27" text-anchor="end" font-family="'+font+'" fill="#9AA39E">'+meta.join(" · ")+'</text>';
+        y+=56;for(var rr=0;rr<rows.length;rr++){svg+='<text x="'+lp+'" y="'+y+'" font-size="38" font-family="'+font+'" fill="#222">'+qfEscV13(rows[rr])+'</text>';y+=55;}y+=12;
+    }
+    y+=28;
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var final='<svg width="'+w+'" height="'+y+'" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="'+(w-4)+'" height="'+(y-4)+'" rx="44" fill="rgba(250,253,251,0.38)" stroke="#D9E4DD" stroke-width="1"/>'+svg+'</svg>';
+        base=qdCardVisPutV500(j,'chapter',visualSig,final);if(!base)return "";
+    }
+    var ob={style:"FULL",type:"qd",click:"showCmtV20('"+String(bid)+"','"+String(cid)+"','-1','0','zp','','"+String(totalNum)+"')"};
+    return '<img src="'+base+','+JSON.stringify(ob)+'">';
+}
+
+/* ---------- 作者说 ---------- */
+
+function qdBubbleImageV20(count,bid,cid,pid,seg,hot,quote,quoteEncoded,quoteJsEncoded){
+    var u=qdBubbleDataV20.call(this,count,bid,cid,pid,seg,hot,quote,quoteEncoded,quoteJsEncoded);
+    return u?'<img src="'+u.replace(/"/g,"&quot;")+'">':"";
+}
+/* ---------- 热评 ---------- */
+
+/* alpha15：旧流程先 split/filter 一遍正文，再单独扫描 lines 建 textIdx。
+ * 这里把两次 O(n) 遍历合并；lines 的输出语义保持不变。 */
+function qdV22BuildLinesV470(content,needTextIdx){
+    var src=String(content||"");if(src.indexOf("\r")>=0)src=src.replace(/\r/g,"");
+    var raw=src.split("\n"),lines=[],idx=[],needIdx=(needTextIdx!==false),hasMedia=false;
+    /* alpha17：只显示作者说/本章说时最终输出仍保持旧版 trim/去空行语义，
+       但不再建立完全用不到的 textIdx，也不再执行媒体判定。 */
+    if(needIdx)hasMedia=(src.indexOf("data:image/")>=0)||(src.indexOf("<")>=0&&/<\s*img\b/i.test(src));
+    for(var i=0;i<raw.length;i++){
+        var t=String(raw[i]||"").trim();if(!t)continue;
+        var pos=lines.length;lines.push(t);
+        if(needIdx&&(!hasMedia||(!/^<\s*img\b/i.test(t)&&t.indexOf("data:image/")<0)))idx.push(pos);
+    }
+    return {lines:lines,textIdx:idx};
+}
+
+
+
+/* ============================================================
+ * v2.9.4 基础运行时恢复
+ * 只恢复被误删的通用 helper，不恢复任何私人服务器。
+ * ============================================================ */
+
+function qdFetchCommentsV20(bid,cid,pid,seg,quote){
+    return qdFetchOfficialCommentsV20.call(this,bid,cid,pid,seg,quote);
+}
+/* ---------- 起点源附件同款 官方章评 ---------- */
+
+function qfTextKeepMediaV323(v){
+    var src=String(v==null?"":v),hint=0;
+    /* alpha16：普通小说正文几乎从不含“<”或“![”，先用 indexOf 过滤掉全局媒体 regex。 */
+    if(src.indexOf("<")>=0&&/<img\b/i.test(src))hint|=1;
+    if(src.indexOf("![")>=0&&src.indexOf("](")>=0&&/!\[[^\]]*\]\(https?:\/\//i.test(src))hint|=2;
+    if(!(hint&3))return qfText(src);
+    var imgs=[];
+    if(hint&2){
+        src=src.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/gi,function(_m,alt,url){
+            return '<img src="'+String(url||'').replace(/"/g,'&quot;')+'" alt="'+String(alt||'').replace(/"/g,'&quot;')+'">';
+        });
+        hint|=1;
+    }
+    if(hint&1){
+        src=src.replace(/<img\b[^>]*>/gi,function(tag){
+            var t=String(tag||'');
+            t=t.replace(/(\bsrc\s*=\s*["'])\/\//i,'$1https://');
+            imgs.push(t);
+            return "\nQFIMGV323_"+(imgs.length-1)+"_END\n";
+        });
+    }
+    var out=qfText(src);
+    if(imgs.length){
+        out=out.replace(/QFIMGV323_(\d+)_END/g,function(_m,n){n=Number(n);return n>=0&&n<imgs.length?imgs[n]:"";});
+        out=out.replace(/(^|\n)\s*我的彩蛋章\s*-?\s*\d{8,}\s*-\s*\d+\s*插图\s*(?=\n|$)/g,'$1');
+        out=out.replace(/\n{3,}/g,'\n\n').trim();
+    }
+    return out;
+}
+
+/* alpha35：晴天评论轻量路径。
+ * 正文只读取 /api/comments 的数量索引来画气泡；不读取 /comments、/chapterComments 详情。
+ * 热评排序/列表交给晴天原生页面，不再在正文阶段做任何评论详情请求。
+ */
+
+/* beta17.2：情无正文 + 起点本地段评的快速索引。
+ * 情无正文服务器本身已经提供 comments.php?action=summary，ParagraphId 与情无正文天然对齐。
+ * 本地模式只借它画气泡/判断热段；真正点击段评仍进入起点本地评论页。
+ * 这样避免每章正文阶段都串行执行起点 PC+移动 reviewSummary 双兜底。 */
+function qfQwLocalFastIndexV3172(bid,cid){
+    var cacheObj=qfRuntimeCacheV13(this),key="qf-qw-local-fast-index-v3172-"+String(bid)+"-"+String(cid),now=Date.now();
+    try{
+        if(cacheObj&&qfCallableV13(cacheObj,"getFromMemory")){
+            var old=String(cacheObj.getFromMemory(key)||"");
+            if(old){var co=JSON.parse(old);if(co&&co.ts&&now-Number(co.ts)<120000&&Array.isArray(co.items))return co.items;}
+        }
+    }catch(_c0){}
+    var out=[];
+    try{
+        var fn=qfModuleFnV38.call(this,"review_server_core","qfQwCommentApiV315");
+        if(typeof fn!=="function")return out;
+        var r=fn.call(this,"summary",{book_id:bid,chapter_id:cid})||{},d=r.Data||r.data||{},box=d.Getparagraphscommentcounts||d.getparagraphscommentcounts||d.GetParagraphsCommentCounts||{},list=box.DataList||box.dataList||box.List||box.list||[];
+        if(!Array.isArray(list)){try{list=Java.from(list);}catch(_ja){list=[];}}
+        var seen={},title=null;
+        for(var i=0;i<list.length;i++){
+            var x=list[i]||{},pid=Number(x.ParagraphId!==undefined?x.ParagraphId:(x.paragraphId!==undefined?x.paragraphId:(x.ParagraphsId!==undefined?x.ParagraphsId:x.paragraphsId))),cnt=Number(
+
+### KW 楼 FN ? @137
+/* v4.0.0-alpha19：正文性能⑪——热评/作者说/本章说视觉层短 LRU。缓存纯 SVG Base64，点击 metadata 仍按章节动态生成；命中时跳过 SVG 字符串构建、Java 获取和 base64Encode。评论数据/TitleInfoList/楼中楼链不改。 */
+/* v4.0.0-alpha18：正文性能⑩——评论装饰对象池 + 点击参数延迟构建。Decoration Plan 改用可复用紧凑行对象；quote 的 URI/JS escape 只在真正生成可点击气泡/热评时计算一次；同章 click context 复用；lineExtra 去除小数组对象。TitleInfoList/标签解析链不改。 */
+/* v4.0.0-alpha17：正文性能⑨——最终输出单次组装。正文行不再反复 += 气泡/热评；作者说/本章说不再对已 join 的整章正文继续 +=；只显示尾卡时跳过 textIdx/媒体索引构建；热评单开时非 hot 段不进入 decoration plan。 */
+/* alpha16：纯文字媒体检测快路径；无媒体正文跳过 Markdown/img replace，lines 无媒体时不逐行跑 img regex。 */
+/* v4.0.0-alpha15：正文性能⑦——正文行/文本索引一次建模；评论 item 单次规划后复用给热评预取与装饰；气泡 SVG Base64 进入共享 LRU；标题 quote 仅有章名气泡时写缓存。 */
+/* alpha81 shared import */
+var __qfRc81=QF_MOD38_CACHE["review_common"]||qfModuleEnsureV38.call(this,"review_common");
+var qdBubbleDataV20=__qfRc81.qdBubbleDataV20;
+var qdQtAuthorSayCardV332=__qfRc81.qdQtAuthorSayCardV332;
+
+/* ============================================================
+ * v4.0.0-alpha11 · Chapter Review Decoration Snapshot
+ *
+ * 这是“最终装饰结果”的短期内存快照，不替代任何官方数据缓存：
+ * - 本地评论 120s；服务器评论 60s；
+ * - 只保留最近 5 个 chapter/mode 组合；
+ * - key 绑定正文轻签名、正文 Provider、评论路由、四个显示开关、智能对齐开关；
+ * - 命中后恢复 chapter title bubble 副作用，再直接返回已经生成好的 body。
+ *
+ * 目的：返回上一章/重复打开同章时，不再重复执行 summary、章末预览、热评、
+ * paragraph map、SVG/base64 构建和作者说/本章说拼接。
+ * ============================================================ */
+var QF_REVIEW_SNAP460={},QF_REVIEW_SNAP460_ORDER=[],QF_REVIEW_SNAP460_MAX=5;
+function qdReviewSnapSigV460(s){
+    s=String(s||'');var n=s.length,h=2166136261>>>0;
+    function mixAt(a,b){for(var i=a;i<b&&i<n;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}}
+    mixAt(0,96);
+    if(n>192){var m=Math.max(96,Math.floor(n/2)-48);mixAt(m,m+96);}
+    if(n>96)mixAt(Math.max(0,n-96),n);
+    return n.toString(36)+'-'+h.toString(36);
+}
+function qdReviewSnapKeyV460(bid,cid,isPaid,provider,serverProvider,flags,smart,content){
+    flags=flags||{};
+    return [String(bid),String(cid),isPaid?'1':'0',String(provider||''),String(serverProvider||''),
+        flags.bubble?'1':'0',flags.hot?'1':'0',flags.talk?'1':'0',flags.author?'1':'0',smart?'1':'0',qdReviewSnapSigV460(content)].join('|');
+}
+function qdReviewSnapGetV460(key,serverMode){
+    var o=QF_REVIEW_SNAP460[String(key||'')],ttl=serverMode?60000:120000;
+    if(!o)return null;
+    if(Date.now()-Number(o.ts||0)>ttl){delete QF_REVIEW_SNAP460[key];var ix=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(ix>=0)QF_REVIEW_SNAP460_ORDER.splice(ix,1);return null;}
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0){QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);}
+    return o;
+}
+function qdReviewSnapPutV460(key,body,titleCount,titleHot){
+    body=String(body==null?'':body);if(!key||!body||body.length>420000)return;
+    QF_REVIEW_SNAP460[key]={ts:Date.now(),body:body,titleCount:Number(titleCount||0)||0,titleHot:!!titleHot};
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0)QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);
+    while(QF_REVIEW_SNAP460_ORDER.length>QF_REVIEW_SNAP460_MAX){var old=QF_REVIEW_SNAP460_ORDER.shift();delete QF_REVIEW_SNAP460[old];}
+}
+function qdReviewSnapRestoreTitleV460(bid,cid,showBubble,snap){
+    try{
+        var ch=qfChapter(this);if(!ch||!ch.putImgUrl)return;
+        if(showBubble&&snap&&Number(snap.titleCount||0)>0){
+            ch.putImgUrl(qdBubbleDataV20.call(this,Number(snap.titleCount||0),bid,cid,-1,0,!!snap.titleHot));
+        }else ch.putImgUrl(null);
+    }catch(_e){}
+}
+
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qdV20List(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e){}
+    return [];
+}
+function qdV20CommentText(c){
+    c=c||{};
+    var t=c.text||c.ReviewContent||c.reviewContent||c.Content||c.content||
+        c.Body||c.Subject||c.CommentContent||
+        (c.raw&&(c.raw.text||c.raw.ReviewContent||c.raw.Content||c.raw.content))||"";
+    if(typeof t==="object")t=t.Text||t.text||t.Content||t.content||"";
+    return qfEmojiV13(String(t||""));
+}
+function qdV20CleanCommentText(s){
+    return qfEmojiV13(String(s||""))
+        .replace(/https?:\/\/[^\s]+/g,"")
+        .replace(/qdd\.gg\/[^\s]+/g,"")
+        .replace(/<[^>]+>/g,"")
+        .trim();
+}
+function qdV20CommentUser(c){
+    c=c||{};
+    var u=c.user_info||c.UserInfo||c.User||c.user||c.raw||{};
+    return {
+        name:String(u.user_name||u.UserName||u.NickName||u.nickname||c.nickname||c.UserName||c.userName||"书友"),
+        avatar:String(u.user_avatar||u.UserHeadIcon||u.Avatar||u.avatar||c.avatar||c.UserHeadIcon||"")
+    };
+}
+function qdV20CommentLike(c){
+    c=c||{};
+    return Number(c.digg_count||c.like_count||c.LikeCount||c.likeCount||c.DiggCount||
+        c.AgreeAmount||c.Likes||(c.raw&&(c.raw.LikeCount||c.raw.DiggCount||c.raw.AgreeAmount))||0)||0;
+}
+function qdV20CommentReply(c){
+    c=c||{};
+    return Number(c.reply_count||c.ReplyCount||c.replyCount||c.CommentCount||c.commentCount||
+        (c.raw&&(c.raw.ReplyCount||c.raw.CommentCount))||0)||0;
+}
+/* alpha18：Decoration Plan 行对象池。
+ * 一章完成后立即归还；仅复用段落位置/quote 等瞬时装饰数据，不缓存评论实体。
+ * tuple: 0=item,1=pid,2=count,3=seg,4=lineIndex,5=quote,6=uriEncoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,
+
+### KW 楼 FN ? @139
+/* v4.0.0-alpha19：正文性能⑪——热评/作者说/本章说视觉层短 LRU。缓存纯 SVG Base64，点击 metadata 仍按章节动态生成；命中时跳过 SVG 字符串构建、Java 获取和 base64Encode。评论数据/TitleInfoList/楼中楼链不改。 */
+/* v4.0.0-alpha18：正文性能⑩——评论装饰对象池 + 点击参数延迟构建。Decoration Plan 改用可复用紧凑行对象；quote 的 URI/JS escape 只在真正生成可点击气泡/热评时计算一次；同章 click context 复用；lineExtra 去除小数组对象。TitleInfoList/标签解析链不改。 */
+/* v4.0.0-alpha17：正文性能⑨——最终输出单次组装。正文行不再反复 += 气泡/热评；作者说/本章说不再对已 join 的整章正文继续 +=；只显示尾卡时跳过 textIdx/媒体索引构建；热评单开时非 hot 段不进入 decoration plan。 */
+/* alpha16：纯文字媒体检测快路径；无媒体正文跳过 Markdown/img replace，lines 无媒体时不逐行跑 img regex。 */
+/* v4.0.0-alpha15：正文性能⑦——正文行/文本索引一次建模；评论 item 单次规划后复用给热评预取与装饰；气泡 SVG Base64 进入共享 LRU；标题 quote 仅有章名气泡时写缓存。 */
+/* alpha81 shared import */
+var __qfRc81=QF_MOD38_CACHE["review_common"]||qfModuleEnsureV38.call(this,"review_common");
+var qdBubbleDataV20=__qfRc81.qdBubbleDataV20;
+var qdQtAuthorSayCardV332=__qfRc81.qdQtAuthorSayCardV332;
+
+/* ============================================================
+ * v4.0.0-alpha11 · Chapter Review Decoration Snapshot
+ *
+ * 这是“最终装饰结果”的短期内存快照，不替代任何官方数据缓存：
+ * - 本地评论 120s；服务器评论 60s；
+ * - 只保留最近 5 个 chapter/mode 组合；
+ * - key 绑定正文轻签名、正文 Provider、评论路由、四个显示开关、智能对齐开关；
+ * - 命中后恢复 chapter title bubble 副作用，再直接返回已经生成好的 body。
+ *
+ * 目的：返回上一章/重复打开同章时，不再重复执行 summary、章末预览、热评、
+ * paragraph map、SVG/base64 构建和作者说/本章说拼接。
+ * ============================================================ */
+var QF_REVIEW_SNAP460={},QF_REVIEW_SNAP460_ORDER=[],QF_REVIEW_SNAP460_MAX=5;
+function qdReviewSnapSigV460(s){
+    s=String(s||'');var n=s.length,h=2166136261>>>0;
+    function mixAt(a,b){for(var i=a;i<b&&i<n;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}}
+    mixAt(0,96);
+    if(n>192){var m=Math.max(96,Math.floor(n/2)-48);mixAt(m,m+96);}
+    if(n>96)mixAt(Math.max(0,n-96),n);
+    return n.toString(36)+'-'+h.toString(36);
+}
+function qdReviewSnapKeyV460(bid,cid,isPaid,provider,serverProvider,flags,smart,content){
+    flags=flags||{};
+    return [String(bid),String(cid),isPaid?'1':'0',String(provider||''),String(serverProvider||''),
+        flags.bubble?'1':'0',flags.hot?'1':'0',flags.talk?'1':'0',flags.author?'1':'0',smart?'1':'0',qdReviewSnapSigV460(content)].join('|');
+}
+function qdReviewSnapGetV460(key,serverMode){
+    var o=QF_REVIEW_SNAP460[String(key||'')],ttl=serverMode?60000:120000;
+    if(!o)return null;
+    if(Date.now()-Number(o.ts||0)>ttl){delete QF_REVIEW_SNAP460[key];var ix=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(ix>=0)QF_REVIEW_SNAP460_ORDER.splice(ix,1);return null;}
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0){QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);}
+    return o;
+}
+function qdReviewSnapPutV460(key,body,titleCount,titleHot){
+    body=String(body==null?'':body);if(!key||!body||body.length>420000)return;
+    QF_REVIEW_SNAP460[key]={ts:Date.now(),body:body,titleCount:Number(titleCount||0)||0,titleHot:!!titleHot};
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0)QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);
+    while(QF_REVIEW_SNAP460_ORDER.length>QF_REVIEW_SNAP460_MAX){var old=QF_REVIEW_SNAP460_ORDER.shift();delete QF_REVIEW_SNAP460[old];}
+}
+function qdReviewSnapRestoreTitleV460(bid,cid,showBubble,snap){
+    try{
+        var ch=qfChapter(this);if(!ch||!ch.putImgUrl)return;
+        if(showBubble&&snap&&Number(snap.titleCount||0)>0){
+            ch.putImgUrl(qdBubbleDataV20.call(this,Number(snap.titleCount||0),bid,cid,-1,0,!!snap.titleHot));
+        }else ch.putImgUrl(null);
+    }catch(_e){}
+}
+
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qdV20List(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e){}
+    return [];
+}
+function qdV20CommentText(c){
+    c=c||{};
+    var t=c.text||c.ReviewContent||c.reviewContent||c.Content||c.content||
+        c.Body||c.Subject||c.CommentContent||
+        (c.raw&&(c.raw.text||c.raw.ReviewContent||c.raw.Content||c.raw.content))||"";
+    if(typeof t==="object")t=t.Text||t.text||t.Content||t.content||"";
+    return qfEmojiV13(String(t||""));
+}
+function qdV20CleanCommentText(s){
+    return qfEmojiV13(String(s||""))
+        .replace(/https?:\/\/[^\s]+/g,"")
+        .replace(/qdd\.gg\/[^\s]+/g,"")
+        .replace(/<[^>]+>/g,"")
+        .trim();
+}
+function qdV20CommentUser(c){
+    c=c||{};
+    var u=c.user_info||c.UserInfo||c.User||c.user||c.raw||{};
+    return {
+        name:String(u.user_name||u.UserName||u.NickName||u.nickname||c.nickname||c.UserName||c.userName||"书友"),
+        avatar:String(u.user_avatar||u.UserHeadIcon||u.Avatar||u.avatar||c.avatar||c.UserHeadIcon||"")
+    };
+}
+function qdV20CommentLike(c){
+    c=c||{};
+    return Number(c.digg_count||c.like_count||c.LikeCount||c.likeCount||c.DiggCount||
+        c.AgreeAmount||c.Likes||(c.raw&&(c.raw.LikeCount||c.raw.DiggCount||c.raw.AgreeAmount))||0)||0;
+}
+function qdV20CommentReply(c){
+    c=c||{};
+    return Number(c.reply_count||c.ReplyCount||c.replyCount||c.CommentCount||c.commentCount||
+        (c.raw&&(c.raw.ReplyCount||c.raw.CommentCount))||0)||0;
+}
+/* alpha18：Decoration Plan 行对象池。
+ * 一章完成后立即归还；仅复用段落位置/quote 等瞬时装饰数据，不缓存评论实体。
+ * tuple: 0=item,1=pid,2=count,3=seg,4=lineIndex,5=quote,6=uriEncoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,se
