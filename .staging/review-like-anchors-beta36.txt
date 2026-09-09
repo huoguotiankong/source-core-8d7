@@ -1,0 +1,282 @@
+
+==== <div class="like"> #1 @ 87522 ====
+    avHtml(c,false)+
+        '</div><div class="body"><div class="nameRow">'+
+        '<span class="name">'+esc(c.name)+'</span>'+
+        '<span class="badges">'+b+'</span></div>'+
+        (role?'<div class="audioRoleMini">'+esc(role)+'</div>':'')+
+        '<div class="content qfFoldable qfFolded">'+fmt(c.content)+'</div><button class="foldBtn hidden" type="button">展开全文</button>';
+
+    if(c.audioPage){
+        h+=qfAudioPlayerHtml(c);
+    }else if(c.audio){
+        h+='<audio class="audio qfAudioNative" src="'+esc(c.audio)+'" controls preload="metadata"></audio>';
+    }
+
+    h+='<div class="meta">'+esc(meta(c))+'</div></div></div>'+
+       '<div class="like">'+likeSvg()+'<span>'+c.like+'</span></div>';
+
+    var embedded=Array.isArray(c.embedded)?c.embedded:[];
+    var total=Math.max(Number(c.replies||0),embedded.length);
+
+    if(total>0){
+        h+='<div class="audioRepliesPreview" id="rp_'+esc(c.id)+'">';
+
+        var previewCount=Math.min(embedded.length,2);
+        for(var r=0;r<previewCount;r++){
+            h+=qfAudioReplyPreviewHtml(embedded[r]);
+        }
+
+        if(c.id){
+            var remain=Math.max(0,total-previewCount);
+            var ids=qfCommentRootIds(c);
+            h+='<div class="audioMoreReplies replyMoreLocal" data-root="'+esc(ids.primary||c.id)+'" data-root-alt="'+esc(ids.alt||'')+'" data-root-list="'+esc((ids.all||[]).join(','))+'" data-total="'+total+'">'+
+                (remain>0?'查看更多'+remain+'条回复':'查看全部'+total+'条回复')+
+                '</div>';
+        }
+
+        h+='</div>';
+    }
+
+    retur
+
+==== <div class="like"> #2 @ 91291 ====
+="badges">'+b+'</span></div>'+
+        '<div class="content">'+fmt(c.content)+'</div>';
+
+    if(c.image){
+        h+='<img class="mediaImg zoom" src="'+esc(c.image)+'" referrerpolicy="no-referrer" loading="lazy" decoding="async">';
+    }
+    /*
+     * 已经通过 reviewId 官方详情页确认是配音时，
+     * 优先让起点自己的详情页播放器处理真正的音频地址/签名/Cookie。
+     * 不再把从详情HTML里提取到但无法直接播放的URL优先塞给<audio>。
+     */
+    if(c.audioPage){
+        h+=qfAudioPlayerHtml(c);
+    }else if(c.audio){
+        h+='<audio class="audio qfAudioNative" src="'+esc(c.audio)+
+           '" controls preload="metadata"></audio>';
+    }
+
+    h+='<div class="meta">'+esc(meta(c))+'</div></div></div>'+
+       '<div class="like">'+likeSvg()+'<span>'+c.like+'</span></div>';
+
+    if(c.god)h+='<div class="god">神评论</div>';
+
+    var embedded=Array.isArray(c.embedded)?c.embedded:[];
+    var total=Math.max(Number(c.replies||0),embedded.length);
+
+    if(total>0){
+        var rh='',ids=qfCommentRootIds(c);
+
+        /* embedded 只作为网络异常时的本地兜底。正常第一次展开会立即用正式楼中楼第1页替换它，
+           避免出现“前1~2条无标签、继续加载后的回复才有标签”的割裂体验。 */
+        for(var r=0;r<embedded.length;r++){
+            rh+=replyHtml(embedded[r]);
+        }
+
+        if(total>embedded.length&&c.id){
+            rh+='<div class="replyMore replyMoreLocal" '+
+                'data-root="'+esc(ids.primary||c.id)+'" '+
+                'data-root-alt="'+esc(ids.alt||'')+'" '+
+                'data-root-list="'+esc((ids.all||[]).join(','))+'" '+
+                'data-total="'+total+'">'+
+                '继续加载剩余 '+(total-embedded.length)+' 条回复</div>';
+        }
+
+   
+
+==== <div class="rLike"> #1 @ 93503 ====
+ded">'+(c.replyTo?'<span class="replyTo">回复 '+esc(c.replyTo)+'：</span>':'')+fmt(c.content)+'</div><button class="foldBtn hidden" type="button">展开全文</button>';if(c.image)h+='<img class="mediaImg zoom" style="margin-left:36px;max-width:55vw" src="'+esc(c.image)+'" referrerpolicy="no-referrer" loading="lazy" decoding="async">';if(c.audioPage){
+    h+='<div style="margin-left:36px;max-width:58vw">'+qfAudioPlayerHtml(c)+'</div>';
+}else if(c.audio){
+    h+='<audio class="audio qfAudioNative" style="margin-left:36px;max-width:55vw" '+
+       'src="'+esc(c.audio)+'" controls preload="metadata"></audio>';
+}h+='<div class="rMeta">'+esc(meta(c))+'</div><div class="rLike">'+likeSvg()+'<span>'+c.like+'</span></div></div>';return h}
+function url(action,p,ps,extra){
+    extra=extra||{};
+    var tp=extra.type==null?2:Number(extra.type);
+    if(isNaN(tp))tp=2;
+
+    var pid=Number(
+        extra.paragraphId!=null
+            ?extra.paragraphId
+            :para
+    );
+    if(isNaN(pid))pid=Number(segment)||0;
+
+    var q=[
+        "bookId="+encodeURIComponent(bid),
+        "chapterId="+encodeURIComponent(cid),
+        "page="+encodeURIComponent(p||1),
+        "pageSize="+encodeURIComponent(ps||20),
+        "segmentId="+encodeURIComponent(segment),
+        "paragraphId="+encodeURIComponent(pid),
+        "type="+encodeURIComponent(tp)
+    ];
+    if(csrf)q.push("_csrfToken="+encodeURIComponent(csrf));
+
+    return "https://www.qidian.com/ajax/chapterReview/reviewList?"+q.join("&");
+}
+function mobileUrl(p,ps,extra){
+    extra=extra||{};
+    var tp=
+
+==== class="meta" #1 @ 87464 ====
+     '<div class="mainRow"><div class="avatarWrap">'+
+        avHtml(c,false)+
+        '</div><div class="body"><div class="nameRow">'+
+        '<span class="name">'+esc(c.name)+'</span>'+
+        '<span class="badges">'+b+'</span></div>'+
+        (role?'<div class="audioRoleMini">'+esc(role)+'</div>':'')+
+        '<div class="content qfFoldable qfFolded">'+fmt(c.content)+'</div><button class="foldBtn hidden" type="button">展开全文</button>';
+
+    if(c.audioPage){
+        h+=qfAudioPlayerHtml(c);
+    }else if(c.audio){
+        h+='<audio class="audio qfAudioNative" src="'+esc(c.audio)+'" controls preload="metadata"></audio>';
+    }
+
+    h+='<div class="meta">'+esc(meta(c))+'</div></div></div>'+
+       '<div class="like">'+likeSvg()+'<span>'+c.like+'</span></div>';
+
+    var embedded=Array.isArray(c.embedded)?c.embedded:[];
+    var total=Math.max(Number(c.replies||0),embedded.length);
+
+    if(total>0){
+        h+='<div class="audioRepliesPreview" id="rp_'+esc(c.id)+'">';
+
+        var previewCount=Math.min(embedded.length,2);
+        for(var r=0;r<previewCount;r++){
+            h+=qfAudioReplyPreviewHtml(embedded[r]);
+        }
+
+        if(c.id){
+            var remain=Math.max(0,total-previewCount);
+            var ids=qfCommentRootIds(c);
+            h+='<div class="audioMoreReplies replyMoreLocal" data-root="'+esc(ids.primary||c.id)+'" data-root-alt="'+esc(ids.alt||'')+'" data-root-list="'+esc((ids.all||[]).join(','))+'" data-total="'+total+'">'+
+                (remain>0?'查看更多'+remain+'条回复':'查看全部'+total+'条回复')+
+                
+
+==== class="meta" #2 @ 91233 ====
+class="name">'+esc(c.name)+'</span>'+
+        '<span class="badges">'+b+'</span></div>'+
+        '<div class="content">'+fmt(c.content)+'</div>';
+
+    if(c.image){
+        h+='<img class="mediaImg zoom" src="'+esc(c.image)+'" referrerpolicy="no-referrer" loading="lazy" decoding="async">';
+    }
+    /*
+     * 已经通过 reviewId 官方详情页确认是配音时，
+     * 优先让起点自己的详情页播放器处理真正的音频地址/签名/Cookie。
+     * 不再把从详情HTML里提取到但无法直接播放的URL优先塞给<audio>。
+     */
+    if(c.audioPage){
+        h+=qfAudioPlayerHtml(c);
+    }else if(c.audio){
+        h+='<audio class="audio qfAudioNative" src="'+esc(c.audio)+
+           '" controls preload="metadata"></audio>';
+    }
+
+    h+='<div class="meta">'+esc(meta(c))+'</div></div></div>'+
+       '<div class="like">'+likeSvg()+'<span>'+c.like+'</span></div>';
+
+    if(c.god)h+='<div class="god">神评论</div>';
+
+    var embedded=Array.isArray(c.embedded)?c.embedded:[];
+    var total=Math.max(Number(c.replies||0),embedded.length);
+
+    if(total>0){
+        var rh='',ids=qfCommentRootIds(c);
+
+        /* embedded 只作为网络异常时的本地兜底。正常第一次展开会立即用正式楼中楼第1页替换它，
+           避免出现“前1~2条无标签、继续加载后的回复才有标签”的割裂体验。 */
+        for(var r=0;r<embedded.length;r++){
+            rh+=replyHtml(embedded[r]);
+        }
+
+        if(total>embedded.length&&c.id){
+            rh+='<div class="replyMore replyMoreLocal" '+
+                'data-root="'+esc(ids.primary||c.id)+'" '+
+                'data-root-alt="'+esc(ids.alt||'')+'" '+
+                'data-root-list="'+esc((ids.all||[]).join(','))+'" '+
+                'data-total="'+total+'">'+
+                '继续加
+
+==== class="meta" #3 @ 132722 ====
+sArray(chapterAll))take(chapterAll);}catch(_c){}
+    try{for(var k in allCache)if(Object.prototype.hasOwnProperty.call(allCache,k))take(allCache[k]);}catch(_a){}
+    return out;
+}
+function qfImageMediaCardV313(c){
+    c=c||{};
+    var av=avHtml(c,false),meta=[];
+    if(c.timeText)meta.push(c.timeText);else if(c.time)meta.push(timeText(c.time));
+    if(c.ip)meta.push(c.ip);
+    var txt=String(c.content||'').trim();
+    if(txt.length>140)txt=txt.slice(0,140)+'…';
+    return '<div class="imageCard comment" data-id="'+esc(c.id||'')+'">'+
+        '<div class="imageHead">'+av+'<div class="imageWho"><div class="name">'+esc(c.name||'书友')+'</div><div class="meta">'+esc(meta.join(' · '))+'</div></div>'+
+        (Number(c.like||0)>0?'<div class="imageLike">♡ '+esc(String(c.like))+'</div>':'')+'</div>'+
+        '<div class="imageStage"><img class="imageHero zoom" src="'+esc(c.image||'')+'" referrerpolicy="no-referrer" loading="lazy" decoding="async"></div>'+
+        (txt?'<div class="imageCaption">'+fmt(txt)+'</div>':'')+
+        '</div>';
+}
+function renderMediaRows(rows,kind){
+    if(!rows||!rows.length)return 0;
+
+    var out=[],h='';
+
+    for(var i=0;i<rows.length;i++){
+        var rawRow=rows[i]||{};
+
+        if(kind==='audio'&&!rawRow._qfAudioDiag){
+            rawRow._qfAudioDiag=rawAudioDiag(rawRow);
+        }
+
+        var c=adapt(rawRow);
+
+        if(
+            c.audio&&
+            /h5\.if\.qidian\.com\/new\/chapterreview/i.test(String(c.audio))
+        ){
+            rawRow._qfAudioUrl='';
+            c.audio='';
+        }
+
+ 
+
+==== class="rMeta" #1 @ 93467 ====
+div class="rContent qfFoldable qfFolded">'+(c.replyTo?'<span class="replyTo">回复 '+esc(c.replyTo)+'：</span>':'')+fmt(c.content)+'</div><button class="foldBtn hidden" type="button">展开全文</button>';if(c.image)h+='<img class="mediaImg zoom" style="margin-left:36px;max-width:55vw" src="'+esc(c.image)+'" referrerpolicy="no-referrer" loading="lazy" decoding="async">';if(c.audioPage){
+    h+='<div style="margin-left:36px;max-width:58vw">'+qfAudioPlayerHtml(c)+'</div>';
+}else if(c.audio){
+    h+='<audio class="audio qfAudioNative" style="margin-left:36px;max-width:55vw" '+
+       'src="'+esc(c.audio)+'" controls preload="metadata"></audio>';
+}h+='<div class="rMeta">'+esc(meta(c))+'</div><div class="rLike">'+likeSvg()+'<span>'+c.like+'</span></div></div>';return h}
+function url(action,p,ps,extra){
+    extra=extra||{};
+    var tp=extra.type==null?2:Number(extra.type);
+    if(isNaN(tp))tp=2;
+
+    var pid=Number(
+        extra.paragraphId!=null
+            ?extra.paragraphId
+            :para
+    );
+    if(isNaN(pid))pid=Number(segment)||0;
+
+    var q=[
+        "bookId="+encodeURIComponent(bid),
+        "chapterId="+encodeURIComponent(cid),
+        "page="+encodeURIComponent(p||1),
+        "pageSize="+encodeURIComponent(ps||20),
+        "segmentId="+encodeURIComponent(segment),
+        "paragraphId="+encodeURIComponent(pid),
+        "type="+encodeURIComponent(tp)
+    ];
+    if(csrf)q.push("_csrfToken="+encodeURIComponent(csrf));
+
+    return "https://www.qidian.com/ajax/chapterReview/reviewList?"+q.join("&");
+}
+function mobileUrl(p,ps,extr
