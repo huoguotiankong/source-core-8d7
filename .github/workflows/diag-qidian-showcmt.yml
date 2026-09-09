@@ -1,0 +1,44 @@
+name: diag-qidian-showcmt
+on:
+  push:
+    paths: ['.staging/diag-qidian-showcmt.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Extract show comment functions
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          a=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text()); s=a[0] if isinstance(a,list) else a
+          lib=s['jsLib']; x=lib.index('var QF_MOD38_PACK=')+len('var QF_MOD38_PACK='); y=lib.index(';\nvar QF_MOD38_EXPORTS=',x); pack=json.loads(lib[x:y])
+          def dec(v):
+            if not v.startswith('gz:'): return v
+            z=v[3:]; z+='='*((4-len(z)%4)%4); return gzip.decompress(base64.b64decode(z)).decode()
+          out=[]
+          for k,v in pack.items():
+            code=dec(v)
+            for name in ['showCmtV20','qdShow','qfReview','showComment','CommentPage','ReviewPage']:
+              for m in re.finditer(r'function\s+([A-Za-z0-9_$]*'+name+'[A-Za-z0-9_$]*)\s*\(',code,re.I):
+                st=m.start(); brace=code.find('{',m.end()); depth=0; en=min(len(code),st+25000)
+                if brace>=0:
+                  i=brace
+                  while i<len(code):
+                    c=code[i]
+                    if c=='{': depth+=1
+                    elif c=='}':
+                      depth-=1
+                      if depth==0: en=i+1; break
+                    i+=1
+                out.append('### '+k+' '+m.group(1)+'\n'+code[st:en])
+          Path('.staging/qidian-showcmt.txt').write_text('\n\n'.join(out)[:180000])
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-showcmt.txt
+          git commit -m 'chore: dump show comment functions'
+          git push origin main
