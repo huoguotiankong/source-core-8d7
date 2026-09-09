@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta35：把评论点赞移动到时间/地点元信息行，正文区域不再被点赞占位。",
+  "summary": "Beta36：继续压缩评论页头像、缩进与卡片留白，提高同屏文字和回复密度。",
   "badges": [
     "Beta",
-    "1.1.0-beta35",
-    "点赞归位"
+    "1.1.0-beta36",
+    "评论紧凑"
   ],
   "sections": [
     {
       "title": "本版更新",
-      "text": "点赞按钮不再悬在评论正文右侧，根评论与楼中楼都移动到时间/IP/楼层这一行，并改为紧凑横向图标+数字。"
+      "text": "在 Beta35 点赞已归位元信息行的基础上，继续收紧头像、评论卡片留白、回复缩进与楼中楼间距。"
     },
     {
-      "title": "信息密度",
-      "text": "评论正文获得完整横向宽度；只有元信息行右侧为点赞保留少量空间，更接近起点原生的紧凑布局。"
+      "title": "阅读密度",
+      "text": "正文主字号保持不变；主要从无效空白和缩进中回收空间，让同屏能显示更多评论文字与更多回复。"
     },
     {
-      "title": "保留范围",
-      "text": "评论数据、排序、身份标签、图片/配音、楼中楼展开和继续加载均不改。"
+      "title": "冻结范围",
+      "text": "评论接口、排序、分页、标签、图片/配音、回复加载、X限免 Provider 和其它业务域均不改。"
     },
     {
       "title": "版本状态",
-      "text": "当前为 Beta / 测试通道，真机确认后再考虑进入 Stable。"
+      "text": "Beta / 测试通道，等待真机确认。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11035",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11035",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11035"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11036",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11036",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11036"
 }
