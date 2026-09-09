@@ -1,0 +1,40 @@
+name: diag-qidian-comment-modal
+on:
+  push:
+    paths: ['.staging/diag-qidian-comment-modal.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Locate modal UI strings
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          a=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text()); s=a[0] if isinstance(a,list) else a
+          lib=s['jsLib']; x=lib.index('var QF_MOD38_PACK=')+len('var QF_MOD38_PACK='); y=lib.index(';\nvar QF_MOD38_EXPORTS=',x); pack=json.loads(lib[x:y])
+          def dec(v):
+            if not isinstance(v,str): return ''
+            if not v.startswith('gz:'): return v
+            z=v[3:]; z+='='*((4-len(z)%4)%4); return gzip.decompress(base64.b64decode(z)).decode()
+          kws=['推荐排序','起点本地','收起回复','加载更多回复','全部','配图','配音','默认','热门','最新']
+          out=[]
+          for k,v in pack.items():
+            code=dec(v)
+            idx=[]
+            for kw in kws:
+              for m in re.finditer(re.escape(kw),code): idx.append((m.start(),kw))
+            if not idx: continue
+            out.append('### MODULE '+k+' LEN '+str(len(code)))
+            for pos,kw in sorted(idx)[:40]:
+              out.append('--- '+kw+' @'+str(pos)+' ---\n'+code[max(0,pos-2600):min(len(code),pos+7000)])
+          Path('.staging/qidian-comment-modal.txt').write_text('\n\n'.join(out)[:200000])
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-comment-modal.txt
+          git commit -m 'chore: dump qidian comment modal UI'
+          git push origin main
