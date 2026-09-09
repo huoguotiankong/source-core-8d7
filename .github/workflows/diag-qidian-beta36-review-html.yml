@@ -1,0 +1,34 @@
+name: diag-qidian-beta36-review-html
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta36-review-html.trigger']
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Dump review_local_ui module
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(p.read_text()); s=arr[0] if isinstance(arr,list) else arr
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+          v=pack['review_local_ui']
+          if v.startswith('gz:'):
+            z=v[3:]; z += '='*((4-len(z)%4)%4); code=gzip.decompress(base64.b64decode(z)).decode()
+          else: code=v
+          out=[]
+          for pat in ['class="comment','class=\\"comment','class="mainRow','class=\\"mainRow','class="meta','class=\\"meta','class="like','class=\\"like','replyWrap','replies','rMeta','rLike']:
+            i=code.find(pat)
+            if i>=0: out.append('\n===== '+pat+' =====\n'+code[max(0,i-1200):min(len(code),i+3500)])
+          Path('.staging/review_local_ui-beta36-dump.txt').write_text('\n'.join(out) or code[:12000])
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/review_local_ui-beta36-dump.txt
+          git commit -m 'chore: dump qidian beta36 review html anchors'
+          git push origin main
