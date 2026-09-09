@@ -1,0 +1,39 @@
+name: diag-qidian-comment-css
+on:
+  push:
+    paths: ['.staging/diag-qidian-comment-css.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Locate comment CSS builders
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          a=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text()); s=a[0] if isinstance(a,list) else a
+          lib=s['jsLib']; x=lib.index('var QF_MOD38_PACK=')+len('var QF_MOD38_PACK='); y=lib.index(';\nvar QF_MOD38_EXPORTS=',x); pack=json.loads(lib[x:y])
+          def dec(v):
+            if not isinstance(v,str): return ''
+            if not v.startswith('gz:'): return v
+            z=v[3:]; z+='='*((4-len(z)%4)%4); return gzip.decompress(base64.b64decode(z)).decode()
+          keys=['<style','font-size','border-radius','display:flex','grid-template','like','thumb','agree','digg','reply','回复','评论']
+          out=[]
+          for k,v in pack.items():
+            code=dec(v)
+            if not ('<style' in code or 'style>' in code): continue
+            score=sum(code.lower().count(q.lower()) for q in ['like','digg','reply','comment']) + code.count('回复') + code.count('评论')
+            if score<2: continue
+            out.append('### MODULE '+k+' score='+str(score)+' len='+str(len(code)))
+            for m in re.finditer(r'<style|style>|like|digg|reply|回复|评论',code,re.I):
+              pos=m.start(); out.append(code[max(0,pos-3200):min(len(code),pos+9000)])
+          Path('.staging/qidian-comment-css.txt').write_text('\n\n'.join(out)[:220000])
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-comment-css.txt
+          git commit -m 'chore: dump qidian comment CSS builders'
+          git push origin main
