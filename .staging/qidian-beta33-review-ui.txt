@@ -1,0 +1,2606 @@
+### review LEN 43885 HITS 112
+
+/* v4.0.0-alpha19：正文性能⑪——热评/作者说/本章说视觉层短 LRU。缓存纯 SVG Base64，点击 metadata 仍按章节动态生成；命中时跳过 SVG 字符串构建、Java 获取和 base64Encode。评论数据/TitleInfoList/楼中楼链不改。 */
+/* v4.0.0-alpha18：正文性能⑩——评论装饰对象池 + 点击参数延迟构建。Decoration Plan 改用可复用紧凑行对象；quote 的 URI/JS escape 只在真正生成可点击气泡/热评时计算一次；同章 click context 复用；lineExtra 去除小数组对象。TitleInfoList/标签解析链不改。 */
+/* v4.0.0-alpha17：正文性能⑨——最终输出单次组装。正文行不再反复 += 气泡/热评；作者说/本章说不再对已 join 的整章正文继续 +=；只显示尾卡时跳过 textIdx/媒体索引构建；热评单开时非 hot 段不进入 decoration plan。 */
+/* alpha16：纯文字媒体检测快路径；无媒体正文跳过 Markdown/img replace，lines 无媒体时不逐行跑 img regex。 */
+/* v4.0.0-alpha15：正文性能⑦——正文行/文本索引一次建模；评论 item 单次规划后复用给热评预取与装饰；气泡 SVG Base64 进入共享 LRU；标题 quote 仅有章名气泡时写缓存。 */
+/* alpha81 shared import */
+var __qfRc81=QF_MOD38_CACHE["review_common"]||qfModuleEnsureV38.call(this,"review_common");
+var qdBubbleDataV20=__qfRc81.qdBubbleDataV20;
+var qdQtAuthorSayCardV332=__qfRc81.qdQtAuthorSayCardV332;
+
+/* ============================================================
+ * v4.0.0-alpha11 · Chapter Review Decoration Snapshot
+ *
+ * 这是“最终装饰结果”的短期内存快照，不替代任何官方数据缓存：
+ * - 本地评论 120s；服务器评论 60s；
+ * - 只保留最近 5 个 chapter/mode 组合；
+ * - key 绑定正文轻签名、正文 Provider、评论路由、四个显示开关、智能对齐开关；
+ * - 命中后恢复 chapter title bubble 副作用，再直接返回已经生成好的 body。
+ *
+ * 目的：返回上一章/重复打开同章时，不再重复执行 summary、章末预览、热评、
+ * paragraph map、SVG/base64 构建和作者说/本章说拼接。
+ * ============================================================ */
+var QF_REVIEW_SNAP460={},QF_REVIEW_SNAP460_ORDER=[],QF_REVIEW_SNAP460_MAX=5;
+function qdReviewSnapSigV460(s){
+    s=String(s||'');var n=s.length,h=2166136261>>>0;
+    function mixAt(a,b){for(var i=a;i<b&&i<n;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}}
+    mixAt(0,96);
+    if(n>192){var m=Math.max(96,Math.floor(n/2)-48);mixAt(m,m+96);}
+    if(n>96)mixAt(Math.max(0,n-96),n);
+    return n.toString(36)+'-'+h.toString(36);
+}
+function qdReviewSnapKeyV460(bid,cid,isPaid,provider,serverProvider,flags,smart,content){
+    flags=flags||{};
+    return [String(bid),String(cid),isPaid?'1':'0',String(provider||''),String(serverProvider||''),
+        flags.bubble?'1':'0',flags.hot?'1':'0',flags.talk?'1':'0',flags.author?'1':'0',smart?'1':'0',qdReviewSnapSigV460(content)].join('|');
+}
+function qdReviewSnapGetV460(key,serverMode){
+    var o=QF_REVIEW_SNAP460[String(key||'')],ttl=serverMode?60000:120000;
+    if(!o)return null;
+    if(Date.now()-Number(o.ts||0)>ttl){delete QF_REVIEW_SNAP460[key];var ix=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(ix>=0)QF_REVIEW_SNAP460_ORDER.splice(ix,1);return null;}
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0){QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);}
+    return o;
+}
+function qdReviewSnapPutV460(key,body,titleCount,titleHot){
+    body=String(body==null?'':body);if(!key||!body||body.length>420000)return;
+    QF_REVIEW_SNAP460[key]={ts:Date.now(),body:body,titleCount:Number(titleCount||0)||0,titleHot:!!titleHot};
+    var i=QF_REVIEW_SNAP460_ORDER.indexOf(key);if(i>=0)QF_REVIEW_SNAP460_ORDER.splice(i,1);QF_REVIEW_SNAP460_ORDER.push(key);
+    while(QF_REVIEW_SNAP460_ORDER.length>QF_REVIEW_SNAP460_MAX){var old=QF_REVIEW_SNAP460_ORDER.shift();delete QF_REVIEW_SNAP460[old];}
+}
+function qdReviewSnapRestoreTitleV460(bid,cid,showBubble,snap){
+    try{
+        var ch=qfChapter(this);if(!ch||!ch.putImgUrl)return;
+        if(showBubble&&snap&&Number(snap.titleCount||0)>0){
+            ch.putImgUrl(qdBubbleDataV20.call(this,Number(snap.titleCount||0),bid,cid,-1,0,!!snap.titleHot));
+        }else ch.putImgUrl(null);
+    }catch(_e){}
+}
+
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qdV20List(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e){}
+    return [];
+}
+function qdV20CommentText(c){
+    c=c||{};
+    var t=c.text||c.ReviewContent||c.reviewContent||c.Content||c.content||
+        c.Body||c.Subject||c.CommentContent||
+        (c.raw&&(c.raw.text||c.raw.ReviewContent||c.raw.Content||c.raw.content))||"";
+    if(typeof t==="object")t=t.Text||t.text||t.Content||t.content||"";
+    return qfEmojiV13(String(t||""));
+}
+function qdV20CleanCommentText(s){
+    return qfEmojiV13(String(s||""))
+        .replace(/https?:\/\/[^\s]+/g,"")
+        .replace(/qdd\.gg\/[^\s]+/g,"")
+        .replace(/<[^>]+>/g,"")
+        .trim();
+}
+function qdV20CommentUser(c){
+    c=c||{};
+    var u=c.user_info||c.UserInfo||c.User||c.user||c.raw||{};
+    return {
+        name:String(u.user_name||u.UserName||u.NickName||u.nickname||c.nickname||c.UserName||c.userName||"书友"),
+        avatar:String(u.user_avatar||u.UserHeadIcon||u.Avatar||u.avatar||c.avatar||c.UserHeadIcon||"")
+    };
+}
+function qdV20CommentLike(c){
+    c=c||{};
+    return Number(c.digg_count||c.like_count||c.LikeCount||c.likeCount||c.DiggCount||
+        c.AgreeAmount||c.Likes||(c.raw&&(c.raw.LikeCount||c.raw.DiggCount||c.raw.AgreeAmount))||0)||0;
+}
+function qdV20CommentReply(c){
+    c=c||{};
+    return Number(c.reply_count||c.ReplyCount||c.replyCount||c.CommentCount||c.commentCount||
+        (c.raw&&(c.raw.ReplyCount||c.raw.CommentCount))||0)||0;
+}
+/* alpha18：Decoration Plan 行对象池。
+ * 一章完成后立即归还；仅复用段落位置/quote 等瞬时装饰数据，不缓存评论实体。
+ * tuple: 0=item,1=pid,2=count,3=seg,4=lineIndex,5=quote,6=uriEncoded,7=jsEscaped,8=hot */
+var QF_DECOR_ROW490_POOL=[],QF_DECOR_ROW490_MAX=128;
+function qdDecorRowAllocV490(it,pid,cnt,seg,ix,quote,hot){
+    var r=QF_DECOR_ROW490_POOL.length?QF_DECOR_ROW490_POOL.pop():new Array(9);
+    r[0]=it;r[1]=pid;r[2]=cnt;r[3]=seg;r[4]=ix;r[5]=quote;r[6]=null;r[7]=null;r[8]=hot?1:0;return r;
+}
+function qdDecorRowQuoteV490(r){
+    if(r[6]===null){var q='';try{q=encodeURIComponent(String(r[5]||''));}catch(_qe490){q='';}r[6]=q;r[7]=qfEscJsV13(q);}return String(r[6]||'');
+}
+function qdDecorRowQuoteJsV490(r){if(r[7]===null)qdDecorRowQuoteV490(r);return String(r[7]||'');}
+function qdDecorRowsReleaseV490(plan){
+    if(!plan||!plan.length)return;
+    for(var i=0;i<plan.length&&QF_DECOR_ROW490_POOL.length<QF_DECOR_ROW490_MAX;i++){
+        var r=plan[i];if(!r)continue;for(var k=0;k<9;k++)r[k]=null;QF_DECOR_ROW490_POOL.push(r);
+    }
+}
+
+/* alpha19：低频正文卡片只缓存“视觉层”，绝不缓存 click / ReviewId / 评论实体。
+ * 同一作者说/本章说/热评在返回章节或快照失效后可直接复用 Base64，减少 SVG 拼接与 Java Bridge。
+ * 36 项 LRU 仅常驻很小的 data URI；业务内容变化会自然产生不同 key。 */
+var QF_CARD_VIS500={},QF_CARD_VIS500_ORDER=[],QF_CARD_VIS500_MAX=36;
+function qdCardVisKeyV500(kind,sig){return String(kind||'')+'\u001f'+String(sig||'');}
+function qdCardVisGetV500(kind,sig){
+    var key=qdCardVisKeyV500(kind,sig),v=QF_CARD_VIS500[key];if(!v)return '';
+    var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0){QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);}return v;
+}
+function qdCardVisPutV500(j,kind,sig,svg){
+    if(!j||!svg)return '';
+    var key=qdCardVisKeyV500(kind,sig),base='';try{base='data:image/svg+xml;base64,'+j.base64Encode(svg);}catch(_e){return '';}
+    if(!base)return '';
+    QF_CARD_VIS500[key]=base;var i=QF_CARD_VIS500_ORDER.indexOf(key);if(i>=0)QF_CARD_VIS500_ORDER.splice(i,1);QF_CARD_VIS500_ORDER.push(key);
+    while(QF_CARD_VIS500_ORDER.length>QF_CARD_VIS500_MAX){var old=QF_CARD_VIS500_ORDER.shift();delete QF_CARD_VIS500[old];}
+    return base;
+}
+
+function qdHotHtmlV20(c,bid,cid,pid,seg,quote,quoteEncoded,quoteJsEncoded){
+    if(!c||!c.content)return "";
+    var t=String(c.content||"").replace(/\s+/g," ").trim();if(t.length>22)t=t.substring(0,22)+"…";
+    var like=Number(c.like||0)||0,meta=like>0?("♡ "+(like>999?"999+":like)):"查看段评 ›";
+    var visualSig=t+'\u001f'+meta,base=qdCardVisGetV500('hot',visualSig);
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var svg='<svg width="1000" height="122" xmlns="http://www.w3.org/2000/svg">'+
+            '<rect x="2" y="5" width="996" height="104" fill="rgba(255,250,248,0.72)" rx="30" stroke="#F0D9D3" stroke-width="1"/>'+
+            '<rect x="27" y="28" width="122" height="50" rx="25" fill="#EF5B50"/>'+
+            '<text x="88" y="62" font-size="28" fill="#FFF" text-anchor="middle" font-weight="700">热评</text>'+
+            '<text x="174" y="63" font-size="33" fill="#252525" font-weight="600">'+qfEscV13(t)+'</text>'+
+            '<text x="962" y="63" font-size="25" fill="#9A8B87" text-anchor="end">'+qfEscV13(meta)+'</text></svg>';
+        base=qdCardVisPutV500(j,'hot',visualSig,svg);if(!base)return "";
+    }
+    var qe=quoteEncoded==null?"":String(quoteEncoded),qj=quoteJsEncoded==null?"":String(quoteJsEncoded);
+    if(quoteEncoded==null){try{qe=encodeURIComponent(String(quote||""));}catch(_qe){qe="";}}
+    if(quoteJsEncoded==null)qj=qfEscJsV13(qe);
+    var click="showCmtV20('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+pid+"','"+seg+"','dp','"+qj+"','"+String(Number(c.total||c.replyCount||0)||0)+"')";
+    var d=base+',{"style":"FULL","type":"qd","click":'+JSON.stringify(click)+'}';
+    return '<img src="'+d.replace(/"/g,"&quot;")+'">';
+}
+function qdAuthorSayCardV20(text,bid,cid,provider){
+    text=String(text||"").trim();if(!qfAuthorSayRealV327(text))return "";
+    provider=String(provider||"");
+    var clickable=(provider===""||provider==="晴天");
+    var author=qfBookVarV09.call(this,"qf_author","作者"),w=1080,lp=62,rp=62,font="system-ui,Arial,sans-serif";
+    /* alpha3.6：旧版固定 slice(27) 没考虑汉字/英文实际宽度，38px 字号下 27 个汉字会超过正文宽度。
+       改按视觉宽度估算换行；保留原文换行，同时避免标点单独掉到下一行。 */
+    function unit(ch){
+        if(/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(ch))return 1;
+        if(/[A-Z0-9]/.test(ch))return .68;
+        if(/[a-z]/.test(ch))return .56;
+        if(/\s/.test(ch))return .32;
+        return .52;
+    }
+    function wrap(src,limit,maxRows){
+        var out=[],paras=String(src||'').replace(/\r/g,'').split('\n');
+        for(var p=0;p<paras.length&&out.length<maxRows;p++){
+            var ss=paras[p],line='',u=0;
+            if(!ss){if(out.length&&out[out.length-1]!=='')out.push('');continue;}
+            for(var i=0;i<ss.length&&out.length<maxRows;i++){
+                var ch=ss.charAt(i),cu=unit(ch);
+                if(line&&u+cu>limit){
+                    /* 句号/逗号等不要单独成为下一行首字符。 */
+                    if(/[，。！？；：、,.!?;:）】》”’]/.test(ch)){line+=ch;out.push(line);line='';u=0;continue;}
+                    out.push(line);line=ch;u=cu;
+                }else{line+=ch;u+=cu;}
+            }
+            if(line&&out.length<maxRows)out.push(line);
+        }
+        if(out.length>maxRows)out=out.slice(0,maxRows);
+        var consumed=out.join('').replace(/\s/g,'').length,full=String(src||'').replace(/\s/g,'').length;
+        if(out.length&&consumed<full){var last=out.length-1;out[last]=out[last].replace(/[，。！？；：、,.!?;:\s]+$/,'');if(out[last].length>1)out[last]=out[last].slice(0,-1)+'…';else out[last]+='…';}
+        return out;
+    }
+    var rows=wrap(text,29.0,4),right=provider==="晴天"?"晴天 · 查看 ›":(!provider?"起点官方 · 查看 ›":provider+"服务器");
+    var visualSig=String(author)+'\u001f'+right+'\u001f'+rows.join('\n'),base=qdCardVisGetV500('author',visualSig),y=96,svg='';
+    svg+='<rect x="34" y="25" width="164" height="52" rx="26" fill="#4A74E4"/>'+ 
+         '<text x="116" y="60" font-size="28" font-family="'+font+'" fill="#fff" font-weight="700" text-anchor="middle">作者说</text>'+ 
+         '<text x="'+(w-rp)+'" y="59" font-size="24" text-anchor="end" font-family="'+font+'" fill="#8992A2">'+qfEscV13(right)+'</text>';
+    y+=30;
+    svg+='<text x="'+lp+'" y="'+y+'" font-size="28" font-family="'+font+'" fill="#4A5570" font-weight="650">'+qfEscV13(author||"作者")+'</text>';y+=48;
+    for(var i=0;i<rows.length;i++){
+        if(rows[i]===''){y+=20;continue;}
+        svg+='<text x="'+lp+'" y="'+y+'" font-size="31" font-family="'+font+'" fill="#27282B" font-weight="400">'+qfEscV13(rows[i])+'</text>';y+=47;
+    }
+    y+=25;
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var final='<svg width="'+w+'" height="'+y+'" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="'+(w-4)+'" height="'+(y-4)+'" rx="38" fill="rgba(249,250,255,0.34)" stroke="#DDE2ED" stroke-width="1"/>'+svg+'</svg>';
+        base=qdCardVisPutV500(j,'author',visualSig,final);if(!base)return "";
+    }
+    if(!clickable)return '<img src="'+base.replace(/"/g,'&quot;')+'">';
+    var openProvider=provider==="晴天"?"晴天":"",payload="",authorPayload="";
+    if(!openProvider){try{payload=encodeURIComponent(text);authorPayload=encodeURIComponent(String(author||""));}catch(_ep){payload=String(text||"");authorPayload=String(author||"");}}
+    var ob={style:"FULL",type:"qd",click:"qfOpenAuthorSayV314('"+qfEscJsV13(bid)+"','"+qfEscJsV13(cid)+"','"+qfEscJsV13(openProvider)+"','"+qfEscJsV13(payload)+"','"+qfEscJsV13(authorPayload)+"')"};
+    return '<img src="'+(base+','+JSON.stringify(ob)).replace(/"/g,'&quot;')+'">';
+}
+
+function qdChapterTalkCardV20(rawList,total,bid,cid){
+    var src=qdV20List(rawList),list=[];
+    for(var i=0;i<src.length&&list.length<2;i++){var c=src[i]||{},txt=qdV20CleanCommentText(qdV20CommentText(c));if(!txt)continue;var u=qdV20CommentUser(c);list.push({name:u.name,content:txt,like:qdV20CommentLike(c),reply:qdV20CommentReply(c)});}
+    /* beta22：本章说卡只展示真实评论预览。没有任何可展示评论时不生成提示占位卡。 */
+    if(!list.length)return "";
+    var totalNum=Number(total);if(!isFinite(totalNum)||totalNum<1)totalNum=list.length;
+    var sigParts=[String(totalNum)];for(var si=0;si<list.length;si++){var sc=list[si];sigParts.push(String(sc.name||''),String(sc.content||''),String(sc.like||0),String(sc.reply||0));}
+    var visualSig=sigParts.join('\u001f'),base=qdCardVisGetV500('chapter',visualSig);
+    var w=1080,lp=58,rp=58,y=104,svg="",font="system-ui,Arial,sans-serif",rightText=totalNum+' 条评论 ›';
+    svg+='<rect x="34" y="28" width="178" height="58" rx="29" fill="#5E9A76"/>'+
+         '<text x="123" y="67" font-size="31" font-family="'+font+'" fill="#fff" font-weight="700" text-anchor="middle">本章说</text>'+
+         '<text x="'+(w-rp)+'" y="67" font-size="29" text-anchor="end" font-family="'+font+'" fill="#7D8D84">'+qfEscV13(rightText)+'</text>';
+    for(var k=0;k<list.length;k++){
+        var c2=list[k],tx=c2.content,rows=[],max=24;while(tx){rows.push(tx.slice(0,max));tx=tx.slice(max);}if(rows.length>2){rows=rows.slice(0,2);rows[1]=rows[1].slice(0,max-1)+"…";}
+        y+=32;svg+='<line x1="'+lp+'" y1="'+y+'" x2="'+(w-rp)+'" y2="'+y+'" stroke="#E7ECE9" stroke-width="1"/>';y+=54;
+        svg+='<text x="'+lp+'" y="'+y+'" font-size="34" font-family="'+font+'" fill="#4F5B54" font-weight="700">'+qfEscV13(c2.name||"书友")+'</text>';
+        var meta=[];if(c2.reply>0)meta.push(c2.reply+"回复");if(c2.like>0)meta.push("♡ "+c2.like);if(meta.length)svg+='<text x="'+(w-rp)+'" y="'+y+'" font-size="27" text-anchor="end" font-family="'+font+'" fill="#9AA39E">'+meta.join(" · ")+'</text>';
+        y+=56;for(var rr=0;rr<rows.length;rr++){svg+='<text x="'+lp+'" y="'+y+'" font-size="38" font-family="'+font+'" fill="#222">'+qfEscV13(rows[rr])+'</text>';y+=55;}y+=12;
+    }
+    y+=28;
+    if(!base){
+        var j=qfImageJavaV14(this);if(!j)return "";try{if(typeof j.base64Encode!=="function")return "";}catch(e0){return "";}
+        var final='<svg width="'+w+'" height="'+y+'" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="'+(w-4)+'" height="'+(y-4)+'" rx="44" fill="rgba(250,253,251,0.38)" stroke="#D9E4DD" stroke-width="1"/>'+svg+'</svg>';
+        base=qdCardVisPutV500(j,'chapter',visualSig,final);if(!base)return "";
+    }
+    var ob={style:"FULL",type:"qd",click:"showCmtV20('"+String(bid)+"','"+String(cid)+"','-1','0','zp','','"+String(totalNum)+"')"};
+    return '<img src="'+base+','+JSON.stringify(ob)+'">';
+}
+
+/* ---------- 作者说 ---------- */
+
+function qdBubbleImageV20(count,bid,cid,pid,seg,hot,quote,quoteEncoded,quoteJsEncoded){
+    var u=qdBubbleDataV20.call(this,count,bid,cid,pid,seg,hot,quote,quoteEncoded,quoteJsEncoded);
+    return u?'<img src="'+u.replace(/"/g,"&quot;")+'">':"";
+}
+/* ---------- 热评 ---------- */
+
+/* alpha15：旧流程先 split/filter 一遍正文，再单独扫描 lines 建 textIdx。
+ * 这里把两次 O(n) 遍历合并；lines 的输出语义保持不变。 */
+function qdV22BuildLinesV470(content,needTextIdx){
+    var src=String(content||"");if(src.indexOf("\r")>=0)src=src.replace(/\r/g,"");
+    var raw=src.split("\n"),lines=[],idx=[],needIdx=(needTextIdx!==false),hasMedia=false;
+    /* alpha17：只显示作者说/本章说时最终输出仍保持旧版 trim/去空行语义，
+       但不再建立完全用不到的 textIdx，也不再执行媒体判定。 */
+    if(needIdx)hasMedia=(src.indexOf("data:image/")>=0)||(src.indexOf("<")>=0&&/<\s*img\b/i.test(src));
+    for(var i=0;i<raw.length;i++){
+        var t=String(raw[i]||"").trim();if(!t)continue;
+        var pos=lines.length;lines.push(t);
+        if(needIdx&&(!hasMedia||(!/^<\s*img\b/i.test(t)&&t.indexOf("data:image/")<0)))idx.push(pos);
+    }
+    return {lines:lines,textIdx:idx};
+}
+
+
+
+/* ============================================================
+ * v2.9.4 基础运行时恢复
+ * 只恢复被误删的通用 helper，不恢复任何私人服务器。
+ * ============================================================ */
+
+function qdFetchCommentsV20(bid,cid,pid,seg,quote){
+    return qdFetchOfficialCommentsV20.call(this,bid,cid,pid,seg,quote);
+}
+/* ---------- 起点源附件同款 官方章评 ---------- */
+
+function qfTextKeepMediaV323(v){
+    var src=String(v==null?"":v),hint=0;
+    /* alpha16：普通小说正文几乎从不含“<”或“![”，先用 indexOf 过滤掉全局媒体 regex。 */
+    if(src.indexOf("<")>=0&&/<img\b/i.test(src))hint|=1;
+    if(src.indexOf("![")>=0&&src.indexOf("](")>=0&&/!\[[^\]]*\]\(https?:\/\//i.test(src))hint|=2;
+    if(!(hint&3))return qfText(src);
+    var imgs=[];
+    if(hint&2){
+        src=src.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/gi,function(_m,alt,url){
+            return '<img src="'+String(url||'').replace(/"/g,'&quot;')+'" alt="'+String(alt||'').replace(/"/g,'&quot;')+'">';
+        });
+        hint|=1;
+    }
+    if(hint&1){
+        src=src.replace(/<img\b[^>]*>/gi,function(tag){
+            var t=String(tag||'');
+            t=t.replace(/(\bsrc\s*=\s*["'])\/\//i,'$1https://');
+            imgs.push(t);
+            return "\nQFIMGV323_"+(imgs.length-1)+"_END\n";
+        });
+    }
+    var out=qfText(src);
+    if(imgs.length){
+        out=out.replace(/QFIMGV323_(\d+)_END/g,function(_m,n){n=Number(n);return n>=0&&n<imgs.length?imgs[n]:"";});
+        out=out.replace(/(^|\n)\s*我的彩蛋章\s*-?\s*\d{8,}\s*-\s*\d+\s*插图\s*(?=\n|$)/g,'$1');
+        out=out.replace(/\n{3,}/g,'\n\n').trim();
+    }
+    return out;
+}
+
+/* alpha35：晴天评论轻量路径。
+ * 正文只读取 /api/comments 的数量索引来画气泡；不读取 /comments、/chapterComments 详情。
+ * 热评排序/列表交给晴天原生页面，不再在正文阶段做任何评论详情请求。
+ */
+
+/* beta17.2：情无正文 + 起点本地段评的快速索引。
+ * 情无正文服务器本身已经提供 comments.php?action=summary，ParagraphId 与情无正文天然对齐。
+ * 本地模式只借它画气泡/判断热段；真正点击段评仍进入起点本地评论页。
+ * 这样避免每章正文阶段都串行执行起点 PC+移动 reviewSummary 双兜底。 */
+function qfQwLocalFastIndexV3172(bid,cid){
+    var cacheObj=qfRuntimeCacheV13(this),key="qf-qw-local-fast-index-v3172-"+String(bid)+"-"+String(cid),now=Date.now();
+    try{
+        if(cacheObj&&qfCallableV13(cacheObj,"getFromMemory")){
+            var old=String(cacheObj.getFromMemory(key)||"");
+            if(old){var co=JSON.parse(old);if(co&&co.ts&&now-Number(co.ts)<120000&&Array.isArray(co.items))return co.items;}
+        }
+    }catch(_c0){}
+    var out=[];
+    try{
+        var fn=qfModuleFnV38.call(this,"review_server_core","qfQwCommentApiV315");
+        if(typeof fn!=="function")return out;
+        var r=fn.call(this,"summary",{book_id:bid,chapter_id:cid})||{},d=r.Data||r.data||{},box=d.Getparagraphscommentcounts||d.getparagraphscommentcounts||d.GetParagraphsCommentCounts||{},list=box.DataList||box.dataList||box.List||box.list||[];
+        if(!Array.isArray(list)){try{list=Java.from(list);}catch(_ja){list=[];}}
+        var seen={},title=null;
+        for(var i=0;i<list.length;i++){
+            var x=list[i]||{},pid=Number(x.ParagraphId!==undefined?x.ParagraphId:(x.paragraphId!==undefined?x.paragraphId:(x.ParagraphsId!==undefined?x.ParagraphsId:x.paragraphsId))),cnt=Number(x.CommentCount!==undefined?x.CommentCount:(x.commentCount!==undefined?x.commentCount:(x.TextCount!==undefined?x.TextCount:(x.textCount!==undefined?x.textCount:(x.ReviewCount!==undefined?x.ReviewCount:x.reviewCount)))))||0;
+            if(isNaN(pid)||cnt<=0)continue;
+            var it={paragraphId:pid>0?pid:-1,segmentId:pid>0?pid:0,count:cnt,reviewId:String(x.ReviewId||x.reviewId||""),hot:Number(x.HasHotComment||x.hasHotComment||0)!==0,quote:String(x.QuoteContent||x.quoteContent||x.ParagraphContent||x.paragraphContent||""),raw:x};
+            if(pid<=0){if(!title||cnt>Number(title.count||0))title=it;continue;}
+            var k=String(pid);if(!seen[k]||cnt>Number(seen[k].count||0))seen[k]=it;
+        }
+        if(title)out.push(title);
+        for(var k2 in seen)if(Object.prototype.hasOwnProperty.call(seen,k2))out.push(seen[k2]);
+        out.sort(function(a,b){if(Number(a.paragraphId)<0)return -1;if(Number(b.paragraphId)<0)return 1;return Number(a.paragraphId)-Number(b.paragraphId);});
+    }catch(_e){}
+    try{if(cacheObj&&qfCallableV13(cacheObj,"putMemory"))cacheObj.putMemory(key,JSON.stringify({ts:now,items:out}));}catch(_c1){}
+    return out;
+}
+
+function qdDecorateContentV26(content,bid,cid,isPaid,provider,hotCtx){
+    var _dAll=Date.now(),_dStage=Date.now();
+    /* alpha23：保留正文中的彩蛋章/插图 img，普通文本仍沿用 qfText 清洗。 */
+    content=qfTextKeepMediaV323(content);
+    if(!content||!bid||!cid)return content;
+    hotCtx=(hotCtx&&typeof hotCtx==='object')?hotCtx:{};
+    var hf=hotCtx.flags&&typeof hotCtx.flags==='object'?hotCtx.flags:null;
+    /* alpha9：正文入口已经读取过一次四个显示开关，模块直接复用；旧入口仍兼容独立读取。 */
+    var showBubble=hf?!!hf.bubble:qfToggle.call(this,"起点段评",true);
+    var showHot=hf?!!hf.hot:qfToggle.call(this,"热评显示",true);
+    var showTalk=hf?!!hf.talk:qfToggle.call(this,"本章说",true);
+    var showAuthor=hf?!!hf.author:qfToggle.call(this,"作家说",true);
+
+    /* alpha34：功能级懒执行。四项全部关闭时，评论/本章说/作者说模块完全不进入。 */
+    if(!showBubble&&!showHot&&!showTalk&&!showAuthor){
+        try{var _chOff=qfChapter(this);if(_chOff&&_chOff.putImgUrl)_chOff.putImgUrl(null);}catch(_off){}
+        return content;
+    }
+
+    /* alpha84：服务器评论是否生效由 Comment Registry 的 bind/mode/capability 决定；
+       其它正文源即使选择“服务器”仍保持起点本地评论链。 */
+    var serverProvider="";
+    if(hotCtx.routeResolved===true)serverProvider=String(hotCtx.serverProvider||"");
+    else{try{serverProvider=qfCommentRouteSetV315.call(this,bid,cid,provider);}catch(_route9){serverProvider="";}}
+    var actualProvider=String(provider||"");
+    /* alpha11：快照 key 需要包含智能对齐开关；这里提前读取一次，后面直接复用。 */
+    var smart=!!isPaid&&["猫眼","得奇","69书吧"].indexOf(actualProvider)>=0&&((hf&&hf.smartAlign!==undefined)?!!hf.smartAlign:qfToggle.call(this,"兜底段评智能对齐",true));
+    var _snapKey460=qdReviewSnapKeyV460(bid,cid,!!isPaid,actualProvider,serverProvider,{bubble:showBubble,hot:showHot,talk:showTalk,author:showAuthor},smart,content);
+    var _snap460=qdReviewSnapGetV460(_snapKey460,!!serverProvider);
+    qfChapterSubStage("decorate.setup-snapshot",Date.now()-_dStage,_snap460?"hit":"miss");_dStage=Date.now();
+    if(_snap460){
+        qdReviewSnapRestoreTitleV460.call(this,bid,cid,showBubble,_snap460);
+        return String(_snap460.body||content);
+    }
+    /* beta17.3：情无 + 本地段评恢复起点官方段落索引。
+     * beta17.2 借情无 summary 直接映射起点本地气泡，在部分章节 ParagraphId 口径不一致，
+     * 会出现整章无气泡。现在本地气泡重新以起点官方 reviewSummary 为准；
+     * 但章末评论详情仍保持懒加载，不在翻章时请求。 */
+    var qwLocalMode=(actualProvider==="情无"&&!serverProvider);
+    var qwChapterLocal=!!(serverProvider==="情无"&&qfCommentPolicyV83(serverProvider,"chapterLocal",false));
+    /* beta17.4：情无本章说恢复真实预览。
+     * 不再零详情预取，而是正文阶段只取起点章末接口第一页 2 条，
+     * 用于卡片预览；完整列表仍在点击后加载。 */
+    var qwPreviewChapter=!!(actualProvider==="情无"&&(qwLocalMode||qwChapterLocal));
+    var serverSummary=null;
+    var items=[];
+    var summaryForHot=!serverProvider||qfCommentPolicyV83(serverProvider,"summaryForHot",true);
+
+    /* v3.5 beta18：本地评论装饰的两条独立网络请求并发预取。
+     * Provider 正文已经成功后才进入这里；预取失败不改变任何数据来源，
+     * 后面的 qdReviewSummary / qdFetchChapterComments 会自动按原稳定链重试。 */
+    if(!serverProvider){
+        try{
+            var _wantSummary=!!(showBubble||(showHot&&summaryForHot));
+            /* alpha9：热评已有专用 paragraph hot endpoint；关闭“本章说”时不再为了热评
+               预取 getchapterendreview。真正命中 hot 段落时再按专用接口获取。 */
+            var _wantChapter=!!showTalk;
+            var _primeSize=2;
+            if(_wantSummary&&_wantChapter)qdPrimeReviewV350.call(this,bid,cid,!!isPaid,true,true,_primeSize);
+        }catch(_prime350){}
+    }
+    qfChapterSubStage("decorate.review-prime",Date.now()-_dStage,(!serverProvider&&showTalk)?"local":"skip");_dStage=Date.now();
+    if(showBubble||(showHot&&summaryForHot)){
+        try{
+            if(serverProvider){serverSummary=qfCommentCallV83.call(this,serverProvider,"summary",[bid,cid]);items=(serverSummary&&serverSummary.items)||[];}
+            else if(qwLocalMode){
+                /* 情无正文 + 本地段评：优先一次起点 PC/mobile 官方 summary。
+                 * 不再使用 beta17.2 的情无 ParagraphId 直映射；只有官方 summary 完全为空时
+                 * 才进入旧移动端兜底，避免“有少量气泡也再跑第二套接口”的额外等待。 */
+                try{items=qdReviewSummaryV292.call(this,bid,cid)||[];}catch(_qwl0){items=[];}
+                if(!items.length){try{items=qdReviewSummaryV11.call(this,bid,cid)||[];}catch(_qwl1){items=[];}}
+            }else items=qdReviewSummaryV22.call(this,bid,cid,!!isPaid)||[];
+        }catch(e0){items=[];}
+    }
+    qfChapterSubStage("decorate.summary-read",Date.now()-_dStage,"items="+String(items&&items.length||0));_dStage=Date.now();
+    if(!items||!items.length){
+        try{qfReviewEdgeTrace({stage:"decorate-summary-empty",source:serverProvider||"local",items:0,total:0,valid:false,detail:"summary items empty before mapping"});}catch(_edgeDS){}
+    }
+
+    /* beta21.3：神魔/晴天气泡索引双向容错。
+     * - 服务器段评：服务器 summary 无法映射时借起点官方 summary 画气泡；
+     * - 本地段评：起点 summary 无法映射时借实际正文服务器 summary 画气泡。
+     * 这里只替换 paragraphId/count 索引，不改变点击后的评论数据来源。 */
+    if(showBubble&&(actualProvider==="神魔"||actualProvider==="晴天")&&!qfBubbleItemsUsableV353(content,items)){
+        var _alt353=[];
+        try{
+            if(serverProvider){
+                _alt353=qdReviewSummaryV22.call(this,bid,cid,!!isPaid)||[];
+            }else{
+                var _ss353=qfCommentCallV83.call(this,actualProvider,"summary",[bid,cid]);
+                _alt353=(_ss353&&Array.isArray(_ss353.items))?_ss353.items:[];
+            }
+        }catch(_e353){_alt353=[];}
+        if(qfBubbleItemsUsableV353(content,_alt353))items=_alt353;
+    }
+
+    /* alpha84：需要原生评论装饰的 Provider 由 capability/policy 决定。
+       主评论模块不再识别具体服务器源名称。 */
+    if(serverProvider&&qfCommentPolicyV83(serverProvider,"nativeDecorate",false)){
+        try{
+            var nativeBody=qfCommentCallV83.call(this,serverProvider,"decorate",[content,bid,cid,showBubble,showTalk,showAuthor,items]);
+            if(nativeBody!==null&&nativeBody!==undefined)return nativeBody;
+        }catch(_native){}
+    }
+
+    /* beta22：本章说预览与评论详情来源解耦。
+     * 所有 Provider 的正文卡统一只取起点官方章末接口前 2 条真实评论；
+     * 点击卡片后仍按本地/服务器路由打开对应评论源。这样避免服务器章评接口/原生 SVG
+     * 为正文阶段额外增加不一致的网络开销，也保证卡片样式与预览数量统一。 */
+    qfChapterSubStage("decorate.alt-native",Date.now()-_dStage,serverProvider?"server":"local");_dStage=Date.now();
+    var chapterPack=null,chapterPreviewPack=null,hotPackByPid={};
+    if(showTalk){
+        try{chapterPreviewPack=qdFetchChapterCommentsV22.call(this,bid,cid,1,2);}catch(_pv22){chapterPreviewPack=null;}
+    }
+    qfChapterSubStage("decorate.chapter-preview",Date.now()-_dStage,chapterPreviewPack?"hit":"empty");_dStage=Date.now();
+    if(showTalk){
+        try{
+            qfReviewEdgeTrace({
+                stage:"decorate-chapter-preview",
+                source:String(chapterPreviewPack&&chapterPreviewPack.source||""),
+                items:Number(chapterPreviewPack&&chapterPreviewPack.rows&&chapterPreviewPack.rows.length||0),
+                total:Number(chapterPreviewPack&&chapterPreviewPack.total||0),
+                segments:Number(chapterPreviewPack&&chapterPreviewPack.segments&&chapterPreviewPack.segments.length||0),
+                valid:!!chapterPreviewPack,
+                detail:chapterPreviewPack?"preview-pack":"preview-empty"
+            });
+        }catch(_edgeCP){}
+    }
+    if(showHot){
+        /* 本地模式直接复用已经获取的官方预览包；服务器模式优先使用 summary.hot，
+         * 只有 summary 没有热评材料时才额外拉服务器 chapter pack。 */
+        /* v4.0：本地热评不再为了热评额外拉整章 getchapterendreview。
+         * 如果本章说已经拿到 preview，可零成本保留为异常兜底；真正热评优先在命中 hot 段落时调用专用 getparagraphshotcomments。 */
+        if(!serverProvider){chapterPack=chapterPreviewPack||null;}
+        else{
+            var _hasServerHot=false;try{for(var _hk0 in (serverSummary&&serverSummary.hot||{})){if(Object.prototype.hasOwnProperty.call(serverSummary.hot,_hk0)&&serverSummary.hot[_hk0]&&serverSummary.hot[_hk0].length){_hasServerHot=true;break;}}}catch(_h0){}
+            if(!_hasServerHot){try{chapterPack=qfCommentCallV83.call(this,serverProvider,"chapter",[bid,cid]);}catch(_cpS){chapterPack=null;}}
+        }
+    }
+    if(showTalk||showHot){
+        if(serverProvider&&serverSummary&&serverSummary.hot){
+            try{for(var _hk in serverSummary.hot){if(Object.prototype.hasOwnProperty.call(serverSummary.hot,_hk)&&serverSummary.hot[_hk]&&serverSummary.hot[_hk].length)hotPackByPid[String(_hk)]={rows:serverSummary.hot[_hk],total:serverSummary.hot[_hk].length,source:serverProvider+"服务器"};}}catch(_hs){}
+        }
+        if(showHot&&chapterPack&&Array.isArray(chapterPack.segments)){
+            try{
+                for(var _si=0;_si<chapterPack.segments.length;_si++){
+                    var _sg=chapterPack.segments[_si]||{};
+                    var _sp=Number(_sg.ParagraphsId!==undefined?_sg.ParagraphsId:(_sg.paragraphsId!==undefined?_sg.paragraphsId:(_sg.ParagraphId!==undefined?_sg.ParagraphId:(_sg.paragraphId!==undefined?_sg.paragraphId:(_sg.SegmentId!==undefined?_sg.SegmentId:_sg.segmentId)))));
+                    var _dl=_sg.DataList||_sg.dataList||_sg.List||_sg.list||[];
+                    if(!Array.isArray(_dl)||!(_sp>0)||!_dl.length)continue;
+                    var _q=String(_sg.QuoteContent||_sg.quoteContent||_sg.RefferContent||_sg.refferContent||"");
+                    var _rows=[];
+                    for(var _di=0;_di<_dl.leng
+
+erProvider&&hotPid470.length>1){try{qdPrimeParagraphHotV450.call(this,bid,cid,hotPid470,1,3);}catch(_ph450){}}
+
+    qfChapterSubStage("decorate.build-plan",Date.now()-_dStage,"plan="+String(plan470.length));_dStage=Date.now();
+    try{
+        if((items&&items.length)&&plan470.length<Math.min(3,items.length)){
+            qfReviewEdgeTrace({
+                stage:"mapping-gap",
+                source:serverProvider||"local",
+                items:Number(items.length||0),
+                total:Number(plan470.length||0),
+                valid:plan470.length>0,
+                detail:"summary-to-textIdx sparse"
+            });
+        }
+    }catch(_edgeMG){}
+    for(var b=0;b<plan470.length;b++){
+        var pp470=plan470[b],x=pp470[0],pid=pp470[1],cnt2=pp470[2],seg=pp470[3],ix=pp470[4],localQuote=pp470[5];
+
+        if(showBubble){
+            var localQuoteEncoded=qdDecorRowQuoteV490(pp470),localQuoteJsEncoded=qdDecorRowQuoteJsV490(pp470);
+            var _bubbleHtml541=qdBubbleImageV20.call(
+                this,cnt2,bid,cid,pid,seg,!!pp470[8],localQuote,localQuoteEncoded,localQuoteJsEncoded
+            );
+            if(_bubbleHtml541){_renderBubble541++;pushLineExtra480(ix,_bubbleHtml541);}
+        }
+
+        if(showHot&&x.hot&&hotN<2){
+            var dk=String(pid)+"|"+String(seg),pack=detailCache[dk];
+            if(!pack){
+                /* alpha9.7：热路径先复用本章说/章末已存在的同 PID 评论。
+                 * 只有本地无可用 rows 时才调用专用 getparagraphshotcomments。
+                 * 数据源优先级变化仅用于减少重复网络，不改变最终热评卡选择逻辑。 */
+                var _reuse537=hotPackByPid[String(pid)]||hotPackByPid[String(seg)]||null;
+                var _reuseRows537=_reuse537&&Array.isArray(_reuse537.rows)?_reuse537.rows:[];
+                if(_reuseRows537.length){
+                    pack=_reuse537;
+                    try{qfChapterHotTraceV535({stage:"local-reuse",pid:String(pid),profile:String(pack.source||""),transport:"decorate",cache:"local",ok:true,rows:_reuseRows537.length,ms:0,detail:_localFull538?"local-full":"reuse-first"});}catch(_lr537){}
+                }else if(_localFull538){
+                    pack=null;
+                    try{qfChapterHotTraceV535({stage:"local-full-skip",pid:String(pid),profile:"",transport:"decorate",cache:"local",ok:true,rows:0,ms:0,detail:"dedicated-api-skipped"});}catch(_lfs538){}
+                }else if(!serverProvider){
+                    try{pack=qdFetchParagraphHotV402.call(this,bid,cid,pid,1,3);}catch(_hot402){pack=null;}
+                    if(!pack||!pack.rows||!pack.rows.length)pack=_reuse537||pack;
+                }else{
+                    pack=_reuse537||null;
+                }
+                if(!pack&&hotFallbackBudget>0){
+                    hotFallbackBudget--;
+                    pack=serverProvider?qfServerCommentPackV315.call(this,serverProvider,bid,cid,Number(x.serverParaId||pid),1,10,false):null;
+                }
+                detailCache[dk]=pack;
+            }
+            var arr=(pack&&pack.rows)||[];
+            try{
+                qfChapterHotTraceV535({
+                    stage:"candidate-result",pid:String(pid||""),profile:String(pack&&pack.source||""),
+                    transport:"decorate",cache:"",ok:!!(pack&&pack.ok),rows:arr.length,ms:0,
+                    detail:arr.length?"rows":"empty"
+                });
+            }catch(_hr536){}
+            if(arr.length){
+                /* alpha15：这里只需要点赞最高的一条，不再为了最多 3 条数据原地 sort 并修改共享缓存顺序。 */
+                var _hotRow=null,_hotLike=-1;for(var _hr470=0;_hr470<arr.length;_hr470++){var _hc470=arr[_hr470];if(!_hc470||!_hc470.content)continue;var _hl470=Number(_hc470.like||0)||0;if(_hotRow===null||_hl470>_hotLike){_hotRow=_hc470;_hotLike=_hl470;}}
+                if(_hotRow&&_hotRow.content){
+                    /* alpha10：热评卡本身携带段落引用，不再依赖正文阶段逐段写 Java memory。 */
+                    try{_hotRow.total=Number(pack&&pack.total||0)||0;}catch(_ht){}
+                    /* 热评单开且接口最终无评论时，整章不会为这些段落生成 quote 点击参数。 */
+                    var _hq490=qdDecorRowQuoteV490(pp470),_hjs490=qdDecorRowQuoteJsV490(pp470);
+                    var hh=qdHotHtmlV20.call(
+                        this,_hotRow,bid,cid,pid,seg,localQuote,_hq490,_hjs490
+                    );
+                    if(hh){pushLineExtra480(ix,"\n"+hh);hotN++;_renderHot541++;try{qfChapterHotRenderedV536(pid,arr.length,_hotLike);}catch(_rend536){}}
+                }
+            }
+        }
+    }
+
+    qfChapterSubStage("decorate.bubble-hot-render",Date.now()-_dStage,"hot="+String(hotN));_dStage=Date.now();
+    var _snapTitleCount460=(showBubble&&titleItem&&Number(titleItem.count||0)>0)?Number(titleItem.count||0):0;
+    var _snapTitleHot460=!!(titleItem&&titleItem.hot);
+    /* alpha15：章名 quote 只有存在章名气泡时才会在点击详情时读取；普通章节不再无条件写 Java memory。 */
+    if(_snapTitleCount460>0){
+        try{var _tc470=qfRuntimeCacheV13(this),_ch470=qfChapter(this),_tt470="";if(_ch470){_tt470=String(_ch470.title||"");if(!_tt470&&typeof _ch470.getTitle==="function")_tt470=String(_ch470.getTitle()||"");}if(_tt470&&_tc470&&qfCallableV13(_tc470,"putMemory"))_tc470.putMemory("qfv20-"+bid+"-"+cid+"-chapter-title",_tt470);}catch(_t470){}
+    }
+    try{
+        var ch2=qfChapter(this);
+        if(ch2&&ch2.putImgUrl){
+            if(_snapTitleCount460>0){
+                ch2.putImgUrl(
+                    qdBubbleDataV20.call(
+                        this,
+                        _snapTitleCount460,
+                        bid,cid,-1,0,_snapTitleHot460
+                    )
+                );
+            }else{
+                ch2.putImgUrl(null);
+            }
+        }
+    }catch(e3){}
+
+    qfChapterSubStage("decorate.title-meta",Date.now()-_dStage,"title="+String(_snapTitleCount460));_dStage=Date.now();
+    if(showAuthor){
+        /* beta14：作者说与“段评来源”解耦。正文实际来自晴天/情无/神魔时，
+           即使段评选择本地，也先读取该正文 Provider 的作者说；没有再退起点官方。 */
+        var as="",authorProvider="";
+        if(qfCommentIsServerV83(actualProvider)&&!(qwLocalMode&&actualProvider==="情无")){
+            try{as=qfCommentCallV83.call(this,actualProvider,"author",[bid,cid])||"";if(as)authorProvider=actualProvider;}catch(e4){as="";}
+        }
+        if(!as&&serverProvider&&serverProvider!==actualProvider){
+            try{as=qfCommentCallV83.call(this,serverProvider,"author",[bid,cid])||"";if(as)authorProvider=serverProvider;}catch(_as2){as="";}
+        }
+        if(!as){
+            /* alpha9：只有 Provider/服务器作者说都为空，才解析原始起点章节并准备官方作者说缓存。 */
+            try{if(hotCtx.authorRaw)qfPrimeAuthorSayV38.call(this,hotCtx.authorRaw,bid,cid);}catch(_primeA9){}
+            try{as=qdAuthorSayV20.call(this,bid,cid)||"";authorProvider="";}catch(_qa){as="";}
+        }
+        if(as){var _ac480=qdAuthorSayCardV20.call(this,as,bid,cid,authorProvider);if(_ac480){tail480.push(_ac480);_renderAuthor541++;}}
+    }
+
+    qfChapterSubStage("decorate.author-say",Date.now()-_dStage,showAuthor?"on":"off");_dStage=Date.now();
+    if(showTalk){
+        var cpv=chapterPreviewPack||{rows:[],total:0},pr=(cpv&&cpv.rows)||[],pt=Number(cpv&&cpv.total||0);
+        /* 起点章末接口至少有一条真实评论时才生成卡片；最多显示前两条。
+         * 不再用“章末讨论/点击后加载”占位图。 */
+        if(pr.length){
+            if(!(pt>0)&&titleItem&&Number(titleItem.count||0)>0)pt=Number(titleItem.count||0);
+            var _card22=qdChapterTalkCardV20.call(this,pr,pt>0?pt:pr.length,bid,cid);
+            if(_card22){tail480.push(_card22);_renderTalk541++;}
+        }
+    }
+
+    qfChapterSubStage("decorate.chapter-talk",Date.now()-_dStage,showTalk?"on":"off");_dStage=Date.now();
+    /* alpha17：最终正文只组装一次。
+       旧实现先 lines.join，再为作者说/本章说执行 body += 大字符串；
+       现在正文行、气泡/热评片段、尾卡统一进入 parts 后一次 join。 */
+    var parts480=[];
+    for(var _li480=0;_li480<lines.length;_li480++){
+        if(_li480>0)parts480.push("\n");
+        parts480.push(lines[_li480]);
+        var _le480=lineExtra480[_li480];
+        if(_le480)parts480.push(_le480);
+    }
+    for(var _ti480=0;_ti480<tail480.length;_ti480++){parts480.push("\n");parts480.push(tail480[_ti480]);}
+    var body=parts480.join("");
+    try{
+        qfReviewEdgeTrace({
+            stage:"renderer-final",
+            source:serverProvider||"local",
+            items:_renderBubble541,
+            total:_renderHot541,
+            segments:_renderTalk541,
+            rawLen:body.length,
+            valid:!!body,
+            detail:"bubble="+String(_renderBubble541)+
+                ",hot="+String(_renderHot541)+
+                ",talk="+String(_renderTalk541)+
+                ",author="+String(_renderAuthor541)+
+                ",plan="+String(plan470.length)+
+                ",tail="+String(tail480.length)
+        });
+    }catch(_edgeRF){}
+    /* plan 已经全部消费，立即归还瞬时行对象。最终 body/快照不持有这些引用。 */
+    qdDecorRowsReleaseV490(plan470);
+
+    /* alpha11：只缓存已经完整生成的最终装饰结果；网络异常导致的空卡不会额外制造长期状态，
+       TTL 远短于原 summary/chapter 业务缓存，且设置/Provider/正文变化都会生成不同 key。 */
+    try{qdReviewSnapPutV460(_snapKey460,body,_snapTitleCount460,_snapTitleHot460);}catch(_snapPut460){}
+    qfChapterSubStage("decorate.final-join-cache",Date.now()-_dStage,"len="+String(body.length));
+    qfChapterSubStage("decorate.total",Date.now()-_dAll,"done");
+    return body;
+}
+
+
+### official LEN 4785 HITS 2
+
+(/^[\s\u3000]+|[\s\u3000]+$/g,"")
+                    .replace(/\s+/g," ")
+                    .trim();
+
+                if(!t||t.length<2)continue;
+                if(title&&qfNorm(t)===qfNorm(title))continue;
+
+                /* 过滤移动阅读页按钮、推广、状态文案。 */
+                if(/^(?:上一章|下一章|目录|返回目录|加入书架|加入书签|本章说|章节报错|下载起点读书|打开起点读书|App免费|APP免费|立即下载|客户端阅读)$/i.test(t))continue;
+                if(/^(?:本章未完|本章完)/.test(t))continue;
+
+                arr.push(t);
+            }
+
+            if(arr.length>best.length)best=arr;
+        }catch(e1){}
+    }
+
+    if(!best.length)return "";
+
+    /* 每个<p>单独一行，交给阅读自身段落缩进/行距设置渲染。 */
+    return best.join("\n").replace(/\n{3,}/g,"\n\n").trim();
+}
+
+/* 覆盖免费正文获取：
+ * 1. 当前移动章节HTML直接按<p>解析
+ * 2. 主动再请求一次m.qidian.com移动章节
+ * 3. 再退回旧的通用起点解析/桌面请求/WebView
+ */
+function qdOfficialFreeV10(raw,meta){
+    var _st0=Date.now(),text=qdMobileFreeExtractV282.call(this,raw,meta.title);
+    qfChapterSubStage("official.raw-mobile-parse",Date.now()-_st0,qfValidContentV10(text)?"hit":"miss");
+    if(qfValidContentV10(text))return text;
+
+    try{
+        var j=qfJava(this);
+        var u="https://m.qidian.com/chapter/"+
+            encodeURIComponent(meta.bookId)+"/"+
+            encodeURIComponent(meta.chapterId)+"/";
+
+        var opt={
+            method:"GET",
+            timeout:12000,
+            headers:{
+                "User-Agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
+                "Referer":"https://m.qidian.com/book/"+meta.bookId+"/",
+                "Accept-Language":"zh-CN,zh;q=0.9"
+            }
+        };
+
+        var _stm=Date.now(),rr=String(j.ajax(u+","+JSON.stringify(opt))||"");
+        qfChapterSubStage("official.m-fetch",Date.now()-_stm,rr?"body":"empty");
+        var _stmp=Date.now();
+        text=qdMobileFreeExtractV282.call(this,rr,meta.title);
+        qfChapterSubStage("official.m-parse",Date.now()-_stmp,qfValidContentV10(text)?"hit":"miss");
+        if(qfValidContentV10(text))return text;
+    }catch(e0){
+        qfChapterSubStage("official.m-fetch",0,"exception");
+    }
+
+    var _stl=Date.now();
+    text=qdExtractOfficialContentV10(raw,meta.title);
+    qfChapterSubStage("official.raw-legacy-parse",Date.now()-_stl,qfValidContentV10(text)?"hit":"miss");
+    if(qfValidContentV10(text))return text;
+
+    try{
+        var j2=qfJava(this);
+        var u2="https://www.qidian.com/chapter/"+
+            encodeURIComponent(meta.bookId)+"/"+
+            encodeURIComponent(meta.chapterId)+"/";
+        var h={
+            "User-Agent":QF_UA,
+            "Referer":"https://www.qidian.com/book/"+meta.bookId+"/",
+            "Accept":"text/html,application/xhtml+xml,*/*"
+        };
+        var ck="";
+        try{ck=String(cookie.getCookie("https://www.qidian.com")||"");}catch(e1){}
+        if(ck)h.Cookie=ck;
+
+        var _stw=Date.now(),r2=j2.get(u2,h,12000);
+        qfChapterSubStage("official.www-fetch",Date.now()-_stw,r2?"body":"empty");
+        var _stwp=Date.now();
+        text=qdExtractOfficialContentV10(String(r2.body()||""),meta.title);
+        qfChapterSubStage("official.www-parse",Date.now()-_stwp,qfValidContentV10(text)?"hit":"miss");
+        if(qfValidContentV10(text))return text;
+    }catch(e2){
+        qfChapterSubStage("official.www-fetch",0,"exception");
+    }
+
+    var _stwv=Date.now(),_wv=qdWebViewFreeV10.call(this,meta);
+    qfChapterSubStage("official.webview",Date.now()-_stwv,qfValidContentV10(_wv)?"hit":"miss");
+    return _wv;
+}
+
+/* ============================================================
+ * v2.8.4：Provider 三重一致性校验
+ *
+ * 1. 书籍：书名 + 作者
+ * 2. 章节：章节号 + 章节正文标题
+ * 3. 正文：起点 paragraph_comments 原文锚点 vs Provider 正文
+ *
+ * 任意一层明确冲突就拒绝该 Provider，继续下一源。
+ * ============================================================ */
+
+
+
+### limited_qw LEN 11944 HITS 5
+
+en=String(hd["X-Content-Token"]||"");}
+    return token;
+}
+function qfQwPickContentV51(obj,raw){
+    function pick(x){
+        if(!x)return "";if(typeof x==="string")return x;
+        if(x.Content!==undefined)return x.Content;if(x.content!==undefined)return x.content;
+        if(x.Data){if(x.Data.Content!==undefined)return x.Data.Content;if(x.Data.content!==undefined)return x.Data.content;}
+        return "";
+    }
+    var val=obj?pick(obj):raw;
+    for(var deep=0;deep<3;deep++){
+        var t=String(val||"").trim();if(!(t.charAt(0)==="{"||t.charAt(0)==="["))break;
+        try{var inner=JSON.parse(t),next=pick(inner);if(next===undefined||next===null||String(next)===String(val))break;val=next;}catch(e){break;}
+    }
+    return String(val||"");
+}
+function qfQwRequestContentV317(api,hd){
+    var raw="",j=qfQwJavaV318(this);if(!j)return "";
+    try{
+        var arr=j.ajaxAll([api+","+JSON.stringify({headers:hd,timeout:12000})]);
+        if(arr&&arr.length)try{raw=String(arr[0].body()||"");}catch(_b){}
+    }catch(e0){}
+    if(!raw)try{raw=String(j.get(String(api),hd,10000).body()||"");}catch(e1){}
+    return raw;
+}
+function qfQwMarkVipVerifiedV101(token){
+    var s=qfQwSrcV318(this),base=qfQwBaseV44.call(this);
+    token=String(token||"");
+    if(!s||!s.put||!token)return;
+    try{s.put("qf_qw_vip_verified_v101",base+"|"+token+"|"+String(Date.now()));}catch(e0){}
+}
+function qfQwAuthLikeV317(obj,raw){
+    var msg="";try{msg=String((obj&&(obj.detail||obj.Message||obj.message||obj.error))||raw||"");}catch(e0){}
+    return /未登录|登录|token|令牌|凭据|unauthor|expired|过期|失效|401|403/i.test(msg);
+}
+function qfQwContentV44(meta){
+    meta=meta||{};var bid=String(meta.bookId||""),cid=String(meta.chapterId||""),isPaid=String(meta.vip||"0")==="1";
+    if(!bid||!cid){qfLimSetErrV30.call(this,"情无","章节参数错误：BookId="+bid+"，ChapterId="+cid);return null;}
+    var base=qfQwBaseV44.call(this),api=base+"/content.php?book_id="+encodeURIComponent(bid)+"&chapter_id="+encodeURIComponent(cid)+(isPaid?"&vip=1":"");
+    var hd=qfQwHeadersV44.call(this);
+    if(isPaid&&!hd["X-Content-Token"]){hd=qfQwRefreshSessionV317.call(this,true);}
+    if(isPaid&&!hd["X-Content-Token"]){qfLimSetErrV30.call(this,"情无","正文线程未读取到情无 request_token；请重新进入登录设置 → 情无 → 检测会话后刷新本章");return null;}
+
+    function decode(raw){var obj=null;try{obj=JSON.parse(String(raw||""));}catch(_j){}return {raw:String(raw||""),obj:obj,val:qfQwPickContentV51(obj,String(raw||""))};}
+    try{
+        var r=decode(qfQwRequestContentV317.call(this,api,hd));
+        if(r.val){if(isPaid)qfQwMarkVipVerifiedV101.call(this,String(hd["X-Content-Token"]||""));qfLimSetErrV30.call(this,"情无","");return r.val.replace(/\\r\\n/g,"\n").replace(/\\n/g,"\n").replace(/\r\n/g,"\n").replace(/\r/g,"\n");}
+
+        /* 只在明确认证错误时续签一次。服务端业务/共享凭据失败不再盲目重登。 */
+        if(qfQwAuthLikeV317(r.obj,r.raw)){
+            var hd2=qfQwRefreshSessionV317.call(this,true);
+            if(hd2&&hd2["X-Content-Token"]){
+                var r2=decode(qfQwRequestContentV317.call(this,api,hd2));
+                if(r2.val){if(isPaid)qfQwMarkVipVerifiedV101.call(this,String(hd2["X-Content-Token"]||""));qfLimSetErrV30.call(this,"情无","");return r2.val.replace(/\\r\\n/g,"\n").replace(/\\n/g,"\n").replace(/\r\n/g,"\n").replace(/\r/g,"\n");}
+                r=r2;
+            }
+        }
+        var msg="";
+        if(r.obj&&r.obj.detail)msg=String(r.obj.detail);else if(r.obj&&r.obj.Message)msg=String(r.obj.Message);else if(r.obj&&r.obj.message)msg=String(r.obj.message);else msg="正文为空";
+        var ds=qfQwDedicatedV317.call(this),authLike=qfQwAuthLikeV317(r.obj,r.raw);
+        if(isPaid&&Number(ds.keys)===0)msg+="（账号会话已建立，但共享凭据为 0；VIP 正文尚不可用）";
+        else if(isPaid&&authLike)msg+="（情无会话/阅读令牌被正文接口拒绝，请重新登录后再试）";
+        else if(isPaid)msg+="（账号会话已建立"+(Number(ds.keys)>0?" · 共享凭据 "+String(Number(ds.keys))+" 个":"")+"，但 VIP 正文服务拒绝本次请求；请保留 Reference 供后续排查）";
+        qfLimSetErrV30.call(this,"情无",msg);return null;
+    }catch(e1){qfLimSetErrV30.call(this,"情无","正文请求失败："+String(e1)+(isPaid?"（账号会话与 VIP 正文可用性是两层状态）":""));return null;}
+}
+
+
+### limited_qt LEN 17236 HITS 6
+
+/* alpha79：本模块私有依赖内聚。未进入该功能时，不在全局运行时建立这些 helper。 */
+function qfQtPatchNativeAuthorCardV332(tag,bid,cid){
+    tag=String(tag||'');var m=tag.match(/\bsrc\s*=\s*(["'])([\s\S]*?)\1/i);if(!m)return tag;
+    var src=String(m[2]||'').replace(/&quot;/g,'"');var cut=src.search(/,\s*\{[\s\S]*$/);if(cut>0)src=src.substring(0,cut);
+    var ob={style:'FULL',type:'qd',click:"qfQtShowAuthorV332('"+String(bid).replace(/'/g,"\\'")+"','"+String(cid).replace(/'/g,"\\'")+"')"};
+    var nv=(src+','+JSON.stringify(ob)).replace(/"/g,'&quot;');return tag.replace(m[0],'src="'+nv+'"');
+}
+
+/* 覆盖三限免服务器评论路由：晴天不再打开服务端网页，而是取服务端数据后交给本地 UI。 */
+
+/* ============================================================
+ * v3.0.0-alpha34：评论模块严格隔离 + 晴天段评按需渲染采集
+ *
+ * 设计原则：
+ * 1. 未选中的服务器源绝不进入其请求函数；未知 provider 不再默认落到神魔。
+ * 2. 晴天 /api/comments 只负责气泡索引；普通段评点击后才加载 /comments 页面。
+ * 3. /comments 是动态页面时，先走轻量 HTTP；解析不到再仅在“用户点击该段评”时
+ *    用隐藏 WebView 渲染一次并读取最终 DOM，不把 WebView 放到正文加载阶段。
+ * 4. 本章说沿用已经验证可用的 /chapterComments 数据链，本地 UI 不变。
+ * 5. 所有服务器评论统一经过同一个本地 UI，数据适配器与 UI 完全解耦。
+ * ============================================================ */
+
+function qfServerChapterMetaPutV316(ctx,provider,bid,cid,root){
+    if(!provider||!bid||!cid||!root||typeof root!=="object")return;
+    qfServerCachePutV315(ctx,"qf-server-native-v316-"+provider+"-"+bid+"-"+cid,root);
+}
+
+function qdVolumeArray(root) {
+    if (!root) return [];
+    var d = root.data || root.Data || root;
+    return qdList(d.vs || d.Volumes || d.volumes || root.Volumes || root.volumes);
+}
+
+function qdChapterArray(vol) {
+    if (!vol) return [];
+    return qdList(vol.cs || vol.Chapters || vol.chapters || vol.chapterList || vol.VolumeList);
+}
+
+function qfLimSetErrV30(name,msg){
+    try{qfRuntimeCacheV13(this).putMemory("qf_lim_err_"+String(name||""),String(msg||""));}catch(e0){}
+}
+function qfLimGetErrV30(name){
+    try{return String(qfRuntimeCacheV13(this).getFromMemory("qf_lim_err_"+String(name||""))||"");}catch(e0){return "";}
+}
+
+/* ---------- 晴天（附件“🔅起点”）· alpha30 ---------- */
+function qfQtParseV330(raw){
+    var v=String(raw==null?'':raw).trim(),o={};
+    if(!v)return {};
+    for(var i=0;i<3;i++){
+        try{o=JSON.parse(v);}catch(e){return i===0?{}:o;}
+        if(typeof o==='string'){v=String(o).trim();continue;}
+        return o||{};
+    }
+    return (o&&typeof o==='object')?o:{};
+}
+function qfQtCatalogRowsV330(root){
+    /* alpha31：先按附件晴天源的真实结构 Data.Chapters 直取，再做兼容递归。
+       原源目录字段就是 C/N/T/V/index，不应先依赖模糊扫描。 */
+    var d=(root&&(root.Data||root.data))||root||{};
+    var direct=d.Chapters||d.chapters||d.ChapterList||d.chapterList||null;
+    if(Array.isArray(direct)&&direct.length)return direct;
+
+    var hit=null,seen=0;
+    function isChapter(x){
+        if(!x||typeof x!=='object'||Array.isArray(x))return false;
+        var id=x.C!==undefined?x.C:(x.ChapterId!==undefined?x.ChapterId:(x.chapterId!==undefined?x.chapterId:(x.id!==undefined?x.id:(x.cId!==undefined?x.cId:x.cid))));
+        var nm=x.N!==undefined?x.N:(x.ChapterName!==undefined?x.ChapterName:(x.chapterName!==undefined?x.chapterName:(x.cN!==undefined?x.cN:x.title)));
+        return id!==undefined&&id!==null&&String(id)!==''&&(nm!==undefined||x.T!==undefined||x.uT!==undefined||x.index!==undefined);
+    }
+    function walk(v,depth){
+        if(hit||v==null||depth>8||seen>4000)return;
+        seen++;
+        if(Array.isArray(v)){
+            if(v.length){
+                var ok=0,lim=Math.min(v.length,10);
+                for(var i=0;i<lim;i++)if(isChapter(v[i]))ok++;
+                if(ok>=Math.max(1,Math.ceil(lim*0.4))){hit=v;return;}
+            }
+            for(var a=0;a<v.length&&!hit&&a<80;a++)walk(v[a],depth+1);
+            return;
+        }
+        if(typeof v!=='object')return;
+        var preferred=['Chapters','chapters','ChapterList','chapterList','DataList','dataList','cs','Cs','vs','Volumes','volumes'];
+        for(var p=0;p<preferred.length&&!hit;p++)if(v[preferred[p]]!==undefined)walk(v[preferred[p]],depth+1);
+        if(hit)return;
+        var n=0;
+        for(var k in v){
+            if(!Object.prototype.hasOwnProperty.call(v,k)||preferred.indexOf(k)>=0)continue;
+            walk(v[k],depth+1);
+            if(hit||++n>70)break;
+        }
+    }
+    wal
+
+,pack);}catch(_c2){}}
+    return pack;
+}
+
+function qfQtCatalogFindV331(cm,meta){
+    var map=(cm&&cm.map)||{},cid=String(meta&&meta.chapterId||'');
+    if(cid&&map[cid])return {item:map[cid],by:'chapterId'};
+
+    var title=String(meta&&meta.title||''),tn='';
+    try{tn=qfNormChapter(title);}catch(_n){tn=String(title).replace(/\s+/g,'').toLowerCase();}
+    var no=-1;try{no=qfChapterNoV10(title);}catch(_no){}
+    var titleHit=null,noHit=null,noCount=0;
+    for(var k in map){
+        if(!Object.prototype.hasOwnProperty.call(map,k))continue;
+        var x=map[k]||{},xt=String(x.title||''),xn='';
+        try{xn=qfNormChapter(xt);}catch(_xn){xn=xt.replace(/\s+/g,'').toLowerCase();}
+        if(tn&&xn&&tn===xn){titleHit=x;break;}
+        if(no>=0){
+            var xno=-2;try{xno=qfChapterNoV10(xt);}catch(_xno){}
+            if(xno===no){noHit=x;noCount++;}
+        }
+    }
+    if(titleHit)return {item:titleHit,by:'title'};
+    if(no>=0&&noCount===1&&noHit)return {item:noHit,by:'chapterNo'};
+    return {item:null,by:''};
+}
+
+function qfQtExtractContentV330(root){
+    root=root||{};
+    var d=root.data||root.Data||{},s='';
+    var vals=[root.content,root.Content,d.content,d.Content,((d.Data||{}).content),((d.Data||{}).Content)];
+    for(var i=0;i<vals.length;i++){if(vals[i]!==undefined&&vals[i]!==null&&String(vals[i]).trim()){s=String(vals[i]);break;}}
+    if(!s)return '';
+
+    /* alpha32：评论气泡仍由本书源统一重建；正文中的服务端 comment 标签不直接输出。 */
+    s=s.replace(/<comment\b[^>]*\/?\s*>/ig,'');
+    s=s.replace(/<p>\s*<img\b[^>]*\bident=["'][^"']+["'][^>]*>\s*<\/p>/ig,'');
+
+    /* 晴天正文有时自带作者说 SVG/图片卡片。若能从同一服务端响应提取到作者说文本，
+       删除原卡片，后续统一用本地作者说卡片重画；提取不到时保留原卡片但修复点击动作。 */
+    var _as='';try{_as=qfQtAuthorSayFromRootV332(root)||'';}catch(_ae){}
+    s=s.replace(/<img\b[^>]*(?:author|writer|author[_-]?say|writer[_-]?say|作者说)[^>]*>/ig,function(tag){
+        if(_as)return '';
+        try{return qfQtPatchNativeAuthorCardV332(tag,String((root.__qtBookId||'')),String((root.__qtChapterId||'')));}catch(_p){return tag;}
+    });
+
+    s=s.replace(/<\/p>\s*<p[^>]*>/ig,'\n').replace(/<p[^>]*>/ig,'').replace(/<\/p>/ig,'\n').replace(/<br\s*\/?\s*>/ig,'\n');
+    s=s.replace(/&nbsp;|&#160;/gi,' ').replace(/&lt;/gi,'<').replace(/&gt;/gi,'>').replace(/&amp;/gi,'&');
+    return s.replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+}
+function qfQtContentV330(meta){
+    var cred=qfQtCredV328.call(this),errors=[];
+    if(!cred.key||!cred.dttoken){qfLimSetErrV30.call(this,'晴天','尚未登录：登录页 → 限免源账号 → 晴天');return '';}
+    function serverMessage(r,raw){
+        if(!r||typeof r!=='object')return String(raw||'').slice(0,180);
+        var d=r.data||r.Data||{};
+        return String(r.message||r.Message||r.detail||r.error||d.message||d.Message||d.detail||'');
+    }
+    function requestOne(ctx,x,label,delta){
+        x=x||{};delta=Number(delta||0);
+        var idx=Number(x.index);if(!isFinite(idx))idx=-1;
+        if(idx>=0)idx+=delta;
+        var ts=x.timestamp==null?'':x.timestamp;
+        var reqCid=String(x.chapterId||meta.chapterId||'');
+        var path='/chapter/vip?bookId='+String(meta.bookId)+'&chapterId='+reqCid+'&para=1&god=true&img=1&timestamp='+String(ts)+'&index='+String(idx);
+        var raw=qfQtRequestV328.call(ctx,path,'GET',{},12000),r=qfQtParseV330(raw),msg=serverMessage(r,raw);
+        try{
+            if(r&&typeof r==='object'){
+                r.__content=String(r.content||r.Content||((r.data||r.Data||{}).content)||((r.data||r.Data||{}).Content)||'');
+                r.__qtBookId=String(meta.bookId||'');
+                r.__qtChapterId=String(meta.chapterId||'');
+                r.__qtCatalog={timestamp:ts,index:idx,title:x.title||'',origin:x.origin||'',requestChapterId:reqCid};
+                qfServerChapterMetaPutV316(ctx,'晴天',String(meta.bookId),String(meta.chapterId),r);
+            }
+        }catch(_m){}
+        var text=qfQtExtractContentV330(r);
+        if(qfValidContentV10(text))return text;
+        errors.push(label+'正文为空或过短'+(msg?'：'+msg:'')+(raw?'':'（接口空响应）'));
+        return '';
+    }
+    function runCatalog(ctx,cm,label){
+        var found=qfQtCatalogFindV331(cm,meta),x=found.item,text='';
+        if(!x){
+            var extra=String(cm&&cm.sunnyMessage||cm&&cm.message||'');
+            errors.push(label+'目录未找到 ChapterId='+String(meta.chapterId)+'（目录 '+Number(cm&&cm.count||0)+' 章，来源 '+String(cm&&cm.origin||'未知')+'）'+(extra?'：'+extra:''));
+            return '';
+        }
+        var tag=label+(found.by&&found.by!=='chapterId'?' ['+found.by+'匹配]':'');
+        text=requestOne(ctx,x,tag,0);if(text)return text;
+        /* 官方目录是估算 index：仅失败后尝试 ±1，不影响正常 Sunny 原生 index。 */
+        if(String(cm&&cm.origin||'').indexOf('official')>=0){
+            text=requestOne(ctx,x,tag+' index+1',1);if(text)return text;
+            if(Number(x.index)>0){text=requestOne(ctx,x,tag+' index-1',-1);if(text)return text;}
+        }
+        return '';
+    }
+
+    var cm=qfQtCatalogV330.call(this,meta,false),text=runCatalog(this,cm,'首次');
+    if(text){qfLimSetErrV30.call(this,'晴天','');return text;}
+    var cm2=qfQtCatalogV330.call(this,meta,true);
+    text=r
+
+### fallback_dq LEN 9876 HITS 1
+
+/* alpha81 shared import */
+var __qfPc81=QF_MOD38_CACHE["provider_common"]||qfModuleEnsureV38.call(this,"provider_common");
+var qfChapterHintTryV56=__qfPc81.qfChapterHintTryV56;
+var qfChapterHintPutV56=__qfPc81.qfChapterHintPutV56;
+var qfChapterWindowTryV310=__qfPc81.qfChapterWindowTryV310;
+var qfChapterWindowPutV310=__qfPc81.qfChapterWindowPutV310;
+var qfNameVariantsV10=__qfPc81.qfNameVariantsV10;
+
+/* alpha80：共享工具由模块依赖 fallback_common 提供，不再常驻 jsLib。 */
+var __qfFc80=QF_MOD38_CACHE["fallback_common"]||qfModuleEnsureV38.call(this,"fallback_common");
+var qfV23Abs=__qfFc80.qfV23Abs;
+var qfV23HtmlToText=__qfFc80.qfV23HtmlToText;
+var qfV23CleanProviderText=__qfFc80.qfV23CleanProviderText;
+var qfV23Doc=__qfFc80.qfV23Doc;
+var qfV23CacheListGet=__qfFc80.qfV23CacheListGet;
+var qfV23CacheListPut=__qfFc80.qfV23CacheListPut;
+/* =========================
+ * 得奇 Provider · alpha44 独立模块
+ * 直接复刻独立得奇源：POST 搜索、bookbox 解析、分页目录、chapter.js token 正文。
+ * ========================= */
+var DQ_HOST="https://www.deqixs.cc";
+var DQ_HEADERS={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36","Referer":"https://www.deqixs.cc/","Accept-Language":"zh-CN,zh;q=0.9"};
+function dqAjaxV44(url,opt){
+    opt=opt||{};var h=QF_ProviderTransport.mergeHeaders(DQ_HEADERS,opt.headers||{});
+    var o=QF_ProviderTransport.options(opt,h,12000);
+    return QF_ProviderTransport.text(this,url,o,{provider:"得奇"});
+}
+function dqBookFromDocV44(doc,fallbackUrl){
+    var out=[];if(!doc)return out;
+    try{
+        var boxes=doc.select(".bookbox");
+        for(var i=0;i<boxes.size();i++){var e=boxes.get(i),a=e.select(".bookname a").first();if(!a)continue;var title=String(a.text()||"").trim(),href=qfV23Abs(DQ_HOST,String(a.attr("href")||"")),ae=e.select(".author").first(),author=ae?String(ae.text()||"").replace(/^作者[：:]\s*/,"").trim():"";if(title&&href)out.push({id:href,name:title,authorName:author,url:href});}
+    }catch(e0){}
+    if(out.length)return out;
+    /* 搜索命中单本时有些站点会直接跳详情页。 */
+    try{
+        var n=doc.select("[property=og\\:novel\\:book_name]").first(),a=doc.select("[property=og\\:novel\\:author]").first(),u=doc.select("link[rel=canonical]").first();
+        var title=n?String(n.attr("content")||"").trim():"",author=a?String(a.attr("content")||"").trim():"",href=u?String(u.attr("href")||""):"";if(!href)href=String(fallbackUrl||"");if(title&&href&&/(?:books|index)\/\d+/.test(href))out.push({id:href,name:title,authorName:author,url:qfV23Abs(DQ_HOST,href)});
+    }catch(e1){}
+    if(out.length)return out;
+    try{
+        var links=doc.select("a[href*=/books/],a[href*=/index/]");
+        for(var j=0;j<links.size();j++){var x=links.get(j),t=String(x.text()||"").trim(),href=qfV23Abs(DQ_HOST,String(x.attr("href")||""));if(t&&href&&t.length<=80)out.push({id:href,name:t,authorName:"",url:href});}
+    }catch(e2){}
+    return out;
+}
+function dqSearchBooksV44(name,author){
+    var vars=qfNameVariantsV10(name),out=[],seen={};
+    function add(arr){for(var i=0;i<arr.length;i++){var x=arr[i]||{},key=String(x.url||x.id||"")||qfNorm(x.name||"");if(!key||seen[key])continue;seen[key]=1;out.push(x);}}
+    for(var vi=0;vi<vars.length;vi++){
+        var bodies=["searchkey="+encodeURIComponent(vars[vi])+"&searchtype=all","searchkey="+String(vars[vi])+"&searchtype=all"];
+        for(var bi=0;bi<bodies.length;bi++)try{
+            var html=dqAjaxV44.call(this,DQ_HOST+"/modules/article/search.php",{method:"POST",charset:"utf-8",timeout:9000,headers:{"Content-Type":"application/x-www-form-urlencoded","Origin":DQ_HOST,"Referer":DQ_HOST+"/"},body:bodies[bi]});
+            add(dqBookFromDocV44(qfV23Doc(html),DQ_HOST+"/modules/article/search.php"));
+            if(qfDqPickBookV44(out,name,author))return out;
+        }catch(e0){}
+    }
+    return out;
+}
+function qfDqNormAuthorV44(s){return qfNorm(s).replace(/^(?:作者)/,"").replace(/(?:著|所著|作品)$/g,"");}
+function qfDqPickBookV44(items,name,author){
+    items=qdList(items);var tn=qfNorm(name),ta=qfDqNormAuthorV44(author),exact=[],best=null,bestScore=-99999;
+    for(var i=0;i<items.length;i++){var x=items[i]||{},xn=qfNorm(x.name||x.bookName||x.title||"");if(xn===tn&&String(x.url||x.id||""))exact.push(x);}if(exact.length===1)return exact[0];
+    for(var j=0;j<items.length;j++){var v=items[j]|
+
+### fallback_69 LEN 7076 HITS 1
+
+/* alpha81 shared import */
+var __qfPc81=QF_MOD38_CACHE["provider_common"]||qfModuleEnsureV38.call(this,"provider_common");
+var qfChapterHintTryV56=__qfPc81.qfChapterHintTryV56;
+var qfChapterHintPutV56=__qfPc81.qfChapterHintPutV56;
+var qfChapterWindowTryV310=__qfPc81.qfChapterWindowTryV310;
+var qfChapterWindowPutV310=__qfPc81.qfChapterWindowPutV310;
+var qfNameVariantsV10=__qfPc81.qfNameVariantsV10;
+
+/* alpha80：共享工具由模块依赖 fallback_common 提供，不再常驻 jsLib。 */
+var __qfFc80=QF_MOD38_CACHE["fallback_common"]||qfModuleEnsureV38.call(this,"fallback_common");
+var qfV23Abs=__qfFc80.qfV23Abs;
+var qfV23HtmlToText=__qfFc80.qfV23HtmlToText;
+var qfV23CleanProviderText=__qfFc80.qfV23CleanProviderText;
+var qfV23Doc=__qfFc80.qfV23Doc;
+var qfV23CacheListGet=__qfFc80.qfV23CacheListGet;
+var qfV23CacheListPut=__qfFc80.qfV23CacheListPut;
+/* =========================
+ * 69书吧 Provider · 独立模块边界修复 alpha43
+ * ========================= */
+var S69_HOST="https://www.69shuba.com";
+
+function s69HeadersV23(){
+    var ua="";
+    try{ua=String(qfJava(this).getWebViewUA()||"");}catch(e0){}
+    if(ua.indexOf("Mozilla")!==0){
+        ua="Mozilla/5.0 (Linux; Android 13; SM-S901U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.165 Mobile Safari/537.36";
+    }
+    return {
+        "User-Agent":ua,
+        "Referer":S69_HOST+"/",
+        "Accept-Language":"zh-CN,zh;q=0.9",
+        "Upgrade-Insecure-Requests":"1"
+    };
+}
+function s69IsCfV23(html){
+    return /_cf_chl_opt|cf_chl_prog|cf-browser-verification|challenge-form|Just a moment|Checking your browser|\/verify\.php/i.test(String(html||""));
+}
+function s69AjaxV23(url,opt){
+    opt=opt||{};var h=QF_ProviderTransport.mergeHeaders(s69HeadersV23.call(this),opt.headers||{});
+    var o=QF_ProviderTransport.options(opt,h,10000);
+    return QF_ProviderTransport.text(this,url,o,{provider:"69书吧"});
+}
+function s69MaybeVerifyV23(url,html){
+    if(!s69IsCfV23(html))return html;
+    if(!qfToggle.call(this,"69验证时弹窗",false)){
+        throw new Error("69书吧需要 Cloudflare 验证（登录页可开启验证弹窗）");
+    }
+    var j=qfJava(this);
+    try{
+        var r=j.startBrowserAwait(url,"69书吧 · 人机验证",false);
+        if(r)return String(r.body()||"");
+    }catch(e0){}
+    throw new Error("69书吧 Cloudflare 未放行");
+}
+function s69SearchBooksV23(name,author){
+    var vars=qfNameVariantsV10(name),out=[],seen={};
+    for(var vi=0;vi<vars.length;vi++){
+        try{
+            var html=s69AjaxV23.call(this,S69_HOST+"/modules/article/search.php",{method:"POST",charset:"gbk",timeout:8000,body:"searchkey="+vars[vi]+"&searchtype=all&page=1"});
+            if(s69IsCfV23(html)){
+                if(qfToggle.call(this,"69验证时弹窗",false)){
+                    var verifyUrl=S69_HOST+"/modules/article/search.php?searchkey="+qfJava(this).encodeURI(vars[vi],"gbk")+"&searchtype=all&page=1";
+                    html=s69MaybeVerifyV23.call(this,verifyUrl,html);
+                }else throw new Error("69书吧需要 Cloudflare 验证");
+            }
+            if(/间隔时间不得少于|两次搜索的间隔/.test(html))throw new Error("69书吧搜索限频");
+            var doc=qfV23Doc(html);
+            if(doc){
+                var els=doc.select(".newbox li");
+                for(var i=0;i<els.size();i++){
+                    var e=els.get(i),a=e.select("h3 a").first();if(!a)continue;
+                    var title=String(a.text()||"").trim(),href=qfV23Abs(S69_HOST,String(a.attr("href")||"")),labels=e.select(".labelbox label");
+                    var au=labels.size()?String(labels.get(0).text()||"").replace(/^作者[：:]?\s*/,"").trim():"";
+                    var key=href||qfNorm(title)+"|"+qfNorm(au);if(!key||seen[key])continue;
+                    seen[key]=1;out.push({id:href,name:title,authorName:au,url:href});
+                }
+            }
+            if(qfPickBookV10(out,name,author))return out;
+        }catch(e0){if(/Cloudflare|限频/.test(String(e0)))throw e0;}
+    }
+    return out;
+}
+function s69FindTocUrlV23(bookUrl,html){
+    var doc=qfV23Doc(html);
+    if(!doc)return bookUrl;
+    var sels=["a.more-btn",".addbtn a"];
+    for(var i=0;i<sels.length;i++){
+        try{
+            var a=doc.select(sels[i]).first();
+            if(a){
+                var u=qfV23Abs(bookUrl,String(a.attr("href")||""));
+                if(u)return u;
+            }
+        }catch(e0){}
+    }
+    return bookUrl;
+}
+function s69LoadTocV23(bind,qid){
+    var cacheKey="qf_v23_toc_69_"+qid+"_"+qfNorm(bind.url);
+    var cach
+
+### egg LEN 36120 HITS 19
+
+prite|qrcode|qr-code|app(?:download|_download|-download)|download(?:app|_app|-app)|client(?:icon|download)|image[_-]?(?:error|fail|failed)|pic[_-]?(?:error|fail|failed)|broken[_-]?image|(?:^|[\/_.-])(?:loading|placeholder|empty|blank|noimg|nopic|error|lazy|face|icon)(?:[\/_.?-]|$)/i.test(u))return false;return true;}
+function qfEggImageDataV62(ctx,u,base){
+    u=qfEggAbsV324(u,base);if(!qfEggGoodImageV324(u))return '';
+    var refs=[],seen={};
+    function add(v){v=String(v||'').trim();if(!v||seen[v])return;seen[v]=1;refs.push(v);}
+    add(base);add('https://read.qidian.com/');add('https://www.qidian.com/');add('https://m.qidian.com/');add('https://h5.if.qidian.com/');
+    for(var i=0;i<refs.length;i++){
+        try{var d=qfCopyrightImageData2929(ctx,u,refs[i],12*1024*1024)||'';if(/^data:image\//i.test(d))return d;}catch(_e){}
+    }
+    return '';
+}
+function qfEggRenderImageV59(ctx,u,base){
+    u=qfEggAbsV324(u,base);if(!qfEggGoodImageV324(u))return '';
+    var data=qfEggImageDataV62(ctx,u,base);
+    /* alpha62：只有真正下载成 data:image 才算成功；禁止把失败远链交给阅读显示错误占位图。 */
+    return data?'<img src="'+String(data).replace(/"/g,'&quot;')+'">':'';
+}
+function qfEggChapterCandidatesV62(node,base){
+    if(!node||typeof node!=='object')return [];
+    var keys=['url','Url','imageUrl','ImageUrl','originalUrl','OriginalUrl','originUrl','OriginUrl','resourceUrl','ResourceUrl','contentUrl','ContentUrl','thumbnail','Thumbnail','thumbUrl','ThumbUrl'];
+    var out=[],seen={};
+    for(var i=0;i<keys.length;i++){
+        var v=node[keys[i]];if(v===undefined||v===null||!String(v).trim())continue;
+        var u=qfEggAbsV324(String(v),base||'https://www.qidian.com/');
+        if(!qfEggGoodImageV324(u))continue;
+        var k=qfEggImageKeyV61(u)||u;if(seen[k])continue;seen[k]=1;out.push(u);
+    }
+    return out;
+}
+function qfEggPushGroupV62(bag,node,base,sem){
+    var g=qfEggChapterCandidatesV62(node,base);if(!g.length)return;
+    bag.imageGroups=bag.imageGroups||[];bag.groupKeys=bag.groupKeys||{};
+    var key=String(sem||'');if(!key)key=g.map(function(x){return qfEggImageKeyV61(x)||x;}).join('|');
+    if(bag.groupKeys[key])return;bag.groupKeys[key]=1;bag.imageGroups.push(g);
+}
+function qfEggRenderGroupsV62(ctx,groups,base,limit){
+    var out=[],seen={};
+    for(var i=0;groups&&i<groups.length&&out.length<(limit||8);i++){
+        var g=groups[i]||[],one='';
+        /* URL 是 APP 原图地址，thumbnail 是缩略图地址：原图失败自动试缩略图，二者只渲染一个。 */
+        for(var j=0;j<g.length;j++){var k=qfEggImageKeyV61(g[j])||g[j];if(seen[k])continue;var im=qfEggRenderImageV59(ctx,g[j],base);if(im){seen[k]=1;one=im;break;}}
+        if(one)out.push(one);
+    }
+    return out.join('\n');
+}
+function qfEggHasInlineImageV59(s){
+    return /<img\b[^>]*src\s*=/i.test(String(s||''));
+}
+function qfEggPushImageV325(bag,u,base){
+    u=qfEggAbsV324(u,base);
+    if(!qfEggGoodImageV324(u))return;
+    if(bag.images.indexOf(u)<0)bag.images.push(u);
+}
+function qfEggPushDirectV60(bag,u,base){u=qfEggAbsV324(u,base);if(!qfEggGoodImageV324(u))return;bag.directImages=bag.directImages||[];if(bag.directImages.indexOf(u)<0)bag.directImages.push(u);qfEggPushImageV325(bag,u,base);}
+function qfEggImageKeyV61(u){
+    u=qfEggAbsV324(u,'https://www.qidian.com/');
+    if(!u)return '';
+    var s=String(u).replace(/&amp;/g,'&');
+    try{s=decodeURIComponent(s);}catch(_d){}
+    s=s.replace(/[?#].*$/,'').replace(/!.*$/,'');
+    s=s.replace(/\.(?:jpg|jpeg|png|webp|gif)_(?:\d+x\d+|\d+)\.(?:jpg|jpeg|png|webp|gif)$/i,function(m){return m.replace(/_(?:\d+x\d+|\d+)\./,'.');});
+    s=s.replace(/(?:[-_](?:thumb|thumbnail|small|middle|large|origin|original|\d+x\d+|\d+))(?=\.(?:jpg|jpeg|png|webp|gif)$)/i,'');
+    return s.toLowerCase();
+}
+function qfEggPushDirectV61(bag,u,base){
+    u=qfEggAbsV324(u,base);if(!qfEggGoodImageV324(u))return;
+    bag.directImages=bag.directImages||[];bag.directKeys=bag.directKeys||{};
+    var k=qfEggImageKeyV61(u)||u;
+    if(bag.directKeys[k])return;
+    bag.directKeys[k]=1;bag.directImages.push(u);qfEggPushImageV325(bag,u,base);
+}
+function qfEggBestChapterImageV61(node){
+    if(!node||typeof node!=='object')return '';
+    var keys=['originalUrl','OriginalUrl','originUrl','OriginUrl','imageUrl','ImageUrl','url','Url','resourceUrl','ResourceUrl','contentUrl','ContentUrl','thumbnail','Thumbnail'];
+    for(var i=0;i<keys.length;i++){var v=node[keys[i]];if(v!==undefined&&v!==null&&String(v).trim())return String(v);}
+    return '';
+}
+function qfEggFindMarkupV60(n,out,d){if(n==null||d>14)return;if(Array.isArray(n)){for(var i=0;i<n.length;i++)qfEggFindMarkupV60(n[i],out,d+1);return;}if(typeof n==='string'){if(/\[img=[\s\S]+?\]/i.test(n)&&n.length>10)out.push(n);return;}if(typeof n!=='object')return;for(var k in n)if(Object.prototype.hasOwnProperty.call(n,k))qfEggFindMarkupV60(n[k],out,d+1);}
+function qfEggRenderMarkupV60(ctx,s,base){s=String(s||'').replace(/\\u002[fF]/g,'/').replace(/\\u003[aA]/g,':').replace(/\\u0026/g,'&').replace(/\\\//g,'/');if(!/\[img=/i.test(s))return '';s=s.replace(/\[img=([\s\S]+?)\]/ig,function(_m,u){var im=qfEggRenderImageV59(ctx,String(u||'').trim(),base);return im?'\n'+im+'\n':'';});s=s.replace(/\\r\\n/g,'\n').replace(/\\n/g,'\n').replace(/<br\s*\/?\s*>/ig,'\n');try{return qfTextKeepMediaLiteV38(s);}catch(_e){return s;}}
+function qfEggHintV325(text,raw,baseUrl){
+    var s=String(text||''),r='';try{r=qfRaw(raw);}catch(e0){r=String(raw||'');}
+    var all=s+'\n'+r+'\n'+String(baseUrl||''),ids=[];
+    function add(v){v=String(v||'').trim();if(/^\d{8,}$/.test(v)&&ids.indexOf(v)<0)ids.push(v);}
+    try{add(qfQueryV09(String(baseUrl||''),'qfMidpageId'));}catch(_q){}
+    var re=/我的彩蛋章\s*-?\s*(\d{8,})\s*-\s*(\d+)\s*插图/ig,m;
+    while((m=re.exec(all))!==null){add(m[1]);}
+    var jr=/(?:"|')(?:MidPageId|MidpageId|midPageId|midpageId|PageId|pageId)(?:"|')\s*:\s*(?:"|')?(\d{8,})(?:"|')?/ig;
+    while((m=jr.exec(all))!==null)add(m[1]);
+    return ids;
+}
+function qfEggLooksV324(text,meta,baseUrl,raw){
+    var s=String(text||''),r='';
+    try{r=qfRaw(raw);}catch(e0){r=String(raw||'');}
+    var u=String(baseUrl||'');
+    if(String(qfQueryV09(u,'qfType')||'').toLowerCase()==='midpage')return true;
+    if(/我的彩蛋章\s*-?\s*\d{8,}\s*-\s*\d+\s*插图|qimoType["']?\s*[:=]\s*["']?midpage|MidPageConfig|MidpageConfig|midPageId|midpageId/i.test(s+' '+r))return true;
+    var t=String(meta&&meta.title||'');
+    if(/彩蛋章|彩蛋内容|🎁|🥚/.test(t))return true;
+    return false;
+}
+function qfEggNodeHasHintV325(node,hints){
+    if(!node||typeof node!=='object'||!hints||!hints.length)return false;
+    var n=0;
+    for(var k in node){
+        if(!Object.prototype.hasOwnProperty.call(node,k))continue;
+        var v=node[k];
+        if(typeof v==='string'||typeof v==='number'){
+            var sv=String(v);
+            for(var i=0;i<hints.length;i++)if(sv.indexOf(String(hints[i]))>=0)return true;
+        }
+        if(++n>90)break;
+    }
+    return false;
+}
+function qfEggCollectV324(node,bag,depth,active,targetCid,targetTitle,hints){
+    if(node==null||depth>14)return;
+    if(Array.isArray(node)){for(var ai=0;ai<node.length;ai++)qfEggCollectV324(node[ai],bag,depth+1,active,targetCid,targetTitle,hints);return;}
+    if(typeof node!=='object')return;
+    function val(keys){for(var i=0;i<keys.length;i++){var v=node[keys[i]];if(v!==undefined&&v!==null&&String(v)!=='')return v;}return '';}
+    var cid=String(val(['ChapterId','ChapterID','chapterId','chapterID','C','Cid','cId','cid'])||'');
+    var title=String(val(['MidPageName','MidpageName','PageName','ChapterName','chapterName','Title','title','Name','name'])||'');
+    var typ=String(val(['qimoType','QimoType','type','Type','kind','Kind'])||'').toLowerCase();
+    var cfg=node.MidPageConfig||node.MidpageConfig||node.midPageConfig||null;
+    var chapterImageLike=(node.url!==undefined||node.Url!==undefined||node.imageUrl!==undefined||node.ImageUrl!==undefined||node.originalUrl!==undefined||node.OriginalUrl!==undefined)&&
+        (node.refContent!==undefined||node.RefContent!==undefined||node.chapterName!==undefined||node.ChapterName!==undefined||node.width!==undefined||node.Width!==undefined||node.height!==undefined||node.Height!==undefined||node.thumbnail!==undefined||node.Thumbnail!==undefined);
+    if(chapterImageLike){
+        bag.chapterMediaKeys=bag.chapterMediaKeys||{};
+        var ref=String(val(['refContent','RefContent','chapterName','ChapterName','pageId','PageId','id','Id'])||'');
+        var wh=String(val(['width','Width'])||'')+'x'+String(val(['height','Height'])||'');
+        var sem=(ref?ref+'|':'')+(wh!=='x'?wh:'');
+        if(!sem)sem='chapterImage@'+depth+'@'+String((bag.imageGroups||[]).length);
+        if(!bag.chapterMediaKeys[sem]){
+            bag.chapterMediaKeys[sem]=1;
+            qfEggPushGroupV62(bag,node,'https://www.qidian.com/',sem);
+        }
+        /* 同一 ChapterImageInfo 的 url/thumbnail 是同一个媒体项，只作为候选地址，不可分别渲染。 */
+        return;
+    }
+    var here=!!active||!!cfg||typ==='midpage'||typ==='egg'||node.isMidpage===true||node.isMidPage===true||node.isEgg===true||qfEggNodeHasHintV325(node,hints);
+    if(targetCid&&cid===String(targetCid))here=true;
+    if(targetTitle&&title&&qfNorm(title)===qfNorm(targetTitle))here=true;
+    if(here){
+        var textKeys=['Text','text','Content','content','Desc','desc','Description','description','Summary','summary'];
+        for(var ti=0;ti<textKeys.length;ti++){
+            var tv=node[textKeys[ti]];
+            if(typeof tv==='string'){
+                var tt=qfText(tv);if(tt&&tt.length>1&&tt.length<5000&&bag.text.indexOf(tt)<0)bag.text.push(tt);
+            }
+        }
+        for(var k in node){
+            if(!Object.prototype.hasOwnProperty.call(node,k))continue;
+            var v=node[k];
+            if(typeof v==='string'){
+                if(/image|img|pic|photo|poster|origin|original|resource|contenturl|material/i.test(k)||/\.(?:jpg|jpeg|png|webp|gif)(?:\?|$)/i.test(v))qfEggPushImageV325(bag,v,'https://www.qidian.com/');
+                if(/[<>{}\[\]]/.test(v)&&(/image|img|pic|photo|qpic|qidian|yuewen/i.test(v)))qfEggFromRawV324(v,bag,hints,'https://www.qidian.com/');
+            }
+        }
+    }
+    for(var key in node){if(Object.prototype.hasOwnProperty.call(node,key)&&node[key]&&typeof node[key]==='object')qfEggCollectV324(node[key],bag,depth+1,here,targetCid,targetTitle,hints);}
+}
+function qfEggFromRawV324(raw,bag,hints,base){
+    var s='';try{s=qfRaw(raw);}catch(e0){s=String(raw||'');}
+    if(!s)return;
+    base=String(base||'https://www.qidian.com/');
+    s=String(s).replace(/\\u002[fF]/g,'/').replace(/\\u003[aA]/g,':').replace(/\\u0026/g,'&').replace(/\\\//g,'/');
+    var dm,dir=/\\?\[img=([\s\S]+?)\\?\]/ig;while((dm=dir.exec(s))!==null){qfEggPushDirectV60(bag,String(dm[1]||'').replace(/^\\+|\\+$/g,'').trim(),base);}
+    var m,re=/<img\b[^>]*>/ig,tag;
+    while((m=re.exec(s))!==null){
+        tag=m[0]||'';
+        /* alpha59：真实懒加载地址优先，src 最后，避免占位图抢在 data-src 前面。 */
+        var attrs=['data-original','data-actualsrc','data-src','data-lazy-src','data-image','data-img','data-url','data-echo','original','src'];
+        for(var ai=0;ai<attrs.length;ai++){
+            var ar=new RegExp("(?:^|\s)"+attrs[ai].replace(/-/g,"\-")+"\s*=\s*['\"]([^'\"]+)['\"]","i"),am=tag.match(ar);
+            if(am&&am[1])qfEggPushImageV325(bag,am[1],base);
+        }
+        var sr=/srcset\s*=\s*['"]([^'"]+)['"]/ig,sm;
+        while((sm=sr.exec(tag))!==null){var pts=String(sm[1]||'').split(',');for(var si=0;si<pts.length;si++)qfEggPushImageV325(bag,String(pts[si]).trim().split(/\s+/)[0],base);}
+    }
+    var keys='ImgUrl|imgUrl|ImageUrl|imageUrl|ImageURL|imageURL|PicUrl|picUrl|PictureUrl|pictureUrl|PhotoUrl|photoUrl|PreImage|preImage|OriginImage|originImage|OriginalUrl|originalUrl|OriginalImage|originalImage|ContentUrl|contentUrl|ResourceUrl|resourceUrl|Poster|poster|PosterUrl|posterUrl';
+    var jr=new RegExp('(?:"|\\\')(?:'+keys+')(?:"|\\\')\\s*:\\s*(?:"|\\\')([^"\\\']+)(?:"|\\\')','ig');
+    while((m=jr.exec(s))!==null)qfEggPushImageV325(bag,m[1],base);
+    var md=/!\[[^\]]*\]\((https?:\/\/[^
+
+length;t++){
+        var tx=String(bag.text[t]||'').replace(/^\s*彩蛋章(?:[\s·：:—-]+)?/,'').trim();
+        if(!tx||qfNorm(tx)===qfNorm(meta.title||''))continue;
+        if(/^我的彩蛋章\s*-?\s*\d{8,}\s*-\s*\d+\s*插图\s*$/i.test(tx))continue;
+        out.push(tx);
+    }
+    return out.join('\n').trim();
+}
+
+/* ============================================================
+ * v3.0.0-alpha27：彩蛋章恢复 Archive 已验证的 App 数据解析链
+ * Qidian Web 对部分 MidPage 明确只提示“到 App 查看”，因此不再把网页 DOM
+ * 当主链。优先使用旧 Archive 已经实际跑通的 midpage_chapters/pageinfo 数据。
+ * ============================================================ */
+function qfEggArchiveExactV327(meta,raw,baseUrl){
+    if(!meta||!meta.bookId)return "";
+    var hints=qfEggHintV325(String(meta.title||""),raw,baseUrl),midId=hints.length?String(hints[0]):"";
+    try{var qid=String(qfQueryV09(String(baseUrl||""),"qfMidpageId")||"");if(qid)midId=qid;}catch(_q){}
+    var cids=[];
+    function addCid(v){v=String(v||"").trim();if(/^\d+$/.test(v)&&cids.indexOf(v)<0)cids.push(v);}
+    addCid(meta.chapterId);
+    function arr(v){if(!v)return[];if(Array.isArray(v))return v;try{if(v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(_e){}return[];}
+    function val(o,ks){o=o||{};for(var i=0;i<ks.length;i++){var v=o[ks[i]];if(v!==undefined&&v!==null&&String(v)!=="")return v;}return "";}
+    /* Resolve parent chapter from midpage_chapters exactly like the old Archive source. */
+    try{
+        var cr=qfEggArchiveApiV326(this,"midpage_chapters",{book_id:String(meta.bookId)}),root=cr.json||{},d=root.data||root.Data||root;
+        var chs=arr(d.Chapters||d.chapters||d.DataList||d.MidpageChapters||d.MidPageChapters);
+        for(var ci=0;ci<chs.length;ci++){
+            var ch=chs[ci]||{},cid=String(val(ch,["ChapterId","chapterId","C","Cid","cid"])||"");
+            var eggs=arr(ch.MidpageList||ch.MidPageList||ch.midPageList||ch.PageList||ch.Pages||ch.List);
+            for(var ei=0;ei<eggs.length;ei++){
+                var e=eggs[ei]||{},cfg=e.MidPageConfig||e.MidpageConfig||e.midPageConfig||{};
+                var id=String(val(cfg,["PageId","MidPageId","MidpageId","pageId","midpageId"])||val(e,["PageId","MidPageId","MidpageId","pageId","midpageId","Id"])||"");
+                var nm=String(val(e,["MidPageName","MidpageName","PageName","Title","title","Name","name"])||val(cfg,["PageName","Title","title"])||"").trim();
+                var hit=(midId&&id===midId)||(!midId&&nm&&qfNorm(nm)===qfNorm(meta.title||""));
+                if(hit){if(id)midId=id;addCid(cid);}
+            }
+        }
+        if(!cids.length)qfEggArchiveFindParentV326(root,hints,String(meta.title||""),cids,0,"");
+    }catch(e0){}
+
+    var texts=[],images=[],seenImg={};
+    function addText(t){t=qfText(String(t||"")).replace(/^\s*彩蛋章(?:[\s·：:—-]+)?/,"").trim();if(t&&t.length<5000&&qfNorm(t)!==qfNorm(meta.title||"")&&texts.indexOf(t)<0)texts.push(t);}
+    function addImg(u){u=qfEggAbsV324(String(u||""),"https://www.qidian.com/");if(!qfEggGoodImageV324(u)||seenImg[u])return;seenImg[u]=1;images.push(u);}
+    function walk(o,active,depth){
+        if(o==null||depth>16)return;
+        if(Array.isArray(o)){for(var ai=0;ai<o.length;ai++)walk(o[ai],active,depth+1);return;}
+        if(typeof o!=="object")return;
+        var cfg=o.MidPageConfig||o.MidpageConfig||o.midPageConfig||{};
+        var id=String(val(cfg,["PageId","MidPageId","MidpageId","pageId","midpageId"])||val(o,["PageId","MidPageId","MidpageId","pageId","midpageId"])||"");
+        var nm=String(val(o,["MidPageName","MidpageName","PageName","Title","title","Name","name"])||"");
+        var here=!!active||(!midId&&qfNorm(nm)===qfNorm(meta.title||""))||(midId&&id===midId);
+        if(here){
+            addText(val(o,["Text","text","Desc","desc","Description","description","Content","content"]));
+            addImg(val(o,["ImgUrl","imgUrl","ImageUrl","imageUrl","ImageURL","PicUrl","picUrl","PictureUrl","pictureUrl","OriginalUrl","originalUrl","OriginUrl","originUrl","ResourceUrl","resourceUrl","CoverUrl","coverUrl","Cover","cover"]));
+            /* Some widget Data contains serialized JSON/HTML. */
+            for(var sk in o)if(Object.prototype.hasOwnProperty.call(o,sk)&&typeof o[sk]==="string"){
+                var sv=String(o[sk]||"");
+                if(/https?:\\?\/\\?\/[^\s\"'<>]+\.(?:jpg|jpeg|png|webp|gif)/i.test(sv)){
+                    var mm=sv.match(/https?:\\?\/\\?\/[^\s\"'<>]+\.(?:jpg|jpeg|png|webp|gif)(?:\?[^\s\"'<>]*)?/ig)||[];
+                    for(var mi=0;mi<mm.length;mi++)addImg(mm[mi].replace(/\\\//g,"/"));
+                }
+            }
+    
+
+### role LEN 41078 HITS 70
+
+atar","avatar",
+            "HeadImage","headImage"
+        ];
+        for(var i=0;i<ks.length;i++){
+            var u=qfRoleNormImg2940(o[ks[i]]);
+            if(u)return u;
+        }
+        return "";
+    }
+
+    var hit=direct(roleObj);
+    if(hit)return hit;
+    hit=direct(containerObj);
+    if(hit)return hit;
+
+    var best="",bestScore=-1,seen=[];
+    function walk(node,depth){
+        if(!node||depth>5||bestScore>=120)return;
+        if(typeof node!=="object")return;
+        if(seen.indexOf(node)>=0)return;
+        seen.push(node);
+
+        if(Array.isArray(node)){
+            for(var ai=0;ai<node.length&&ai<24;ai++)walk(node[ai],depth+1);
+            return;
+        }
+
+        for(var k in node){
+            if(!Object.prototype.hasOwnProperty.call(node,k))continue;
+            var v=node[k];
+
+            if(typeof v==="string"){
+                var u=qfRoleNormImg2940(v);
+                if(!u)continue;
+
+                var key=String(k||"").toLowerCase();
+                var score=0;
+                if(/role.*back.*ground/.test(key))score+=120;
+                else if(/background/.test(key))score+=90;
+                else if(/role.*image|role.*pic/.test(key))score+=75;
+                else if(/portrait|photo/.test(key))score+=55;
+                else if(/image|img|pic/.test(key))score+=40;
+                else if(/avatar|head/.test(key))score+=20;
+
+                if(/thumb|small|icon/.test(key))score-=35;
+                if(/bookcover|cover/.test(u.toLowerCase()))score-=15;
+
+                if(score>bestScore){
+                    bestScore=score;
+                    best=u;
+                }
+            }else if(v&&typeof v==="object"){
+                walk(v,depth+1);
+            }
+        }
+    }
+
+    walk(roleObj,0);
+    walk(containerObj,0);
+    return best;
+}
+
+function qfRoleTags2940(roleObj,containerObj){
+    var cand=[
+        roleObj&&roleObj.TagList,roleObj&&roleObj.tagList,
+        roleObj&&roleObj.Tags,roleObj&&roleObj.tags,
+        roleObj&&roleObj.RoleTagList,roleObj&&roleObj.roleTagList,
+        roleObj&&roleObj.CharacterTagList,roleObj&&roleObj.characterTagList,
+        roleObj&&roleObj.HonorList,roleObj&&roleObj.honorList,
+        roleObj&&roleObj.LabelList,roleObj&&roleObj.labelList,
+        containerObj&&containerObj.TagList,containerObj&&containerObj.tagList,
+        containerObj&&containerObj.RoleTagList,containerObj&&containerObj.roleTagList,
+        containerObj&&containerObj.CharacterTagList,containerObj&&containerObj.characterTagList,
+        containerObj&&containerObj.HonorList,containerObj&&containerObj.honorList,
+        containerObj&&containerObj.LabelList,containerObj&&containerObj.labelList
+    ];
+    var out=[],seen={};
+    for(var c=0;c<cand.length;c++){
+        var a=qfRoleArr2940(cand[c]);
+        for(var i=0;i<a.length&&out.length<24;i++){
+            var t=a[i],name="",likes=0;
+            if(typeof t==="string"){
+                name=qfRolePlainB61(t);
+            }else{
+                t=t||{};
+                var ti=t.TagInfo||t.tagInfo||t.LabelInfo||t.labelInfo||{};
+                name=qfRolePlainB61(
+                    t.TagName||t.tagName||t.Name||t.name||t.Title||t.title||
+                    t.LabelName||t.labelName||ti.TagName||ti.tagName||ti.Name||ti.name||""
+                );
+                likes=qfRoleNum2943(
+                    t.Likes||t.likes||t.LikeCount||t.likeCount||t.Count||t.count||
+                    t.HotValue||t.hotValue||ti.Likes||ti.likes||ti.Count||ti.count||0
+                );
+            }
+            if(!name||name.length>40||seen[name])continue;
+            seen[name]=1;
+            out.push({name:name,likes:likes||0});
+        }
+    }
+    return out;
+}
+
+function qfRoleNum2943(v){
+    if(v===undefined||v===null||v==="")return 0;
+    if(typeof v==="number")return isFinite(v)?v:0;
+    var s=String(v).replace(/,/g,"").trim();
+    var m=s.match(/-?\d+(?:\.\d+)?/);
+    return m?Number(m[0])||0:0;
+}
+
+function qfRolePrettyNum2943(n){
+    n=Number(n||0);
+    if(!isFinite(n)||n<=0)return "";
+    if(n>=100000000){
+        var y=n/100000000;
+        return (Math.round(y*10)/10).toString().replace(/\.0$/,"")+"亿";
+    }
+    if(n>=10000){
+        var w=n/10000;
+        return (Math.round(w*10)/10).toString().replace(/\.0$/,"")+"万";
+    }
+    return String(Math.round(n));
+}
+
+function qfRoleNormalize2940(root,bid){
+    var d=(root&&(root.Data||root.data))||root||{};
+    var out=[],byId={},byName={};
+    bid=String(bid||"");
+
+    function cleanId(v){
+        if(v===undefined||v===null)return "";
+        var s=String(v).trim();
+        if(!/^\d{5,}$/.test(s))return "";
+        if(bid&&s===bid)return "";
+        return s;
+    }
+    function directRoleId(o,allowGeneric){
+        if(!o||typeof o!=="object")return "";
+        var ks=[
+            "RoleId","roleId","RoleID","roleID",
+            "BookRoleId","bookRoleId","BookRoleID","bookRoleID",
+            "CharacterId","characterId","CharacterID","characterID"
+        ];
+        for(var i=0;i<ks.length;i++){var x=cleanId(o[ks[i]]);if(x)return x;}
+        for(var k in o){
+            if(!Object.prototype.hasOwnProperty.call(o,k))continue;
+            var lk=String(k).toLowerCase();
+            if(((/(role|character)/.test(lk)&&/id$/.test(lk))||(/^id(role|character)/.test(lk)))){
+                var y=cleanId(o[k]);if(y)return y;
+            }
+        }
+        if(allowGeneric){var z=cleanId(o.Id||o.id);if(z)return z;}
+        return "";
+    }
+    function nestedRoleId(o,depth){
+        if(!o||typeof o!=="object"||depth>3)return "";
+        var id=directRoleId(o,false);if(id)return id;
+        var pref=["Role","role","RoleInfo","roleInfo","TopRoleInfo","topRoleInfo","BookRole","bookRole","Character","character"];
+        for(var i=0;i<pref.length;i++){
+            var v=o[pref[i]];
+            if(v&&typeof v==="object"){
+                id=directRoleId(v,true)||nestedRoleId(v,depth+1);if(id)return id;
+            }
+        }
+        for(var k in o){
+            if(!Object.prototype.hasOwnProperty.call(o,k))continue;
+            var v2=o[k];if(v2&&typeof v2==="object"){id=nestedRoleId(v2,depth+1);if(id)return id;}
+        }
+        return "";
+    }
+    function roleIdOf(roleObj,containerObj){
+        return directRoleId(roleObj,true)||directRoleId(containerObj,false)||nestedRoleId(roleObj,0)||nestedRoleId(containerObj,0)||"";
+    }
+    function normKey(v){return qfRolePlainB61(v).toLowerCase().replace(/\s+/g,"").replace(/[·•:：,，.。!！?？;；"'“”‘’《》〈〉「」『』【】\[\]（）()_\-—–]/g,"");}
+    function mergeTags(a,b){
+        a=Array.isArray(a)?a:[];b=Array.isArray(b)?b:[];
+        var seen={},r=[],i,t;
+        for(i=0;i<a.length;i++){t=a[i]||{};if(t.name&&!seen[t.name]){seen[t.name]=1;r.push(t);}}
+        for(i=0;i<b.length&&r.length<24;i++){t=b[i]||{};if(t.name&&!seen[t.name]){seen[t.name]=1;r.push(t);}}
+        return r;
+    }
+    function findExisting(name,position,roleId){
+        if(roleId&&Object.prototype.hasOwnProperty.call(byId,roleId))return byId[roleId];
+        var nk=normKey(name),a=byName[nk]||[],pk=normKey(position);
+        for(var i=0;i<a.length;i++){
+            var idx=a[i],old=out[idx]||{},op=normKey(old.position||"");
+            if(!pk||!op||pk===op)return idx;
+        }
+        return -1;
+    }
+    function indexRole(idx){
+        var r=out[idx]||{};
+        if(r.id)byId[String(r.id)]=idx;
+        var nk=normKey(r.name||"");if(nk){if(!byName[nk])byName[nk]=[];if(byName[nk].indexOf(idx)<0)byName[nk].push(idx);}
+    }
+    function add(roleObj,containerObj){
+        if(!roleObj||typeof roleObj!=="object")return;
+        var name=qfRolePlainB61(
+            roleObj.RoleName||roleObj.roleName||roleObj.CharacterName||roleObj.characterName||roleObj.Name||roleObj.name||""
+        );
+        if(!name)return;
+        var position=qfRolePlainB61(
+            roleObj.Position||roleObj.position||roleObj.RolePosition||roleObj.rolePosition||roleObj.Identity||roleObj.identity||roleObj.RoleTypeName||roleObj.roleTypeName||""
+        );
+        var desc=qfRolePlainB61(
+            roleObj.RoleDesc||roleObj.roleDesc||roleObj.CharacterDesc||roleObj.characterDesc||
+            roleObj.Description||roleObj.description||roleObj.Introduction||roleObj.introduction||roleObj.Intro||roleObj.intro||roleObj.Desc||roleObj.desc||""
+        );
+        if(!desc)desc="角色太过神秘还没有简介";
+        var likes=qfRoleNum2943(
+            roleObj.Likes||roleObj.likes||roleObj.LikeCount||roleObj.likeCount||roleObj.PraiseCount||roleObj.praiseCount||
+            roleObj.AgreeAmount||roleObj.agreeAmount||roleObj.HotValue||roleObj.hotValue||0
+        );
+        var roleId=roleIdOf(roleObj,containerObj),image=qfRoleBestImg2940(roleObj,containerObj),tags=qfRoleTags2940(roleObj,containerObj);
+        var idx=findExisting(name,position,roleId);
+        if(idx>=0){
+            var old=out[idx];
+            if(!old.id&&roleId)old.id=roleId;
+            if(!old.position&&position)old.position=position;
+            if((!old.desc||old.desc==="角色太过神秘还没有简介")&&desc)old.desc=desc;
+            else if(desc&&desc!=="角色太过神秘还没有简介"&&String(desc).length>String(old.desc||"").length)old.desc=desc;
+            if(likes>Number(old.likes||0))old.likes=likes;
+            if(!old.image&&image)old.image=image;
+            old.tags=mergeTags(old.tags,tags);
+            if(roleObj&&typeof roleObj==="object")old.raw=roleObj;
+            indexRole(idx);
+            return;
+        }
+        idx=out.length;
+        out.push({id:roleId,name:name,position:position,desc:desc,likes:likes||0,image:image,tags:tags,raw:roleObj});
+        indexRole(idx);
+    }
+
+    var details=qfRoleArr2940(d.BookLookForDetail||d.bookLookForDetail);
+    for(var i=0;i<details.length;i++){
+        var x=details[i]||{},mt=Number(x.ModelType||x.modelType||0);
+        var r=x.TopRoleInfo||x.topRoleInfo||x.RoleInfo||x.roleInfo||x.CharacterInfo||x.characterInfo;
+        if(r&&(mt===3||mt===0))add(r,x);
+    }
+
+    function walk(node,depth){
+        if(!node||depth>7)return;
+        if(Array.isArray(node)){for(var ai=0;ai<node.length;ai++)walk(node[ai],depth+1);return;}
+        if(typeof node!=="object")return;
+        if(node.TopRoleInfo)add(node.TopRoleInfo,node);
+        if(node.topRoleInfo)add(node.topRoleInfo,node);
+        if(node.RoleInfo&&(node.RoleName||node.roleName||node.RoleInfo.RoleName||node.RoleInfo.roleName))add(node.RoleInfo,node);
+        if(node.roleInfo&&(node.RoleName||node.roleName||node.roleInfo.RoleName||node.roleInfo.roleName))add(node.roleInfo,node);
+        var arrays=[
+            node.RoleList,node.roleList,node.Roles,node.roles,node.BookRoleList,node.bookRoleList,
+            node.RoleCardList,node.roleCardList,node.CharacterList,node.characterList,node.Characters,node.characters,
+            node.RoleInfoList,node.roleInfoList,node.RoleDetailList,node.roleDetailList
+        ];
+        for(var ri=0;ri<arrays.length;ri++){var rs=qfRoleArr2940(arrays[ri]);for(var rj=0;rj<rs.length;rj++)add(rs[rj],rs[rj]);}
+        if((node.RoleName||node.roleName||node.CharacterName||node.characterName)&&(
+            node.Position||node.position||node.Identity||node.identity||node.RoleDesc||node.roleDesc||
+            node.CharacterDesc||node.characterDesc||node.RoleBackGroundImage||node.roleBackGroundImage||node.RoleImage||node.roleImage
+        ))add(node,node);
+        for(var k in node){if(Object.prototype.hasOwnProperty.call(node,k)){var v=node[k];if(v&&typeof v==="object")walk(v,depth+1);}}
+    }
+    walk(d,0);
+
+    /* 最终只为仍缺 ID 的角色做一次名字邻近补全，避免 BookId/ModelId 被误当 RoleId。 */
+    function findIdByName(wanted){
+        wanted=normKey(wanted);if(!wanted)return "";
+        var found="";
+        function scan(node,depth,parent){
+            if(found||!node||depth>7)return;
+            if(Array.isArray(node)){for(var i=0;i<node.length&&!found;i++)scan(node[i],depth+1,parent);return;}
+            if(typeof node!=="object")return;
+            var nm=normKey(node.RoleName||node.roleName||node.CharacterName||node.characterName||node.Name||node.name||"");
+            if(nm&&nm===wanted){found=roleIdOf(node,parent||node);if(found)return;}
+            for(var k in node){if(Object.prototype.hasOwnProperty.call(node,k)){var v=node[k];if(v&&typeof v==="object")scan(v,depth+1,node);if(found)return;}}
+        }
+        scan(d,0,null);return found;
+    }
+    for(var z=0;z<out.length;z++){
+        if(!out[z].id){var fid=findIdByName(out[z].name);if(fid){out[z].id=fid;byId[fid]=z;}}
+    }
+
+    var cover="https://bookcover.yuewen.com/qdbimg/349573/"+encodeURIComponent(String(bid))+"/600";
+    for(var q=0;q<out.length;q++)if(!out[q].image)out[q].image=cover;
+    return out;
+}
+
+function qfRoleMetaB22(raw){
+    var profile={gender:"",birthday:"",constellation:"",age:"",identity:"",faction:""};
+    var star={rank:"",value:"",level:"",guardians:"",current:0,next:0,percent:-1};
+    if(!raw||typeof raw!=="object")return {profile:profile,star:star};
+    var seen=[];
+    function clean(v){
+        if(v===undefined||v===null)return "";
+        if(typeof v==="number"){if(!isFinite(v))return "";return String(v);}
+        if(typeof v==="boolean")return v?"是":"否";
+        if(typeof v!=="string")return "";
+        var s=qfRolePlainB61(v);return s&&s!=="0"?s:"";
+    }
+    function primitive(o,names){
+        if(!o||typeof o!=="object"||Array.isArray(o))return "";
+        var map={};for(var k in o)if(Object.prototype.hasOwnProperty.call(o,k))map[String(k).toLowerCase()]=k;
+        for(var i=0;i<names.length;i++){
+            var rk=map[String(names[i]).toLowerCase()];if(rk===undefined)continue;
+            var x=o[rk];if(x!==null&&typeof x!=="object"){var s=clean(x);if(s)return s;}
+        }
+        return "";
+    }
+    function num(o,names){var s=primitive(o,names);if(!s)return 0;var n=Number(String(s).replace(/,/g,""));return isFinite(n)?n:0;}
+    function walk(o,d){
+        if(!o||typeof 
+
+Name","GuardianLevelName"]);
+        if(!star.guardians)star.guardians=primitive(o,["GuardianCount","GuardCount","SupporterCount","FansCount"]);
+        if(!star.current)star.current=num(o,["CurrentValue","CurrentExp","CurrentScore","CurrentStarValue","CurValue"]);
+        if(!star.next)star.next=num(o,["NextValue","NextExp","NextScore","NextStarValue","UpgradeValue","TargetValue"]);
+        if(Array.isArray(o)){for(var i=0;i<o.length&&i<30;i++)walk(o[i],d+1);return;}
+        for(var k in o)if(Object.prototype.hasOwnProperty.call(o,k)){var x=o[k];if(x&&typeof x==="object")walk(x,d+1);}
+    }
+    walk(raw,0);
+    if(star.current>0&&star.next>star.current)star.percent=Math.max(0,Math.min(100,Math.round(star.current*100/star.next)));
+    return {profile:profile,star:star};
+}
+
+function qfRoleBookName2940(root,bookObj){
+    try{
+        var n=String(bookObj&&bookObj.name||"").trim();
+        if(n)return n;
+    }catch(e0){}
+
+    var d=(root&&(root.Data||root.data))||root||{};
+    var bi=d.BaseBookInfo||d.baseBookInfo||d.BookInfo||d.bookInfo||{};
+    return String(
+        bi.BookName||bi.bookName||
+        bi.Name||bi.name||
+        d.BookName||d.bookName||
+        "书籍信息"
+    ).trim()||"书籍信息";
+}
+
+function qfRoleHtml2940(root,bid,bookObj,roles){
+    var bookName=qfRoleBookName2940(root,bookObj),cover="https://bookcover.yuewen.com/qdbimg/349573/"+encodeURIComponent(String(bid))+"/600",cards="";
+    function v(x){return qfRoleEsc2940(String(x==null?"":x));}
+    function nice(x){var n=Number(x);return isFinite(n)&&n>0?qfRolePrettyNum2943(n):v(x);}
+    for(var i=0;i<roles.length;i++){
+        var r=roles[i]||{},meta=(r.profile||r.star)?{profile:r.profile||{},star:r.star||{}}:qfRoleMetaB22(r.raw||{}),p=meta.profile||{},s=meta.star||{},tags="",rows="";
+        for(var k=0;k<(r.tags||[]).length;k++){var t=r.tags[k]||{};tags+='<span class="roleTag">'+v(t.name)+(t.likes>0?'<b> · '+v(qfRolePrettyNum2943(t.likes))+'</b>':'')+'</span>';}
+        function row(label,val){if(val)rows+='<div class="kv"><span>'+label+'</span><b>'+v(val)+'</b></div>';}
+        row('性别',p.gender);row('生日',p.birthday);row('星座',p.constellation);row('年龄',p.age);row('身份',p.identity);row('阵营',p.faction);
+        var hasStar=!!(s.rank||s.value||s.level||s.guardians||s.current||s.next),prog=(Number(s.percent)>=0)?('<div class="progress"><i style="width:'+Math.max(0,Math.min(100,Number(s.percent)))+'%"></i></div><div class="progressText">'+(s.current?nice(s.current):'')+(s.next?' / '+nice(s.next):'')+'</div>'):'',img=v(r.image||cover),imgAttr=i===0?('src="'+img+'" loading="eager" fetchpriority="high"'):('src="'+v(cover)+'" data-src="'+img+'" loading="lazy" fetchpriority="low"'),desc=String(r.desc||'');
+        if(desc==='角色太过神秘还没有简介')desc='';
+        cards+='<section class="slide'+(i===0?' active':'')+'"><article class="card" data-bg="'+img+'" data-roleid="'+v(r.id||'')+'">'+
+        '<div class="photo"><img class="roleImg" '+imgAttr+' data-fallback="'+v(cover)+'" decoding="async" referrerpolicy="no-referrer"><div class="photoShade"></div><div class="heroMeta"><div class="heroLine"><div class="roleName">'+v(r.name)+'</div>'+(r.position?'<span class="position">'+v(r.position)+'</span>':'')+(r.likes>0?'<span class="likes">♥ '+v(qfRolePrettyNum2943(r.likes))+'</span>':'')+'</div><div class="heroSub">角色档案 · 起点官方数据 · B25</div></div></div>'+
+        '<div class="info"><input class="tabRadio profileRadio" type="radio" name="roleTab'+i+'" id="roleProfile'+i+'" checked>'+'<input class="tabRadio starRadio" type="radio" name="roleTab'+i+'" id="roleStar'+i+'">'+'<div class="tabs"><label class="tabBtn profileLabel" for="roleProfile'+i+'">角色档案</label><label class="tabBtn starLabel" for="roleStar'+i+'">星耀守护</label></div>'+
+        '<div class="tabPane starPane"><div class="stats"><div><span>守护排名</span><b>'+v(s.rank||'—')+'</b></div><div><span>星耀值</span><b>'+v(s.value||'—')+'</b></div><div><span>等级</span><b>'+v(s.level||'—')+'</b></div></div>'+prog+(s.guardians?'<div class="guardians">已有 <b>'+v(s.guardians)+'</b> 位读者守护</div>':'')+(!hasStar?'<div class="officialEmpty">官方暂未返回该角色的星耀守护数据</div>':'')+'<div class="ruleTitle">星耀互动</div><div class="ruleGrid"><span>♡ 比心</span><span>♢ 送礼</span><span>🏷 标签</span><span>✦ 大事记</span></div><div class="ruleHint">互动入口仅作角色卡信息分区；数值只展示官方接口实际返回的数据。</div></div>'+
+        '<div class="tabPane profilePane">'+(rows?'<div class="profileGrid">'+rows+'</div>':'')+(desc?'<div class="sectionTitle">角色简介</div><div class="desc">'+v(desc)+'</div>':'<div class="officialEmpty">官方暂未提供角色简介</div>')+(tags?'<div class="sectionTitle tagTitle">角色标签</div><div class="roleTags">'+tags+'</div>':'')+(r.id?'<div class="roleId">Role ID · '+v(r.id)+'</div>':'')+'</div></div></article></section>';
+    }
+    if(!cards)cards='<section class="slide active"><div class="empty"><div class="emptyIcon">✦</div><div class="emptyTitle">暂无角色资料</div><div class="emptyText">起点官方接口暂未返回该书角色卡</div></div></section>';
+    return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>角色卡</title><style>'+ 
+    '*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#08090d;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}.top{height:68px;padding:10px 16px 7px;background:linear-gradient(180deg,#151821,#0b0d12);border-bottom:1px solid rgba(255,255,255,.06)}.topLine{display:flex;align-items:center;justify-content:space-between}.pageTitle{font-size:18px;font-weight:760}.roleCount{font-size:11px;color:#d6b66b}.book{margin-top:2px;font-size:11px;color:rgba(255,255,255,.58);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hint{margin-top:2px;font-size:9px;color:rgba(255,255,255,.32)}.viewport{position:absolute;left:0;right:0;top:68px;bottom:0;overflow:hidden}.slide{position:absolute;inset:0;display:none;padding:8px 10px 10px}.slide.active{display:block}.card{height:100%;overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:22px;background:linear-gradient(180deg,#171a22,#101218);box-shadow:0 14px 34px rgba(0,0,0,.28)}.photo{position:relative;height:43%;min-height:210px;overflow:hidden;background:radial-gradient(circle at 50% 15%,#2b2f3b,#111319 70%)}.roleImg{width:100%;height:100%;object-fit:contain;object-position:center top;opacity:0;transition:opacity .2s}.roleImg.loaded{opacity:1}.photoShade{position:absolute;inset:0;background:linear-gradient(180deg,transparent 48%,rgba(10,11,15,.18) 66%,rgba(10,11,15,.96) 100%);pointer-events:none}.heroMeta{position:absolute;left:17px;right:15px;bottom:12px}.heroLine{display:flex;align-items:center;gap:7px;min-width:0}.roleName{font-size:25px;font-weight:830;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 12px rgba(0,0,0,.5)}.position,.likes{flex:0 0 auto;padding:4px 7px;border-radius:9px;font-size:10px}.position{background:rgba(236,199,111,.16);border:1px solid rgba(236,199,111,.28);color:#f0d18a}.likes{background:rgba(226,83,107,.13);color:#f4a2b0}.heroSub{margin-top:3px;font-size:9px;color:rgba(255,255,255,.44)}.info{height:57%;overflow-y:auto;overscroll-behavior:contain;padding:0 14px 26px;scrollbar-width:none}.info::-webkit-scrollbar{display:none}.tabs{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px 0 9px;background:linear-gradient(180deg,#111319 80%,rgba(17,19,25,0))}.tabBtn{height:35px;border:0;border-radius:12px;background:#1b1e27;color:rgba(255,255,255,.52);font-size:12px;font-weight:700}.tabRadio{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}.tabBtn{display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;touch-action:manipulation}.tabs{touch-action:manipulation}.profileRadio:checked~.tabs .profileLabel,.starRadio:checked~.tabs .starLabel{background:linear-gradient(135deg,#40351e,#282116);color:#f2d38b;box-shadow:inset 0 0 0 1px rgba(231,193,104,.25)}.tabPane{display:none}.profileRadio:checked~.profilePane,.starRadio:checked~.starPane{display:block}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.stats>div{padding:12px 7px 11px;text-align:center;border-radius:14px;background:linear-gradient(180deg,#1d2029,#181a21);border:1px solid rgba(255,255,255,.055)}.stats span{display:block;font-size:9px;color:rgba(255,255,255,.38)}.stats b{display:block;margin-top:5px;font-size:16px;color:#f2d38b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.progress{height:6px;margin-top:13px;border-radius:6px;background:#222630;overflow:hidden}.progress i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#9c762f,#f0d48d)}.progressText{margin-top:4px;text-align:right;font-size:9px;color:rgba(255,255,255,.34)}.guardians{margin-top:10px;padding:10px 12px;border-radius:12px;background:#171a21;font-size:11px;color:rgba(255,255,255,.58)}.guardians b{color:#f0d18a}.officialEmpty{margin-top:10px;padding:13px;border-radius:12px;background:#161920;color:rgba(255,255,255,.38);font-size:11px;line-height:1.6}.ruleTitle,.sectionTitle{margin:15px 0 8px;font-size:12px;font-weight:760;color:#e8e9ed}.ruleGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.ruleGrid span{padding:9px 4px;text-align:center;border-radius:11px;background:#1a1d25;color:#d9c48f;font-size:10px;border:1px solid rgba(255,255,255,.045)}.ruleHint{margin-top:7px;font-size:9px;line-height:1.55;color:rgba(255,255,255,.28)}.profileGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.kv{padding:9px 10px;border-radius:11px;background:#181b23;min-width:0}.kv span{display:block;font-size:9px;color:rgba(255,255,255,.34)}.kv b{display:block;margin-top:3px;font-size:12px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.desc{font-size:12px;line-height:1.72;color:rgba(255,255,255,.72);white-space:pre-wrap}.roleTags{display:flex;flex-wrap:wrap;gap:6px}.roleTag{padding:5px 8px;border-radius:9px;font-size:10px;color:#f6d57b;background:linear-gradient(135deg,rgba(168,119,27,.28),rgba(97,67,19,.15));border:1px solid rgba(225,182,72,.28)}.roleTag b{font-weight:620;color:#ffe7a7}.roleId{margin-top:15px;padding-bottom:12px;font-size:9px;letter-spacing:.05em;color:rgba(255,255,255,.18)}.pager{position:absolute;right:14px;top:44%;transform:translateY(-50%);z-index:28;display:flex;flex-direction:column;align-items:center;gap:6px}.dot{display:block;width:7px;height:7px;border:0;padding:0;border-radius:8px;background:rgba(255,255,255,.28);transition:.2s}.dot.on{height:18px;background:#f3d28c}.counter{position:absolute;right:19px;bottom:9px;z-index:24;font-size:9px;color:rgba(255,255,255,.34);pointer-events:none}.scrollTip{position:absolute;left:50%;bottom:9px;z-index:25;transform:translateX(-50%);font-size:9px;color:rgba(255,255,255,.28);pointer-events:none;transition:opacity .2s}.modal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.96)}.modal.show{display:flex}.modal img{max-width:96vw;max-height:94vh;object-fit:contain}.close{position:absolute;right:14px;top:7px;z-index:2;padding:10px;font-size:36px;line-height:1;color:#fff}.empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px}.emptyIcon{font-size:44px;color:#d3ae58}.emptyTitle{margin-top:14px;font-size:20px;font-weight:800}.emptyText{margin-top:7px;font-size:12px;color:#777}'+
+    '</style></head><body><div class="top"><div class="topLine"><div class="pageTitle">角色卡</div><div class="roleCount">'+v(roles.length)+' 位角色</div></div><div class="book">'+v(bookName)+'</div><div class="hint">左右滑动切换角色 · 档案区上下滑动 · 点击立绘查看原图</div></div><div id="vp" class="viewport">'+cards+'</div><div id="pager" class="pager"></div><div id="scrollTip" class="scrollTip">上下滑动查看完整档案</div><div id="counter" class="counter"></div><div id="modal" class="modal"><div id="close" class="close">×</div><img id="full"></div>'+
+    '<script>(function(){var ss=[].slice.call(document.querySelectorAll(".slide")),i=0,p=document.getElementById("pager"),vp=document.getElementById("vp"),m=document.getElementById("modal"),fi=document.getElementById("full"),ct=document.getElementById("counter");function ensureImg(n){var s=ss[n];if(!s)return;var im=s.querySelector(".roleImg");if(!im)return;if(!im.__qfLife){im.__qfLife=1;im.onload=function(){im.classList.add("loaded")};im.onerror=function(){var fb=im.getAttribute("data-fallback");if(fb&&im.src!==fb){im.src=fb;return}im.classList.add("loaded")};if(im.complete&&im.naturalWidth)im.classList.add("loaded")}var u=im.getAttribute("data-src");if(u){im.removeAttribute("data-src");im.src=u}}function bindTabs(s){return}function paint(){for(var k=0;k<ss.length;k++)ss[k].classList.toggle("active",k===i);ensureImg(i);if(ss.length>1){ensureImg((i+1)%ss.length);ensureImg((i-1+ss.length)%ss.length)}if(p){var h="";for(var q=0;q<ss.length;q++)h+="<i class=\\"dot "+(q===i?"on":"")+"\\" data-i=\\""+q+"\\"></i>";p.innerHTML=h}if(ct)ct.textContent=ss.length>1?(i+1)+" / "+ss.length:"";var inf=ss[i]&&ss[i].querySelector(".info"),tip=document.getElementById("scrollTip");if(inf){inf.scrollTop=0;setTimeout(function(){if(tip)tip.style.opacity=(inf.scrollHeight>inf.clientHeight+8)?"1":"0"},45)}else if(tip)tip.style.opacity="0"}function go(n){if(!ss.length)return;i=(n+ss.length)%ss.length;paint()}function lock(){try{if(window.java&&typeof window.java.upConfig==="function")window.java.upConfig(JSON.stringify({state:3,skipCollapsed:true,isDraggable:false,isDraggableOnNestedScroll:false,scrollNoDraggable:true}))}catch(e){}}function bindInfo(){var ins=document.querySelectorAll(".info");for(var n=0;n<ins.length;n++){(function(inf){if(inf.__qfBound)return;inf.__qfBound=1;var sx=0,sy=0,ss0=0,dx=0,dy=0,axis="",interactive=false;inf.addEventListener("touchstart",function(e){lock();interactive=!!(e.target&&e.target.closest&&e.target.closest(".tabs"));if(interactive){e.stopPropagation();return}var t=e.touches[0];sx=t.clientX;sy=t.clientY;ss0=inf.scrollTop;dx=0;dy=0;axis="";if(e.cancelable)e.preventDefault();e.stopPropagation()},{passive:false});inf.addEventListener("touchmove",function(e){if(interactive){e.stopPropagation();return}var t=e.touches[0];dx=t.clientX-sx;dy=t.clientY-sy;var ax=Math.abs(dx),ay=Math.abs(dy);if(!axis&&(ax>6||ay>6))axis=(ax>ay*1.22)?"x":"y";if(axis!=="x"){var max=Math.max(0,inf.scrollHeight-inf.clientHeight),next=ss0-dy;if(next<0)next=0;if(next>max)next=max;inf.scrollTop=next}if(e.cancelable)e.preventDefault();e.stopPropagation()},{passive:false});inf.addEventListener("touchend",function(e){if(interactive){interactive=false;e.stopPropagation();return}if(axis==="x"&&Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)*1.22)go(i+(dx<0?1:-1));if(e.cancelable)e.preventDefault();e.stopPropagation();axis=""},{passive:false});inf.addEventListener("touchcancel",function(e){interactive=false;axis="";e.stopPropagation()},{passive:true})})(ins[n])}}bindInfo();var x0=0,y0=0,t0=0,startInfo=false,moved=false;vp.addEventListener("touchstart",function(e){lock();var t=e.touches[0];x0=t.clientX;y0=t.clientY;t0=Date.now();moved=false;startInfo=!!(e.target&&e.target.closest&&e.target.closest(".info"))},{passive:true});vp.addEventListener("touchmove",function(e){var t=e.touches[0];if(Math.abs(t.clientX-x0)>8||Math.abs(t.clientY-y0)>8)moved=true},{passive:true});vp.addEventListener("touchend",function(e){var t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;if(startInfo)return;if(Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)*1.35&&Date.now()-t0<1200){go(i+(dx<0?1:-1));return}var c=ss[i]&&ss[i].querySelector(".card");if(c&&!moved&&Math.abs(dx)<13&&Math.abs(dy)<13){var u=c.getAttribute("data-bg");if(u){fi.src=u;m.classList.add("show")}}},{passive:true});if(p)p.onclick=function(e){var t=e.target&&e.target.closest?e.target.closest("[data-i]"):null;if(!t)return;var n=Number(t.getAttribute("data-i"));if(isFinite(n))go(n)};document.getElementById("close").onclick=function(){m.classList.remove("show");fi.src=""};m.onclick=function(e){if(e.target===m){m.classList.remove("show");fi.src=""}};paint()})();</script></body></html>';
+}
+
+function qfRoleData(bookObj,chapterObj){
+    var bid='';
+    try{bid=qfRoleBookIdV12(bookObj);}catch(_b0){}
+    if(!bid){
+        try{var vals=[String(bookObj&&bookObj.bookUrl||''),String(bookObj&&bookObj.tocUrl||''),String(chapterObj&&chapterObj.url||'')].join(' '),m=vals.match(/(?:book_id=|bookId=|\/book\/|qdbimg\/349573\/)(\d{5,})/i);if(m)bid=String(m[1]);}catch(_b1){}
+    }
+    if(!bid)return {ok:false,bookId:'',bookName:'',roles:[],message:'未识别到当前起点 BookId',source:'lookfor',schema:'qf.role-set/1',contractVersion:1};
+    var pack=qfRoleFetchOfficial2940(this,bid);
+    if(!pack||!pack.ok)return {ok:false,bookId:bid,bookName:'',roles:[],message:String(pack&&pack.message||'官方接口暂未返回角色资料'),source:'lookfor',schema:'qf.role-set/1',contractVersion:1};
+    var roles=Array.isArray(pack.roles)?pack.roles:null;if(!roles){roles=qfRoleNormalize2940(pack.root,bid);pack.roles=roles;}
+    var bookName=qfRoleBookName2940(pack.root,bookObj),canonical=[],src=Array.isArray(roles)?roles:[];
+    for(var i=0;i<src.length;i++){var r=src[i]||{};var rm=qfRoleMetaB22(r.raw||{});canonical.push({id:String(r.id||''),name:String(r.name||''),position:String(r.position||''),desc:String(r.description!==undefined?r.description:(r.desc||'')),likes:Number(r.likes||0)||0,image:String(r.image||''),tags:Array.isArray(r.tags)?r.tags:[],profile:rm.profile,star:rm.star});}
+    return {ok:true,bookId:bid,bookName:bookName,roles:canonical,message:'',source:'lookfor',schema:'qf.role-set/1',contractVersion:1};
+}
+function qfRoleView(model){
+    model=model&&typeof model==='object'?model:{};
+    var bid=String(model.bookId||''),roles=Array.isArray(model.roles)?model.roles:[],bookName=String(model.bookName||'书籍信息');
+    if(!bid)return {ok:false,message:'未识别到当前起点 BookId'};
+    if(!roles.length)return {ok:false,message:String(model.message||'该书暂无官方角色卡')};
+    var viewRoles=roles;
+    if(String(model.schema||'')!=='qf.role-set/1'){viewRoles=[];for(var i=0;i<roles.length;i++){var r=roles[i]||{};viewRoles.push({id:String(r.id||''),name:String(r.name||''),position:String(r.position||''),desc:String(r.description!==undefined?r.description:(r.desc||'')),likes:Number(r.likes||0)||0,image:String(r.image||''),tags:Array.isArray(r.tags)?r.tags:[],profile:r.profile||{},star:r.star||{}});}}
+    var html=qfRoleHtml2940({},bid,{name:bookName},viewRoles);
+    return {ok:true,html:html,target:'https://h5.if.qidian.com/new/role/share/?bookId='+encodeURIComponent(bid),config:qfV18RoleConfig(),message:''};
+}
+
+function qfOpenRoleCardV20(j,src,bookObj,chapterObj){
+    if(!j)return;
+
+    var bid="";
+    try{bid=qfRoleBookIdV12(bookObj);}catch(e0){}
+    if(!bid){
+        try{
+            var vals=[String(bookObj&&bookObj.bookUrl||""),String(bookObj&&bookObj.tocUrl||""),String(chapterObj&&chapterObj.url||"")].join(" ");
+            var m=vals.match(/(?:book_id=|bookId=|\/book\/|qdbimg\/349573\/)(\d{5,})/i);if(m)bid=m[1];
+        }catch(e1){}
+    }
+    if(!bid){try{j.longToast("角色卡：未识别到当前起点 BookId");}catch(e2){}return;}
+
+    var pack=qfRoleFetchOfficial2940(this,bid);
+    if(!pack||!pack.ok){
+        var msg=pack&&pack.message?String(pack.message):"官方接口暂未返回角色资料";
+        try{j.longToast("角色卡加载失败："+msg);}catch(e3){}return;
+    }
+
+    /* beta6.1：fetch 阶段已经归一化并缓存角色；重复打开不再遍历整份官方 JSON。 */
+    var roles=Array.isArray(pack.roles)?pack.roles:null;
+    if(!roles){roles=qfRoleNormalize2940(pack.root,bid);pack.roles=roles;}
+    if(!roles.length){try{j.longToast("角色卡：该书暂无官方角色卡");}catch(e4){}return;}
+
+    var bookName=qfRoleBookName2940(pack.root,bookObj);
+    var html="";
+    if(pack.viewHtml&&pack.viewBookName===bookName)html=pack.viewHtml;
+    else{html=qfRoleHtml2940(pack.root,bid,bookObj,roles);pack.viewHtml=html;pack.viewBookName=bookName;}
+
+    var target="https://h5.if.qidian.com/new/role/share/?bookId="+encodeURIComponent(String(bid));
+    var cfg=qfV18RoleConfig(),pre="window.java=java;"+qfV18BottomAnchorPre();
+    try{j.showBrowser(target,html,pre,JSON.stringify(cfg));}
+    catch(e5){try{j.longToast("角色卡打开失败："+String(e5));}catch(_e){}}
+}
+
+
+/* ---------- 最终正文 ---------- */
+
+/* ===== v2.1 mature progressive comment UI ===== */
+
+function qfRoleDataV420(){return qfRoleData.apply(this,arguments);}
+
+function qfRoleViewV420(){return qfRoleView.apply(this,arguments);}
+
+
+### circle LEN 159617 HITS 171
+
+/* v3.1.0-beta5.6：书友圈加载速度 + 原生化美观专项优化。
+ * - 分类规则完全沿用 beta5.5，不再改动动态/精华/同人候选与交叉逻辑；
+ * - 首开取消“为了追求长讨论 JsId”而额外补拉一次 getcircledetail：beta5.4 后短 PostCategoryId=2 已有稳定兜底，减少一次串行网络请求；
+ * - 书友圈 Boot 内存缓存延长到 5 分钟；WebView 分类页请求缓存支持空结果短缓存，避免同一失败参数在切分类/翻页时重复请求；
+ * - 帖子详情首屏增加 2 分钟会话缓存，重复打开同帖直接复用；
+ * - 图片统一 lazy + async decode + low priority，降低首屏图片解码阻塞；
+ * - 顶部、卡片、分类条、详情和回复区做紧凑原生化重排；筛选加载改为轻量骨架屏。
+ */
+/* alpha80：继续将仅属于本模块的 helper 收回 lazy module，未进入功能时不建立全局函数。 */
+function qfStripVideoMetaV13(text){
+    var s=String(text==null?"":text);
+    if(!/(?:VideoCover|VideoUrl|VideoId|VideoStatus|VideoHeight|VideoWidth)/i.test(s))return s;
+    var keys=['"VideoCover"',"'VideoCover'",'VideoCover:', '"VideoUrl"',"'VideoUrl'",'VideoUrl:','"VideoId"',"'VideoId'",'VideoId:'];
+    var p=-1;
+    for(var i=0;i<keys.length;i++){var x=s.indexOf(keys[i]);if(x>=0&&(p<0||x<p))p=x;}
+    if(p<0)return s;
+    var st=p,b1=s.lastIndexOf('{',p),b2=s.lastIndexOf('(',p),b3=s.lastIndexOf('[',p);
+    if(b1>=0&&p-b1<6)st=b1;else if(b2>=0&&p-b2<6)st=b2;else if(b3>=0&&p-b3<6)st=b3;
+    return s.slice(0,st).replace(/[({\[\s]+$/g,'').trim();
+}
+
+/* alpha79：本模块私有依赖内聚。未进入该功能时，不在全局运行时建立这些 helper。 */
+function qfCircleFaceTextV310(text){
+    var s=String(text==null?"":text);
+    /* beta5.1：先修复 beta5 第二层正则误伤 &nbsp; 形成的历史污染文本。 */
+    s=s.replace(/&\[fn=\$1\]b\[fn=\$1\]p;/ig," ").replace(/\[fn=\$1\]/g,"");
+    s=s.replace(/&#91;/ig,"[").replace(/&#93;/ig,"]");
+    try{
+        s=s.replace(/\[(?:fn|em|face|emoji)[ ]*[=:][ ]*([0-9]{1,3})\]/ig,function(_,n){
+            var map={1:"👏",2:"🌹",3:"🤝",4:"😁",5:"😄",6:"🥺",7:"🙂",8:"😏",9:"😙",10:"👆🏻🐽",11:"🙄",12:"😭",13:"😵",14:"😥",15:"🖕🏻",16:"🥵",17:"😓",18:"🤫",19:"😂",20:"😢",21:"😍",22:"🤕🔨",23:"😑",24:"😫",25:"🤗",26:"🤪",27:"🙏",28:"😣",29:"💪",30:"💀",31:"😳",32:"😎",33:"🤭",34:"😄👏",35:"👍🏻",36:"🤓",37:"😡",38:"🙁",39:"😄❓",40:"😞",41:"😧",42:"💋",43:"☺️",44:"🤬",45:"😴",46:"🤠🚬",47:"😱",48:"🐷",49:"😪",50:"🤐",51:"🥴",52:"🌙",53:"❤️",54:"🔪",55:"🎁",56:"💔",57:"👊🏻",58:"😒",59:"✌🏻️",60:"😮",61:"🤨",62:"😴",63:"👏🏻",64:"🐲",65:"⭐",66:"🌧️",67:"🍉",68:"🍵",69:"🔥",70:"💯"};
+            return map[Number(n)]||"";
+        });
+    }catch(e){}
+    return s;
+}
+
+function qfRoleBookIdV12(bookObj){
+    var vals=[];
+    try{vals.push(String(bookObj&&bookObj.bookUrl||""));}catch(e0){}
+    try{vals.push(String(bookObj&&bookObj.tocUrl||""));}catch(e1){}
+    try{vals.push(String(bookObj&&bookObj.origin||""));}catch(e2){}
+    try{vals.push(String(bookObj&&bookObj.bookId||""));}catch(e3){}
+    try{
+        if(bookObj&&bookObj.getVariable){
+            vals.push("bookId="+String(bookObj.getVariable("qf_bid")||""));
+        }
+    }catch(e4){}
+
+    for(var i=0;i<vals.length;i++){
+        var x=vals[i];
+        if(/^\d{5,}$/.test(x))return x;
+        var m=x.match(/(?:book_id=|bookId=|\/book\/|qdbimg\/349573\/)(\d+)/i);
+        if(m&&m[1])return String(m[1]);
+    }
+    return "";
+}
+
+function qfCircleCleanResult2964(v){
+    var s=String(v==null?"":v).trim();
+    if(!s||s==="null"||s==="undefined")return "";
+    if(s.charAt(0)==='"'&&s.charAt(s.length-1)==='"'){
+        try{return String(JSON.parse(s)||"");}catch(e0){}
+    }
+    return s;
+}
+
+function qfCircleExtractScript2965(){
+    return "(function(){"
+        +"function n(s){return String(s||'').replace(/[\\t\\r ]+/g,' ').replace(/\\n{3,}/g,'\\n\\n').trim();}"
+        +"function bad(t){return !t||/^(书友圈|动态|热门|最新|精华|同人创作|全部|作家说|讨论|书评|登录|立即登录|打开起点读书|下载起点读书|发帖|查看全部帖子)/.test(t);}"
+        +"function hrefOf(el){if(!el)return'';var as=[];if(el.matches&&el.matches('a[href]'))as=[el];else as=el.querySelectorAll('a[href]');for(var i=0;i<as.length;i++){var h=String(as[i].href||as[i].getAttribute('href')||'');if(h&&!/javascript:/i.test(h))return h;}return'';}"
+        +"function imgOf(el){if(!el)return'';var is=el.querySelectorAll('img');for(var i=0;i<is.length;i++){var im=is[i],u=im.getAttribute('data-src')||im.getAttribute('data-original')||im.currentSrc||im.src||'';if(!u)continue;var p=im,cls='';for(var d=0;d<4&&p;d++,p=p.parentElement)cls+=' '+String(p.className||'');if(/avatar|head|user|author|logo|icon|qrcode|sprite|loading/i.test(cls+' '+u))continue;var w=Number(im.naturalWidth||im.width||im.getAttribute('width')||0),h=Number(im.naturalHeight||im.height||im.getAttribute('height')||0);if(w&&h&&w<=180&&h<=180)continue;return String(u);}return'';}"
+        +"function avatarOf(el){if(!el)return'';var is=el.querySelectorAll('img');for(var i=0;i<is.length;i++){var im=is[i],u=im.getAttribute('data-src')||im.getAttribute('data-original')||im.currentSrc||im.src||'';if(!u)continue;var p=im,cls='';for(var d=0;d<3&&p;d++,p=p.parentElement)cls+=' '+String(p.className||'');var w=Number(im.naturalWidth||im.width||im.getAttribute('width')||0),h=Number(im.naturalHeight||im.height||im.getAttribute('height')||0);if(/avatar|head|user|author/i.test(cls+' '+u)||(w&&h&&w<=120&&h<=120))return String(u);}return'';}"
+        +"var out=[],seen={};"
+        +"function add(el){if(!el||out.length>=36)return;var raw=String(el.innerText||el.textContent||'');var t=n(raw);if(!t||t.length<8||t.length>1400)return;if(/登录后获得更多|新人.*免费读|下载起点读书|打开起点读书/.test(t))return;"
+            +"var lines=raw.split(/\\n+/).map(n).filter(function(x){return x&&!bad(x)&&x.length<240;});if(!lines.length)return;"
+            +"var user='',title='',body='';"
+            +"if(lines.length>=2&&lines[0].length<=20&&!/[，。！？：]/.test(lines[0]))user=lines.shift();"
+            +"if(lines.length)title=lines.shift();"
+            +"if(lines.length)body=lines.slice(0,7).join('\\n');"
+            +"if(!title&&user){title=user;user='';}"
+            +"var meaningful=(title?title.length:0)+(body?body.length:0);if(meaningful<8)return;if(!body&&title.length<10&&!imgOf(el))return;"
+            +"var h=hrefOf(el),im=imgOf(el),av=avatarOf(el);"
+            +"var k=n((user+'|'+title+'|'+body).substring(0,320));if(seen[k])return;seen[k]=1;"
+            +"out.push({user:user,title:title,body:body,url:h,img:im,avatar:av});"
+        +"}"
+        +"var sels=['article','li','[class*=thread-item]','[class*=topic-item]','[class*=post-item]','[class*=feed-item]','[class*=comment-item]','[class*=card]','[class*=post]','[class*=thread]','[class*=feed]','[class*=topic]'];"
+        +"for(var s=0;s<sels.length;s++){var es=document.querySelectorAll(sels[s]);for(var i=0;i<es.length;i++)add(es[i]);if(out.length>=12)break;}"
+        +"if(!out.length){var as=document.querySelectorAll('a[href]');for(var j=0;j<as.length;j++){var h=String(as[j].href||'');if(/forum|circle|comment|review|discuss|topic|thread|post/i.test(h))add(as[j].parentElement||as[j]);}}"
+        +"var text=n(document.body?document.body.innerText:'');var mm=text.match(/(\\d+)\\s*讨论帖/);"
+        +"var allTxt='',allUrl='';var ae=document.querySelectorAll('a,button,[role=button],div,span');for(var q=0;q<ae.length;q++){var z=n(ae[q].innerText||ae[q].textContent||'');if(/^查看全部帖子/.test(z)){allTxt=z;var aa=(ae[q].matches&&ae[q].matches('a[href]'))?ae[q]:(ae[q].closest?ae[q].closest('a[href]'):null);if(aa)allUrl=String(aa.href||aa.getAttribute('href')||'');break;}}"
+        +"return JSON.stringify({url:location.href,title:document.title||'',count:mm?mm[1]:'',all:{text:allTxt,url:allUrl},items:out,body:text.slice(0,1200),cand:document.querySelectorAll('article,li,[class*=post],[class*=thread],[class*=feed],[class*=topic],[class*=card]').length});"
+    +"})()";
+}
+
+function qfCircleExtract2965(j,url){
+    var pack={url:String(url||""),count:"",all:{text:"",url:""},items:[],title:"",body:"",cand:0};
+    if(!j||typeof j.webView!=="function"||!url)return pack;
+    try{
+        var raw=qfCircleCleanResult2964(j.webView(null,String(url),qfCircleExtractScript2965()));
+        if(!raw)return pack;
+        var x=JSON.parse(raw);
+        if(x&&typeof x==="object"){
+            pack.url=String(x.url||url);
+            pack.count=String(x.count||"");
+            pack.all=x.all||pack.all;
+            pack.items=Array.isArray(x.items)?x.items:[];
+            pack.title=String(x.title||"");
+            pack.body=String(x.body||"");
+            pack.cand=Number(x.cand||0)||0;
+        }
+    }catch(e){}
+    return pack;
+}
+
+function qfCircleFindRealUrl2965(j,bid){
+    var bookUrls=[
+        "https://www.qidian.com/book/"+encodeURIComponent(String(bid))+"/",
+        "https://book.qidian.com/info/"+encodeURIComponent(String(bid))+"/"
+    ];
+    var script="(function(){"
+        +"function n(s){return String(s||'').replace(/\\s+/g,'').trim();}"
+        +"var a=document.querySelectorAll('a[href],button,[role=button],[onclick]'),best='',bs=0;"
+        +"for(var i=0;i<a.length;i++){var t=n(a[i].innerText||a[i].textContent||a[i].getAttribute('title')||''),h=String(a[i].href||a[i].getAttribute('href')||''),s=0;"
+        +"if(/书友圈/.test(t))s+=150;if(/书友互动/.test(t))s+=100;if(/书评区|书评/.test(t))s+=80;if(/forum|circle|comment|review|discuss|topic|thread/i.test(h))s+=55;"
+        +"if(s>bs&&h&&h.indexOf('javascript:')!==0){bs=s;best=h;}}return best;})()";
+    for(var i=0;i<bookUrls.length;i++){
+        try{
+            var raw=qfCircleCleanResult2964(j.webView(null,bookUrls[i],script));
+            if(/^https?:\/\//i.test(raw))return raw;
+        }catch(e){}
+    }
+    return "";
+}
+
+function qfCircleEsc2964(v){
+    return String(v==null?"":v)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#39;");
+}
+
+function qfCircleBookName2964(b){
+    var n="";
+    try{n=String(b&&b.getVariable?b.getVariable("qf_name"):"").trim();}catch(e0){}
+    try{if(!n)n=String(b&&(b.name||b.bookName||b.title)||"").trim();}catch(e1){}
+    return n;
+}
+
+function qfCircleHtml2964(bookName,bid,pack,officialUrl){
+    pack=pack||{};
+    var rawItems=Array.isArray(pack.items)?pack.items:[];
+    var items=[],seenTitle={};
+
+    function qfCircleKey2968(s){
+        s=String(s||"")
+            .replace(/[\s·•，。！？、：；（）()【】《》<>\[\]_-]+/g,"")
+            .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,"")
+            .toLowerCase();
+        return s;
+    }
+
+    function qfCircleRich2968(x){
+        var v=0;
+        try{if(x.body)v+=Math.min(260,String(x.body).length);}catch(e0){}
+        try{if(x.img)v+=100;}catch(e1){}
+        try{if(x.avatar)v+=25;}catch(e2){}
+        try{if(x.user)v+=18;}catch(e3){}
+        try{if(x.url)v+=45;}catch(e4){}
+        return v;
+    }
+
+    for(var di=0;di<rawItems.length;di++){
+        var it0=rawItems[di]||{};
+        var dk=qfCircleKey2968(it0.title||"");
+        if(!dk)dk=qfCircleKey2968(String(it0.body||"").slice(0,100));
+        if(!dk)continue;
+
+        if(seenTitle[dk]!==undefined){
+            var oi=seenTitle[dk];
+            var oldIt=items[oi]||{};
+            if(qfCircleRich2968(it0)>qfCircleRich2968(oldIt)){
+                if(!it0.body&&oldIt.body)it0.body=oldIt.body;
+                if(!it0.user&&oldIt.user)it0.user=oldIt.user;
+                if(!it0.avatar&&oldIt.avatar)it0.avatar=oldIt.avatar;
+                if(!it0.img&&oldIt.img)it0.img=oldIt.img;
+                if(!it0.url&&oldIt.url)it0.url=oldIt.url;
+                items[oi]=it0;
+            }else{
+                if(!oldIt.body&&it0.body)oldIt.body=it0.body;
+                if(!oldIt.user&&it0.user)oldIt.user=it0.user;
+                if(!oldIt.avatar&&it0.avatar)oldIt.avatar=it0.avatar;
+                if(!oldIt.img&&it0.img)oldIt.img=it0.img;
+                if(!oldIt.url&&it0.url)oldIt.url=it0.url;
+            }
+            continue;
+        }
+
+        seenTitle[dk]=items.length;
+        items.push(it0);
+    }
+
+    var count=String(pack.count||"");
+    var all=pack.all||{};
+    var html=[];
+    html.push("<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'>");
+    html.push("<title>起点书友圈</title><style>");
+    html.push(":root{color-scheme:light dark;--bg:#f4f5f7;--card:#fff;--text:#202226;--sub:#8a8e96;--line:#eceef1;--red:#ef4553;--chip:#f1f2f4}");
+    html.push("*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif}");
+    html.push("body{padding:0 0 26px}.head{position:sticky;top:0;z-index:8;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);padding:14px 16px 11px;backdrop-filter:blur(12px)}");
+    html.push(".topline{display:flex;align-items:center;gap:10px}.ttl{font-size:19px;font-weight:760;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.count{font-size:12px;color:var(--sub);margin-top:4px}");
+    html.push(".official{margin-left:auto;color:#777;text-decoration:none;font-size:12px;border:1px solid #ddd;padding:6px 10px;border-radius:999px;white-space:nowrap}");
+    html.push(".tabs{display:flex;gap:18px;margin-top:12px;font-size:14px}.tab{font-weight:700;color:#222;position:relative;padding-bottom:6px}.tab:after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:99px;background:var(--red)}.future{color:#aaa}");
+    html.push(".feed{padding:8px 0}.card{background:var(--card);padding:14px 16px;margin:0 0 9px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}");
+    html.push(".user{display:flex;align-items:center;gap:9px;color:var(--sub);font-size:12px;margin-bottom:8px}.avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;background:#eee}.avatarFallback{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#eee;color:#999}");
+    html.push(".ct{font-size:16px;font-weight:720;line-height:1.45;margin-bottom:6px}.cb{font-size:14px;line-height:1.65;color:#555;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}.pic{display:block;margin-top:10px;max-width:48%;max-height:180px;border-radius:9px;object-fit:cover}");
+    html.push(".actions{margin-top:11px;display:flex;align-items:center;justify-content:space-between}.go{color:#d64651;text-decoration:none;font-size:13px;font-weight:680}.hint{color:var(--sub);font-size:11px}");
+    html.push(".empty{margin:14px;background:var(--card);border-radius:14px;padding:28px 18px;text-align:center;color:var(--sub)}.empty b{display:block;color:var(--text);font-size:16px;margin-bottom:8px}.diag{margin-top:12px;font-size:11px;line-height:1.55;word-break:break-all;text-align:left;background:var(--chip);padding:10px;border-radius:9px}");
+    html.push(".foot{text-align:center;color:#a2a5ab;font-size:11px;padding:14px}");
+    html.push("@media(prefers-color-scheme:dark){:root{--bg:#101115;--card:#181a20;--text:#eef0f3;--sub:#9297a2;--line:#292c34;--chip:#22252d}.head{background:rgba(24,26,32,.97)}.tab{color:#eee}.official{border-color:#3b3e47;color:#bbb}.cb{color:#c0c4ca}.avatarFallback{background:#2c2f37}.empty b{color:#eee}}");
+    html.push("</style></head><body>");
+
+    html.push("<header class='head'><div class='topline'><div><div class='ttl'>💬 "+qfCircleEsc2964((bookName||("BookId "+bid))+"书友圈")+"</div>");
+    html.push("<div class='count'>"+(count?qfCircleEsc2964(count)+" 讨论帖 · ":"")+"数据来自起点官方页面，本地整理</div></div>");
+    html.push("<a class='official' href='"+qfCircleEsc2964(officialUrl)+"'>官方页</a></div>");
+    html.push("<div class='tabs'><span class='tab'>动态</span><span class='future'>精华</span><span class='future'>同人创作</span></div></header>");
+
+    if(items.length){
+        html.push("<main class='feed'>");
+        for(var i=0;i<items.length&&i<30;i++){
+            var it=items[i]||{};
+            html.push("<article class='card'>");
+            if(it.user||it.avatar){
+                html.push("<div class='user'>");
+                if(it.avatar)html.push("<img class='avatar' src='"+qfCircleEsc2964(it.avatar)+"' referrerpolicy='no-referrer'>");
+                else html.push("<span class='avatarFallback'>书</span>");
+                html.push("<span>"+qfCircleEsc2964(it.user||"书友")+"</span></div>");
+            }
+            if(it.title)html.push("<div class='ct'>"+qfCircleEsc2964(it.title)+"</div>");
+            if(it.body)html.push("<div class='cb'>"+qfCircleEsc2964(it.body)+"</div>");
+            if(it.img&&/^https?:\/\//i.test(String(it.img)))html.push("<img class='pic' src='"+qfCircleEsc2964(it.img)+"' referrerpolicy='no-referrer'>");
+            html.push("<div class='actions'>");
+            if(it.url&&/^https?:\/\//i.test(String(it.url)))html.push("<a class='go' href='"+qfCircleEsc2964(it.url)+"'>查看帖子 ›</a>");
+            else html.push("<span class='hint'>预览帖</span>");
+            html.push("</div></article>");
+        }
+        html.push("</main>");
+    }else{
+        html.push("<div class='empty'><b>暂未提取到帖子</b><div>本版已改用旧版曾成功显示帖子卡片的宽松提取规则，并先定位真实书友圈 URL。</div>");
+        html.push("<div class='diag'>最终页："+qfCircleEsc2964(String(pack.url||officialUrl))+"<br>页面标题："+qfCircleEsc2964(String(pack.title||""))+"<br>候选容器："+qfCircleEsc2964(String(pack.cand||0))+"<br>“查看全部帖子”："+qfCircleEsc2964(String((all&&all.text)||"未识别"))+"<br>链接："+qfCircleEsc2964(String((all&&all.url)||"未暴露"))+"<br><br>页面正文前1200字：<br>"+qfCircleEsc2964(String(pack.body||""))+"</div>");
+        html.push("</div>");
+    }
+    html.push("<div class='foot'>起点书友圈 · 本地整理测试版 v2.9.68</div>");
+    html.push("</body></html>");
+    return html.join("");
+}
+
+
+function qfCircleApiJson2970(raw){
+    var s=String(raw||"").trim();
+    if(!s)return null;
+
+    /*
+     * 书友圈 Post/Topic/Circle/User Id 经常超过 JS 安全整数。
+     * 真机 getcirclepostlist 已返回 Id / CircleId 等长整数，
+     * 先字符串化再 JSON.parse，避免帖子详情链接 ID 被舍入。
+     */
+    function safe(t){
+        return String(t||"").replace(
+            /("(?:Id|ID|CircleId|circleId|PostId|postId|TopicId|topicId|UserId|userId|MemberId|memberId|AuthorId|authorId|RoleId|roleId|MasterPostId|masterPostId|PostCategoryId|postCategoryId|CategoryId|categoryId|SubCategoryId|subCategoryId|SubCategory|subCategory|JsId|jsId)"\s*:\s*)(\d{16,})/g,
+            '$1"$2"'
+        );
+    }
+
+    try{return JSON.parse(safe(s));}catch(e0){}
+    try{
+        if(s.charAt(0)==='"'&&s.charAt(s.length-1)==='"'){
+            var x=JSON.parse(s);
+            return JSON.parse(safe(String(x||"")));
+        }
+    }catch(e1){}
+    return null;
+}
+
+function qfCircleApiKeys2970(o){
+    try{
+        if(o&&typeof o==="object")return Object.keys(o).slice(0,40).join(",");
+    }catch(e){}
+    return "";
+}
+
+function qfCircleApiCode2970(o){
+    if(!o||typeof o!=="object")return "";
+    var v="";
+    try{
+        if(o.Code!==undefined)v=o.Code;
+        else if(o.code!==undefined)v=o.code;
+        else if(o.Status!==undefined)v=o.Status;
+        else if(o.status!==undefined)v=o.status;
+    }catch(e){}
+    return String(v===undefined||v===null?"":v);
+}
+
+function qfCircleApiMsg2970(o){
+    if(!o||typeof o!=="object")return "";
+
+
+stImagesV310(o){
+    var out=[],seen={},deny={},seenObj=[];
+    function norm(u){
+        u=String(u==null?"":u).trim().replace(/^['"]|['"]$/g,"")
+            .replace(/\\u002[fF]/g,"/").replace(/\\u0026/g,"&").replace(/\\u003[dD]/g,"=")
+            .replace(/\\\//g,"/").replace(/&amp;/ig,"&");
+        if(/^\/\//.test(u))u="https:"+u;
+        if(/^http:\/\//i.test(u))u="https://"+u.slice(7);
+        return u;
+    }
+    function denyPath(path){
+        return /(?:^|[._\[\]])(?:user|userinfo|useritem|author|profile|avatar|head|headicon|headimage|portrait|level|rank|grade|badge|medal|honou?r|identity|role|vip|titleicon|usertitle|label|tag|frame|pendant|decorate|decoration|icon|logo|qrcode|emoji|face|sprite)(?:$|[._\[\]])/i.test(String(path||""));
+    }
+    function badUrl(u){
+        return /(?:avatar|head(?:icon|img|image)?|user(?:icon|head)?|profile|portrait|level|rank|grade|badge|medal|honou?r|identity|role|vip|title[_-]?icon|label|tag|frame|pendant|decoration|emoji|face|sprite|logo|qrcode)/i.test(String(u||""));
+    }
+    function isImage(u,path){
+        u=norm(u);path=String(path||"");
+        if(!/^https?:\/\//i.test(u))return false;
+        if(/\.(?:mp4|m4v|mov|webm|m3u8|ts)(?:[?#]|$)/i.test(u))return false;
+        if(denyPath(path)||badUrl(u))return false;
+        return /\.(?:jpe?g|png|webp|gif|avif|bmp)(?:[?#]|$)/i.test(u)||/(?:image|img|pic|photo|picture|cover|poster|thumb|snapshot|preimage|bitmap)/i.test(path+" "+u);
+    }
+    function collectUrls(v,path,d,target){
+        if(v==null||d>7)return;
+        if(typeof v==="string"){
+            var s=String(v),m;
+            var re=/["'](?:ImageUrl|imageUrl|ImgUrl|imgUrl|OriginUrl|originUrl|OriginalUrl|originalUrl|PictureUrl|pictureUrl|PicUrl|picUrl|PreImage|preImage|BitmapUrl|bitmapUrl|CoverUrl|coverUrl|Poster|poster|PhotoUrl|photoUrl|Src|src)["']\s*:\s*["']([^"']+)["']/ig;
+            while((m=re.exec(s))!==null)target(norm(m[1]),path+".embedded");
+            var hi=/<img[^>]+(?:src|data-src)=["']([^"']+)["']/ig;
+            while((m=hi.exec(s))!==null)target(norm(m[1]),path+".htmlimg");
+            return;
+        }
+        if(typeof v!=="object")return;
+        if(seenObj.indexOf(v)>=0)return;seenObj.push(v);
+        if(Array.isArray(v)){for(var i=0;i<v.length&&i<80;i++)collectUrls(v[i],path+"["+i+"]",d+1,target);return;}
+        var ks=Object.keys(v);
+        for(var k=0;k<ks.length;k++){
+            var key=String(ks[k]),x=v[key],np=path?path+"."+key:key;
+            if(denyPath(np)){collectUrls(x,np,d+1,function(u){if(/^https?:\/\//i.test(u))deny[u]=1;});continue;}
+            if(/(?:image|img|pic|photo|picture|attachment|media|cover|poster|thumb|snapshot|preimage|bitmap|bodyrichtext|richtext|postcontent|contenttext|body|content|summary)/i.test(key)){
+                if(typeof x==="string"){
+                    var u=norm(x);if(/^https?:\/\//i.test(u))target(u,np);
+                    collectUrls(x,np,d+1,target);
+                }else if(x&&typeof x==="object")collectUrls(x,np,d+1,target);
+            }
+        }
+    }
+    /* 正文媒体采用白名单路径；UserInfo/等级/称号等非媒体子树不会被遍历。 */
+    seenObj=[];
+    function add(v,path){
+        var u=norm(v);if(!isImage(u,path)||deny[u]||seen[u])return;
+        seen[u]=1;out.push(u);
+    }
+    /* 官方正文媒体字段优先。 */
+    var lists=[
+        o&&o.ImgList,o&&o.imgList,o&&o.ImageList,o&&o.imageList,
+        o&&o.ImageObjList,o&&o.imageObjList,o&&o.NineImageList,o&&o.nineImageList,
+        o&&o.Images,o&&o.images,o&&o.PicList,o&&o.picList,o&&o.PictureList,o&&o.pictureList,
+        o&&o.AttachmentList,o&&o.attachmentList,o&&o.MediaList,o&&o.mediaList
+    ];
+    for(var li=0;li<lists.length;li++)collectUrls(lists[li],"post.mediaList"+li,0,add);
+    var rich=[
+        o&&o.BodyRichText,o&&o.bodyRichText,o&&o.RichText,o&&o.richText,
+        o&&o.PostContent,o&&o.postContent,o&&o.ContentText,o&&o.contentText,
+        o&&o.Body,o&&o.body,o&&o.Content,o&&o.content,o&&o.Summary,o&&o.summary
+    ];
+    for(var ri=0;ri<rich.length;ri++)collectUrls(rich[ri],"post.rich"+ri,0,add);
+    var direct=["ImageUrl","imageUrl","ImgUrl","imgUrl","PreImage","preImage","BitmapUrl","bitmapUrl","PicUrl","picUrl","PictureUrl","pictureUrl"];
+    for(var di=0;di<direct.length;di++)if(o&&o[direct[di]]!=null)add(o[direct[di]],"post."+direct[di]);
+    /* 最后一层只遍历媒体语义字段，不再扫描整个帖子对象。 */
+    seenObj=[];collectUrls(o,"post",0,add);
+    try{
+        var av=qfCirclePostText2970(o,["UserIcon","userIcon","UserHeadIcon","userHeadIcon","Avatar","avatar"]),nav=norm(av);
+        if(nav)out=out.filter(function(u){return norm(u)!==nav;});
+    }catch(_av){}
+    return out.slice(0,9);
+}
+function qfCirclePostImage2970(o){
+    var a=qfCirclePostImagesV310(o);
+    return a.length?a[0]:"";
+}
+
+function qfCircleVideoInfo2975(o){
+    var best={url:"",poster:"",duration:0,score:-999},seen=[];
+    function norm(u){
+        u=String(u==null?"":u).trim().replace(/^['"]|['"]$/g,"")
+          .replace(/\\u002[fF]/g,"/").replace(/\\u0026/g,"&").replace(/\\u003[dD]/g,"=")
+          .replace(/\\\//g,"/").replace(/&amp;/ig,"&");
+        if(/^\/\//.test(u))u="https:"+u;
+        if(/^http:\/\//i.test(u))u="https://"+u.slice(7);
+        return u;
+    }
+    function img(u){u=norm(u);return /^https?:\/\//i.test(u)&&(/\.(?:jpe?g|png|webp|gif|avif)(?:[?#]|$)/i.test(u)||/(?:image|img|pic|cover|poster|thumb)/i.test(u));}
+    function take(v,path,key){
+        var u=norm(v),p=(String(path||"")+"."+String(key||"")).toLowerCase();
+        if(!/^https?:\/\//i.test(u))return;
+        var sc=-999;
+        if(/\.(?:mp4|m4v|mov|webm|m3u8|ts)(?:[?#]|$)/i.test(u))sc=48;
+        if(/(?:video|vod|play|stream|media)/i.test(p))sc=Math.max(sc,58);
+        if(/(?:playurl|play_url|videourl|video_url|sourceurl|source_url|streamurl|stream_url|transcode|urlhd|hdurl)/i.test(p))sc+=30;
+        if(/(?:cover|poster|thumb|image|img|pic|avatar|head|icon)/i.test(p))sc-=95;
+        if(/\.(?:mp4|m4v|mov|webm)(?:[?#]|$)/i.test(u))sc+=35;
+        if(/\.m3u8(?:[?#]|$)/i.test(u))sc+=28;
+        if(sc>best.score){best.url=u;best.score=sc;}
+        if(!best.poster&&img(u)&&/(?:cover|poster|thumb|firstframe|snapshot|image|img|pic)/i.test(p))best.poster=u;
+    }
+    function scanEmbedded(s,path){
+        s=String(s||"");
+        var re=/["'](VideoUrl|videoUrl|PlayUrl|playUrl|StreamUrl|streamUrl|VideoCover|videoCover|Poster|poster)["']\s*:\s*["']([^"']+)["']/ig,m;
+        while((m=re.exec(s))!==null)take(m[2],path,m[1]);
+        var ru=/(https?:\/\/[^\s"'<>]+?\.(?:mp4|m4v|mov|webm|m3u8)(?:\?[^\s"'<>]*)?)/ig;
+        while((m=ru.exec(s))!==null)take(m[1],path,"embeddedVideoUrl");
+    }
+    function walk(v,path,d){
+        if(v==null||d>11)return;
+        if(typeof v==="string"){
+            var s=String(v).trim();
+            scanEmbedded(s,path);
+            if(/^https?:\/\//i.test(norm(s))||/^\/\//.test(s))take(s,path,"");
+            if((s.charAt(0)==="{"&&s.charAt(s.length-1)==="}")||(s.charAt(0)==="["&&s.charAt(s.length-1)==="]")){
+                try{walk(JSON.parse(s),path+".json",d+1);}catch(_j){}
+            }
+            return;
+        }
+        if(typeof v!=="object")return;
+        if(seen.indexOf(v)>=0)return;seen.push(v);
+        if(Array.isArray(v)){for(var i=0;i<v.length&&i<100;i++)walk(v[i],path+"["+i+"]",d+1);return;}
+        for(var k in v){if(!Object.prototype.hasOwnProperty.call(v,k))continue;var x=v[k],np=path?path+"."+k:k;
+            if(typeof x==="string")take(x,path,k);
+            else if(typeof x==="number"&&/(duration|videotime|video_time|playtime|play_time|length)/i.test(k)&&!best.duration){var n=Number(x);if(n>100000)n/=1000;if(n>0&&n<86400)best.duration=n;}
+            if(x&&typeof x==="object")walk(x,np,d+1);
+        }
+    }
+    walk(o,"",0);if(best.score<20)best.url="";return {url:best.url,poster:best.poster,duration:best.duration};
+}
+
+function qfCircleExtractPosts2970(root){
+    var out=[],seenObj=[],seenPost={};
+
+    function normKey(s){
+        return String(s||"")
+            .replace(/[\s·•，。！？、：；（）()【】《》<>\[\]_-]+/g,"")
+            .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,"")
+            .toLowerCase();
+    }
+
+    function cleanId(v){
+        if(v===undefined||v===null)return "";
+        var s=String(v).trim();
+        return /^\d{5,}$/.test(s)?s:"";
+    }
+
+    function plain(v){
+        if(v==null)return "";
+        if(typeof v==="number"||typeof v==="boolean")return String(v);
+
+        if(typeof v==="string"){
+            var s=String(v).trim();
+            if(!s)return "";
+
+            if(
+                (s.charAt(0)==="{"&&s.charAt(s.length-1)==="}")||
+                (s.charAt(0)==="["&&s.charAt(s.length-1)==="]")
+            ){
+                try{
+                    var jo=JSON.parse(s);
+                    var jt=plain(jo);
+                    if(jt)return jt;
+                }catch(_json){}
+            }
+
+            s=qfStripVideoMetaV13(s);
+            return qfCircleFaceTextV310(s)
+                .replace(/<br\s*\/?>/ig,"\n")
+                .replace(/<\/p\s*>/ig,"\n")
+                .replace(/<[^>]+>/g," ")
+                .replace(/&nbsp;/ig," ")
+                .replace(/&amp;/ig,"&")
+                .replace(/&lt;/ig,"<")
+                .replace(/&gt;/ig,">")
+                .replace(/[ \t\r]+/g," ")
+                .replace(/\n{3,}/g,"\n\n")
+                .trim();
+ 
+
+sh=!!(
+            force||postId||topicId||circleId||h5||
+            o.PostType!=null||o.postType!=null||
+            o.Type!=null||o.type!=null||
+            o.PostCategoryId!=null||o.postCategoryId!=null||
+            o.QDBookId!=null||o.qdBookId!=null||
+            o.BookId!=null||o.bookId!=null
+        );
+
+        if(!postish)return;
+        if(!title&&!body&&!postId&&!topicId&&!h5)return;
+
+        if(!postId)postId=cleanId(o.Id||o.id||"");
+
+        var key=
+            postId||topicId||
+            normKey(title||body.slice(0,140));
+
+        if(!key||seenPost[key])return;
+        seenPost[key]=1;
+
+        var mediaImages=[];
+        try{mediaImages=qfCirclePostImagesV310(o)||[];}catch(_images){mediaImages=[];}
+        var vinfo={url:"",poster:"",duration:0};
+        try{vinfo=qfCircleVideoInfo2975(o)||vinfo;}catch(_video){}
+
+        out.push({
+            circleId:circleId,
+            postId:postId,
+            topicId:topicId,
+            user:userOf(o),
+            avatar:avatarOf(o),
+            title:title,
+            body:body,
+            image:mediaImages.length?String(mediaImages[0]):"",
+            images:mediaImages,
+            video:String(vinfo.url||""),
+            videoPoster:String(vinfo.poster||(mediaImages.length?mediaImages[0]:"")||""),
+            videoDuration:Number(vinfo.duration||0)||0,
+            url:/^https?:\/\//i.test(h5)?h5:"",
+            reply:String(
+                o.CommentCount!=null?o.CommentCount:
+                o.commentCount!=null?o.commentCount:
+                o.ReviewCount!=null?o.ReviewCount:
+                o.reviewCount!=null?o.reviewCount:
+                o.PostCount!=null?o.PostCount:
+                o.postCount!=null?o.postCount:""
+            ),
+            like:String(
+                o.LikeCount!=null?o.LikeCount:
+                o.likeCount!=null?o.likeCount:
+                o.AgreeAmount!=null?o.AgreeAmount:
+                o.agreeAmount!=null?o.agreeAmount:
+                o.StarCount!=null?o.StarCount:
+                o.starCount!=null?o.starCount:""
+            ),
+            time:timeOf(o),
+            postCategoryId:String(
+                o.PostCategoryId!=null?o.PostCategoryId:
+                o.postCategoryId!=null?o.postCategoryId:""
+            ),
+            categoryId:String(
+                o.CategoryId!=null?o.CategoryId:
+                o.categoryId!=null?o.categoryId:
+                o.PostCategoryId!=null?o.PostCategoryId:
+                o.postCategoryId!=null?o.postCategoryId:""
+            ),
+            subCategoryId:String(
+                o.SubCategoryId!=null?o.SubCategoryId:
+                o.subCategoryId!=null?o.subCategoryId:
+                o.SubCategory!=null?o.SubCategory:
+                o.subCategory!=null?o.subCategory:""
+            ),
+            postType:String(
+                o.PostType!=null?o.PostType:
+                o.postType!=null?o.postType:
+                o.Type!=null?o.Type:
+                o.type!=null?o.type:""
+            )
+        });
+    }
+
+    /*
+     * 先专门抓官方列表字段。
+     * 这是 v2.9.71 真机诊断真正返回数据的位置。
+     */
+    function direct(v,d){
+        if(!v||d>10||typeof v!=="object")return;
+
+        if(Array.isArray(v)){
+            for(var i=0;i<v.length&&i<120;i++)direct(v[i],d+1);
+            return;
+        }
+
+        var names=[
+            "TopicDataList","topicDataList",
+            "PostList","postList",
+            "TopPostList","topPostList",
+            "TopPost","topPost",
+            "TopPostV2","topPostV2",
+            "FansWorkList","fansWorkList"
+        ];
+
+        for(var n=0;n<names.length;n++){
+            var a=v[names[n]];
+            if(Array.isArray(a)){
+                for(var j=0;j<a.length&&j<120;j++){
+                    if(a[j]&&typeof a[j]==="object")add(a[j],true);
+                }
+            }
+        }
+
+        var ks=Object.keys(v);
+        for(var k=0;k<ks.length;k++){
+            var x=v[ks[k]];
+            if(x&&typeof x==="object")direct(x,d+1);
+        }
+    }
+
+    direct(root,0);
+
+    /*
+     * 再做通用递归兜底，以兼容 getcircledetail / getpostdetail。
+     */
+    function walk(v,d){
+        if(!v||d>10||out.length>=100)return;
+        if(typeof v!=="object")return;
+        if(seenObj.indexOf(v)>=0)return;
+        seenObj.push(v);
+
+        if(Array.isArray(v)){
+            for(var i=0;i<v.length&&i<120;i++){
+                var it=v[i];
+                if(it&&typeof it==="object")add(it,false);
+                walk(it,d+1);
+            }
+            return;
+        }
+
+        add(v,false);
+
+        var ks=Object.keys(v);
+        for(var j=0;j<ks.length;j++){
+            var x=v[ks[j]];
+            if(x&&typeof x==="object")walk(x,d+1);
+        }
+    }
+
+    walk(root,0);
+    return out;
+}
+
+function qfCircleApiSummary2970(raw){
+    var o=qfCircleApiJson2970(raw);
+    var s={
+        len:String(raw||"").length,
+        code:"",
+        msg:"",
+        topKeys:"",
+        dataKeys:"",
+        ids:{circleId:"",postId:"",topicId:""},
+        posts:[],
+        total:0
+    };
+
+    if(!o)return s;
+
+    s.code=qfCircleApiCod
+
+
+    out.filterSets.dongtai=dm;
+    out.filterSets.jinghua=jm;
+    out.filterSets.tongren=fm;
+    out.filters=[];
+    for(var d=0;d<dm.length;d++)out.filters.push(dm[d]);
+    for(var j=0;j<jm.length;j++)out.filters.push(jm[j]);
+    for(var t=0;t<fm.length;t++)out.filters.push(fm[t]);
+    return out;
+}
+
+function qfCircleApiCall2970(j,path,params){
+    var raw="";
+    try{raw=qfArgusOuterRequest2931({java:j},path,params)||"";}catch(e){}
+    return {
+        path:path,
+        params:params,
+        raw:String(raw||""),
+        sum:qfCircleApiSummary2970(raw)
+    };
+}
+
+function qfCircleApiHtml2970(bookName,bid,tests,circleId,posts,tabs,totals,categoryMode,categoryMeta){
+    var E=qfCircleEsc2964;
+
+    tabs=tabs||{};
+    totals=totals||{};
+    cat
