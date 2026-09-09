@@ -1,0 +1,250 @@
+### circle qfReviewId
+function qfReviewId(o){o=o||{};return String(o.comment_id||o.review_id||o.ReviewId||o.reviewId||o.RootReviewId||o.rootReviewId||o.root_review_id||o.Id||o.id||o.CommentId||o.commentId||o.PostId||o.postId||'');}
+
+### circle qfReviewDetailRows
+function qfReviewDetailRows(root){return qfFindReplyArray(dataOf(root),0);}
+
+### review_local_ui qfReviewUiContextV420
+function qfReviewUiContextV420(bid0,cid0,para0,segment0,openType0,authorReviewId0,authorParagraphId0){
+    var p=String(para0==null?"":para0),ot=String(openType0||"dp").toLowerCase();
+    var author=ot==="author"||p==="-10";
+    var chapter=(p==="-1"&&ot==="zp");
+    var paragraph=!author&&!chapter&&p!=="";
+    var seg=Number(segment0);
+    if(isNaN(seg))seg=paragraph?Number(p):0;
+    if(isNaN(seg)||seg<0||author||chapter)seg=0;
+    return {
+        kind:author?"author":(chapter?"chapter":"paragraph"),
+        bookId:String(bid0||""),
+        chapterId:String(cid0||""),
+        paragraphId:author?String(authorParagraphId0||p):p,
+        segmentId:seg,
+        reviewId:author?String(authorReviewId0||""):"",
+        openType:ot,
+        isAuthor:author,
+        isChapter:chapter,
+        hasParagraph:paragraph
+    };
+}
+
+### review_local_ui qfReviewUiIdentity
+function qfReviewUiIdentity(item,raw){
+    item=item||{};raw=raw||item;
+    var user=item.user_info||raw.UserInfo||raw.userInfo||raw.User||raw.user||{};
+    return {
+        id:String(
+            item.comment_id||
+            raw.ReviewId||raw.reviewId||
+            raw.CommentId||raw.commentId||
+            raw.Id||raw.id||
+            raw.PostId||raw.PostID||raw.postId||
+            raw.RootReviewId||raw.rootReviewId||
+            ""
+        ),
+        name:String(
+            user.user_name||user.UserName||
+            user.NickName||user.nickName||user.nickname||
+            raw.UserName||raw.userName||
+            raw.NickName||raw.nickName||
+            "匿名"
+        ),
+        avatar:String(
+            user.user_avatar||user.UserHeadIcon||
+            user.Avatar||user.avatar||
+            raw.UserHeadIcon||raw.userHeadIcon||
+            raw.Avatar||raw.avatar||
+            ""
+        ),
+        titles:titlesOf(item,raw)
+    };
+}
+
+### review_local_ui qfReviewUiRowBase
+function qfReviewUiRowBase(item,raw){
+    item=item||{};raw=raw||item;
+    var ui=qfReviewUiIdentity(item,raw);
+    return {
+        id:ui.id,
+        name:ui.name,
+        avatar:ui.avatar,
+        titles:ui.titles,
+        time:tsOf(item),
+        ip:String(
+            raw.IpLocation||raw.ipLocation||
+            raw.IPLocation||raw.IPAddress||
+            raw.ipAddress||raw.Address||
+            ""
+        ),
+        like:Number(
+            item.digg_count||
+            raw.AgreeAmount||raw.agreeAmount||
+            raw.LikeCount||raw.likeCount||
+            raw.DiggCount||raw.StarCount||
+            raw.PraiseCount||0
+        )||0,
+        floor:raw.level||raw.Level||raw.Floor||raw.floor||raw.FloorNo||0
+    };
+}
+
+### review_local_ui qfReviewUiPayloadBase
+function qfReviewUiPayloadBase(item,raw){
+    item=item||{};raw=raw||item;
+    return {
+        content:String(
+            textOf(
+                item.text||item.content||
+                raw.Content||raw.content||
+                raw.ReviewContent||raw.reviewContent||
+                raw.Body||raw.PostBody||raw.PostContent||
+                raw.Subject||raw.Title
+            )||""
+        ),
+        image:qfCommentImageV504(raw),
+        audio:String(raw._qfAudioUrl||audioOf(raw)||""),
+        audioPage:String(raw._qfAudioPage||""),
+        audioDetected:!!raw._qfAudioDetected,
+        audioDuration:saneAudioDuration(raw._qfAudioDuration)||audioDurationOf(raw)||0,
+        audioPath:String(raw._qfAudioPath||audioPathOf(raw,raw._qfAudioUrl||audioOf(raw))||""),
+        audioDiag:String(raw._qfAudioDiag||rawAudioDiag(raw)||"")
+    };
+}
+
+### review_local_ui qfReviewRowIdsV503
+function qfReviewRowIdsV503(row){
+    row=row||{};var raw=row.raw||row,u=row.user_info||raw.UserInfo||raw.userInfo||raw.User||raw.user||{},out=[],seen={};
+    function add(v){var x=String(v==null?'':v).trim();if(!x||seen[x])return;seen[x]=1;out.push(x);}
+    add(row.comment_id);add(row.reply_id);add(row.ReplyId);add(row.replyId);
+    add(raw.ReplyId);add(raw.replyId);add(raw.ReviewId);add(raw.reviewId);add(raw.CommentId);add(raw.commentId);
+    add(raw.Id);add(raw.id);add(raw.PostId);add(raw.postId);
+    return out;
+}
+
+### review_local_ui qfReviewRowIdV502
+function qfReviewRowIdV502(row){var a=qfReviewRowIdsV503(row);return a.length?a[0]:'';}
+
+### review_local_ui qfReviewUserIdV503
+function qfReviewUserIdV503(row){
+    row=row||{};var raw=row.raw||row,u=row.user_info||raw.UserInfo||raw.userInfo||raw.User||raw.user||{};
+    return String(row.user_id||u.UserId||u.userId||u.UserID||u.userID||u.Uid||u.uid||raw.UserId||raw.userId||raw.UserID||raw.userID||raw.Uid||raw.uid||'').trim();
+}
+
+### review_local_ui qfReviewUserNameV503
+function qfReviewUserNameV503(row){
+    row=row||{};var raw=row.raw||row,u=row.user_info||raw.UserInfo||raw.userInfo||raw.User||raw.user||{};
+    return String(u.user_name||u.UserName||u.NickName||u.nickName||u.nickname||raw.UserName||raw.userName||raw.NickName||raw.nickName||raw.nickname||'').replace(/\s+/g,'').trim();
+}
+
+### review_local_ui qfReviewTextSigV503
+function qfReviewTextSigV503(row){
+    row=row||{};var raw=row.raw||row;
+    var c=String(textOf(row.text||row.content||raw.Content||raw.content||raw.ReviewContent||raw.reviewContent||raw.Body||raw.PostContent||raw.Text||raw.text||'')||'');
+    c=c.replace(/^回复\s*[^：:]{1,40}[：:]\s*/,'').replace(/\[fn=\d+\]/g,'').replace(/[\s\u200b\u200c\u200d\ufeff]+/g,'').replace(/[“”‘’]/g,'').trim();
+    return c;
+}
+
+### review_local_ui qfReviewRowSigV502
+function qfReviewRowSigV502(row){return qfReviewUserNameV503(row)+'|'+qfReviewTextSigV503(row);}
+
+### review_local_ui qfReviewTitleListV502
+function qfReviewTitleListV502(o){
+    if(!o||typeof o!=='object')return null;
+    var a=o.TitleInfoList!==undefined?o.TitleInfoList:(o.titleInfoList!==undefined?o.titleInfoList:o.title_info_list);
+    if(typeof a==='string'){try{a=JSON.parse(a)}catch(_e){a=null}}
+    return Array.isArray(a)&&a.length?a:null;
+}
+
+### review_local_ui qfReviewHasTitleV503
+function qfReviewHasTitleV503(v){
+    if(!v||typeof v!=='object')return false;
+    try{return QF_ReviewIdentity.rawTitleList(v).length>0;}catch(_e){return false;}
+}
+
+### review_local_ui qfReviewCopyTitleV502
+function qfReviewCopyTitleV502(dst,src){
+    if(!dst||!src||typeof dst!=='object'||typeof src!=='object')return dst;
+    function rawOf(v){return v&&typeof v==='object'?(v.raw||v):{};}
+    function userOf(v){var r=rawOf(v);return v.user_info||r.user_info||v.UserInfo||v.userInfo||r.UserInfo||r.userInfo||r.User||r.user||null;}
+    function setList(o,a){if(!o||typeof o!=='object'||!a||!a.length)return;o.TitleInfoList=a;}
+    var dr=rawOf(dst),sr=rawOf(src),du=userOf(dst),su=userOf(src);
+    var top=qfReviewTitleListV502(sr)||qfReviewTitleListV502(src),usr=qfReviewTitleListV502(su);
+    if(top){setList(dr,top);if(dst!==dr)setList(dst,top);}
+    if(usr){if(!du){try{dr.UserInfo={};du=dr.UserInfo;}catch(_u){}}setList(du,usr);}
+    if(su&&du){var ks=['UserName','userName','NickName','nickName','UserHeadIcon','userHeadIcon','Avatar','avatar','UserId','userId','UserID','userID'];for(var i=0;i<ks.length;i++){var k=ks[i];if((du[k]===undefined||du[k]===null||du[k]==='')&&su[k]!==undefined&&su[k]!==null)du[k]=su[k];}}
+    return dst;
+}
+
+### review_local_ui qfReviewRichRowsV503
+function qfReviewRichRowsV503(pack){
+    var out=[],seenObj=[],seenKey={};
+    function add(v){
+        if(!v||typeof v!=='object'||Array.isArray(v)||!qfReviewHasTitleV503(v))return;
+        var ids=qfReviewRowIdsV503(v),uid=qfReviewUserIdV503(v),nm=qfReviewUserNameV503(v),tx=qfReviewTextSigV503(v);
+        var k=ids.length?'i:'+ids[0]:(uid?'u:'+uid:(nm?('n:'+nm+(tx?'|'+tx:'')):''));
+        if(k&&seenKey[k])return;if(k)seenKey[k]=1;out.push(v);
+    }
+    function walk(v,d,parent){
+        if(v==null||d>11||typeof v!=='object')return;if(seenObj.indexOf(v)>=0)return;seenObj.push(v);
+        if(Array.isArray(v)){for(var i=0;i<v.length;i++)walk(v[i],d+1,parent);return;}
+        add(v);
+        /* TitleInfoList 常直接挂在 UserInfo 对象上。此时把父评论身份字段复制到轻量候选，便于按 UserId/用户名匹配。 */
+        if(qfReviewTitleListV502(v)&&parent&&typeof parent==='object'){
+            var pu=parent.UserInfo||parent.userInfo||parent.User||parent.user||{};
+            var proxy={raw:parent,UserInfo:v};
+            if(!qfReviewUserIdV503(proxy)&&qfReviewUserIdV503({raw:parent,user_info:pu}))proxy.user_id=qfReviewUserIdV503({raw:parent,user_info:pu});
+            add(proxy);
+        }
+        for(var k in v)if(Object.prototype.hasOwnProperty.call(v,k)&&v[k]&&typeof v[k]==='object')walk(v[k],d+1,v);
+    }
+    if(pack&&Array.isArray(pack.list))for(var i=0;i<pack.list.length;i++)add(pack.list[i]);
+    try{if(pack&&pack.raw)walk(pack.raw,0,null);else if(pack&&pack.data)walk(pack.data,0,null);}catch(_w){}
+    return out;
+}
+
+### review_local_ui qfReviewFusePackV502
+function qfReviewFusePackV502(structPack,richPack){
+    if(!structPack||!Array.isArray(structPack.list)||!structPack.list.length)return richPack||structPack;
+    if(!richPack)return structPack;
+    var rl=qfReviewRichRowsV503(richPack);if(!rl.length)return structPack;
+    var byId={},byUid={},bySig={},byName={},nameCount={};
+    function put(map,k,v){if(k&&!map[k])map[k]=v;}
+    for(var i=0;i<rl.length;i++){
+        var rr=rl[i]||{};try{qfTitleIdentityPutV504(rr);}catch(_tir){}
+        var ids=qfReviewRowIdsV503(rr),uid=qfReviewUserIdV503(rr),sg=qfReviewRowSigV502(rr),nm=qfReviewUserNameV503(rr);
+        for(var ii=0;ii<ids.length;ii++)put(byId,ids[ii],rr);
+        put(byUid,uid,rr);put(bySig,sg,rr);if(nm){nameCount[nm]=(nameCount[nm]||0)+1;put(byName,nm,rr);}
+    }
+    for(var j=0;j<structPack.list.length;j++){
+        var st=structPack.list[j]||{},sids=qfReviewRowIdsV503(st),suid=qfReviewUserIdV503(st),ss=qfReviewRowSigV502(st),sn=qfReviewUserNameV503(st),m=null;
+        for(var si=0;si<sids.length&&!m;si++)m=byId[sids[si]]||null;
+        if(!m&&suid)m=byUid[suid]||null;
+        if(!m&&ss)m=bySig[ss]||null;
+        /* 用户级标签可按唯一用户名回填。即便同一用户多条回复，身份标签本身也是一致的。 */
+        if(!m&&sn&&nameCount[sn]===1)m=byName[sn]||null;
+        if(m){
+            qfReviewCopyTitleV502(st,m);
+            /* Reader 根评论常把首批楼中楼放在 replyList。结构骨架仍用 Web/share，
+               但嵌入回复的用户标签在这里提前登记/融合，展开时无需等待第二次请求。 */
+            try{
+                var sr0=st.raw||st,rr0=m.raw||m;
+                var sa=sr0.replyList||sr0.ReplyList||sr0.replies||sr0.Replies||[];
+                var ra=rr0.replyList||rr0.ReplyList||rr0.replies||rr0.Replies||[];
+                if(Array.isArray(ra))for(var ari=0;ari<ra.length;ari++)qfTitleIdentityPutV504(ra[ari]);
+                if(Array.isArray(sa)&&Array.isArray(ra)&&sa.length&&ra.length){
+                    var rp=qfReviewFusePackV502({list:sa,total:sa.length,source:'embedded-struct'},{list:ra,total:ra.length,source:'embedded-reader'});
+                    if(rp&&rp.list&&rp.list!==sa){/* 当前实现原地融合；保留防御分支 */}
+                }
+            }catch(_erf){}
+        }
+        try{st._qfStructReview=1;}catch(_m){}
+    }
+    structPack.total=Math.max(Number(structPack.total||0),Number(richPack.total||0),structPack.list.length);
+    structPack.richSource=String(richPack.source||'');
+    return structPack;
+}
+
+### review_local_ui qfReviewMarkStructPackV502
+function qfReviewMarkStructPackV502(pack){
+    if(!pack||!Array.isArray(pack.list))return pack;
+    for(var i=0;i<pack.list.length;i++){try{pack.list[i]._qfStructReview=1;}catch(_e){}}
+    return pack;
+}
