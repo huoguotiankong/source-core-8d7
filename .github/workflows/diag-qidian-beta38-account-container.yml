@@ -1,0 +1,29 @@
+name: diag-qidian-beta38-account-container
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta38-account-container.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Locate qfAccountsHtmlV5 compressed container
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          s=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text())[0]
+          lib=s['jsLib']
+          hits=0
+          for m in re.finditer(r'gz:([A-Za-z0-9+/_=-]{80,})',lib):
+            z=m.group(1); z=z+'='*((4-len(z)%4)%4)
+            try:c=gzip.decompress(base64.b64decode(z.replace('-','+').replace('_','/'))).decode()
+            except Exception:continue
+            if 'qfAccountsHtmlV5' in c:
+              hits+=1
+              print('HIT',hits,'POS',m.start(),'LEN',len(c))
+              print('CONTEXT_BEFORE=',lib[max(0,m.start()-500):m.start()])
+              i=c.index('qfAccountsHtmlV5'); print('CODE=',c[max(0,i-1000):i+5000])
+          print('TOTAL_HITS=',hits)
+          PY
