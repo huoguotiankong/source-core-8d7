@@ -1,0 +1,12 @@
+[
+  {
+    "bookSourceName": "小雨的世界",
+    "providerDisplayName": "情无",
+    "apiRoot": "https://full.hnxianxin.cn/qd/",
+    "contentEndpoint": "content.php",
+    "catalogEndpoint": "catalog.php",
+    "detailEndpoint": "detail.php",
+    "customHeaders": ["Ywkey", "Ywguid"],
+    "note": "Imported from user attachment bookSource_小雨的世界.json. Use only to replace the existing 情无 limited-content Provider implementation; keep public/provider display name 情无 and preserve all unrelated qidian-next domains."
+  }
+]
