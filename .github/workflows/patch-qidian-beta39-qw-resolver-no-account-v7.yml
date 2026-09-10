@@ -1,0 +1,52 @@
+name: patch-qidian-beta39-qw-resolver-no-account-v7
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta39-qw-resolver-no-account-v7.trigger']
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Run Beta39 v6 publisher with captured diagnostics
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/patch-qidian-beta39-qw-resolver-no-account-v6.yml')
+          lines=p.read_text().splitlines()
+          out=[]; inside=False
+          for line in lines:
+              if "python3 - <<'PY'" in line:
+                  inside=True
+                  continue
+              if inside and line.strip()=='PY':
+                  break
+              if inside:
+                  out.append(line[10:] if line.startswith('          ') else line)
+          Path('/tmp/beta39_v6.py').write_text('\n'.join(out)+'\n')
+          print('extracted lines',len(out))
+          PY
+          set +e
+          python3 /tmp/beta39_v6.py >/tmp/beta39.out 2>/tmp/beta39.err
+          rc=$?
+          set -e
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          if [ "$rc" -ne 0 ]; then
+            {
+              echo "Beta39 v7 diagnostic failure, rc=$rc"
+              echo "--- stdout ---"
+              cat /tmp/beta39.out
+              echo "--- stderr ---"
+              cat /tmp/beta39.err
+            } > .staging/beta39-v7-error.txt
+            git add .staging/beta39-v7-error.txt
+            git commit -m 'diag: capture beta39 v7 publisher failure'
+            git push origin main
+            exit "$rc"
+          fi
+          cat /tmp/beta39.out
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git commit -m 'fix: publish qidian-next beta39 qingwu no-account v7'
+          git push origin main
