@@ -1,0 +1,1405 @@
+## MODULE review
+HITS: 情无, Provider
+LEN: 43885
+--- 情无 context ---
+;return n>=0&&n<imgs.length?imgs[n]:"";});
+        out=out.replace(/(^|\n)\s*我的彩蛋章\s*-?\s*\d{8,}\s*-\s*\d+\s*插图\s*(?=\n|$)/g,'$1');
+        out=out.replace(/\n{3,}/g,'\n\n').trim();
+    }
+    return out;
+}
+
+/* alpha35：晴天评论轻量路径。
+ * 正文只读取 /api/comments 的数量索引来画气泡；不读取 /comments、/chapterComments 详情。
+ * 热评排序/列表交给晴天原生页面，不再在正文阶段做任何评论详情请求。
+ */
+
+/* beta17.2：情无正文 + 起点本地段评的快速索引。
+ * 情无正文服务器本身已经提供 comments.php?action=summary，ParagraphId 与情无正文天然对齐。
+ * 本地模式只借它画气泡/判断热段；真正点击段评仍进入起点本地评论页。
+ * 这样避免每章正文阶段都串行执行起点 PC+移动 reviewSummary 双兜底。 */
+function qfQwLocalFastIndexV3172(bid,cid){
+    var cacheObj=qfRuntimeCacheV13(this),key="qf-qw-local-fast-index-v3172-"+String(bid)+"-"+String(cid),now=Date.now();
+    try{
+        if(cacheObj&&qfCallableV13(cacheObj,"getFromMemory")){
+            var old=String(cacheObj.getFromMemory(key)||"");
+            if(old){var co=JSON
+--- 情无 context ---
+ngth?imgs[n]:"";});
+        out=out.replace(/(^|\n)\s*我的彩蛋章\s*-?\s*\d{8,}\s*-\s*\d+\s*插图\s*(?=\n|$)/g,'$1');
+        out=out.replace(/\n{3,}/g,'\n\n').trim();
+    }
+    return out;
+}
+
+/* alpha35：晴天评论轻量路径。
+ * 正文只读取 /api/comments 的数量索引来画气泡；不读取 /comments、/chapterComments 详情。
+ * 热评排序/列表交给晴天原生页面，不再在正文阶段做任何评论详情请求。
+ */
+
+/* beta17.2：情无正文 + 起点本地段评的快速索引。
+ * 情无正文服务器本身已经提供 comments.php?action=summary，ParagraphId 与情无正文天然对齐。
+ * 本地模式只借它画气泡/判断热段；真正点击段评仍进入起点本地评论页。
+ * 这样避免每章正文阶段都串行执行起点 PC+移动 reviewSummary 双兜底。 */
+function qfQwLocalFastIndexV3172(bid,cid){
+    var cacheObj=qfRuntimeCacheV13(this),key="qf-qw-local-fast-index-v3172-"+String(bid)+"-"+String(cid),now=Date.now();
+    try{
+        if(cacheObj&&qfCallableV13(cacheObj,"getFromMemory")){
+            var old=String(cacheObj.getFromMemory(key)||"");
+            if(old){var co=JSON.parse(old);if(co&&co.t
+--- 情无 context ---
+的彩蛋章\s*-?\s*\d{8,}\s*-\s*\d+\s*插图\s*(?=\n|$)/g,'$1');
+        out=out.replace(/\n{3,}/g,'\n\n').trim();
+    }
+    return out;
+}
+
+/* alpha35：晴天评论轻量路径。
+ * 正文只读取 /api/comments 的数量索引来画气泡；不读取 /comments、/chapterComments 详情。
+ * 热评排序/列表交给晴天原生页面，不再在正文阶段做任何评论详情请求。
+ */
+
+/* beta17.2：情无正文 + 起点本地段评的快速索引。
+ * 情无正文服务器本身已经提供 comments.php?action=summary，ParagraphId 与情无正文天然对齐。
+ * 本地模式只借它画气泡/判断热段；真正点击段评仍进入起点本地评论页。
+ * 这样避免每章正文阶段都串行执行起点 PC+移动 reviewSummary 双兜底。 */
+function qfQwLocalFastIndexV3172(bid,cid){
+    var cacheObj=qfRuntimeCacheV13(this),key="qf-qw-local-fast-index-v3172-"+String(bid)+"-"+String(cid),now=Date.now();
+    try{
+        if(cacheObj&&qfCallableV13(cacheObj,"getFromMemory")){
+            var old=String(cacheObj.getFromMemory(key)||"");
+            if(old){var co=JSON.parse(old);if(co&&co.ts&&now-Number(co.ts)<120000&&Array.isArray(co.items))re
+--- 情无 context ---
+ntent);
+    var _snap460=qdReviewSnapGetV460(_snapKey460,!!serverProvider);
+    qfChapterSubStage("decorate.setup-snapshot",Date.now()-_dStage,_snap460?"hit":"miss");_dStage=Date.now();
+    if(_snap460){
+        qdReviewSnapRestoreTitleV460.call(this,bid,cid,showBubble,_snap460);
+        return String(_snap460.body||content);
+    }
+    /* beta17.3：情无 + 本地段评恢复起点官方段落索引。
+     * beta17.2 借情无 summary 直接映射起点本地气泡，在部分章节 ParagraphId 口径不一致，
+     * 会出现整章无气泡。现在本地气泡重新以起点官方 reviewSummary 为准；
+     * 但章末评论详情仍保持懒加载，不在翻章时请求。 */
+    var qwLocalMode=(actualProvider==="情无"&&!serverProvider);
+    var qwChapterLocal=!!(serverProvider==="情无"&&qfCommentPolicyV83(serverProvider,"chapterLocal",false));
+    /* beta17.4：情无本章说恢复真实预览。
+     * 不再零详情预取，而是正文阶段只取起点章末接口第一页 2 条，
+     * 用于卡片预览；完整列表仍在点击后加载。 */
+    var qwPreviewChapter=!!(actualProvider==="情无"&&(qwLocalMode||qwCha
+--- 情无 context ---
+etV460(_snapKey460,!!serverProvider);
+    qfChapterSubStage("decorate.setup-snapshot",Date.now()-_dStage,_snap460?"hit":"miss");_dStage=Date.now();
+    if(_snap460){
+        qdReviewSnapRestoreTitleV460.call(this,bid,cid,showBubble,_snap460);
+        return String(_snap460.body||content);
+    }
+    /* beta17.3：情无 + 本地段评恢复起点官方段落索引。
+     * beta17.2 借情无 summary 直接映射起点本地气泡，在部分章节 ParagraphId 口径不一致，
+     * 会出现整章无气泡。现在本地气泡重新以起点官方 reviewSummary 为准；
+     * 但章末评论详情仍保持懒加载，不在翻章时请求。 */
+    var qwLocalMode=(actualProvider==="情无"&&!serverProvider);
+    var qwChapterLocal=!!(serverProvider==="情无"&&qfCommentPolicyV83(serverProvider,"chapterLocal",false));
+    /* beta17.4：情无本章说恢复真实预览。
+     * 不再零详情预取，而是正文阶段只取起点章末接口第一页 2 条，
+     * 用于卡片预览；完整列表仍在点击后加载。 */
+    var qwPreviewChapter=!!(actualProvider==="情无"&&(qwLocalMode||qwChapterLocal));
+    var serverSummary=nul
+--- 情无 context ---
+       qdReviewSnapRestoreTitleV460.call(this,bid,cid,showBubble,_snap460);
+        return String(_snap460.body||content);
+    }
+    /* beta17.3：情无 + 本地段评恢复起点官方段落索引。
+     * beta17.2 借情无 summary 直接映射起点本地气泡，在部分章节 ParagraphId 口径不一致，
+     * 会出现整章无气泡。现在本地气泡重新以起点官方 reviewSummary 为准；
+     * 但章末评论详情仍保持懒加载，不在翻章时请求。 */
+    var qwLocalMode=(actualProvider==="情无"&&!serverProvider);
+    var qwChapterLocal=!!(serverProvider==="情无"&&qfCommentPolicyV83(serverProvider,"chapterLocal",false));
+    /* beta17.4：情无本章说恢复真实预览。
+     * 不再零详情预取，而是正文阶段只取起点章末接口第一页 2 条，
+     * 用于卡片预览；完整列表仍在点击后加载。 */
+    var qwPreviewChapter=!!(actualProvider==="情无"&&(qwLocalMode||qwChapterLocal));
+    var serverSummary=null;
+    var items=[];
+    var summaryForHot=!serverProvider||qfCommentPolicyV83(serverProvider,"summaryForHot",true);
+
+    /* v3.5 beta18：本地评论装饰的两条独立网络请求并发预取。
+     * Pr
+--- 情无 context ---
+nap460);
+        return String(_snap460.body||content);
+    }
+    /* beta17.3：情无 + 本地段评恢复起点官方段落索引。
+     * beta17.2 借情无 summary 直接映射起点本地气泡，在部分章节 ParagraphId 口径不一致，
+     * 会出现整章无气泡。现在本地气泡重新以起点官方 reviewSummary 为准；
+     * 但章末评论详情仍保持懒加载，不在翻章时请求。 */
+    var qwLocalMode=(actualProvider==="情无"&&!serverProvider);
+    var qwChapterLocal=!!(serverProvider==="情无"&&qfCommentPolicyV83(serverProvider,"chapterLocal",false));
+    /* beta17.4：情无本章说恢复真实预览。
+     * 不再零详情预取，而是正文阶段只取起点章末接口第一页 2 条，
+     * 用于卡片预览；完整列表仍在点击后加载。 */
+    var qwPreviewChapter=!!(actualProvider==="情无"&&(qwLocalMode||qwChapterLocal));
+    var serverSummary=null;
+    var items=[];
+    var summaryForHot=!serverProvider||qfCommentPolicyV83(serverProvider,"summaryForHot",true);
+
+    /* v3.5 beta18：本地评论装饰的两条独立网络请求并发预取。
+     * Provider 正文已经成功后才进入这里；预取失败不改变任何数据来源，
+     * 后面的 qdReviewSummary / qdF
+--- 情无 context ---
+无 + 本地段评恢复起点官方段落索引。
+     * beta17.2 借情无 summary 直接映射起点本地气泡，在部分章节 ParagraphId 口径不一致，
+     * 会出现整章无气泡。现在本地气泡重新以起点官方 reviewSummary 为准；
+     * 但章末评论详情仍保持懒加载，不在翻章时请求。 */
+    var qwLocalMode=(actualProvider==="情无"&&!serverProvider);
+    var qwChapterLocal=!!(serverProvider==="情无"&&qfCommentPolicyV83(serverProvider,"chapterLocal",false));
+    /* beta17.4：情无本章说恢复真实预览。
+     * 不再零详情预取，而是正文阶段只取起点章末接口第一页 2 条，
+     * 用于卡片预览；完整列表仍在点击后加载。 */
+    var qwPreviewChapter=!!(actualProvider==="情无"&&(qwLocalMode||qwChapterLocal));
+    var serverSummary=null;
+    var items=[];
+    var summaryForHot=!serverProvider||qfCommentPolicyV83(serverProvider,"summaryForHot",true);
+
+    /* v3.5 beta18：本地评论装饰的两条独立网络请求并发预取。
+     * Provider 正文已经成功后才进入这里；预取失败不改变任何数据来源，
+     * 后面的 qdReviewSummary / qdFetchChapterComments 会自动按原稳定链重试。 */
+    if(!serverProvider){
+        try{
+      
+--- 情无 context ---
+ 为准；
+     * 但章末评论详情仍保持懒加载，不在翻章时请求。 */
+    var qwLocalMode=(actualProvider==="情无"&&!serverProvider);
+    var qwChapterLocal=!!(serverProvider==="情无"&&qfCommentPolicyV83(serverProvider,"chapterLocal",false));
+    /* beta17.4：情无本章说恢复真实预览。
+     * 不再零详情预取，而是正文阶段只取起点章末接口第一页 2 条，
+     * 用于卡片预览；完整列表仍在点击后加载。 */
+    var qwPreviewChapter=!!(actualProvider==="情无"&&(qwLocalMode||qwChapterLocal));
+    var serverSummary=null;
+    var items=[];
+    var summaryForHot=!serverProvider||qfCommentPolicyV83(serverProvider,"summaryForHot",true);
+
+    /* v3.5 beta18：本地评论装饰的两条独立网络请求并发预取。
+     * Provider 正文已经成功后才进入这里；预取失败不改变任何数据来源，
+     * 后面的 qdReviewSummary / qdFetchChapterComments 会自动按原稳定链重试。 */
+    if(!serverProvider){
+        try{
+            var _wantSummary=!!(showBubble||(showHot&&summaryForHot));
+            /* alpha9：热评已有专用 paragraph hot endpoint；关闭“本章说”时不再
+--- 情无 context ---
+te.now()-_dStage,(!serverProvider&&showTalk)?"local":"skip");_dStage=Date.now();
+    if(showBubble||(showHot&&summaryForHot)){
+        try{
+            if(serverProvider){serverSummary=qfCommentCallV83.call(this,serverProvider,"summary",[bid,cid]);items=(serverSummary&&serverSummary.items)||[];}
+            else if(qwLocalMode){
+                /* 情无正文 + 本地段评：优先一次起点 PC/mobile 官方 summary。
+                 * 不再使用 beta17.2 的情无 ParagraphId 直映射；只有官方 summary 完全为空时
+                 * 才进入旧移动端兜底，避免“有少量气泡也再跑第二套接口”的额外等待。 */
+                try{items=qdReviewSummaryV292.call(this,bid,cid)||[];}catch(_qwl0){items=[];}
+                if(!items.length){try{items=qdReviewSummaryV11.call(this,bid,cid)||[];}catch(_qwl1){items=[];}}
+            }else items=qdReviewSummaryV22.call(this,bid,cid,!!isPaid)||[];
+        }catch(e0){items=[];}
+    }
+    qfChapterSu
+--- 情无 context ---
+ow();
+    if(showBubble||(showHot&&summaryForHot)){
+        try{
+            if(serverProvider){serverSummary=qfCommentCallV83.call(this,serverProvider,"summary",[bid,cid]);items=(serverSummary&&serverSummary.items)||[];}
+            else if(qwLocalMode){
+                /* 情无正文 + 本地段评：优先一次起点 PC/mobile 官方 summary。
+                 * 不再使用 beta17.2 的情无 ParagraphId 直映射；只有官方 summary 完全为空时
+                 * 才进入旧移动端兜底，避免“有少量气泡也再跑第二套接口”的额外等待。 */
+                try{items=qdReviewSummaryV292.call(this,bid,cid)||[];}catch(_qwl0){items=[];}
+                if(!items.length){try{items=qdReviewSummaryV11.call(this,bid,cid)||[];}catch(_qwl1){items=[];}}
+            }else items=qdReviewSummaryV22.call(this,bid,cid,!!isPaid)||[];
+        }catch(e0){items=[];}
+    }
+    qfChapterSubStage("decorate.summary-read",Date.now()-_dStage,"items="+String(items&&it
+--- 情无 context ---
+ bid,cid,-1,0,_snapTitleHot460
+                    )
+                );
+            }else{
+                ch2.putImgUrl(null);
+            }
+        }
+    }catch(e3){}
+
+    qfChapterSubStage("decorate.title-meta",Date.now()-_dStage,"title="+String(_snapTitleCount460));_dStage=Date.now();
+    if(showAuthor){
+        /* beta14：作者说与“段评来源”解耦。正文实际来自晴天/情无/神魔时，
+           即使段评选择本地，也先读取该正文 Provider 的作者说；没有再退起点官方。 */
+        var as="",authorProvider="";
+        if(qfCommentIsServerV83(actualProvider)&&!(qwLocalMode&&actualProvider==="情无")){
+            try{as=qfCommentCallV83.call(this,actualProvider,"author",[bid,cid])||"";if(as)authorProvider=actualProvider;}catch(e4){as="";}
+        }
+        if(!as&&serverProvider&&serverProvider!==actualProvider){
+            try{as=qfCommentCallV83.call(this,serverProvider,"author",[bid,cid])||"";if(as)author
+--- 情无 context ---
+rSubStage("decorate.title-meta",Date.now()-_dStage,"title="+String(_snapTitleCount460));_dStage=Date.now();
+    if(showAuthor){
+        /* beta14：作者说与“段评来源”解耦。正文实际来自晴天/情无/神魔时，
+           即使段评选择本地，也先读取该正文 Provider 的作者说；没有再退起点官方。 */
+        var as="",authorProvider="";
+        if(qfCommentIsServerV83(actualProvider)&&!(qwLocalMode&&actualProvider==="情无")){
+            try{as=qfCommentCallV83.call(this,actualProvider,"author",[bid,cid])||"";if(as)authorProvider=actualProvider;}catch(e4){as="";}
+        }
+        if(!as&&serverProvider&&serverProvider!==actualProvider){
+            try{as=qfCommentCallV83.call(this,serverProvider,"author",[bid,cid])||"";if(as)authorProvider=serverProvider;}catch(_as2){as="";}
+        }
+        if(!as){
+            /* alpha9：只有 Provider/服务器作者说都为空，才解析原始起点章节并准备官方作者说缓存。 */
+            try{if(hotCtx.authorRaw)qfPrim
+
+## MODULE review_align
+HITS: Provider
+LEN: 8902
+
+## MODULE official
+HITS: Provider
+LEN: 4785
+
+## MODULE match
+HITS: 情无, Provider
+LEN: 4280
+--- 情无 context ---
+    }
+
+    if(bestScore>=980){if(provider)qfChapterHintPutV56(provider,meta,list,best);return best;}
+    return null;
+}
+
+
+/* ---------- Provider 正文 vs 起点段落原文 ---------- */
+
+/* ---------- Provider绑定诊断信息 ---------- */
+
+
+/* ---------- 最终Provider分发 ---------- */
+
+
+/* ============================================================
+ * v3.0.0-alpha3：独立限免正文层（情无 + 神魔）
+ *
+ * 是否选择限免源=是：
+ *   VIP 只走限免 Provider，失败不进入普通 Provider。
+ * ============================================================ */
+
+
+## MODULE limited_qw
+HITS: 情无, Provider
+LEN: 6164
+--- 情无 context ---
+function qfLimSetErrV30(name,msg){
+    try{qfRuntimeCacheV13(this).putMemory("qf_lim_err_"+String(name||""),String(msg||""));}catch(e0){}
+}
+function qfLimGetErrV30(name){
+    try{return String(qfRuntimeCacheV13(this).getFromMemory("qf_lim_err_"+String(name||""))||"");}catch(e0){return "";}
+}
+
+/* 情无 Provider · beta38
+ * 来源替换为用户附件「小雨的世界」的起点正文链：
+ *   https://full.hnxianxin.cn/qd/catalog.php
+ *   https://full.hnxianxin.cn/qd/content.php
+ * 对外名称仍保持“情无”。
+ * 不接管搜索/详情/评论，只作为起点增强限免正文 Provider。
+ */
+function qfQwSrcV38(ctx){try{return qfSource(ctx);}catch(e){return null;}}
+function qfQwJavaV38(ctx){try{return qfJava(ctx);}catch(e){return null;}}
+function qfQwNormBaseV44(v){return "https://full.hnxianxin.cn/qd";}
+function qfQwBaseV44(){return "https://full.hnxianxin.cn/qd";}
+function qfQwRootsV44(){r
+--- 情无 context ---
+name||""),String(msg||""));}catch(e0){}
+}
+function qfLimGetErrV30(name){
+    try{return String(qfRuntimeCacheV13(this).getFromMemory("qf_lim_err_"+String(name||""))||"");}catch(e0){return "";}
+}
+
+/* 情无 Provider · beta38
+ * 来源替换为用户附件「小雨的世界」的起点正文链：
+ *   https://full.hnxianxin.cn/qd/catalog.php
+ *   https://full.hnxianxin.cn/qd/content.php
+ * 对外名称仍保持“情无”。
+ * 不接管搜索/详情/评论，只作为起点增强限免正文 Provider。
+ */
+function qfQwSrcV38(ctx){try{return qfSource(ctx);}catch(e){return null;}}
+function qfQwJavaV38(ctx){try{return qfJava(ctx);}catch(e){return null;}}
+function qfQwNormBaseV44(v){return "https://full.hnxianxin.cn/qd";}
+function qfQwBaseV44(){return "https://full.hnxianxin.cn/qd";}
+function qfQwRootsV44(){return [qfQwBaseV44.call(this)];}
+function qfQwCredV38(){
+    var s=qfQwSrcV38(this),m=null,out={ywkey:"",ywguid:""};
+    try{m=s&&s.getLoginInfoMap?s.g
+--- 情无 context ---
+n qfQwRootsV44(){return [qfQwBaseV44.call(this)];}
+function qfQwCredV38(){
+    var s=qfQwSrcV38(this),m=null,out={ywkey:"",ywguid:""};
+    try{m=s&&s.getLoginInfoMap?s.getLoginInfoMap():null;}catch(_e0){}
+    function g(k){try{return m&&(m.get?m.get(k):m[k]);}catch(_e1){return null;}}
+    try{out.ywkey=String((s&&s.get?s.get("qf_qw_ywkey"):"")||g("情无Ywkey")||g("ywkey")||"").trim();}catch(_e2){}
+    try{out.ywguid=String((s&&s.get?s.get("qf_qw_ywguid"):"")||g("情无Ywguid")||g("ywguid")||"").trim();}catch(_e3){}
+    return out;
+}
+function qfQwHeadersV44(){
+    var h={"Accept":"application/json,text/plain,*/*","User-Agent":"Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36","Referer":qfQwBaseV44.call(this)+"/"};
+    var c=qfQwCredV38.call(this);if(c.ywkey&&c.ywguid){h.Ywkey=c.ywkey;h.Ywguid=c.ywguid;}
+    retur
+--- 情无 context ---
+ywkey:"",ywguid:""};
+    try{m=s&&s.getLoginInfoMap?s.getLoginInfoMap():null;}catch(_e0){}
+    function g(k){try{return m&&(m.get?m.get(k):m[k]);}catch(_e1){return null;}}
+    try{out.ywkey=String((s&&s.get?s.get("qf_qw_ywkey"):"")||g("情无Ywkey")||g("ywkey")||"").trim();}catch(_e2){}
+    try{out.ywguid=String((s&&s.get?s.get("qf_qw_ywguid"):"")||g("情无Ywguid")||g("ywguid")||"").trim();}catch(_e3){}
+    return out;
+}
+function qfQwHeadersV44(){
+    var h={"Accept":"application/json,text/plain,*/*","User-Agent":"Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36","Referer":qfQwBaseV44.call(this)+"/"};
+    var c=qfQwCredV38.call(this);if(c.ywkey&&c.ywguid){h.Ywkey=c.ywkey;h.Ywguid=c.ywguid;}
+    return h;
+}
+function qfQwAcquireTokenV44(force){return "small-rain-free";}
+function qfQwNormB64V38(v){var x=String(v||"
+--- 情无 context ---
+!==undefined?it.T:(it.time!==undefined?it.time:""))||""),
+                epub:Number((p&&p.epub)||it.epub||0)?1:0,
+                vip:Number((p&&(p.v!==undefined?p.v:p.vip))||(it.V!==undefined?it.V:it.vip)||0)?1:0
+            };
+        }
+        try{qfRuntimeCacheV13(this).putMemory(key,out);}catch(_c1){}
+    }catch(e){qfLimSetErrV30.call(this,"情无","目录映射失败："+String(e));}
+    return out;
+}
+function qfQwPickContentV38(obj,raw){
+    if(obj){
+        if(obj.error)throw new Error(String(obj.error));
+        if(obj.detail)throw new Error(String(obj.detail));
+        if(obj.code!==undefined&&Number(obj.code)!==0&&obj.msg)throw new Error(String(obj.msg));
+        if(obj.content!==undefined)return String(obj.content||"");
+        if(obj.Content!==undefined)return String(obj.Content||"");
+        if(obj.Data){if(obj.Data.Content!==undefined)return
+--- 情无 context ---
+.replace(/\s*免费看七天请求无限制[，,]?\s*喜欢就来闲鱼支持一下吧\s*/g,"\n");
+    s=s.replace(/\n[ \t]+/g,"\n").replace(/\n{3,}/g,"\n\n").replace(/^\s+|\s+$/g,"");
+    return s;
+}
+function qfQwContentV44(meta){
+    meta=meta||{};var bid=String(meta.bookId||""),cid=String(meta.chapterId||""),isPaid=String(meta.vip||"0")==="1";
+    if(!bid||!cid){qfLimSetErrV30.call(this,"情无","章节参数错误：BookId="+bid+"，ChapterId="+cid);return null;}
+    var map=qfQwCatalogMapV38.call(this,bid),it=map[cid]||null;
+    if(!it||!String(it.time||"")){qfLimSetErrV30.call(this,"情无","未从新来源目录解析到章节时间戳，请刷新目录/章节后重试");return null;}
+    var v=isPaid?1:Number(it.vip||0)?1:0;
+    var api=qfQwBaseV44.call(this)+"/content.php?bookId="+encodeURIComponent(bid)+"&chapterId="+encodeURIComponent(cid)+"&t="+encodeURIComponent(String(it.time))+"&epub="+(Number(it.epub||0)?1:0)+"&v="+v;
+    var j=qfQwJavaV38(th
+--- 情无 context ---
+eta){
+    meta=meta||{};var bid=String(meta.bookId||""),cid=String(meta.chapterId||""),isPaid=String(meta.vip||"0")==="1";
+    if(!bid||!cid){qfLimSetErrV30.call(this,"情无","章节参数错误：BookId="+bid+"，ChapterId="+cid);return null;}
+    var map=qfQwCatalogMapV38.call(this,bid),it=map[cid]||null;
+    if(!it||!String(it.time||"")){qfLimSetErrV30.call(this,"情无","未从新来源目录解析到章节时间戳，请刷新目录/章节后重试");return null;}
+    var v=isPaid?1:Number(it.vip||0)?1:0;
+    var api=qfQwBaseV44.call(this)+"/content.php?bookId="+encodeURIComponent(bid)+"&chapterId="+encodeURIComponent(cid)+"&t="+encodeURIComponent(String(it.time))+"&epub="+(Number(it.epub||0)?1:0)+"&v="+v;
+    var j=qfQwJavaV38(this);if(!j){qfLimSetErrV30.call(this,"情无","java context unavailable");return null;}
+    try{
+        var res=j.get(String(api),qfQwHeadersV44.call(this),12000),raw=String(res.body()||
+--- 情无 context ---
+新来源目录解析到章节时间戳，请刷新目录/章节后重试");return null;}
+    var v=isPaid?1:Number(it.vip||0)?1:0;
+    var api=qfQwBaseV44.call(this)+"/content.php?bookId="+encodeURIComponent(bid)+"&chapterId="+encodeURIComponent(cid)+"&t="+encodeURIComponent(String(it.time))+"&epub="+(Number(it.epub||0)?1:0)+"&v="+v;
+    var j=qfQwJavaV38(this);if(!j){qfLimSetErrV30.call(this,"情无","java context unavailable");return null;}
+    try{
+        var res=j.get(String(api),qfQwHeadersV44.call(this),12000),raw=String(res.body()||""),obj=null;
+        try{obj=JSON.parse(raw);}catch(_j){}
+        var txt=qfQwPickContentV38(obj,raw);txt=qfQwStripFooterV38(txt);
+        if(!txt){qfLimSetErrV30.call(this,"情无","新来源正文为空");return null;}
+        qfLimSetErrV30.call(this,"情无","");return txt;
+    }catch(e){qfLimSetErrV30.call(this,"情无","新来源正文请求失败："+String(e));return null;}
+}
+
+--- 情无 context ---
+!j){qfLimSetErrV30.call(this,"情无","java context unavailable");return null;}
+    try{
+        var res=j.get(String(api),qfQwHeadersV44.call(this),12000),raw=String(res.body()||""),obj=null;
+        try{obj=JSON.parse(raw);}catch(_j){}
+        var txt=qfQwPickContentV38(obj,raw);txt=qfQwStripFooterV38(txt);
+        if(!txt){qfLimSetErrV30.call(this,"情无","新来源正文为空");return null;}
+        qfLimSetErrV30.call(this,"情无","");return txt;
+    }catch(e){qfLimSetErrV30.call(this,"情无","新来源正文请求失败："+String(e));return null;}
+}
+
+--- 情无 context ---
+eturn null;}
+    try{
+        var res=j.get(String(api),qfQwHeadersV44.call(this),12000),raw=String(res.body()||""),obj=null;
+        try{obj=JSON.parse(raw);}catch(_j){}
+        var txt=qfQwPickContentV38(obj,raw);txt=qfQwStripFooterV38(txt);
+        if(!txt){qfLimSetErrV30.call(this,"情无","新来源正文为空");return null;}
+        qfLimSetErrV30.call(this,"情无","");return txt;
+    }catch(e){qfLimSetErrV30.call(this,"情无","新来源正文请求失败："+String(e));return null;}
+}
+
+--- 情无 context ---
+HeadersV44.call(this),12000),raw=String(res.body()||""),obj=null;
+        try{obj=JSON.parse(raw);}catch(_j){}
+        var txt=qfQwPickContentV38(obj,raw);txt=qfQwStripFooterV38(txt);
+        if(!txt){qfLimSetErrV30.call(this,"情无","新来源正文为空");return null;}
+        qfLimSetErrV30.call(this,"情无","");return txt;
+    }catch(e){qfLimSetErrV30.call(this,"情无","新来源正文请求失败："+String(e));return null;}
+}
+
+
+## MODULE limited_sm
+HITS: 账号, 登录
+LEN: 8415
+--- 账号 context ---
+g(meta.title||meta.chapterId||""));
+            return "";
+        }
+        var raw=String(qfJava(ctx).ajax(u,12000)||""),j=qfSmParseJsonV30(raw);
+        if(j&&Number(j.code)===401){
+            try{source.put("qf_sm_logged","0");}catch(e0){}
+            qfLimSetErrV30.call(ctx,"神魔","登录会话已失效，请到限免源账号 → 神魔重新登录");
+            return "";
+        }
+        /* alpha16：保存神魔正文响应中的原生 review_list/title_review/say/cmtBase。
+           单独神魔源的气泡就是直接靠这些字段注入，不再先绕 end-review。 */
+        try{if(j&&typeof j==="object")qfServerChapterMetaPutV316(ctx,"神魔",String(meta.bookId),String(meta.chapterId),j);}catch(_cm){}
+        var text=qfSmExtractContentV30.call(ctx,raw);
+        if(qfValidContentV10(text)){
+            qfLimSetErrV30.call(ctx,"神魔","");
+            return text;
+        }
+        qfLimSetErrV30.call(ctx,"神魔",String(j.message||j.detail||"正文为空或过短"));
+    }catch(e1){
+        qfLimSetErrV30.call(this,"神魔",String(e1&&e1.message||e1));
+    }
+    return "";
+}
+
+
+
+
+--- 登录 context ---
+ar m=base.match(/^(https?:\/\/[^\/]+)/i);
+    var origin=m?m[1]:base;
+    if(u.charAt(0)==="/")return origin+u;
+    return base+"/"+u.replace(/^\/+/,"");
+}
+
+
+/* ============================================================
+ * v3.0.0-alpha30：晴天限免源（参考附件“🔅起点”）
+ * - 服务入口默认 https://sb.shazi.tk，可自定义。
+ * - 登录凭据：key + dttoken；后台 /login。
+ * - VIP 正文：/chapter/vip；目录辅助：/catalog。
+ * - 服务器段评：正文索引 /api/comments，点击详情直接复用服务端 /comments 页面；
+ *   本章说复用 /chapter/chapterEndComments + /chapterComments。
+ * ============================================================ */
+
+function qfServerChapterMetaPutV316(ctx,provider,bid,cid,root){
+    if(!provider||!bid||!cid||!root||typeof root!=="object")return;
+    qfServerCachePutV315(ctx,"qf-server-native-v316-"+provider+"-"+bid+"-"+cid,root);
+}
+
+function qfLimSetErrV30(name,msg){
+    try{qfRuntimeCacheV13(this).putMemory("qf_lim_err_"+String(name||""),String(msg||""));}catch(e0){}
+}
+function qfLimGetErrV30(name){
+    try{return String(qfRuntimeCacheV13(this).getFromMemory("qf_lim_err_"+String(name||""))||"");}catch(e0){return "";}
+}
+
+/* ---------- 神魔 ----------
+ * 精简复用附件“神魔小说—闲人”的服务器链路：
+ * detail(normalized) -> tocUrl -> chapter.url -> content
+ * 登录/session/动态域名放在
+
+## MODULE limited_qt
+HITS: 账号, 登录
+LEN: 17236
+--- 账号 context ---
+'<').replace(/&gt;/gi,'>').replace(/&amp;/gi,'&');
+    return s.replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+}
+function qfQtContentV330(meta){
+    var cred=qfQtCredV328.call(this),errors=[];
+    if(!cred.key||!cred.dttoken){qfLimSetErrV30.call(this,'晴天','尚未登录：登录页 → 限免源账号 → 晴天');return '';}
+    function serverMessage(r,raw){
+        if(!r||typeof r!=='object')return String(raw||'').slice(0,180);
+        var d=r.data||r.Data||{};
+        return String(r.message||r.Message||r.detail||r.error||d.message||d.Message||d.detail||'');
+    }
+    function requestOne(ctx,x,label,delta){
+        x=x||{};delta=Number(delta||0);
+        var idx=Number(x.index);if(!isFinite(idx))idx=-1;
+        if(idx>=0)idx+=delta;
+        var ts=x.timestamp==null?'':x.timestamp;
+        var reqCid=String(x.chapterId||meta.chapterId||'');
+        var path='/chapter/vip?bookId='+String(meta.bookId)+'&chapterId='+reqCid+'&para=1&god=true&img=1&timestamp='+String(ts)+'&index='+String(idx);
+        var raw=qfQtRequestV328.call(ctx,path,'GET',{},12000),r=qfQtParseV330(raw),msg=serverMessage(r,raw);
+        try{
+            if(r&&typeof r==='object'){
+                r.__content=String(r.
+--- 登录 context ---
+ce(/&lt;/gi,'<').replace(/&gt;/gi,'>').replace(/&amp;/gi,'&');
+    return s.replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+}
+function qfQtContentV330(meta){
+    var cred=qfQtCredV328.call(this),errors=[];
+    if(!cred.key||!cred.dttoken){qfLimSetErrV30.call(this,'晴天','尚未登录：登录页 → 限免源账号 → 晴天');return '';}
+    function serverMessage(r,raw){
+        if(!r||typeof r!=='object')return String(raw||'').slice(0,180);
+        var d=r.data||r.Data||{};
+        return String(r.message||r.Message||r.detail||r.error||d.message||d.Message||d.detail||'');
+    }
+    function requestOne(ctx,x,label,delta){
+        x=x||{};delta=Number(delta||0);
+        var idx=Number(x.index);if(!isFinite(idx))idx=-1;
+        if(idx>=0)idx+=delta;
+        var ts=x.timestamp==null?'':x.timestamp;
+        var reqCid=String(x.chapterId||meta.chapterId||'');
+        var path='/chapter/vip?bookId='+String(meta.bookId)+'&chapterId='+reqCid+'&para=1&god=true&img=1&timestamp='+String(ts)+'&index='+String(idx);
+        var raw=qfQtRequestV328.call(ctx,path,'GET',{},12000),r=qfQtParseV330(raw),msg=serverMessage(r,raw);
+        try{
+            if(r&&typeof r==='object'){
+                r.__conte
+
+## MODULE fallback_my
+HITS: Provider
+LEN: 8063
+
+## MODULE fallback_dq
+HITS: Provider
+LEN: 9876
+
+## MODULE fallback_69
+HITS: 登录, Provider
+LEN: 7076
+--- 登录 context ---
+rs||{});
+    var o=QF_ProviderTransport.options(opt,h,10000);
+    return QF_ProviderTransport.text(this,url,o,{provider:"69书吧"});
+}
+function s69MaybeVerifyV23(url,html){
+    if(!s69IsCfV23(html))return html;
+    if(!qfToggle.call(this,"69验证时弹窗",false)){
+        throw new Error("69书吧需要 Cloudflare 验证（登录页可开启验证弹窗）");
+    }
+    var j=qfJava(this);
+    try{
+        var r=j.startBrowserAwait(url,"69书吧 · 人机验证",false);
+        if(r)return String(r.body()||"");
+    }catch(e0){}
+    throw new Error("69书吧 Cloudflare 未放行");
+}
+function s69SearchBooksV23(name,author){
+    var vars=qfNameVariantsV10(name),out=[],seen={};
+    for(var vi=0;vi<vars.length;vi++){
+        try{
+            var html=s69AjaxV23.call(this,S69_HOST+"/modules/article/search.php",{method:"POST",charset:"gbk",timeout:8000,body:"searchkey="+vars[vi]+"&searchtype=all&page=1"});
+            if(s69IsCfV23(html)){
+                if(qfToggle.call(this,"69验证时弹窗",false)){
+                    var verifyUrl=S69_HOST+"/modules/article/search.php?searchkey="+qfJava(this).encodeURI(vars[vi],"gbk")+"&searchtype=all&page=1";
+                    html=s69MaybeVerifyV23.call(this,verifyUrl,html);
+                }else throw new Error("69书吧需要 C
+
+## MODULE egg
+HITS: 情无
+LEN: 36120
+--- 情无 context ---
+ferer':'https://www.qidian.com/','Accept':'text/html,application/xhtml+xml'}}))||'');
+                qfEggFromRawV324(hr,bag,hints,wu);
+            }catch(_h){}
+            if(!bag.images.length||hints.length)qfEggWebProbeV325(j,wu,hints,bag);
+        }
+    }
+
+    /* ③ 最后一层：若 provider 只留下“我的彩蛋章-ID-序号 插图”占位，
+       继续在起点官方页面源码/DOM里围绕该 ID 取候选图片；绝不请求情无/神魔彩蛋接口。 */
+    var out=[];
+    for(var i=0;i<bag.images.length;i++){var it=qfEggRenderImageV59(this,bag.images[i],baseUrl);if(it)out.push(it);}
+    for(var t=0;t<bag.text.length;t++){
+        var tx=String(bag.text[t]||'').replace(/^\s*彩蛋章(?:[\s·：:—-]+)?/,'').trim();
+        if(!tx||qfNorm(tx)===qfNorm(meta&&meta.title||''))continue;
+        if(/^我的彩蛋章\s*-?\s*\d{8,}\s*-\s*\d+\s*插图\s*$/i.test(tx))continue;
+        out.push(tx);
+    }
+    return out.join('\n').trim();
+}
+
+
+/* =====================
+--- 情无 context ---
+|'');
+    var a=Array.isArray(model.items)?model.items:[],out=[];
+    for(var i=0;i<a.length;i++){
+        var x=a[i]||{},src=String(x.src||x.url||'');if(!src)continue;
+        out.push('<img src="'+src+'">');
+    }
+    return out.join('\n').trim();
+}
+
+/* ============================================================
+ * v3.0.0-alpha7：三类正文源严格路由
+ * 限免：情无 / 神魔 / 晴天
+ * 优选：七猫 / 书旗 / QQ浏览器
+ * 兜底：猫眼 / 得奇 / 69书吧
+ * 三类互不跨越。具体源=自动才在本类内按排序失败切换。
+ * ============================================================ */
+function qfEggDataV430(){return qfEggData.apply(this,arguments);}
+
+function qfEggRenderV430(){return qfEggRender.apply(this,arguments);}
+
+
+## MODULE circle
+HITS: 登录
+LEN: 159617
+--- 登录 context ---
+.parse(s)||"");}catch(e0){}
+    }
+    return s;
+}
+
+function qfCircleExtractScript2965(){
+    return "(function(){"
+        +"function n(s){return String(s||'').replace(/[\\t\\r ]+/g,' ').replace(/\\n{3,}/g,'\\n\\n').trim();}"
+        +"function bad(t){return !t||/^(书友圈|动态|热门|最新|精华|同人创作|全部|作家说|讨论|书评|登录|立即登录|打开起点读书|下载起点读书|发帖|查看全部帖子)/.test(t);}"
+        +"function hrefOf(el){if(!el)return'';var as=[];if(el.matches&&el.matches('a[href]'))as=[el];else as=el.querySelectorAll('a[href]');for(var i=0;i<as.length;i++){var h=String(as[i].href||as[i].getAttribute('href')||'');if(h&&!/javascript:/i.test(h))return h;}return'';}"
+        +"function imgOf(el){if(!el)return'';var is=el.querySelectorAll('img');for(var i=0;i<is.length;i++){var im=is[i],u=im.getAttribute('data-src')||im.getAttribute('data-original')||im.currentSrc||im.src||'';if(!u)continue;var p=im,cls='';for(var d=0;d<4&&p;d++,p=p.parentElement)cls+=' '+String(p.className||'');if(/avatar|head|user|author|logo|icon|qrcode|sprite|loading/i.test(cls+' '+u))continue;var w=Number(im.naturalWidth||im.width||im.getAttribute('width')||0),h=Number(im.naturalHeight||im.height||im.getAttribute('height')||0);if(w&&h&&w<=180&&h<=180)continue;ret
+
+## MODULE copyright
+HITS: Provider
+LEN: 12633
+
+## MODULE review_server_ui
+HITS: 情无
+LEN: 31992
+--- 情无 context ---
+'');if(window.java&&typeof window.java.ajax==='function'){var v=String(window.java.ajax(u)||'');if(v)reqCache[u]={t:now,v:v};return v}throw new Error('WebView 不支持 java.ajax')}\nfunction safe(raw){raw=String(raw||'').replace(/([:\\[,]\\\\s*)(\\d{16,})(?=\\\\s*[,}\\]])/g,'$1\"$2\"');return JSON.parse(raw||'{}')}\nfunction urlPage(p){if(C.provider==='情无'){var a='paragraph';return C.apiBase+'?action='+a+'&book_id='+encodeURIComponent(C.bid)+'&chapter_id='+encodeURIComponent(C.cid)+'&paragraph_id='+encodeURIComponent(C.mode==='chapter'?0:C.pid)+'&type=text&sort_type=0&page='+p+'&page_size='+C.pageSize}return C.apiBase+'/chapter/comments?bookId='+encodeURIComponent(C.bid)+'&chapterId='+encodeURIComponent(C.cid)+'&paragraphId='+encodeURIComponent(C.pid)+'&page='+p+'&pageSize='+C.pageSize+(C.authQuery||'')}\nfunction loadMore(auto){if(!hasMore||loa
+--- 情无 context ---
+ncodeURIComponent(C.pid)+'&page='+p+'&pageSize='+C.pageSize+(C.authQuery||'')}\nfunction loadMore(auto){if(!hasMore||loading)return;loading=true;var m=document.getElementById('more'),oldY=window.scrollY||document.documentElement.scrollTop||0;m.textContent='加载中…';m.classList.add('loading');try{page++;var j=safe(ajax(urlPage(page))),d=(C.provider==='情无'?(j.Data||j.data||{}):(j.data||j.Data||{})),a=(C.provider==='情无'?(d.DataList||d.dataList||d.comments||[]):(d.comments||d.Comments||[])),pg=d.pagination||d.Pagination||{};add(a);if(C.provider==='情无'){var total=Number(d.TotalCount||d.totalCount||d.TextCount||d.textCount||0);if(total>0)allTotal=total;hasMore=total?rows.length<total:a.length>=Number(C.pageSize||20)}else{var st=Number(d.total||d.Total||d.TotalCount||d.totalCount||pg.total||pg.Total||pg.totalCount||pg.TotalCount||0);if(st>0)allTotal=
+--- 情无 context ---
+uthQuery||'')}\nfunction loadMore(auto){if(!hasMore||loading)return;loading=true;var m=document.getElementById('more'),oldY=window.scrollY||document.documentElement.scrollTop||0;m.textContent='加载中…';m.classList.add('loading');try{page++;var j=safe(ajax(urlPage(page))),d=(C.provider==='情无'?(j.Data||j.data||{}):(j.data||j.Data||{})),a=(C.provider==='情无'?(d.DataList||d.dataList||d.comments||[]):(d.comments||d.Comments||[])),pg=d.pagination||d.Pagination||{};add(a);if(C.provider==='情无'){var total=Number(d.TotalCount||d.totalCount||d.TextCount||d.textCount||0);if(total>0)allTotal=total;hasMore=total?rows.length<total:a.length>=Number(C.pageSize||20)}else{var st=Number(d.total||d.Total||d.TotalCount||d.totalCount||pg.total||pg.Total||pg.totalCount||pg.TotalCount||0);if(st>0)allTotal=Math.max(allTotal,st,Number(C.expected||0));hasMore=!!(pg.hasNex
+--- 情无 context ---
+rollY||document.documentElement.scrollTop||0;m.textContent='加载中…';m.classList.add('loading');try{page++;var j=safe(ajax(urlPage(page))),d=(C.provider==='情无'?(j.Data||j.data||{}):(j.data||j.Data||{})),a=(C.provider==='情无'?(d.DataList||d.dataList||d.comments||[]):(d.comments||d.Comments||[])),pg=d.pagination||d.Pagination||{};add(a);if(C.provider==='情无'){var total=Number(d.TotalCount||d.totalCount||d.TextCount||d.textCount||0);if(total>0)allTotal=total;hasMore=total?rows.length<total:a.length>=Number(C.pageSize||20)}else{var st=Number(d.total||d.Total||d.TotalCount||d.totalCount||pg.total||pg.Total||pg.totalCount||pg.TotalCount||0);if(st>0)allTotal=Math.max(allTotal,st,Number(C.expected||0));hasMore=!!(pg.hasNextPage||pg.hasNext||pg.HasNextPage||pg.HasNext)||(st>0&&rows.length<st&&a.length>0)}render();if(page>1)try{window.scrollTo(0,oldY)}cat
+--- 情无 context ---
+e;m.classList.remove('loading')}if(auto)setTimeout(ensureFill,60)}\nfunction ensureFill(){if(!hasMore||loading)return;var h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight),v=window.innerHeight||document.documentElement.clientHeight||0;if(h<v+220&&page<4)loadMore(true)}\nfunction fetchReplies(id,box){if(!id||C.provider!=='情无')return;var ck=String(id),cached=replyCache[ck];if(cached&&Array.isArray(cached.rows)){box.innerHTML='';for(var ci=0;ci<cached.rows.length;ci++)box.appendChild(replyEl(cached.rows[ci]));if(!cached.rows.length)box.innerHTML='<div class=\"reply\">暂无回复</div>';setTimeout(function(){qfApplyFolds(box)},0);return}box.innerHTML='<div class=\"reply\">加载回复中…</div>';try{var u=C.apiBase+'?action=replies&book_id='+encodeURIComponent(C.bid)+'&chapter_id='+encodeURIComponent(C.cid)+'&paragraph_id='+encodeURIC
+--- 情无 context ---
+de\" type=\"button\">展开全文</button>'+(media?'<div class=\"media\">'+media+'</div>':'')+'<div class=\"foot\"><span>♡ '+x.like+'</span><span>回复 '+x.reply+'</span></div>';if(x.replies.length||x.reply>0){var rb=document.createElement('div');rb.className='replybox';for(var r=0;r<x.replies.length;r++)rb.appendChild(replyEl(x.replies[r]));if(C.provider==='情无'&&x.reply>x.replies.length&&x.id){var b=document.createElement('div');b.className='replyMore';b.textContent='查看全部回复';b.onclick=function(){fetchReplies(x.id,rb)};rb.appendChild(b)}d.appendChild(rb)}return d}\nfunction viewKey(){return String(filter||'all')+'|'+String(sort||'default')}\nfunction rememberView(){try{viewPos[viewKey()]=window.scrollY||document.documentElement.scrollTop||0}catch(_e){}}\nfunction restoreView(){var y=0;try{y=Number(viewPos[viewKey()]||0)}catch(_e){}if(!(y>0))return;set
+--- 情无 context ---
+'themeBtn');if(tb)tb.onclick=function(){m=document.body.classList.contains('dark')?'light':'dark';try{localStorage.setItem('qidian_comment_theme',m)}catch(e){}apply()}}\ninitTheme();add(C.rows||[]);allTotal=Math.max(Number(allTotal||0),Number(C.total||0),Number(C.expected||0),rows.length);var srcName=C.provider==='神魔'?'神魔':(C.provider==='晴天'?'晴天':'情无');var srcEl=document.getElementById('src');srcEl.textContent='⚡ '+srcName+' · '+(C.mode==='chapter'?'本章说':'段评');srcEl.title=srcName+'服务器 · '+(C.mode==='chapter'?'本章说':'段评');var q=document.getElementById('quote'),qb=document.getElementById('quoteBtn');try{quoteOpen=localStorage.getItem('qidian_comment_quote')!=='0'}catch(_qo){quoteOpen=true}function applyQuote(){if(!q||!qb)return;var has=!!String(C.quote||'');q.textContent=String(C.quote||'');q.style.display=(has&&quoteOpen)?'block':'none';qb.cl
+
+## MODULE preferred_sq
+HITS: 情无, Provider
+LEN: 17561
+--- 情无 context ---
+")||0)||0;
+    }catch(e0){}
+    if(cached&&now-ts<600000)return cached;
+
+    var j=qfJava(this),token="",resp=null,rawCookie="",old="";
+    function pick(v){
+        var s=String(v||""),m=s.match(/shuqi_token=([^,;\s]+)/);
+        if(m&&m[1])return qfSqTokenCleanV47(m[1]);
+        return "";
+    }
+
+    /* alpha49：聚合源最大的差异是 source.loginHeader 可能正在保存情无/其它源认证头。
+       独立书旗源取 token 时 loginHeader 为空，因此取 token 的短窗口先清空，完成后立即恢复。 */
+    try{old=qfSqOldLoginHeaderV47.call(this);}catch(_o){old="";}
+    try{
+        try{source.putLoginHeader("");}catch(_c0){}
+
+        /* 先复用 t.shuqi.com 自己已经存在的 cookie。 */
+        if(!force)try{
+            rawCookie=String(cookie.getCookie("https://t.shuqi.com/")||cookie.getCookie("https://t.shuqi.com")||"");
+            token=pick(rawCookie);
+        }catch(_ck0){}
+
+        /* 强制刷新时先清掉旧 token cookie，行为更接近独立源首次访问。 */
+ 
+
+## MODULE preferred_qq
+HITS: Provider
+LEN: 10528
+
+## MODULE qidian_app
+HITS: 登录
+LEN: 60553
+--- 登录 context ---
+ines.length){
+                var line=String(lines[li]||'').trim();
+                if(line)res.push(line);
+            }
+        }
+        out.content=res.join('\n').trim();
+        var plain=out.content.replace(/<img\b[^>]*>/ig,'').replace(/\s+/g,'');
+        out.ok=plain.length>=60&&!/订阅本章|购买本章|登录后阅读|本章为VIP章节|付费后阅读/.test(plain.slice(0,500));
+        if(!out.ok)out.message='APP 正文长度不足或疑似付费提示';
+    }catch(e){out.message=String(e&&e.message||e);}
+    QF_APP57_MEM[key]=out;
+    return out;
+}
+function qfAppRequestCoreV440(path,params,opt){
+    return QF_OfficialClient.requestAppCore(this,path,params,opt);
+}
+function qfAppRequestV57(path,params,opt){
+    return QF_OfficialClient.requestApp(this,path,params,opt);
+}
+function qfAppProbeV57(bookId,chapterId,force){
+    var bid=String(bookId||''),cid=String(chapterId||''),key='probe:'+bid+':'+cid,old=QF_APP57_MEM[key];
+    if(!force&&old&&Date.now()-Number(old.ts||0)<30*60*1000)return old;
+    var out={ts:Date.now(),bookId:bid,chapterId:cid,detail:false,catalog:false,midpage:false,content:false,license:false,notes:{}};
+    if(bid){
+        var d=qfAppRequestV57.call(this,'/argus/api/v3/bookdetail/get',{bookId:bid,isOutBook:0},{bookId:bid,
+
+## MODULE preferred_qm
+HITS: 登录, Provider
+LEN: 12602
+--- 登录 context ---
+["content-type"]="application/x-www-form-urlencoded";
+    var opt={method:"POST",headers:headers,body:qmForm(form)};
+    var r=qmParse(j.ajax("https://xiaoshuo.wtzw.com/api/v1/login/tourist,"+JSON.stringify(opt)));
+    token=String(r.data && r.data.token || "");
+    if (!token) throw new Error("七猫游客登录失败");
+    var jwt=qmParseJwt(token), user=jwt.user||{};
+    s.put("qf_qm_token",token);
+    s.put("qf_qm_exp",String(jwt.exp||Math.floor(Date.now()/1000)+3600));
+    s.put("qf_qm_uid",String(user.uid || (r.data && r.data.id) || ""));
+    if (user.deviceId) {
+        var d=qmDevice.call(this); d.device_id=String(user.deviceId); s.put("qf_qm_device",JSON.stringify(d));
+    }
+    return token;
+}
+function qmRequest(method,url,params,form) {
+    var j=qfJava(this);
+    var token=qmLogin.call(this);
+    params=params||{};
+    var full=url, opt={method:method,headers:qmHeaders.call(this,token),timeout:8000};
+    if (form) {
+        var body={}, keys=Object.keys(form);
+        for(var i=0;i<keys.length;i++) body[keys[i]]=String(form[keys[i]]);
+        body.sign=qmUrlSign(body);
+        opt.headers["content-type"]="application/x-www-form-urlencoded";
+        opt.body=qmForm(body);
+    } else {
+
+
+## MODULE provider_runtime
+HITS: 登录, Provider
+LEN: 10111
+--- 登录 context ---
+未找到|找不到|不存在|无此|没有).*?(?:书籍|本书)|(?:书籍|本书).*?(?:未找到|找不到|不存在|匹配失败)|目录\s*0\s*章|目录(?:为空|获取失败.*(?:空|0章))|book\s*(?:not\s*found|missing)/i.test(s);
+}
+/* beta20：失败类型只影响自动模式冷却时长；固定源永远不经过本模块。 */
+function qfProviderFailClass(msg){
+    var s=String(msg||"");
+    if(qfProviderHardFail(s))return "book";
+    if(/未登录|重新登录|登录会话|request[_ -]?token|token[^\n]{0,20}(?:失效|过期|无效)|令牌|凭据|unauthor|\b401\b/i.test(s))return "auth";
+    if(/Cloudflare|验证码|人机验证|风控|限频|请求频繁|频繁访问|too\s*many|rate\s*limit|\b429\b|forbidden|\b403\b/i.test(s))return "rate";
+    if(/未匹配章节|章节[^\n]{0,20}(?:未找到|不存在|匹配失败)|正文为空|正文过短|正文解密失败|锚点校验失败/i.test(s))return "chapter";
+    if(/timeout|超时|connection|网络|socket|502|503|504|temporar/i.test(s))return "transient";
+    return "other";
+}
+function qfProviderMarkFail(provider,meta,msg,state,deferSave){
+    provider=String(provider||"");if(!provider)return false;
+    var o=(state&&typeof state==="object"&&!Array.isArray(state))?state:qfProviderHealthLoad.call(this);
+    var x=o[provider]||{},now=Date.now(),cid=String(meta&&meta.chapterId||""),kind=qfProviderFailClass(msg),hard=kind==="book";
+    var same=cid&&String(x.lastFailCid||"")===cid;
+    if(!same)x.fails=Math.min(9,Number(x.fails||0)+1);
+
+## MODULE fallback_common
+HITS: Provider
+LEN: 2536
+
+## MODULE provider_common
+HITS: Provider
+LEN: 8563
+
+## MODULE review_server_core
+HITS: 情无, Provider
+LEN: 35221
+--- 情无 context ---
+this).ajax(bases[i]+"?"+q.join("&"))||"");
+            var r=qfServerJsonV315(raw);last=r;
+            if(useful(r)){
+                try{this.source.put("qf_qw_comment_base",bases[i]);}catch(_s){}
+                return r;
+            }
+        }catch(e0){last={code:-1,message:String(e0),Data:{},data:{}};}
+    }
+    return last||{code:-1,message:"情无评论接口无响应",Data:{},data:{}};
+}
+function qfSmCommentTokenV315(force){
+    if(!force){try{var old=String(this.source.get("qf_sm_ct")||"");if(old)return old;}catch(e0){}}
+    var base=qfSmChosenBaseV30.call(this,false),t="";
+    try{var r=qfServerJsonV315(String(qfRuntimeJavaV13(this).ajax(base+"/comment-token")||""));if(r&&Number(r.code)===0&&r.token)t=String(r.token);}catch(e1){}
+    if(t){try{this.source.put("qf_sm_ct",t);}catch(e2){}}
+    return t;
+}
+function qfSmAuthQueryV315(force){
+    var t=q
+--- 情无 context ---
+return r.data||r.Data||{};
+}
+function qfServerArrayV319(v){
+    if(Array.isArray(v))return v;
+    try{if(v&&v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e0){}
+    try{if(typeof Java!=="undefined"&&Java.from&&v)return Java.from(v);}catch(e1){}
+    return [];
+}
+function qfQwSummaryV315(bid,cid){
+    /* alpha26：情无服务器只负责“服务器可用的 ParagraphId/详情”，
+       气泡数量以起点官方本地 reviewSummary 为权威。
+       这样既保留情无 paragraph 接口已经验证可用的 ID，又避免第三方缓存数量偏差。 */
+    var key="qf-qw-summary-v326b-"+bid+"-"+cid;
+    var old=qfServerCacheGetV315(this,key,120000);
+    if(old&&old.items&&old.items.length)return old;
+
+    function parseServer(root){
+        root=(root&&typeof root==="object")?root:{};
+        var d=root.Data||root.data||{},box=d.Getparagraphscommentcounts||d.getparagraphscommentcounts||d.GetParagraphsCommentCounts||{};
+  
+--- 情无 context ---
+)return v;
+    try{if(v&&v.size&&v.get){var a=[];for(var i=0;i<v.size();i++)a.push(v.get(i));return a;}}catch(e0){}
+    try{if(typeof Java!=="undefined"&&Java.from&&v)return Java.from(v);}catch(e1){}
+    return [];
+}
+function qfQwSummaryV315(bid,cid){
+    /* alpha26：情无服务器只负责“服务器可用的 ParagraphId/详情”，
+       气泡数量以起点官方本地 reviewSummary 为权威。
+       这样既保留情无 paragraph 接口已经验证可用的 ID，又避免第三方缓存数量偏差。 */
+    var key="qf-qw-summary-v326b-"+bid+"-"+cid;
+    var old=qfServerCacheGetV315(this,key,120000);
+    if(old&&old.items&&old.items.length)return old;
+
+    function parseServer(root){
+        root=(root&&typeof root==="object")?root:{};
+        var d=root.Data||root.data||{},box=d.Getparagraphscommentcounts||d.getparagraphscommentcounts||d.GetParagraphsCommentCounts||{};
+        var list=qfServerArrayV319(box.DataList||box.dataList||box.List||box.list),ou
+--- 情无 context ---
+          if(isNaN(pid)||cnt<=0)continue;
+            out.push({paragraphId:pid>0?pid:-1,segmentId:pid>0?pid:0,serverParaId:pid>0?pid:0,count:cnt,reviewId:String(x.ReviewId||x.reviewId||""),hot:Number(x.HasHotComment||x.hasHotComment||0)!==0,quote:String(x.QuoteContent||x.quoteContent||x.ParagraphContent||x.paragraphContent||""),raw:x,countSource:"情无服务器"});
+        }
+        out.sort(function(a,b){if(Number(a.paragraphId)<0)return -1;if(Number(b.paragraphId)<0)return 1;return Number(a.paragraphId)-Number(b.paragraphId);});
+        return out;
+    }
+
+    var server=[];
+    try{server=parseServer(qfQwCommentApiV315.call(this,"summary",{book_id:bid,chapter_id:cid}));}catch(e0){server=[];}
+    var local=[];
+    try{local=qdReviewSummaryV22.call(this,bid,cid,true)||[];}catch(e1){local=[];}
+
+    if(!local.length){
+        var only={items:server,h
+--- 情无 context ---
+
+        return out;
+    }
+
+    var server=[];
+    try{server=parseServer(qfQwCommentApiV315.call(this,"summary",{book_id:bid,chapter_id:cid}));}catch(e0){server=[];}
+    var local=[];
+    try{local=qdReviewSummaryV22.call(this,bid,cid,true)||[];}catch(e1){local=[];}
+
+    if(!local.length){
+        var only={items:server,hot:{},raw:{},indexSource:"情无服务器索引兜底"};
+        if(server.length)qfServerCachePutV315(this,key,only);
+        return only;
+    }
+
+    var lbody=[],ltitle=null,lByPid={},lBySeg={};
+    for(var li=0;li<local.length;li++){
+        var l=local[li]||{},lp=Number(l.paragraphId),ls=Number(l.segmentId),lc=Number(l.count||0);
+        if(lc<=0)continue;
+        if(lp<0||ls===0){if(!ltitle||lc>Number(ltitle.count||0))ltitle=l;continue;}
+        lbody.push(l);
+        if(lp>0)lByPid[String(lp)]=l;
+        if(ls>0)lBySeg[String(ls)]=l;
+
+--- 情无 context ---
+le.reviewId||""),hot:!!ltitle.hot,quote:String(ltitle.quote||""),raw:ltitle.raw||ltitle,countSource:"起点官方"});}
+    out.sort(function(a,b){if(Number(a.paragraphId)<0)return -1;if(Number(b.paragraphId)<0)return 1;return Number(a.segmentId||a.paragraphId)-Number(b.segmentId||b.paragraphId);});
+    var pack={items:out,hot:{},raw:{},indexSource:"起点官方数量/情无服务器详情"};
+    if(out.length)qfServerCachePutV315(this,key,pack);
+    return pack;
+}
+function qfSmEndV315(bid,cid){
+    var key="qf-sm-end-v320-"+bid+"-"+cid,old=qfServerCacheGetV315(this,key,120000);if(old)return old;
+    var base=qfSmChosenBaseV30.call(this,false),j=qfRuntimeJavaV13(this),data={};
+    function once(auth){
+        try{
+            var u=base+"/chapter/end-review?bookId="+encodeURIComponent(String(bid))+"&chapterId="+encodeURIComponent(String(cid))+auth;
+            var r=qfServer
+--- 情无 context ---
+            reviewId:String(x.reviewId||""),
+            hot:!!x.hot,
+            quote:String(x.quote||""),
+            raw:x.raw||x
+        });
+    }
+    var pack={items:out,hot:{},raw:{},indexSource:"起点轻量索引/神魔服务器详情"};
+    qfServerCachePutV315(this,key,pack);
+    return pack;
+}
+
+function qfQwCommentPackV315(bid,cid,pid,page,size,chapter){
+    /* 情无原生评论：
+       正文段评 -> action=paragraph + paragraph_id=ParagraphId
+       本章说   -> 优先 action=paragraph + paragraph_id=0
+       旧服务若 paragraph_id=0 不返回章评，则仅本章说回退起点本地章评；
+       不影响已经正常的情无正文段评。 */
+    page=Number(page||1)||1;size=Number(size||20)||20;
+    var p={book_id:bid,chapter_id:cid,page:page,page_size:size,type:"text",sort_type:0};
+    p.paragraph_id=chapter?0:pid;
+    var r=qfQwCommentApiV315.call(this,"paragraph",p),root=(r&&typeof r==="object")?r:{},d=root.Data||root.data||{};
+    var a=qfS
+--- 情无 context ---
+raw:{},indexSource:"起点轻量索引/神魔服务器详情"};
+    qfServerCachePutV315(this,key,pack);
+    return pack;
+}
+
+function qfQwCommentPackV315(bid,cid,pid,page,size,chapter){
+    /* 情无原生评论：
+       正文段评 -> action=paragraph + paragraph_id=ParagraphId
+       本章说   -> 优先 action=paragraph + paragraph_id=0
+       旧服务若 paragraph_id=0 不返回章评，则仅本章说回退起点本地章评；
+       不影响已经正常的情无正文段评。 */
+    page=Number(page||1)||1;size=Number(size||20)||20;
+    var p={book_id:bid,chapter_id:cid,page:page,page_size:size,type:"text",sort_type:0};
+    p.paragraph_id=chapter?0:pid;
+    var r=qfQwCommentApiV315.call(this,"paragraph",p),root=(r&&typeof r==="object")?r:{},d=root.Data||root.data||{};
+    var a=qfServerArrayV319(d.DataList||d.dataList||d.comments||d.Comments||d.list||d.List),rows=[];
+    for(var i=0;i<a.length;i++){
+        var n=qfServerNormV315(a[i],"");if(n&&n.content)rows.p
+--- 情无 context ---
+|d.List),rows=[];
+    for(var i=0;i<a.length;i++){
+        var n=qfServerNormV315(a[i],"");if(n&&n.content)rows.push(n);
+    }
+    var total=Number(d.TotalCount||d.totalCount||d.TextCount||d.textCount||d.Count||d.count||rows.length)||rows.length;
+
+    return {rows:rows,rawRows:a,total:total,hasMore:rows.length>0&&(page*size)<total,raw:root,source:"情无服务器"};
+}
+
+function qfSmChapterSayPackV319(bid,cid){
+    /* beta14.1：按神魔 /chapter/end-review 的完整结构解析。
+       ChapterDataList 是章评，SegmentDataList[*].DataList 是段评预览；
+       ChapterReviewTotalCount 与 SegmentReviewTotalCount 均计入本章总讨论数。 */
+    var key="qf-sm-chapter-say-v3141-"+bid+"-"+cid;
+    var old=qfServerCacheGetV315(this,key,120000);
+    if(old&&((old.rows&&old.rows.length)||Number(old.total||0)>0||old.serverOk))return old;
+
+    var rows=[],previewRows=[],rawRows=[],seen={},raw={},serverOk=fals
+--- 情无 context ---
+server-native-v316-晴天-'+String(bid)+'-'+String(cid),root);
+                    qt=qfQtAuthorSayFromRootV332(root)||'';
+                    if(qt){qfServerCachePutV315(this,'qf-qt-author-v332-'+bid+'-'+cid,{text:qt});return qt;}
+                }
+            }
+        }catch(_q1){}
+        return '';
+    }
+    var d={},o={},t='';
+    if(provider==='情无'){
+        try{var r=qfQwCommentApiV315.call(this,'chapter_activity',{book_id:bid,chapter_id:cid,page:1,page_size:20});d=qfServerDataV319(r);}catch(e0){d={};}
+    }else if(provider==='神魔'){
+        try{var r2=qfSmCommentApiV315.call(this,'/chapter/activity?bookId='+encodeURIComponent(String(bid))+'&chapterId='+encodeURIComponent(String(cid)));d=qfServerDataV319(r2);}catch(e1){d={};}
+    }else return '';
+    o=d.author_say||d.authorSay||d.AuthorSay||d.Author_say||d||{};
+    if(typeof o==='string
+--- 情无 context ---
+ntent||o.Text||o.content||o.text||o.Comment||o.comment||o.Say||o.say||o.AuthorWords||o.authorWords||o.WriterSay||o.writerSay||'').trim();
+    if(!t){var ask=o.AskMonthTicket||o.ask_month_ticket||{};t=String(ask.AuthorExpectText||ask.author_expect_text||'').trim();}
+    return t;
+}
+
+function qfServerSummaryV315(provider,bid,cid){
+    if(provider==='情无')return qfQwSummaryV315.call(this,bid,cid);
+    if(provider==='神魔')return qfSmSummaryV315.call(this,bid,cid);
+    if(provider==='晴天')return qfQtSummaryV328.call(this,bid,cid);
+    return {items:[],hot:{},raw:{},indexSource:''};
+}
+function qfServerCommentPackV315(provider,bid,cid,pid,page,size,chapter){
+    if(provider==='情无')return qfQwCommentPackV315.call(this,bid,cid,pid,page,size,!!chapter);
+    if(provider==='神魔')return qfSmParagraphPackV315.call(this,bid,cid,pid,page,size);
+    /* alpha35：
+--- 情无 context ---
+id){
+    if(provider==='情无')return qfQwSummaryV315.call(this,bid,cid);
+    if(provider==='神魔')return qfSmSummaryV315.call(this,bid,cid);
+    if(provider==='晴天')return qfQtSummaryV328.call(this,bid,cid);
+    return {items:[],hot:{},raw:{},indexSource:''};
+}
+function qfServerCommentPackV315(provider,bid,cid,pid,page,size,chapter){
+    if(provider==='情无')return qfQwCommentPackV315.call(this,bid,cid,pid,page,size,!!chapter);
+    if(provider==='神魔')return qfSmParagraphPackV315.call(this,bid,cid,pid,page,size);
+    /* alpha35：晴天详情不进入本地 Pack 层。 */
+    if(provider==='晴天')return qfServerEmptyPackV334('晴天服务器原生页面');
+    return qfServerEmptyPackV334('');
+}
+function qfServerChapterPackV315(provider,bid,cid){
+    if(provider==='晴天')return qfServerEmptyPackV334('晴天服务器原生页面');
+    if(provider==='神魔')return qfSmChapterSayPackV319.call(this,bid,cid);
+    if(p
+--- 情无 context ---
+  /* alpha35：晴天详情不进入本地 Pack 层。 */
+    if(provider==='晴天')return qfServerEmptyPackV334('晴天服务器原生页面');
+    return qfServerEmptyPackV334('');
+}
+function qfServerChapterPackV315(provider,bid,cid){
+    if(provider==='晴天')return qfServerEmptyPackV334('晴天服务器原生页面');
+    if(provider==='神魔')return qfSmChapterSayPackV319.call(this,bid,cid);
+    if(provider==='情无'){
+        /* beta17.2：情无 comments.php 已验证普通 paragraph 可用，但 chapter/title 能力不完整。
+         * Registry 会把本章说点击路由到起点本地；这里仅保留轻量占位，避免正文阶段无效请求 paragraph_id=0。 */
+        return qfServerEmptyPackV334('情无普通段评服务器 / 本章说起点补全');
+    }
+    return qfServerEmptyPackV334('');
+}
+function qfShowServerCommentV315(provider,bid,cid,pid,seg,tp,quote,expected){
+    var j=qfRuntimeJavaV13(this)||qfJava(this);if(!j)return;
+    if(provider!=='情无'&&provider!=='神魔'&&provider!=='晴天')return;
+    var low=String(tp||'dp').toL
+--- 情无 context ---
+k 层。 */
+    if(provider==='晴天')return qfServerEmptyPackV334('晴天服务器原生页面');
+    return qfServerEmptyPackV334('');
+}
+function qfServerChapterPackV315(provider,bid,cid){
+    if(provider==='晴天')return qfServerEmptyPackV334('晴天服务器原生页面');
+    if(provider==='神魔')return qfSmChapterSayPackV319.call(this,bid,cid);
+    if(provider==='情无'){
+        /* beta17.2：情无 comments.php 已验证普通 paragraph 可用，但 chapter/title 能力不完整。
+         * Registry 会把本章说点击路由到起点本地；这里仅保留轻量占位，避免正文阶段无效请求 paragraph_id=0。 */
+        return qfServerEmptyPackV334('情无普通段评服务器 / 本章说起点补全');
+    }
+    return qfServerEmptyPackV334('');
+}
+function qfShowServerCommentV315(provider,bid,cid,pid,seg,tp,quote,expected){
+    var j=qfRuntimeJavaV13(this)||qfJava(this);if(!j)return;
+    if(provider!=='情无'&&provider!=='神魔'&&provider!=='晴天')return;
+    var low=String(tp||'dp').toLowerCase();
+
+    /* alpha3
+--- 情无 context ---
+f(provider==='晴天')return qfServerEmptyPackV334('晴天服务器原生页面');
+    if(provider==='神魔')return qfSmChapterSayPackV319.call(this,bid,cid);
+    if(provider==='情无'){
+        /* beta17.2：情无 comments.php 已验证普通 paragraph 可用，但 chapter/title 能力不完整。
+         * Registry 会把本章说点击路由到起点本地；这里仅保留轻量占位，避免正文阶段无效请求 paragraph_id=0。 */
+        return qfServerEmptyPackV334('情无普通段评服务器 / 本章说起点补全');
+    }
+    return qfServerEmptyPackV334('');
+}
+function qfShowServerCommentV315(provider,bid,cid,pid,seg,tp,quote,expected){
+    var j=qfRuntimeJavaV13(this)||qfJava(this);if(!j)return;
+    if(provider!=='情无'&&provider!=='神魔'&&provider!=='晴天')return;
+    var low=String(tp||'dp').toLowerCase();
+
+    /* alpha35：晴天完全恢复原生服务器评论页。
+       不请求/解析评论详情，不生成本地评论 HTML；点击才打开对应服务器 URL。 */
+    if(provider==='晴天'){
+        if(low==='author'||Number(pid)===-10)return qfQtShowAuthorV332.call(th
+--- 情无 context ---
+le 能力不完整。
+         * Registry 会把本章说点击路由到起点本地；这里仅保留轻量占位，避免正文阶段无效请求 paragraph_id=0。 */
+        return qfServerEmptyPackV334('情无普通段评服务器 / 本章说起点补全');
+    }
+    return qfServerEmptyPackV334('');
+}
+function qfShowServerCommentV315(provider,bid,cid,pid,seg,tp,quote,expected){
+    var j=qfRuntimeJavaV13(this)||qfJava(this);if(!j)return;
+    if(provider!=='情无'&&provider!=='神魔'&&provider!=='晴天')return;
+    var low=String(tp||'dp').toLowerCase();
+
+    /* alpha35：晴天完全恢复原生服务器评论页。
+       不请求/解析评论详情，不生成本地评论 HTML；点击才打开对应服务器 URL。 */
+    if(provider==='晴天'){
+        if(low==='author'||Number(pid)===-10)return qfQtShowAuthorV332.call(this,bid,cid);
+        if(low==='zp'){
+            return qfQtNativeOpenV335.call(this,
+                '/chapterComments?bookId='+encodeURIComponent(String(bid))+'&chapterId='+encodeURIComponent(String(cid)),
+                '本章
+--- 情无 context ---
+vider+'服务器'),err='';
+    try{pack=mode==='chapter'?qfServerChapterPackV315.call(this,provider,bid,cid):qfServerCommentPackV315.call(this,provider,bid,cid,requestPid,1,20,false);}catch(e0){err=String(e0&&e0.message||e0);}
+    if(!err&&pack&&pack.error)err=String(pack.error||'');
+
+    /* beta12：服务器评论详情不再因为数量不一致而静默回退起点本地。 */
+
+    var base=provider==='情无'?qfQwCommentBaseV315():qfSmChosenBaseV30.call(this,false);
+    var auth=provider==='神魔'?qfSmAuthQueryV315.call(this,false):'';
+    var cfg={provider:provider,bid:String(bid),cid:String(cid),pid:Number(requestPid),displayPid:Number(pid),segment:Number(seg)||0,mode:mode,title:mode==='chapter'?'本章说':(Number(pid)<0?'章名段评':'段评'),quote:String(quote||''),expected:Number(expected||0),rows:qfServerPopupRawRowsV315(provider,bid,cid,requestPid,tp,pack),total:Number(pack.total||0),page:1,pageSize:20,hasMor
+--- 情无 context ---
+der,bid,cid,requestPid,tp,pack),total:Number(pack.total||0),page:1,pageSize:20,hasMore:!!pack.hasMore,apiBase:base,authQuery:auth,error:err,completeSource:String(pack.source||'')};
+    var pre='window.java=java;window.__QF_SERVER_CMT__='+JSON.stringify(cfg).replace(/<\/script/gi,'<\\/script')+';'+qfV18BottomAnchorPre();
+    var pageUrl=provider==='情无'?qfQwCommentBaseV315.call(this):(base+'/');
+    try{j.showBrowser(pageUrl,qfServerCommentHtmlV315(),pre,JSON.stringify(qfV18CommentConfig.call(this)));}catch(e1){try{j.longToast('服务器段评打开失败：'+e1);}catch(_e){}}
+}
+
+
+## MODULE preferred_dj
+HITS: Provider
+LEN: 10056
+
+## MODULE fallback_sdg
+HITS: Provider
+LEN: 12032
+
+## MODULE preferred_kw
+HITS: Provider
+LEN: 8098
+
+## MODULE fallback_wx
+HITS: Provider
+LEN: 13735
+
+## MODULE limited_tr
+HITS: 登录, Provider
+LEN: 10662
+--- 登录 context ---
+/* v4.1.0-alpha10.9.2 · 同人小说网限免 Provider
+ * 来源：附件「起点限免（同人小说网）」。
+ * 鉴权严格使用 source.getVariable() 的共享 Token，不写入登录信息 Map。
+ * 只移植 VIP 正文所需 /novel/chap，不移植搜索、发现、目录、评论 UI。
+ */
+function qfTrSetErrV102(msg){
+    try{qfRuntimeCacheV13(this).putMemory("qf_lim_err_同人",String(msg||""));}catch(e0){}
+}
+function qfTrGetErrV102(){
+    try{return String(qfRuntimeCacheV13(this).getFromMemory("qf_lim_err_同人")||"");}catch(e0){return "";}
+}
+function qfTrSourceV102(ctx){
+    try{return qfSource(ctx);}catch(e0){return null;}
+}
+function qfTrJavaV102(ctx){
+    try{return qfJava(ctx);}catch(e0){return null;}
+}
+function qfTrTokenV102(){
+    var s=qfTrSourceV102(this),v="",o=null;
+    try{v=String(s&&s.getVariable?s.getVariable():"").trim();}catch(e0){v="";}
+    if(v&&v.charAt(0)==="{"){
+        try{o=JSON.parse(v);}catch(e1){o=null;}
+        if(o&&typeof o==="object"&&Object.prototype.hasOwnProperty.call(o,"qfV21Search"))return "";
+    }
+    return String(v||"").trim();
+}
+function qfTrBaseV102(){return "https://qd.aadcn.
+
+## MODULE limited_x
+HITS: 账号, 登录, Provider
+LEN: 3626
+--- 账号管理 context ---
+|""),vip=String(meta.vip||"0"),tm=String(meta.time||meta.updateTime||""),pid=String(meta.mid||meta.pid||"");
+    if(!bid||!cid){qfXSetErrV32.call(this,"章节参数错误：BookId="+bid+"，ChapterId="+cid);return null;}
+    var token=qfXAcquireTokenV32.call(this);if(!token){qfXSetErrV32.call(this,"未获取到 X Token；请进入账号管理 → X 登录，或填写 X 密钥");return null;}
+    var p={token:token,v:vip,t:tm,bookId:bid,chapterId:cid};if(pid)p.pid=pid;
+    var url=qfXQueryV32("content.php",p),j=qfXJavaV32(this),raw="",text="";if(!j){qfXSetErrV32.call(this,"java 运行环境不可用");return null;}
+    try{raw=String(j.ajax(url+","+JSON.stringify({timeout:10000,headers:{"Accept":"application/json,text/plain,*/*"}}))||"");}catch(e0){try{raw=String(j.ajax(url)||"");}catch(e1){qfXSetErrV32.call(this,"X 正文请求失败："+String(e1));return null;}}
+    text=qfXPickContentV32(raw);
+    if(text&&text!=="您的权限不足以请求该正文内容"&&!/^\s*(?:error|错误|请求异常)/i.test(text)){qfXSetErrV32.call(this,"");return text;}
+    var o=qfXJsonV32(raw),msg=String((o&&(o.error||o.message||o.msg))||text||"X 正文为空");
+    qfXSetErrV32.call(this,msg);return null;
+}
+
+--- 账号 context ---
+/* beta32：X-QD 独立限免 Provider。
+ * 仅移植附件「起点X-QD」的 X 正文链：api-x.shrtxs.cn/qidth/content.php。
+ * 不移植附件评论、购买、AI、发现、目录 UI，也不读取其它 Provider 账号。
+ * 固定 X 或自动路由命中 X 时才加载本模块；未配置 Token 时只尝试当前 X 登录会话取 token 一次。
+ */
+function qfXSetErrV32(msg){try{qfRuntimeCacheV13(this).putMemory("qf_lim_err_X",String(msg||""));}catch(_e){}}
+function qfXGetErrV32(){try{return String(qfRuntimeCacheV13(this).getFromMemory("qf_lim_err_X")||"");}catch(_e){return "";}}
+function qfXSourceV32(ctx){try{return qfSource(ctx);}catch(_e){return null;}}
+function qfXJavaV32(ctx){try{return qfJava(ctx);}catch(_e){return null;}}
+function qfXMapV32(ctx,key){
+    var s=qfXSourceV32(ctx),m=null,v="";
+    try{m=s&&s.getLoginInfoMap?s.getLoginInfoMap():null;v=String(m&&(m.get?m.get(key):m[key])||"");}catch(_e){}
+    if(!v)try{var o=JSON.parse(String(s&&s.getLoginInfo?s.getLoginInfo():"")||"{}")||{};v=String(o[key]||"");}catch(_j){}
+    return v;
+}
+function qfXBaseV32(){return "https://api-x.shrtxs.cn/qidth";}
+function qfXTokenV32(){
+    var s=qfXSourceV32(this),v=qfXMa
+--- 登录 context ---
+/* beta32：X-QD 独立限免 Provider。
+ * 仅移植附件「起点X-QD」的 X 正文链：api-x.shrtxs.cn/qidth/content.php。
+ * 不移植附件评论、购买、AI、发现、目录 UI，也不读取其它 Provider 账号。
+ * 固定 X 或自动路由命中 X 时才加载本模块；未配置 Token 时只尝试当前 X 登录会话取 token 一次。
+ */
+function qfXSetErrV32(msg){try{qfRuntimeCacheV13(this).putMemory("qf_lim_err_X",String(msg||""));}catch(_e){}}
+function qfXGetErrV32(){try{return String(qfRuntimeCacheV13(this).getFromMemory("qf_lim_err_X")||"");}catch(_e){return "";}}
+function qfXSourceV32(ctx){try{return qfSource(ctx);}catch(_e){return null;}}
+function qfXJavaV32(ctx){try{return qfJava(ctx);}catch(_e){return null;}}
+function qfXMapV32(ctx,key){
+    var s=qfXSourceV32(ctx),m=null,v="";
+    try{m=s&&s.getLoginInfoMap?s.getLoginInfoMap():null;v=String(m&&(m.get?m.get(key):m[key])||"");}catch(_e){}
+    if(!v)try{var o=JSON.parse(String(s&&s.getLoginInfo?s.getLoginInfo():"")||"{}")||{};v=String(o[key]||"");}catch(_j){}
+    return v;
+}
+function qfXBaseV32(){return "https://api-x.shrtxs.cn/qidth";}
+function qfXTokenV32(){
+    var s=qfXSourceV32(this),v=qfXMapV32(this,"🎬X佬密钥");
+    if(!v)try{v=String(s&&s.g
+
+## TOP-LEVEL loginUrl
+LEN: 85155
+HIT 情无
+function login() {
+    var page="main";
+    try{page=String(source.get("qf_ui_page")||"main");}catch(e0){}
+    /* alpha49：附件情无源依赖阅读顶部“✓/登录”触发 login()。
+       之前聚合源这里为空，用户填写账号密码后点顶部确认实际上什么也没保存。 */
+    if(page==="qw")return qfQwNativeLoginV52();
+    return true;
+}
+
+function qfMsgV30(s){try{java.longToast(String(s));}catch(e0){try{java.toast(String(s));}catch(e1){}}}
+function qfStrV30(v){try{return new Packages.java.lang.String(String(v));}catch(e){return String(v);}}
+
+/* v3.0-alpha2：多页面登录设置。只用 upLoginData 做增量写入，避免二级页覆盖其它页面设置。 */
+function qfLoginSave(key) {
+    try {
+        var value = "";
+        try { value = result && result[key] != null ? String(result[key]) : ""; } catch(e0) {}
+        if (!value) { try { value = String(Map(key) || ""); } catch(e1) {} }
+        if (!value) return java.toast("未读取到设置：" + key);
+        var map = new Packages.java.util.HashMap();
+        map.put(key, value);
+        java.upLoginData(map);
+        try{qfSettingsMarkCustom(key);}catch(_pc){}
+        java.toast("已保存 · " + key);
+ 
+HIT 账号
+function login() {
+    var page="main";
+    try{page=String(source.get("qf_ui_page")||"main");}catch(e0){}
+    /* alpha49：附件情无源依赖阅读顶部“✓/登录”触发 login()。
+       之前聚合源这里为空，用户填写账号密码后点顶部确认实际上什么也没保存。 */
+    if(page==="qw")return qfQwNativeLoginV52();
+    return true;
+}
+
+function qfMsgV30(s){try{java.longToast(String(s));}catch(e0){try{java.toast(String(s));}catch(e1){}}}
+function qfStrV30(v){try{return new Packages.java.lang.String(String(v));}catch(e){return String(v);}}
+
+/* v3.0-alpha2：多页面登录设置。只用 upLoginData 做增量写入，避免二级页覆盖其它页面设置。 */
+function qfLoginSave(key) {
+    try {
+        var value = "";
+        try { value = result && result[key] != null ? String(result[key]) : ""; } catch(e0) {}
+        if (!value) { try { value = String(Map(key) || ""); } catch(e1) {} }
+        if (!value) return java.toast("未读取到设置：" + key);
+        var map = new Packages.java.util.HashMap();
+        map.put(key, value);
+        java.upLoginData(map);
+        try{qfSettingsMarkCustom(key);}catch(_pc){}
+        java.toast("已保存 · " + key);
+    } catch(e) { qfMsgV30("保存失败：" + e); }
+}
+
+
+/* 
+HIT 登录
+function login() {
+    var page="main";
+    try{page=String(source.get("qf_ui_page")||"main");}catch(e0){}
+    /* alpha49：附件情无源依赖阅读顶部“✓/登录”触发 login()。
+       之前聚合源这里为空，用户填写账号密码后点顶部确认实际上什么也没保存。 */
+    if(page==="qw")return qfQwNativeLoginV52();
+    return true;
+}
+
+function qfMsgV30(s){try{java.longToast(String(s));}catch(e0){try{java.toast(String(s));}catch(e1){}}}
+function qfStrV30(v){try{return new Packages.java.lang.String(String(v));}catch(e){return String(v);}}
+
+/* v3.0-alpha2：多页面登录设置。只用 upLoginData 做增量写入，避免二级页覆盖其它页面设置。 */
+function qfLoginSave(key) {
+    try {
+        var value = "";
+        try { value = result && result[key] != null ? String(result[key]) : ""; } catch(e0) {}
+        if (!value) { try { value = String(Map(key) || ""); } catch(e1) {} }
+        if (!value) return java.toast("未读取到设置：" + key);
+        var map = new Packages.java.util.HashMap();
+        map.put(key, value);
+        java.upLoginData(map);
+        try{qfSettingsMarkCustom(key);}catch(_pc){}
+        java.toast("已保存 · " + key);
+    } catch(e
+HIT qfMultiAccounts
+开启深度诊断采集。')+
+      '</div>';
+    var all=sk.concat(tk);
+    for(var i=0;i<all.length;i++)inner+=qfMSpan423('v_'+i,qfMGet423(all[i],tk.indexOf(all[i])>=0?'🔳':(all[i]=='段评弹窗高度'?'80':'24')));
+    var body=qfMOpen423('🎨 界面与提示',inner,qfMScript423(sk,tk,[]));
+    if(body)qfMSave423(body,all);
+}
+
+function qfMultiAccountsV423(){
+    var ik=['email','password','情无接口地址','神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址','🎬X佬密钥'];
+    var inner=
+      '<div class="card"><div class="lab"><b>🌙 情无</b><small>填写后选择下方动作，再点右上角 ✓。</small></div>'+
+      qfMInput423('邮箱','email','text','','QQ邮箱')+
+      qfMInput423('密码','password','password','','情无密码')+
+      qfMInput423('接口地址','情无接口地址','text','http://103.236.85.8:7878/qd','可自定义')+
+      '<div class="grid"><button class="act primary" onclick="act(\'qw-login\')">登录</button><button class="act" onclick="act(\'qw-check\')">检测</button><button class="act" onclick="act(\'qw-web\')">网页登录</button><button class="act" onclick="act(\'qw-logout\')">退出</button></div></div>'+
+      '<div class="card"><div class="lab"><b>⚔️ 神魔</b></div>'+
+      qfMInput423('账号或邮箱','神魔账号或邮箱','text','','')+
+      qfMInput423('密码','神魔密码','password','','')+
+      '<div class="grid"><button class="ac
+HIT account
+  var js=qfMScript423([],[],ik)+'function fire(a){sync();var q=[],ks='+JSON.stringify(ik)+';for(var i=0;i<ks.length;i++){var el=document.getElementById(fid(ks[i]));if(el)q.push(encodeURIComponent(ks[i])+"="+encodeURIComponent(el.value||""));}document.title="已选择："+a+"；请点右上角✓";location.href="qfnext://account?action="+encodeURIComponent(a)+"&"+q.join("&");}';
+    qfMOpen423('🔐 Provider 账号',inner,js);
+    var a=qfNextTakeActionV011();if(a)qfNextAccountRunV011(a);
+};
+qfMultiDiagV423=function(){
+    try{source.remove('qf_next_action_v011');}catch(_e){}
+    var inner='<div class="card"><div class="grid"><button class="act primary" onclick="fire(\'overview\')">Runtime 概览</button><button class="act" onclick="fire(\'performance\')">性能摘要</button><button class="act" onclick="fire(\'performance-deep\')">深度追踪</button><button class="act" onclick="fire(\'copy\')">复制脱敏诊断</button><button class="act" onclick="fire(\'reset\')">清空诊断</button></div><div class="tip">点击动作后看到提示，再点右上角 ✓ 返回执行。</div></div>';
+    qfMOpen423('🩺 诊断工具',inner,'function fire(a){document.title="已选择："+a+"；请点右上角✓";location.href="qfnext://diag?action="+encodeURIComponent(a);}');
+    var a=qfNextTakeActionV011();
+    try{if(a==='copy')qf
+HIT Account
+集。')+
+      '</div>';
+    var all=sk.concat(tk);
+    for(var i=0;i<all.length;i++)inner+=qfMSpan423('v_'+i,qfMGet423(all[i],tk.indexOf(all[i])>=0?'🔳':(all[i]=='段评弹窗高度'?'80':'24')));
+    var body=qfMOpen423('🎨 界面与提示',inner,qfMScript423(sk,tk,[]));
+    if(body)qfMSave423(body,all);
+}
+
+function qfMultiAccountsV423(){
+    var ik=['email','password','情无接口地址','神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址','🎬X佬密钥'];
+    var inner=
+      '<div class="card"><div class="lab"><b>🌙 情无</b><small>填写后选择下方动作，再点右上角 ✓。</small></div>'+
+      qfMInput423('邮箱','email','text','','QQ邮箱')+
+      qfMInput423('密码','password','password','','情无密码')+
+      qfMInput423('接口地址','情无接口地址','text','http://103.236.85.8:7878/qd','可自定义')+
+      '<div class="grid"><button class="act primary" onclick="act(\'qw-login\')">登录</button><button class="act" onclick="act(\'qw-check\')">检测</button><button class="act" onclick="act(\'qw-web\')">网页登录</button><button class="act" onclick="act(\'qw-logout\')">退出</button></div></div>'+
+      '<div class="card"><div class="lab"><b>⚔️ 神魔</b></div>'+
+      qfMInput423('账号或邮箱','神魔账号或邮箱','text','','')+
+      qfMInput423('密码','神魔密码','password','','')+
+      '<div class="grid"><button class="act prima
+HIT Provider
+ng(token||"");
+    try{if(ck)source.put("qf_qw_cookie_v317",ck);}catch(e0){}
+    try{if(token)source.put("qf_qw_token_v317",token);}catch(e1){}
+    try{if(keys!==undefined&&keys!==null&&!isNaN(Number(keys)))source.put("qf_qw_keys_v317",String(Number(keys)));}catch(e2){}
+    /* beta17.1：再镜像到登录数据 Map。Provider 在阅读线程即使拿不到全局 source 自由变量，
+       也能通过 this.source.getLoginInfoMap() 读取同一份 Cookie/Token。 */
+    try{
+        var bm=new Packages.java.util.HashMap();
+        if(ck)bm.put("情无会话Cookie",ck);
+        if(token)bm.put("情无会话令牌",token);
+        if(keys!==undefined&&keys!==null&&!isNaN(Number(keys)))bm.put("情无共享凭据",String(Number(keys)));
+        java.upLoginData(bm);
+    }catch(_bridge){}
+    var lh={};try{lh=JSON.parse(String(source.getLoginHeader()||"{}"))||{};}catch(e3){lh={};}
+    lh.Accept="application/json";if(ck)lh.Cookie=ck;if(token)lh["X-Content-Token"]=token;
+    source.putLoginHeader(new Packages.java.lang.String(JSON.stringify(lh)));
+    var info={};try{info=JSON.parse(String(source.getLoginInfo()||"{}"))||{};}catch(e4){info={};}
+    if(email!==undefined&&email!==null)info.email=String(email||"").trim();
+    if(password!==undefined&&password!==null&&String(password)!=="")info
