@@ -1,0 +1,178 @@
+## limited_sm hits=['账号'] len=8415
+-- 账号 #1 --
+ raw=String(qfJava(ctx).ajax(u,12000)||""),j=qfSmParseJsonV30(raw);
+        if(j&&Number(j.code)===401){
+            try{source.put("qf_sm_logged","0");}catch(e0){}
+            qfLimSetErrV30.call(ctx,"神魔","登录会话已失效，请到限免源账号 → 神魔重新登录");
+            return "";
+        }
+        /* alpha16：保存神魔正文响应中的原生 review_list/title_review/say/cmtBase。
+           单独神魔源的气泡就是直接靠这些字段注入，不再先绕 end-review。 */
+        try{if(j&&typeof j==="object")qfServerChapterMetaPutV316(ctx,"神魔",String(meta.bookId),String(meta.chapterId),j);}catch(_cm){}
+        var text=qfSmExtractContentV30.call(ctx,raw);
+        if(qfValidContentV10(text)){
+            qfLimSetErrV30.call(ctx,"神魔","");
+            return text;
+        }
+        qfLimSetErrV30.call(ctx,"神魔",String(j.message||j.detail||"正文为空或过短"));
+    }catch(e1){
+        qfLimSetErrV30.call(this,"神魔",String(e1&&e1.message||e1));
+    }
+    return "";
+}
+
+
+
+
+
+## limited_qt hits=['账号'] len=17236
+-- 账号 #1 --
+'\n').replace(/\r/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+}
+function qfQtContentV330(meta){
+    var cred=qfQtCredV328.call(this),errors=[];
+    if(!cred.key||!cred.dttoken){qfLimSetErrV30.call(this,'晴天','尚未登录：登录页 → 限免源账号 → 晴天');return '';}
+    function serverMessage(r,raw){
+        if(!r||typeof r!=='object')return String(raw||'').slice(0,180);
+        var d=r.data||r.Data||{};
+        return String(r.message||r.Message||r.detail||r.error||d.message||d.Message||d.detail||'');
+    }
+    function requestOne(ctx,x,label,delta){
+        x=x||{};delta=Number(delta||0);
+        var idx=Number(x.index);if(!isFinite(idx))idx=-1;
+        if(idx>=0)idx+=delta;
+        var ts=x.timestamp==null?'':x.timestamp;
+        var reqCid=String(x.chapterId||meta.chapterId||'');
+        var path='/chapter/vip?bookId='+String(meta.bookId)+'&chapterId='+reqCid+'&para=1&god=true&img=1&timestamp='+String(ts)+'&index='+String(idx);
+
+## limited_x hits=['账号管理', '账号'] len=3626
+-- 账号管理 #1 --
+ing(meta.mid||meta.pid||"");
+    if(!bid||!cid){qfXSetErrV32.call(this,"章节参数错误：BookId="+bid+"，ChapterId="+cid);return null;}
+    var token=qfXAcquireTokenV32.call(this);if(!token){qfXSetErrV32.call(this,"未获取到 X Token；请进入账号管理 → X 登录，或填写 X 密钥");return null;}
+    var p={token:token,v:vip,t:tm,bookId:bid,chapterId:cid};if(pid)p.pid=pid;
+    var url=qfXQueryV32("content.php",p),j=qfXJavaV32(this),raw="",text="";if(!j){qfXSetErrV32.call(this,"java 运行环境不可用");return null;}
+    try{raw=String(j.ajax(url+","+JSON.stringify({timeout:10000,headers:{"Accept":"application/json,text/plain,*/*"}}))||"");}catch(e0){try{raw=String(j.ajax(url)||"");}catch(e1){qfXSetErrV32.call(this,"X 正文请求失败："+String(e1));return null;}}
+    text=qfXPickContentV32(raw);
+    if(text&&text!=="您的权限不足以请求该正文内容"&&!/^\s*(?:error|错误|请求异常)/i.test(text)){qfXSetErrV32.call(this,"");return text;}
+    var o=qfXJsonV32(raw),msg=String((o&&(o.error||o.messag
+-- 账号 #1 --
+/* beta32：X-QD 独立限免 Provider。
+ * 仅移植附件「起点X-QD」的 X 正文链：api-x.shrtxs.cn/qidth/content.php。
+ * 不移植附件评论、购买、AI、发现、目录 UI，也不读取其它 Provider 账号。
+ * 固定 X 或自动路由命中 X 时才加载本模块；未配置 Token 时只尝试当前 X 登录会话取 token 一次。
+ */
+function qfXSetErrV32(msg){try{qfRuntimeCacheV13(this).putMemory("qf_lim_err_X",String(msg||""));}catch(_e){}}
+function qfXGetErrV32(){try{return String(qfRuntimeCacheV13(this).getFromMemory("qf_lim_err_X")||"");}catch(_e){return "";}}
+function qfXSourceV32(ctx){try{return qfSource(ctx);}catch(_e){return null;}}
+function qfXJavaV32(ctx){try{return qfJava(ctx);}catch(_e){return null;}}
+function qfXMapV32(ctx,key){
+    var s=qfXSourceV32(ctx),m=null,v="";
+    try{m=s&&s.getLoginInfoMap?s.getLoginInfoMap():null;v=String(m&&(m.get?m.get(key):m[key])||"");}catch(_e){}
+    if(!v)try{var o=JSON.parse(String(s&&s.getLoginInfo?s.get
+-- 账号 #2 --
+ing(meta.mid||meta.pid||"");
+    if(!bid||!cid){qfXSetErrV32.call(this,"章节参数错误：BookId="+bid+"，ChapterId="+cid);return null;}
+    var token=qfXAcquireTokenV32.call(this);if(!token){qfXSetErrV32.call(this,"未获取到 X Token；请进入账号管理 → X 登录，或填写 X 密钥");return null;}
+    var p={token:token,v:vip,t:tm,bookId:bid,chapterId:cid};if(pid)p.pid=pid;
+    var url=qfXQueryV32("content.php",p),j=qfXJavaV32(this),raw="",text="";if(!j){qfXSetErrV32.call(this,"java 运行环境不可用");return null;}
+    try{raw=String(j.ajax(url+","+JSON.stringify({timeout:10000,headers:{"Accept":"application/json,text/plain,*/*"}}))||"");}catch(e0){try{raw=String(j.ajax(url)||"");}catch(e1){qfXSetErrV32.call(this,"X 正文请求失败："+String(e1));return null;}}
+    text=qfXPickContentV32(raw);
+    if(text&&text!=="您的权限不足以请求该正文内容"&&!/^\s*(?:error|错误|请求异常)/i.test(text)){qfXSetErrV32.call(this,"");return text;}
+    var o=qfXJsonV32(raw),msg=String((o&&(o.error||o.messag
+
+## TOP loginUrl hits=['qfMultiAccounts', '账号管理', '账号登录', '账号', '登录设置'] len=85155
+ngth;i++)inner+=qfMSpan423('v_'+i,qfMGet423(all[i],tk.indexOf(all[i])>=0?'🔳':(all[i]=='段评弹窗高度'?'80':'24')));
+    var body=qfMOpen423('🎨 界面与提示',inner,qfMScript423(sk,tk,[]));
+    if(body)qfMSave423(body,all);
+}
+
+function qfMultiAccountsV423(){
+    var ik=['email','password','情无接口地址','神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址','🎬X佬密钥'];
+    var inner=
+      '<div class="card"><div class="lab"><b>🌙 情无</b><small>填写后选择下方动作，再点右上角 ✓。</small></div>'+
+      qfMInput423('邮箱','email','text','','QQ邮箱')+
+      qfMInput423('密码','password','password','','情无密码')+
+      qfMInput423('接口地址','情无接口地址','text','http://103.236.85.8:7878/qd','可自定义')+
+      '<div class="grid"><button class="act primary" onclick="act(\'qw-login\')">登录</button><button class="act" onclick="act(\'qw-check\')">检测</button><button class="act" onclick="act(\'qw-web\')">网页登录</button><button class="act" onclick="act(\'qw-logout\')">退出</button></div></div>'+
+     
+==='清除')return qfXClearV32();
+        }
+        try{java.toast(provider+' 不支持「'+action+'」');}catch(_t){}
+    }catch(e){try{java.longToast('账号操作失败：'+String(e));}catch(_e){}}
+}
+qfMultiAccountsV423=function(){
+    var sk=['账号管理Provider','账号管理动作'];
+    var ik=['email','password','情无接口地址','神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址'];
+    var provider=qfMGet423('账号管理Provider','情无');
+    var inner='<div class="card">'+
+      qfMSelect423('Provider','账号管理Provider',['情无','神魔','晴天','同人'],provider,'一次只管理一个 Provider，页面会自动切换对应账号字段。')+
+      '</div>'+
+      '<div id="pv_qw" class="card"><div class="lab"><b>🌙 情无</b><small>邮箱 / 密码 / 接口地址</small></div>'+qfMInput423('邮箱','email','text','','QQ邮箱')+qfMInput423('密码','password','password','','情无密码')+qfMInput423('接口地址','情无接口地址','text','http://103.236.85.8:7878/qd','可自定义')+'</div>'+
+      '<div id="pv_sm" class="card"><div class="lab"><b>⚔️ 神魔</b><small>账号或邮箱 / 密码</small></div>'+qfMIn
+{}"))||{};delete li.request_token;source.putLoginInfo(JSON.stringify(li));}catch(e2){}
+    qfQwNativeMsgV52("已清除情无会话（邮箱/密码保留）");try{java.reLoginView();}catch(_v){}
+}
+function qfQwNativeHelpV52(){
+    qfQwNativeMsgV52("情无账号登录与 VIP 正文可用性是两层状态：登录/检测成功只代表账号会话和 request_token 有效；只有实际成功获取一次 VIP 正文后才标记为“VIP正文已验证”。情无正文会显式使用独立 UA/Referer/Cookie/Token；仅遇到明确认证错误时自动续签一次。");
+}
+
+function qfSmHelpV30(){
+    qfMsgV30(
+        "神魔限免源\n\n"+
+        "默认入口：https://shenmobook.top\n"+
+        "登录：使用神魔后台账号/邮箱 + 密码，生成独立 admin_session。\n"+
+        "正文：使用神魔后台归一化 detail → toc → chapter 链路，按起点 BookId / ChapterId / 章节名匹配。\n\n"+
+        "“进入神魔后台设置”会打开神魔用户中心；域名、共享账号、独享、设备等复杂设置继续由服务方后台维护，本书源不重复复制整套后台代码。"
+    );
+}
+function qfSmLoginV30(){
+    var ctx=qfSmCtxV30();
+    var acc=qfSmTrimV30(qfSmInputV30("神魔账号或邮箱"));
+    var pw=qfSmInputV30("神魔密码");
+    qfSmSaveCredsV30(acc,pw);
+    if(!acc||!pw){java.toast("请填写神魔账号/邮箱和密码");return false;}
+
+    
+function login() {
+    var page="main";
+    try{page=String(source.get("qf_ui_page")||"main");}catch(e0){}
+    /* alpha49：附件情无源依赖阅读顶部“✓/登录”触发 login()。
+       之前聚合源这里为空，用户填写账号密码后点顶部确认实际上什么也没保存。 */
+    if(page==="qw")return qfQwNativeLoginV52();
+    return true;
+}
+
+function qfMsgV30(s){try{java.longToast(String(s));}catch(e0){try{java.toast(String(s));}catch(e1){}}}
+function qfStrV30(v){try{return new Packages.java.lang.String(String(v));}catch(e){return String(v);}}
+
+/* v3.0-alpha2：多页面登录设置。只用 upLoginData 做增量写入，避免二级页覆盖其它页面设置。 */
+function qfLoginSave(key) {
+    try {
+        var value = "";
+        try { value = result && result[key] != null ? String(result[key]) : ""; } catch(e0) {}
+        if (!value) { try { value = String(Map(key) || ""); } catch(e1) {} }
+        if (!value) return java.toast("未读取到设置：" + key);
+        var map = new Packages.java.util.HashMap(
+ion qfMsgV30(s){try{java.longToast(String(s));}catch(e0){try{java.toast(String(s));}catch(e1){}}}
+function qfStrV30(v){try{return new Packages.java.lang.String(String(v));}catch(e){return String(v);}}
+
+/* v3.0-alpha2：多页面登录设置。只用 upLoginData 做增量写入，避免二级页覆盖其它页面设置。 */
+function qfLoginSave(key) {
+    try {
+        var value = "";
+        try { value = result && result[key] != null ? String(result[key]) : ""; } catch(e0) {}
+        if (!value) { try { value = String(Map(key) || ""); } catch(e1) {} }
+        if (!value) return java.toast("未读取到设置：" + key);
+        var map = new Packages.java.util.HashMap();
+        map.put(key, value);
+        java.upLoginData(map);
+        try{qfSettingsMarkCustom(key);}catch(_pc){}
+        java.toast("已保存 · " + key);
+    } catch(e) { qfMsgV30("保存失败：" + e); }
+}
+
+
+/* v4.1.0-alpha8 · Settings Profile actions
+ * 写入使用一次 HashMap + 一次 loginInfo 镜像，确保预设切换是原子操作。
+ * 预设不修改正文源/账号/服务器评论源/弹窗外观。
