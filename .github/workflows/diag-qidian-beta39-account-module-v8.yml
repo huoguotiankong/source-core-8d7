@@ -1,0 +1,60 @@
+name: diag-qidian-beta39-account-module-v8
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta39-account-module-v8.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Locate account-management implementation inside packed modules
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(p.read_text()); s=arr[0] if isinstance(arr,list) else arr
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a)
+          pack=json.loads(lib[a:b])
+          def dec(v):
+              if not isinstance(v,str): return ''
+              if not v.startswith('gz:'): return v
+              z=v[3:]+'='*((4-len(v[3:])%4)%4)
+              return gzip.decompress(base64.b64decode(z)).decode()
+          keys=['情无','账号','账户','登录','qfMultiAccounts','qfProviderNames','account','Account','Provider']
+          rows=[]
+          for name,val in pack.items():
+              try: code=dec(val)
+              except Exception as e:
+                  rows.append(f'## {name}\nDECODE ERROR: {e}\n'); continue
+              hits=[]
+              for key in keys:
+                  if key in code: hits.append(key)
+              if not hits: continue
+              rows.append(f'## MODULE {name}\nHITS: {", ".join(hits)}\nLEN: {len(code)}')
+              for m in re.finditer('情无',code):
+                  st=max(0,m.start()-350); en=min(len(code),m.end()+500)
+                  rows.append('--- 情无 context ---\n'+code[st:en])
+              for marker in ['qfMultiAccounts','qfProviderNames','账号管理','账号','登录']:
+                  pos=code.find(marker)
+                  if pos>=0:
+                      st=max(0,pos-300); en=min(len(code),pos+900)
+                      rows.append(f'--- {marker} context ---\n'+code[st:en])
+              rows.append('')
+          login=str(s.get('loginUrl','') or '')
+          rows.append('## TOP-LEVEL loginUrl\nLEN: '+str(len(login)))
+          for key in keys:
+              if key in login:
+                  rows.append('HIT '+key)
+                  pos=login.find(key); rows.append(login[max(0,pos-300):pos+900])
+          out='\n'.join(rows) if rows else 'NO MATCHES'
+          Path('.staging/beta39-account-module-v8.txt').write_text(out)
+          print(out[:8000])
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/beta39-account-module-v8.txt
+          git commit -m 'diag: locate qidian account module for beta39'
+          git push origin main
