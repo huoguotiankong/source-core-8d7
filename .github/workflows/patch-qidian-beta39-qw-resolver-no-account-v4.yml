@@ -1,0 +1,102 @@
+name: patch-qidian-beta39-qw-resolver-no-account-v4
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta39-qw-resolver-no-account-v4.trigger']
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Publish Beta39 v4
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,hashlib,re
+          from pathlib import Path
+          SRC=Path('sources/novel/qidian-next/qidian-next-beta.json'); STABLE=Path('sources/novel/qidian-next/qidian-next.json')
+          arr=json.loads(SRC.read_text()); s=arr[0] if isinstance(arr,list) else arr
+          stable_hash=hashlib.sha256(STABLE.read_bytes()).hexdigest()
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+          def dec(v):
+              if not isinstance(v,str): return ''
+              if not v.startswith('gz:'): return v
+              z=v[3:]+'='*((4-len(v[3:])%4)%4); return gzip.decompress(base64.b64decode(z)).decode()
+          def enc(code): return 'gz:'+base64.b64encode(gzip.compress(code.encode(),mtime=0)).decode().rstrip('=')
+
+          wf=Path('.github/workflows/patch-qidian-beta39-qw-resolver-no-account.yml').read_text()
+          mm=re.search(r"code=r'''(.*?)'''",wf,re.S)
+          assert mm, 'cannot extract beta39 limited_qw body'
+          rawcode=mm.group(1).strip('\n')
+          lines=rawcode.splitlines()
+          nonblank=[len(x)-len(x.lstrip()) for x in lines if x.strip()]
+          cut=min(nonblank) if nonblank else 0
+          code='\n'.join(x[cut:] if len(x)>=cut else x for x in lines)
+          assert 'qfQwResolveChapterV39' in code and 'free-no-login' in code
+          assert '所有接口算法来自于' in code and '免费看七天请求无限制' in code
+          pack['limited_qw']=enc(code)
+
+          assert 'login_ui_runtime' in pack
+          acc=dec(pack['login_ui_runtime']); acc0=acc
+          replacements=[
+            ("cfg.providers?cfg.providers:['情无','神魔','晴天','同人']","cfg.providers?cfg.providers:['神魔','晴天','同人','X']"),
+            ('cfg.providers?cfg.providers:["情无","神魔","晴天","同人"]','cfg.providers?cfg.providers:["神魔","晴天","同人","X"]'),
+            ("['情无','神魔','晴天','同人','X']","['神魔','晴天','同人','X']"),
+            ('["情无","神魔","晴天","同人","X"]','["神魔","晴天","同人","X"]'),
+            ("['情无','神魔','晴天','同人']","['神魔','晴天','同人','X']"),
+            ('["情无","神魔","晴天","同人"]','["神魔","晴天","同人","X"]')]
+          for old,new in replacements: acc=acc.replace(old,new)
+          assert acc!=acc0, 'login_ui_runtime account provider list not found'
+          pack['login_ui_runtime']=enc(acc)
+
+          lib=lib[:a]+json.dumps(pack,ensure_ascii=False,separators=(',',':'))+lib[b:]
+          assert '"限免源":["情无","神魔","晴天","同人","X"]' in lib, 'content tier accidentally changed'
+          assert 'ProviderRegistry.register("情无"' in lib, '情无 provider registry lost'
+          s['jsLib']=lib
+          s['bookSourceComment']='v1.1.0-beta39：修复新情无章节匹配并移除情无账号登录。情无继续使用“小雨的世界”免费正文来源，无账号/Token要求；章节由ID、标题、章节号和索引多级匹配后取得来源时间戳；保留两段推广尾注净化。账号管理不再显示情无，正文设置中的情无 Provider 保留。其它域沿用 beta38。'
+          SRC.write_text(json.dumps(arr,ensure_ascii=False,indent=2))
+          assert hashlib.sha256(STABLE.read_bytes()).hexdigest()==stable_hash
+
+          VERSION='1.1.0-beta39'; VC=11039; DATE='2026-09-11'; TS='2026-09-11T01:08:00+08:00'
+          summary='Beta39：修复新情无章节时间戳匹配；情无改为完全免登录并从账号管理移除。'
+          tags=['起点','测试版','限免源','情无','免登录','章节匹配','小雨来源','评论页']
+          changes=['情无继续使用 full.hnxianxin.cn/qd 免费正文链，不要求账号、Token 或会话','章节解析升级为 chapterId→标题→章节号→索引多级匹配，修复“未从新来源目录解析到章节时间戳”','账号管理移除情无入口；正文 Provider 名称和限免路由仍保留情无','继续默认过滤来源附带的两段推广尾注；Beta37 评论点赞结构修复及其它域不变']
+          raw=f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={VC}'; backup=f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v={VC}'; imp='legado://import/importonline?src='+raw; detail='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json'; sha=hashlib.sha256(SRC.read_bytes()).hexdigest()
+          def entry(base=None,itype=False):
+              e=dict(base or {}); e.update({'id':'qidian-next-beta','name':'🌈 起点增强 · Beta','summary':summary,'icon':e.get('icon',''),'channel':'beta','version':VERSION,'updatedAt':DATE,'tags':tags,'changelog':changes,'sourceUrl':raw,'backupUrl':backup,'importUrl':imp,'detailUrl':detail,'versionCode':VC})
+              if itype:e['type']='novel'
+              return e
+          mp=Path('manifest.json'); m=json.loads(mp.read_text()); m['updatedAt']=TS
+          for i,e in enumerate(m.get('sources',[])):
+              if e.get('id')=='qidian-next-beta':
+                  ne=dict(e); ne.update({'name':'🌈 起点增强 · Beta','category':'novel','channel':'beta','version':VERSION,'versionCode':VC,'updatedAt':TS,'sourcePath':'sources/novel/qidian-next/qidian-next-beta.json','sourceUrl':raw,'bookSourceUrl':'https://m.qidian.com/?qf_source=qidian_next_8d7','summary':summary,'tags':tags,'changelog':changes,'sha256':sha}); m['sources'][i]=ne; break
+          else: raise AssertionError('manifest entry missing')
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2))
+          for p,itype in [(Path('subscription/beta.json'),False),(Path('subscription/novel.json'),True)]:
+              j=json.loads(p.read_text()); j['updatedAt']=TS; j['generatedAt']=TS
+              for i,e in enumerate(j.get('items',[])):
+                  if e.get('id')=='qidian-next-beta': j['items'][i]=entry(e,itype); break
+              else: j.setdefault('items',[]).append(entry(itype=itype))
+              p.write_text(json.dumps(j,ensure_ascii=False,indent=2))
+          dp=Path('rss/data/details/beta/qidian-next.json'); dp.write_text(json.dumps({'kind':'source','title':'🌈 起点增强 · Beta','summary':summary,'badges':['Beta',VERSION,'情无免登录'],'sections':[{'title':'本版更新','text':'修复新情无按起点 chapterId 直接查找导致部分章节拿不到 time 的问题，改为多级章节匹配。'},{'title':'情无账号','text':'新情无来源默认免费使用，不需要账号登录；账号管理已移除情无入口，正文限免源仍保留情无。'},{'title':'正文净化','text':'继续默认移除来源正文末尾的接口算法链接与闲鱼推广两段文字。'},{'title':'版本状态','text':'Beta / 测试通道，等待真机确认。'}],'sourceUrl':raw,'backupUrl':backup,'importUrl':imp},ensure_ascii=False,indent=2))
+          bund=Path('bundles/all-beta.json'); ba=json.loads(bund.read_text()); src_obj=arr[0] if isinstance(arr,list) else arr
+          if not isinstance(ba,list): ba=[]
+          hit=False
+          for i,o in enumerate(ba):
+              if isinstance(o,dict) and o.get('bookSourceUrl')==src_obj.get('bookSourceUrl'): ba[i]=src_obj; hit=True; break
+          if not hit: ba.append(src_obj)
+          dd={}; order=[]
+          for o in ba:
+              if not isinstance(o,dict): continue
+              k=str(o.get('bookSourceUrl') or o.get('bookSourceName') or len(order))
+              if k not in dd: order.append(k)
+              dd[k]=o
+          bund.write_text(json.dumps([dd[k] for k in order],ensure_ascii=False,indent=2))
+          rp=Path('docs/RELEASE_LOG.md'); old=rp.read_text(); rp.write_text('## 2026-09-11 · 起点增强 1.1.0-beta39 — 新情无章节匹配 / 免登录\n\n- Stable 保持 1.1.0 不变。\n- 新情无继续使用附件“小雨的世界”的 `full.hnxianxin.cn/qd` 免费正文链，不要求账号、Token 或会话。\n- 修复 Beta38 仅按当前起点 chapterId 查目录导致部分章节取不到时间戳：改为 ID、标题、章节号、索引多级匹配。\n- 账号管理移除情无入口；正文设置、Provider Registry 与限免路由中的“情无”名称继续保留。\n- 两段来源推广尾注继续默认过滤；Beta37 评论点赞结构和其它业务域冻结。\n- 状态：Beta，等待真机确认。\n\n'+old)
+          hp=Path('docs/sources/qidian-next/PROJECT_HANDOFF.md'); h=hp.read_text(); hp.write_text('## 2026-09-11 · Current Beta 1.1.0-beta39 — 情无免登录 / 章节匹配修复\n\n- Stable remains 1.1.0.\n- 情无 keeps its public/provider name but uses the user attachment 小雨的世界 free content backend. No account/token is required and 情无 is removed from Account Management.\n- Chapter resolution now uses ID/title/chapter-number/index fallbacks before requesting content.php; source promo footer cleanup remains enabled.\n- Awaiting real-device verification.\n\n'+h)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git commit -m 'fix: publish qidian-next beta39 qingwu resolver no-account'
+          git push origin main
