@@ -1,0 +1,38 @@
+name: diag-qidian-beta39-v4-preflight
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta39-v4-preflight.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Preflight Beta39 v4 assumptions
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          s=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text())[0]
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+          print('PACK_HAS_LOGIN_UI_RUNTIME=', 'login_ui_runtime' in pack)
+          print('PACK_KEYS=', sorted(pack.keys()))
+          wf=Path('.github/workflows/patch-qidian-beta39-qw-resolver-no-account.yml').read_text(); mm=re.search(r"code=r'''(.*?)'''",wf,re.S)
+          print('EXTRACT=',bool(mm))
+          if mm:
+            c=mm.group(1)
+            print('HAS_RESOLVER=', 'qfQwResolveChapterV39' in c)
+            print('HAS_NO_LOGIN=', 'free-no-login' in c)
+            print('HAS_PROMO1=', '所有接口算法来自于' in c)
+            print('HAS_PROMO2=', '免费看七天请求无限制' in c)
+          for n,v in pack.items():
+            if not isinstance(v,str):continue
+            try:
+              if v.startswith('gz:'):
+                z=v[3:]+'='*((4-len(v[3:])%4)%4); c=gzip.decompress(base64.b64decode(z)).decode()
+              else:c=v
+            except:continue
+            if 'qfAccountsHtmlV5' in c:
+              print('ACCOUNT_MODULE=',n)
+              i=c.index('qfAccountsHtmlV5'); print(c[i:i+1200])
+          PY
