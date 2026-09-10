@@ -1,0 +1,27 @@
+name: diag-qidian-beta38-account-fields
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta38-account-fields.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Inspect account-related source fields
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text())[0]
+          for field in ['loginUi','loginUrl','jsLib']:
+            txt=str(s.get(field,'') or '')
+            print('\n### FIELD',field,'LEN',len(txt))
+            for needle in ['账号管理','情无','Provider','qfMultiAccounts','accounts','Accounts']:
+              st=0;n=0
+              while True:
+                i=txt.find(needle,st)
+                if i<0 or n>=12:break
+                print('\n===',needle,'@',i,'===\n'+txt[max(0,i-1800):i+4200])
+                st=i+len(needle);n+=1
+          PY
