@@ -1,0 +1,49 @@
+name: diag-qidian-beta38-small-rain-live
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta38-small-rain-live.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Inspect live catalog and account UI
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re,urllib.request
+          from pathlib import Path
+          arr=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text()); s=arr[0]
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+          def dec(v):
+            if not v.startswith('gz:'): return v
+            z=v[3:]+'='*((4-len(v[3:])%4)%4)
+            return gzip.decompress(base64.b64decode(z)).decode()
+          q=dec(pack['limited_qw'])
+          Path('.staging/limited_qw-beta38.js').write_text(q)
+          # dump account-related fragments from main lib
+          pats=['function qfAccount','情无','Provider']
+          out=[]
+          for needle in ['情无','qfAccount']:
+            st=0
+            while True:
+              i=lib.find(needle,st)
+              if i<0: break
+              out.append('==== '+needle+' @ '+str(i)+' ====\n'+lib[max(0,i-1200):i+2200])
+              st=i+len(needle)
+              if len(out)>25: break
+          Path('.staging/account-fragments-beta38.txt').write_text('\n\n'.join(out))
+          # live catalog sample for user's shown book
+          u='https://full.hnxianxin.cn/qd/catalog.php?bookId=1046692521'
+          req=urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0','Accept':'application/json'})
+          try:
+            body=urllib.request.urlopen(req,timeout=15).read().decode('utf-8','replace')
+          except Exception as e:
+            body='ERR '+repr(e)
+          Path('.staging/small-rain-catalog-sample.txt').write_text(body[:30000])
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/limited_qw-beta38.js .staging/account-fragments-beta38.txt .staging/small-rain-catalog-sample.txt
+          git commit -m 'chore: inspect beta38 small-rain provider live data'
+          git push origin main
