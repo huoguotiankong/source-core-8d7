@@ -1,0 +1,8 @@
+Beta39 v7 diagnostic failure, rc=1
+--- stdout ---
+--- stderr ---
+Traceback (most recent call last):
+  File "/tmp/beta39_v6.py", line 73, in <module>
+    assert changed, 'no effective account-management function containing 情无 was patched'
+           ^^^^^^^
+AssertionError: no effective account-management function containing 情无 was patched
