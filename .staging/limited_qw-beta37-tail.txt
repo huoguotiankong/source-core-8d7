@@ -1,0 +1,130 @@
+EXPORTS=["qfLimSetErrV30", "qfLimGetErrV30", "qfQwNormBaseV44", "qfQwBaseV44", "qfQwRootsV44", "qfQwHeadersV44", "qfQwAcquireTokenV44", "qfQwContentV44"]
+
+TAIL:
+}
+function qfQwMeV317(hd){
+    var base=qfQwBaseV44.call(this),obj=null,j=qfQwJavaV318(this);if(!j)return null;
+    try{var me=j.get(base+"/auth.php?action=me",hd||qfQwHeadersV44.call(this),12000);obj=JSON.parse(String(me.body()||"{}"));}catch(e0){return null;}
+    var token=String(obj&&obj.request_token||""),keys=qfQwKeyCountV317(obj&&obj.user),ck=String((hd&&hd.Cookie)||qfQwDedicatedV317.call(this).cookie||"");
+    if(token||obj&&obj.user)qfQwSaveSessionV317.call(this,ck,token,keys);
+    return obj;
+}
+function qfQwPasswordLoginV317(){
+    var li=qfQwReadLoginInfoV51.call(this),email=String(li.email||"").trim(),pw=String(li.password||""),j=qfQwJavaV318(this);
+    if(!email||!pw||!j)return false;
+    var base=qfQwBaseV44.call(this),root=/\/qd$/i.test(base)?base.replace(/\/qd$/i,""):base;
+    var body=new Packages.java.lang.String(JSON.stringify({email:email,password:pw}));
+    var h=qfQwStaticHeadersV51.call(this);h["Content-Type"]="application/json";var res=null,data=null;
+    try{res=j.post(new Packages.java.lang.String(root+"/auth.php?action=login"),body,h,15000);}catch(e0){return false;}
+    try{data=JSON.parse(String(res.body()||"{}"));}catch(e1){return false;}
+    if(!data||!data.user)return false;
+    var ck=qfQwCollectCookieV317(res),token=String(data.request_token||""),keys=qfQwKeyCountV317(data.user);
+    if(!ck)try{ck=qfQwCookieJarV317.call(this);}catch(_ck){}
+    qfQwSaveSessionV317.call(this,ck,token,keys);
+    var hd=qfQwStaticHeadersV51.call(this);if(ck)hd.Cookie=ck;if(token)hd["X-Content-Token"]=token;
+    var me=qfQwMeV317.call(this,hd);if(me&&me.request_token)token=String(me.request_token);
+    return !!(token||(me&&me.user));
+}
+function qfQwRefreshSessionV317(allowPassword){
+    var hd=qfQwHeadersV44.call(this),me=qfQwMeV317.call(this,hd);
+    if(me&&(me.user||me.request_token))return qfQwHeadersV44.call(this);
+    if(allowPassword&&qfQwPasswordLoginV317.call(this))return qfQwHeadersV44.call(this);
+    return hd;
+}
+function qfQwAcquireTokenV44(force){
+    var hd=force?qfQwRefreshSessionV317.call(this,true):qfQwHeadersV44.call(this);
+    var token=String(hd["X-Content-Token"]||"");
+    if(!token&&force){hd=qfQwRefreshSessionV317.call(this,true);token=String(hd["X-Content-Token"]||"");}
+    return token;
+}
+function qfQwPickContentV51(obj,raw){
+    function pick(x){
+        if(!x)return "";if(typeof x==="string")return x;
+        if(x.Content!==undefined)return x.Content;if(x.content!==undefined)return x.content;
+        if(x.Data){if(x.Data.Content!==undefined)return x.Data.Content;if(x.Data.content!==undefined)return x.Data.content;}
+        return "";
+    }
+    var val=obj?pick(obj):raw;
+    for(var deep=0;deep<3;deep++){
+        var t=String(val||"").trim();if(!(t.charAt(0)==="{"||t.charAt(0)==="["))break;
+        try{var inner=JSON.parse(t),next=pick(inner);if(next===undefined||next===null||String(next)===String(val))break;val=next;}catch(e){break;}
+    }
+    return String(val||"");
+}
+function qfQwRequestContentV317(api,hd){
+    var raw="",j=qfQwJavaV318(this);if(!j)return "";
+    try{
+        var arr=j.ajaxAll([api+","+JSON.stringify({headers:hd,timeout:12000})]);
+        if(arr&&arr.length)try{raw=String(arr[0].body()||"");}catch(_b){}
+    }catch(e0){}
+    if(!raw)try{raw=String(j.get(String(api),hd,10000).body()||"");}catch(e1){}
+    return raw;
+}
+function qfQwMarkVipVerifiedV101(token){
+    var s=qfQwSrcV318(this),base=qfQwBaseV44.call(this);
+    token=String(token||"");
+    if(!s||!s.put||!token)return;
+    try{s.put("qf_qw_vip_verified_v101",base+"|"+token+"|"+String(Date.now()));}catch(e0){}
+}
+function qfQwAuthLikeV317(obj,raw){
+    var msg="";try{msg=String((obj&&(obj.detail||obj.Message||obj.message||obj.error))||raw||"");}catch(e0){}
+    return /未登录|登录|token|令牌|凭据|unauthor|expired|过期|失效|401|403/i.test(msg);
+}
+function qfQwContentV44(meta){
+    meta=meta||{};var bid=String(meta.bookId||""),cid=String(meta.chapterId||""),isPaid=String(meta.vip||"0")==="1";
+    if(!bid||!cid){qfLimSetErrV30.call(this,"情无","章节参数错误：BookId="+bid+"，ChapterId="+cid);return null;}
+    var base=qfQwBaseV44.call(this),api=base+"/content.php?book_id="+encodeURIComponent(bid)+"&chapter_id="+encodeURIComponent(cid)+(isPaid?"&vip=1":"");
+    var hd=qfQwHeadersV44.call(this);
+    if(isPaid&&!hd["X-Content-Token"]){hd=qfQwRefreshSessionV317.call(this,true);}
+    if(isPaid&&!hd["X-Content-Token"]){qfLimSetErrV30.call(this,"情无","正文线程未读取到情无 request_token；请重新进入登录设置 → 情无 → 检测会话后刷新本章");return null;}
+
+    function decode(raw){var obj=null;try{obj=JSON.parse(String(raw||""));}catch(_j){}return {raw:String(raw||""),obj:obj,val:qfQwPickContentV51(obj,String(raw||""))};}
+    try{
+        var r=decode(qfQwRequestContentV317.call(this,api,hd));
+        if(r.val){if(isPaid)qfQwMarkVipVerifiedV101.call(this,String(hd["X-Content-Token"]||""));qfLimSetErrV30.call(this,"情无","");return r.val.replace(/\\r\\n/g,"\n").replace(/\\n/g,"\n").replace(/\r\n/g,"\n").replace(/\r/g,"\n");}
+
+        /* 只在明确认证错误时续签一次。服务端业务/共享凭据失败不再盲目重登。 */
+        if(qfQwAuthLikeV317(r.obj,r.raw)){
+            var hd2=qfQwRefreshSessionV317.call(this,true);
+            if(hd2&&hd2["X-Content-Token"]){
+                var r2=decode(qfQwRequestContentV317.call(this,api,hd2));
+                if(r2.val){if(isPaid)qfQwMarkVipVerifiedV101.call(this,String(hd2["X-Content-Token"]||""));qfLimSetErrV30.call(this,"情无","");return r2.val.replace(/\\r\\n/g,"\n").replace(/\\n/g,"\n").replace(/\r\n/g,"\n").replace(/\r/g,"\n");}
+                r=r2;
+            }
+        }
+        var msg="";
+        if(r.obj&&r.obj.detail)msg=String(r.obj.detail);else if(r.obj&&r.obj.Message)msg=String(r.obj.Message);else if(r.obj&&r.obj.message)msg=String(r.obj.message);else msg="正文为空";
+        var ds=qfQwDedicatedV317.call(this),authLike=qfQwAuthLikeV317(r.obj,r.raw);
+        if(isPaid&&Number(ds.keys)===0)msg+="（账号会话已建立，但共享凭据为 0；VIP 正文尚不可用）";
+        else if(isPaid&&authLike)msg+="（情无会话/阅读令牌被正文接口拒绝，请重新登录后再试）";
+        else if(isPaid)msg+="（账号会话已建立"+(Number(ds.keys)>0?" · 共享凭据 "+String(Number(ds.keys))+" 个":"")+"，但 VIP 正文服务拒绝本次请求；请保留 Reference 供后续排查）";
+        qfLimSetErrV30.call(this,"情无",msg);return null;
+    }catch(e1){qfLimSetErrV30.call(this,"情无","正文请求失败："+String(e1)+(isPaid?"（账号会话与 VIP 正文可用性是两层状态）":""));return null;}
+}
+
+FUNCTIONS:
+qfQwSrcV318
+qfQwJavaV318
+qfQwLoginMapV318
+qfQwCookieObjV318
+qfQwNormBaseV44
+qfQwBaseV44
+qfQwRootsV44
+qfQwStaticHeadersV51
+qfQwReadLoginInfoV51
+qfQwReadLoginHeaderV51
+qfQwDedicatedV317
+qfQwCookieJarV317
+qfQwSaveSessionV317
+qfQwHeadersV44
+qfQwCollectCookieV317
+qfQwKeyCountV317
+qfQwMeV317
+qfQwPasswordLoginV317
+qfQwRefreshSessionV317
+qfQwAcquireTokenV44
+qfQwPickContentV51
+qfQwRequestContentV317
+qfQwMarkVipVerifiedV101
+qfQwAuthLikeV317
+qfQwContentV44
