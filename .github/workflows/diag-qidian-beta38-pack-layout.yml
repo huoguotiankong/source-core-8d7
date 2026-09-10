@@ -1,0 +1,43 @@
+name: diag-qidian-beta38-pack-layout
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta38-pack-layout.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Inspect pack layout and account function
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          s=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text())[0]
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='
+          poss=[m.start() for m in re.finditer(re.escape(mk),lib)]
+          print('PACK_OCCURRENCES',poss)
+          for num,p in enumerate(poss):
+            a=p+len(mk)
+            try:b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+            except Exception as e: print('PACK',num,'ERR',e); continue
+            print('PACK',num,'KEYS',sorted(pack.keys()))
+            for n,v in pack.items():
+              if not isinstance(v,str): continue
+              try:
+                if v.startswith('gz:'):
+                  z=v[3:]+'='*((4-len(v[3:])%4)%4); c=gzip.decompress(base64.b64decode(z)).decode()
+                else:c=v
+              except:continue
+              if 'qfMultiAccountsV423' in c or 'qfAccountsHtmlV5' in c:
+                print('ACCOUNT_MODULE',n,'LEN',len(c))
+                for needle in ['qfMultiAccountsV423','qfAccountsHtmlV5','情无']:
+                  i=c.find(needle)
+                  if i>=0: print('\n--',needle,i,'--\n'+c[max(0,i-1800):i+6000])
+          print('PLAIN qfMultiAccounts count',lib.count('qfMultiAccountsV423'))
+          st=0
+          while True:
+            i=lib.find('qfMultiAccountsV423',st)
+            if i<0:break
+            print('\nPLAIN @',i,'\n',lib[max(0,i-3000):i+9000]);st=i+1
+          PY
