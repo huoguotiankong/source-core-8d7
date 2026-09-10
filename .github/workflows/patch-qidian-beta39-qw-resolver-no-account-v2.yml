@@ -1,0 +1,29 @@
+name: patch-qidian-beta39-qw-resolver-no-account-v2
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta39-qw-resolver-no-account-v2.trigger']
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Run corrected Beta39 publisher
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/patch-qidian-beta39-qw-resolver-no-account.yml').read_text()
+          marker="          python3 - <<'PY'\n"
+          a=p.index(marker)+len(marker)
+          b=p.index("\n          PY\n",a)
+          lines=p[a:b].splitlines()
+          script='\n'.join((ln[10:] if ln.startswith('          ') else ln) for ln in lines)
+          script=script.replace("String(s.get(field,'') or '')","str(s.get(field,'') or '')")
+          exec(compile(script,'beta39-publisher','exec'))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git commit -m 'fix: publish qidian-next beta39 qingwu resolver no-account'
+          git push origin main
