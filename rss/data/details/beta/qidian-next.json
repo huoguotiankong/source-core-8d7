@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta38：情无限免来源替换为小雨正文链，并默认清除来源附加的两段推广尾注。",
+  "summary": "Beta39：修复新情无章节时间戳匹配；情无改为完全免登录并从账号管理移除。",
   "badges": [
     "Beta",
-    "1.1.0-beta38",
-    "情无换源"
+    "1.1.0-beta39",
+    "情无免登录"
   ],
   "sections": [
     {
       "title": "本版更新",
-      "text": "情无名称不变，正文来源切换到附件“小雨的世界”的 full.hnxianxin.cn/qd 接口。"
+      "text": "修复新情无按起点 chapterId 直接查找导致部分章节拿不到 time 的问题，改为多级章节匹配。"
+    },
+    {
+      "title": "情无账号",
+      "text": "新情无来源默认免费使用，不需要账号登录；账号管理已移除情无入口，正文限免源仍保留情无。"
     },
     {
       "title": "正文净化",
-      "text": "来源默认附加的“所有接口算法来自于…”与“免费看七天请求无限制，喜欢就来闲鱼支持一下吧”两段文字在返回阅读前自动移除。"
-    },
-    {
-      "title": "隔离范围",
-      "text": "仅替换情无 Provider；评论页继续使用 Beta37 布局，搜索、详情、起点目录、评论及其它 Provider 不改。"
+      "text": "继续默认移除来源正文末尾的接口算法链接与闲鱼推广两段文字。"
     },
     {
       "title": "版本状态",
-      "text": "Beta / 测试通道，等待真机验证情无 VIP 正文和尾注清理。"
+      "text": "Beta / 测试通道，等待真机确认。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11038",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11038",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11038"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11039",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11039",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11039"
 }

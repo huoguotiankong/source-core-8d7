@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "type": "novel",
   "name": "小说源",
-  "updatedAt": "2026-09-11T00:35:00+08:00",
+  "updatedAt": "2026-09-11T07:45:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -40,33 +40,34 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "Beta38：情无限免来源替换为小雨正文链，并默认清除来源附加的两段推广尾注。",
+      "summary": "Beta39：修复新情无章节时间戳匹配；情无改为完全免登录并从账号管理移除。",
       "icon": "",
       "channel": "beta",
-      "version": "1.1.0-beta38",
+      "version": "1.1.0-beta39",
       "updatedAt": "2026-09-11",
       "tags": [
         "起点",
         "测试版",
-        "限免",
+        "限免源",
         "情无",
-        "Provider",
-        "正文净化",
-        "X-QD"
+        "免登录",
+        "章节匹配",
+        "小雨来源",
+        "评论页"
       ],
       "changelog": [
-        "情无对外名称不变，底层来源替换为附件“小雨的世界” full.hnxianxin.cn/qd",
-        "按新来源 catalog.php 解析章节时间戳，再调用 content.php 获取正文",
-        "默认移除正文末尾“所有接口算法来自于…”和“免费看七天请求无限制，喜欢就来闲鱼支持一下吧”",
-        "评论页保留 Beta37；搜索、详情、目录、评论、其它 Provider 与 Stable 均不改"
+        "情无继续使用 full.hnxianxin.cn/qd 免费正文链，不要求账号、Token 或会话",
+        "章节解析升级为 chapterId→标题→章节号→索引多级匹配，修复“未从新来源目录解析到章节时间戳”",
+        "账号管理移除情无入口；正文 Provider 名称和限免路由仍保留情无",
+        "继续默认过滤来源附带的两段推广尾注；Beta37 评论点赞结构修复及其它域不变"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11038",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11038",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11038",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11039",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11039",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11039",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
       "type": "novel",
-      "versionCode": 11038
+      "versionCode": 11039
     }
   ],
-  "generatedAt": "2026-09-11T00:35:00+08:00"
+  "generatedAt": "2026-09-11T07:45:00+08:00"
 }

@@ -1,3 +1,10 @@
+## 2026-09-11 · Current Beta 1.1.0-beta39 — 情无免登录 / 章节匹配修复
+
+- Stable remains 1.1.0.
+- 情无 keeps its public/provider name but uses the user attachment 小雨的世界 free content backend. No account/token is required and 情无 is removed from Account Management.
+- Chapter resolution now uses ID/title/chapter-number/index fallbacks before requesting content.php; source promo footer cleanup remains enabled.
+- Awaiting real-device verification.
+
 ## 2026-09-11 · Current Beta 1.1.0-beta38 — 情无来源替换
 
 - Stable remains 1.1.0.
