@@ -1,141 +1,49 @@
 name: patch-qidian-beta38-qw-small-rain
 on:
   push:
-    paths: ['.staging/patch-qidian-beta38-qw-small-rain.trigger']
+    paths:
+      - '.staging/patch-qidian-beta38-qw-small-rain-v2.trigger'
 jobs:
   patch:
     runs-on: ubuntu-latest
-    permissions: {contents: write}
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main}
-      - name: Replace 情无 provider with 小雨来源 and publish Beta38
+        with:
+          ref: main
+      - name: Publish Beta38
         run: |
           python3 - <<'PY'
           import json,gzip,base64,hashlib,time
           from pathlib import Path
           SRC=Path('sources/novel/qidian-next/qidian-next-beta.json')
           STABLE=Path('sources/novel/qidian-next/qidian-next.json')
-          arr=json.loads(SRC.read_text()); s=arr[0] if isinstance(arr,list) else arr
+          MOD=Path('.staging/limited_qw-beta38-new.js')
+          arr=json.loads(SRC.read_text())
+          s=arr[0] if isinstance(arr,list) else arr
           stable_hash=hashlib.sha256(STABLE.read_bytes()).hexdigest()
-          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
-          def enc(code):
-              return 'gz:'+base64.b64encode(gzip.compress(code.encode(),mtime=0)).decode().rstrip('=')
-          code=r'''function qfLimSetErrV30(name,msg){
-    try{qfRuntimeCacheV13(this).putMemory("qf_lim_err_"+String(name||""),String(msg||""));}catch(e0){}
-}
-function qfLimGetErrV30(name){
-    try{return String(qfRuntimeCacheV13(this).getFromMemory("qf_lim_err_"+String(name||""))||"");}catch(e0){return "";}
-}
-
-/* 情无 Provider · beta38
- * 来源替换为用户附件「小雨的世界」的起点正文链：
- *   https://full.hnxianxin.cn/qd/catalog.php
- *   https://full.hnxianxin.cn/qd/content.php
- * 对外名称仍保持“情无”。
- * 不接管搜索/详情/评论，只作为起点增强限免正文 Provider。
- */
-function qfQwSrcV38(ctx){try{return qfSource(ctx);}catch(e){return null;}}
-function qfQwJavaV38(ctx){try{return qfJava(ctx);}catch(e){return null;}}
-function qfQwNormBaseV44(v){return "https://full.hnxianxin.cn/qd";}
-function qfQwBaseV44(){return "https://full.hnxianxin.cn/qd";}
-function qfQwRootsV44(){return [qfQwBaseV44.call(this)];}
-function qfQwCredV38(){
-    var s=qfQwSrcV38(this),m=null,out={ywkey:"",ywguid:""};
-    try{m=s&&s.getLoginInfoMap?s.getLoginInfoMap():null;}catch(_e0){}
-    function g(k){try{return m&&(m.get?m.get(k):m[k]);}catch(_e1){return null;}}
-    try{out.ywkey=String((s&&s.get?s.get("qf_qw_ywkey"):"")||g("情无Ywkey")||g("ywkey")||"").trim();}catch(_e2){}
-    try{out.ywguid=String((s&&s.get?s.get("qf_qw_ywguid"):"")||g("情无Ywguid")||g("ywguid")||"").trim();}catch(_e3){}
-    return out;
-}
-function qfQwHeadersV44(){
-    var h={"Accept":"application/json,text/plain,*/*","User-Agent":"Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36","Referer":qfQwBaseV44.call(this)+"/"};
-    var c=qfQwCredV38.call(this);if(c.ywkey&&c.ywguid){h.Ywkey=c.ywkey;h.Ywguid=c.ywguid;}
-    return h;
-}
-function qfQwAcquireTokenV44(force){return "small-rain-free";}
-function qfQwNormB64V38(v){var x=String(v||"").replace(/\s+/g,"").replace(/-/g,"+").replace(/_/g,"/");while(x.length%4)x+="=";return x;}
-function qfQwDecodePayloadV38(v){
-    var j=qfQwJavaV38(this),txt=String(v||"");if(!txt)return null;
-    try{if(j&&j.hexDecodeToString&&/^[0-9a-f]+$/i.test(txt)&&txt.length%2===0)txt=String(j.hexDecodeToString(txt)||txt);}catch(_h){}
-    try{txt=decodeURIComponent(txt);}catch(_u){}
-    try{if(txt.charAt(0)==="{")return JSON.parse(txt);}catch(_j0){}
-    var m=txt.match(/base64,([A-Za-z0-9+\/_=%-]+)/i),z=m?m[1]:txt;
-    var comma=z.indexOf(",");if(comma>=0)z=z.substring(0,comma);
-    try{if(j&&j.base64Decode){var raw=String(j.base64Decode(qfQwNormB64V38(z))||"");if(raw&&raw.charAt(0)==="{")return JSON.parse(raw);}}catch(_b){}
-    return null;
-}
-function qfQwCatalogMapV38(bid){
-    bid=String(bid||"");var key="qf_qw_xy_cat_"+bid,cache=null;
-    try{cache=qfRuntimeCacheV13(this).getFromMemory(key);if(cache&&typeof cache==="object")return cache;}catch(_c0){}
-    var out={},j=qfQwJavaV38(this);if(!j)return out;
-    try{
-        var url=qfQwBaseV44.call(this)+"/catalog.php?bookId="+encodeURIComponent(bid);
-        var res=j.get(String(url),qfQwHeadersV44.call(this),12000),obj=JSON.parse(String(res.body()||"{}"));
-        var list=obj.data||obj.Data||[];if(list&&list.DataList)list=list.DataList;if(!Array.isArray(list))list=[];
-        for(var i=0;i<list.length;i++){
-            var it=list[i]||{},p=qfQwDecodePayloadV38.call(this,it.C!==undefined?it.C:(it.c!==undefined?it.c:it.chapterUrl));
-            var cid=String((p&&(p.chapterId!==undefined?p.chapterId:p.ChapterId))||(it.chapterId!==undefined?it.chapterId:(it.ChapterId!==undefined?it.ChapterId:""))||"");
-            if(!cid)continue;
-            out[cid]={
-                time:String((p&&(p.time!==undefined?p.time:p.t))||(it.T!==undefined?it.T:(it.time!==undefined?it.time:""))||""),
-                epub:Number((p&&p.epub)||it.epub||0)?1:0,
-                vip:Number((p&&(p.v!==undefined?p.v:p.vip))||(it.V!==undefined?it.V:it.vip)||0)?1:0
-            };
-        }
-        try{qfRuntimeCacheV13(this).putMemory(key,out);}catch(_c1){}
-    }catch(e){qfLimSetErrV30.call(this,"情无","目录映射失败："+String(e));}
-    return out;
-}
-function qfQwPickContentV38(obj,raw){
-    if(obj){
-        if(obj.error)throw new Error(String(obj.error));
-        if(obj.detail)throw new Error(String(obj.detail));
-        if(obj.code!==undefined&&Number(obj.code)!==0&&obj.msg)throw new Error(String(obj.msg));
-        if(obj.content!==undefined)return String(obj.content||"");
-        if(obj.Content!==undefined)return String(obj.Content||"");
-        if(obj.Data){if(obj.Data.Content!==undefined)return String(obj.Data.Content||"");if(obj.Data.content!==undefined)return String(obj.Data.content||"");}
-    }
-    return String(raw||"");
-}
-function qfQwStripFooterV38(text){
-    var s=String(text||"").replace(/\\r\\n/g,"\n").replace(/\\n/g,"\n").replace(/\r\n?/g,"\n");
-    s=s.replace(/\s*所有接口算法来自于\s*(?:\[?https?:\/\/m\.tb\.cn\/h\.8pvBZxh\?tk=R4fMTSqAOiS\]?(?:\([^\n)]*\))?)?\s*/gi,"\n");
-    s=s.replace(/\s*免费看七天请求无限制[，,]?\s*喜欢就来闲鱼支持一下吧\s*/g,"\n");
-    s=s.replace(/\n[ \t]+/g,"\n").replace(/\n{3,}/g,"\n\n").replace(/^\s+|\s+$/g,"");
-    return s;
-}
-function qfQwContentV44(meta){
-    meta=meta||{};var bid=String(meta.bookId||""),cid=String(meta.chapterId||""),isPaid=String(meta.vip||"0")==="1";
-    if(!bid||!cid){qfLimSetErrV30.call(this,"情无","章节参数错误：BookId="+bid+"，ChapterId="+cid);return null;}
-    var map=qfQwCatalogMapV38.call(this,bid),it=map[cid]||null;
-    if(!it||!String(it.time||"")){qfLimSetErrV30.call(this,"情无","未从新来源目录解析到章节时间戳，请刷新目录/章节后重试");return null;}
-    var v=isPaid?1:Number(it.vip||0)?1:0;
-    var api=qfQwBaseV44.call(this)+"/content.php?bookId="+encodeURIComponent(bid)+"&chapterId="+encodeURIComponent(cid)+"&t="+encodeURIComponent(String(it.time))+"&epub="+(Number(it.epub||0)?1:0)+"&v="+v;
-    var j=qfQwJavaV38(this);if(!j){qfLimSetErrV30.call(this,"情无","java context unavailable");return null;}
-    try{
-        var res=j.get(String(api),qfQwHeadersV44.call(this),12000),raw=String(res.body()||""),obj=null;
-        try{obj=JSON.parse(raw);}catch(_j){}
-        var txt=qfQwPickContentV38(obj,raw);txt=qfQwStripFooterV38(txt);
-        if(!txt){qfLimSetErrV30.call(this,"情无","新来源正文为空");return null;}
-        qfLimSetErrV30.call(this,"情无","");return txt;
-    }catch(e){qfLimSetErrV30.call(this,"情无","新来源正文请求失败："+String(e));return null;}
-}
-'''
-          # Verify exported compatibility names and requested footer sanitation are present.
+          code=MOD.read_text()
           for name in ['qfLimSetErrV30','qfLimGetErrV30','qfQwNormBaseV44','qfQwBaseV44','qfQwRootsV44','qfQwHeadersV44','qfQwAcquireTokenV44','qfQwContentV44']:
               assert ('function '+name+'(') in code, name
           assert 'https://full.hnxianxin.cn/qd' in code
           assert '所有接口算法来自于' in code and '免费看七天请求无限制' in code
-          Path('/tmp/limited_qw-beta38.js').write_text(code)
-          pack['limited_qw']=enc(code)
+          lib=s['jsLib']
+          mk='var QF_MOD38_PACK='
+          a=lib.index(mk)+len(mk)
+          b=lib.index(';\nvar QF_MOD38_EXPORTS=',a)
+          pack=json.loads(lib[a:b])
+          pack['limited_qw']='gz:'+base64.b64encode(gzip.compress(code.encode(),mtime=0)).decode().rstrip('=')
           s['jsLib']=lib[:a]+json.dumps(pack,ensure_ascii=False,separators=(',',':'))+lib[b:]
           s['bookSourceComment']='v1.1.0-beta38：情无限免 Provider 来源替换为附件“小雨的世界”正文链，名称继续保持“情无”。新来源使用 full.hnxianxin.cn/qd 的 catalog/content 接口，并在正文输出层默认移除“所有接口算法来自于…”与“免费看七天请求无限制，喜欢就来闲鱼支持一下吧”两段尾注。评论页保留 beta37 点赞定位修复，其它域冻结。'
           s['lastUpdateTime']=int(time.time()*1000)
           SRC.write_text(json.dumps(arr,ensure_ascii=False,indent=2))
           assert hashlib.sha256(STABLE.read_bytes()).hexdigest()==stable_hash
 
-          VERSION='1.1.0-beta38'; VC=11038; DATE='2026-09-11'; TS='2026-09-11T00:30:00+08:00'
+          VERSION='1.1.0-beta38'
+          VC=11038
+          DATE='2026-09-11'
+          TS='2026-09-11T00:35:00+08:00'
           summary='Beta38：情无限免来源替换为小雨正文链，并默认清除来源附加的两段推广尾注。'
           tags=['起点','测试版','限免','情无','Provider','正文净化','X-QD']
           changes=['情无对外名称不变，底层来源替换为附件“小雨的世界” full.hnxianxin.cn/qd','按新来源 catalog.php 解析章节时间戳，再调用 content.php 获取正文','默认移除正文末尾“所有接口算法来自于…”和“免费看七天请求无限制，喜欢就来闲鱼支持一下吧”','评论页保留 Beta37；搜索、详情、目录、评论、其它 Provider 与 Stable 均不改']
@@ -144,46 +52,81 @@ function qfQwContentV44(meta){
           imp='legado://import/importonline?src='+raw
           detail='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json'
           sha=hashlib.sha256(SRC.read_bytes()).hexdigest()
+
           def entry(base=None,include_type=False):
-              e=dict(base or {});e.update({'id':'qidian-next-beta','name':'🌈 起点增强 · Beta','summary':summary,'icon':e.get('icon',''),'channel':'beta','version':VERSION,'updatedAt':DATE,'tags':tags,'changelog':changes,'sourceUrl':raw,'backupUrl':backup,'importUrl':imp,'detailUrl':detail,'versionCode':VC})
-              if include_type:e['type']='novel'
+              e=dict(base or {})
+              e.update({'id':'qidian-next-beta','name':'🌈 起点增强 · Beta','summary':summary,'icon':e.get('icon',''),'channel':'beta','version':VERSION,'updatedAt':DATE,'tags':tags,'changelog':changes,'sourceUrl':raw,'backupUrl':backup,'importUrl':imp,'detailUrl':detail,'versionCode':VC})
+              if include_type:
+                  e['type']='novel'
               return e
-          mp=Path('manifest.json');m=json.loads(mp.read_text());m['updatedAt']=TS
+
+          mp=Path('manifest.json')
+          m=json.loads(mp.read_text())
+          m['updatedAt']=TS
+          found=False
           for i,e in enumerate(m.get('sources',[])):
               if e.get('id')=='qidian-next-beta':
-                  ne=dict(e);ne.update({'name':'🌈 起点增强 · Beta','category':'novel','channel':'beta','version':VERSION,'versionCode':VC,'updatedAt':TS,'sourcePath':'sources/novel/qidian-next/qidian-next-beta.json','sourceUrl':raw,'bookSourceUrl':'https://m.qidian.com/?qf_source=qidian_next_8d7','summary':summary,'tags':tags,'changelog':changes,'sha256':sha});m['sources'][i]=ne;break
-          else: raise AssertionError('manifest entry missing')
+                  ne=dict(e)
+                  ne.update({'name':'🌈 起点增强 · Beta','category':'novel','channel':'beta','version':VERSION,'versionCode':VC,'updatedAt':TS,'sourcePath':'sources/novel/qidian-next/qidian-next-beta.json','sourceUrl':raw,'bookSourceUrl':'https://m.qidian.com/?qf_source=qidian_next_8d7','summary':summary,'tags':tags,'changelog':changes,'sha256':sha})
+                  m['sources'][i]=ne
+                  found=True
+                  break
+          assert found
           mp.write_text(json.dumps(m,ensure_ascii=False,indent=2))
+
           for p,itype in [(Path('subscription/beta.json'),False),(Path('subscription/novel.json'),True)]:
-              j=json.loads(p.read_text());j['updatedAt']=TS;j['generatedAt']=TS
+              j=json.loads(p.read_text())
+              j['updatedAt']=TS
+              j['generatedAt']=TS
+              hit=False
               for i,e in enumerate(j.get('items',[])):
-                  if e.get('id')=='qidian-next-beta':j['items'][i]=entry(e,itype);break
-              else:j.setdefault('items',[]).append(entry(include_type=itype))
+                  if e.get('id')=='qidian-next-beta':
+                      j['items'][i]=entry(e,itype)
+                      hit=True
+                      break
+              if not hit:
+                  j.setdefault('items',[]).append(entry(include_type=itype))
               p.write_text(json.dumps(j,ensure_ascii=False,indent=2))
+
           dp=Path('rss/data/details/beta/qidian-next.json')
           d={'kind':'source','title':'🌈 起点增强 · Beta','summary':summary,'badges':['Beta',VERSION,'情无换源'],'sections':[{'title':'本版更新','text':'情无名称不变，正文来源切换到附件“小雨的世界”的 full.hnxianxin.cn/qd 接口。'},{'title':'正文净化','text':'来源默认附加的“所有接口算法来自于…”与“免费看七天请求无限制，喜欢就来闲鱼支持一下吧”两段文字在返回阅读前自动移除。'},{'title':'隔离范围','text':'仅替换情无 Provider；评论页继续使用 Beta37 布局，搜索、详情、起点目录、评论及其它 Provider 不改。'},{'title':'版本状态','text':'Beta / 测试通道，等待真机验证情无 VIP 正文和尾注清理。'}],'sourceUrl':raw,'backupUrl':backup,'importUrl':imp}
           dp.write_text(json.dumps(d,ensure_ascii=False,indent=2))
-          bund=Path('bundles/all-beta.json');ba=json.loads(bund.read_text());src_obj=arr[0] if isinstance(arr,list) else arr
-          if not isinstance(ba,list):ba=[]
+
+          bund=Path('bundles/all-beta.json')
+          ba=json.loads(bund.read_text())
+          src_obj=arr[0] if isinstance(arr,list) else arr
+          if not isinstance(ba,list):
+              ba=[]
           hit=False
           for i,o in enumerate(ba):
-              if isinstance(o,dict) and o.get('bookSourceUrl')==src_obj.get('bookSourceUrl'):ba[i]=src_obj;hit=True;break
-          if not hit:ba.append(src_obj)
-          dd={};order=[]
+              if isinstance(o,dict) and o.get('bookSourceUrl')==src_obj.get('bookSourceUrl'):
+                  ba[i]=src_obj
+                  hit=True
+                  break
+          if not hit:
+              ba.append(src_obj)
+          dd={}
+          order=[]
           for o in ba:
-              if not isinstance(o,dict):continue
+              if not isinstance(o,dict):
+                  continue
               k=str(o.get('bookSourceUrl') or o.get('bookSourceName') or len(order))
-              if k not in dd:order.append(k)
+              if k not in dd:
+                  order.append(k)
               dd[k]=o
           bund.write_text(json.dumps([dd[k] for k in order],ensure_ascii=False,indent=2))
-          rp=Path('docs/RELEASE_LOG.md');old=rp.read_text()
+
+          rp=Path('docs/RELEASE_LOG.md')
+          old=rp.read_text()
           head='## 2026-09-11 · 起点增强 1.1.0-beta38 — 情无来源替换 / 尾注净化\n\n- Stable 保持 1.1.0 不变。\n- 情无 Provider 名称不变，底层正文来源替换为用户附件“小雨的世界”的 `https://full.hnxianxin.cn/qd/`。\n- 新 Provider 通过 `catalog.php` 获取章节时间戳/epub/vip 元数据，再调用 `content.php`，避免猜测 `t` 参数。\n- 正文输出默认移除来源附加的“所有接口算法来自于…”与“免费看七天请求无限制，喜欢就来闲鱼支持一下吧”两段尾注。\n- Beta37 评论点赞结构化定位保留；其它 Provider、搜索、详情、目录、评论和 Stable 冻结。\n- 状态：Beta，等待真机验证。\n\n'
           rp.write_text(head+old)
-          hp=Path('docs/sources/qidian-next/PROJECT_HANDOFF.md');hold=hp.read_text()
+
+          hp=Path('docs/sources/qidian-next/PROJECT_HANDOFF.md')
+          hold=hp.read_text()
           hhead='## 2026-09-11 · Current Beta 1.1.0-beta38 — 情无来源替换\n\n- Stable remains 1.1.0.\n- 情无 display/provider name stays unchanged, but its limited-content backend is replaced by the user-supplied 小雨 source (`full.hnxianxin.cn/qd`).\n- Runtime resolves chapter `t/epub/vip` from the new catalog before content fetch; no old 情无 auth/token requirement is used for the default path.\n- Two provider-added promotional footer paragraphs are stripped before returning chapter text.\n- Beta37 review UI is preserved; unrelated domains are frozen. Awaiting real-device verification.\n\n'
           hp.write_text(hhead+hold)
           PY
-          node --check /tmp/limited_qw-beta38.js
+          node --check .staging/limited_qw-beta38-new.js
           python3 -m json.tool sources/novel/qidian-next/qidian-next-beta.json >/dev/null
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
