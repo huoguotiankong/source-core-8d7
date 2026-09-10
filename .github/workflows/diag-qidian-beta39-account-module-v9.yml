@@ -1,0 +1,52 @@
+name: diag-qidian-beta39-account-module-v9
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta39-account-module-v9.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Locate concise account-management implementation
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          arr=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text()); s=arr[0] if isinstance(arr,list) else arr
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+          def dec(v):
+              if not isinstance(v,str): return ''
+              if not v.startswith('gz:'): return v
+              z=v[3:]+'='*((4-len(v[3:])%4)%4); return gzip.decompress(base64.b64decode(z)).decode()
+          markers=['qfMultiAccounts','qfProviderNames','账号管理','账户管理','账号登录','账号','登录设置','providerNames','accounts']
+          out=[]
+          for name,val in pack.items():
+              try: code=dec(val)
+              except: continue
+              hits=[m for m in markers if m in code]
+              if not hits: continue
+              out.append(f'## {name} hits={hits} len={len(code)}')
+              for marker in hits:
+                  pos=0; c=0
+                  while True:
+                      pos=code.find(marker,pos)
+                      if pos<0 or c>=4: break
+                      st=max(0,pos-220); en=min(len(code),pos+700)
+                      out.append(f'-- {marker} #{c+1} --\n'+code[st:en])
+                      pos+=len(marker); c+=1
+              out.append('')
+          for field in ['loginUrl']:
+              code=str(s.get(field,'') or '')
+              hits=[m for m in markers if m in code]
+              out.append(f'## TOP {field} hits={hits} len={len(code)}')
+              for marker in hits:
+                  pos=code.find(marker); out.append(code[max(0,pos-220):pos+700])
+          Path('.staging/beta39-account-module-v9.txt').write_text('\n'.join(out))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/beta39-account-module-v9.txt
+          git commit -m 'diag: pinpoint qidian account module for beta39'
+          git push origin main
