@@ -1,0 +1,27 @@
+name: diag-qidian-beta38-ui-login
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta38-ui-login.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Dump ui_login account function
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64
+          from pathlib import Path
+          s=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text())[0]
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+          v=pack['ui_login']; z=v[3:]+'='*((4-len(v[3:])%4)%4); c=gzip.decompress(base64.b64decode(z)).decode()
+          print('LEN=',len(c))
+          for needle in ['qfMultiAccountsV423','qfAccountsHtmlV5','情无','providers','Provider']:
+            st=0;n=0
+            while True:
+              i=c.find(needle,st)
+              if i<0 or n>=8: break
+              print('\n===',needle,'@',i,'===\n'+c[max(0,i-2200):i+7200])
+              st=i+len(needle);n+=1
+          PY
