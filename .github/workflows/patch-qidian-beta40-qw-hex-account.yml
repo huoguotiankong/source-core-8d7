@@ -1,0 +1,99 @@
+name: patch-qidian-beta40-qw-hex-account
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta40-qw-hex-account.trigger']
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Publish Beta40
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,hashlib,re
+          from pathlib import Path
+          SRC=Path('sources/novel/qidian-next/qidian-next-beta.json'); STABLE=Path('sources/novel/qidian-next/qidian-next.json')
+          arr=json.loads(SRC.read_text()); s=arr[0] if isinstance(arr,list) else arr
+          stable_hash=hashlib.sha256(STABLE.read_bytes()).hexdigest()
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+          def dec(v):
+              if not isinstance(v,str): return ''
+              if not v.startswith('gz:'): return v
+              z=v[3:]+'='*((4-len(v[3:])%4)%4); return gzip.decompress(base64.b64decode(z)).decode()
+          def enc(code): return 'gz:'+base64.b64encode(gzip.compress(code.encode(),mtime=0)).decode().rstrip('=')
+
+          # 情无：附件 ruleContent 明确先 hexDecodeToString(C)，再 base64Decode JSON。
+          code=dec(pack['limited_qw'])
+          old='var p=qfQwDecodePayloadV39.call(this,x.C!==undefined?x.C:(x.c!==undefined?x.c:x.chapterUrl)),cid=String((p&&(p.chapterId!==undefined?p.chapterId:p.ChapterId))||(x.chapterId!==undefined?x.chapterId:(x.ChapterId!==undefined?x.ChapterId:""))||"");'
+          new='var cv=(x.C!==undefined?x.C:(x.c!==undefined?x.c:x.chapterUrl));try{if(j&&j.hexDecodeToString)cv=String(j.hexDecodeToString(String(cv||""))||cv);}catch(_hx){}var p=qfQwDecodePayloadV39.call(this,cv),cid=String((p&&(p.chapterId!==undefined?p.chapterId:p.ChapterId))||(x.chapterId!==undefined?x.chapterId:(x.ChapterId!==undefined?x.ChapterId:""))||"");'
+          assert old in code, 'limited_qw catalog decode anchor missing'
+          code=code.replace(old,new,1)
+          assert 'hexDecodeToString(String(cv||""))' in code
+          pack['limited_qw']=enc(code)
+          lib=lib[:a]+json.dumps(pack,ensure_ascii=False,separators=(',',':'))+lib[b:]
+          s['jsLib']=lib
+
+          # 账号管理：当前真机实际由 loginUrl 中的后置 qfMultiAccountsV423 覆盖层渲染。
+          login=str(s.get('loginUrl','') or '')
+          before=login
+          # Provider selector patterns with/without X.
+          login=login.replace("['情无','神魔','晴天','同人','X']","['神魔','晴天','同人','X']")
+          login=login.replace('["情无","神魔","晴天","同人","X"]','["神魔","晴天","同人","X"]')
+          login=login.replace("['情无','神魔','晴天','同人']","['神魔','晴天','同人']")
+          login=login.replace('["情无","神魔","晴天","同人"]','["神魔","晴天","同人"]')
+          login=login.replace("qfMGet423('账号管理Provider','情无')","qfMGet423('账号管理Provider','神魔')")
+          login=login.replace('qfMGet423("账号管理Provider","情无")','qfMGet423("账号管理Provider","神魔")')
+          # Hide/remove legacy qw account panel from polished account page without touching content Provider.
+          login=re.sub(r"\+'<div id=\\\"pv_qw\\\" class=\\\"card\\\">.*?</div>'\+", "+''+", login, count=1, flags=re.S)
+          s['loginUrl']=login
+          assert login!=before, 'loginUrl account UI unchanged'
+          # Strong gate: no effective account selector may start with 情无.
+          assert "账号管理Provider',['情无'" not in login
+          assert '账号管理Provider,["情无"' not in login
+
+          s['bookSourceComment']='v1.1.0-beta40：修复新情无目录字段解码链，按附件原逻辑先 Hex 解码章节 C 字段、再 Base64 解析章节元数据，解决“新来源未匹配当前章节”。账号管理最终覆盖层移除情无，仅保留神魔/晴天/同人/X；正文限免 Provider 仍保留情无且免登录。其它域沿用 beta39。'
+          SRC.write_text(json.dumps(arr,ensure_ascii=False,indent=2))
+          assert hashlib.sha256(STABLE.read_bytes()).hexdigest()==stable_hash
+
+          VERSION='1.1.0-beta40'; VC=11040; DATE='2026-09-11'; TS='2026-09-11T07:58:00+08:00'
+          summary='Beta40：修复新情无章节 C 字段 Hex→Base64 解码链；账号管理彻底移除情无。'
+          tags=['起点','测试版','限免源','情无','免登录','章节解码','小雨来源','评论页']
+          changes=['情无目录章节 C 字段按附件原规则先 hexDecodeToString，再 Base64 解析 bookId/chapterId/time/epub/vip','修复 Beta39 新情无仍提示“新来源未匹配当前章节”的核心解析问题','账号管理最终 qfMultiAccountsV423 覆盖层移除情无，只显示神魔/晴天/同人/X；正文设置仍保留情无','继续过滤来源两段推广尾注；Beta37 评论点赞结构及其它业务域冻结']
+          raw=f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={VC}'
+          backup=f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v={VC}'
+          imp='legado://import/importonline?src='+raw
+          detail='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json'
+          sha=hashlib.sha256(SRC.read_bytes()).hexdigest()
+          def entry(base=None,itype=False):
+              e=dict(base or {}); e.update({'id':'qidian-next-beta','name':'🌈 起点增强 · Beta','summary':summary,'icon':e.get('icon',''),'channel':'beta','version':VERSION,'updatedAt':DATE,'tags':tags,'changelog':changes,'sourceUrl':raw,'backupUrl':backup,'importUrl':imp,'detailUrl':detail,'versionCode':VC})
+              if itype:e['type']='novel'
+              return e
+          mp=Path('manifest.json'); m=json.loads(mp.read_text()); m['updatedAt']=TS
+          for i,e in enumerate(m.get('sources',[])):
+              if e.get('id')=='qidian-next-beta':
+                  ne=dict(e); ne.update({'name':'🌈 起点增强 · Beta','category':'novel','channel':'beta','version':VERSION,'versionCode':VC,'updatedAt':TS,'sourcePath':'sources/novel/qidian-next/qidian-next-beta.json','sourceUrl':raw,'bookSourceUrl':'https://m.qidian.com/?qf_source=qidian_next_8d7','summary':summary,'tags':tags,'changelog':changes,'sha256':sha}); m['sources'][i]=ne; break
+          else: raise AssertionError('manifest entry missing')
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2))
+          for p,itype in [(Path('subscription/beta.json'),False),(Path('subscription/novel.json'),True)]:
+              j=json.loads(p.read_text()); j['updatedAt']=TS; j['generatedAt']=TS
+              for i,e in enumerate(j.get('items',[])):
+                  if e.get('id')=='qidian-next-beta': j['items'][i]=entry(e,itype); break
+              else: j.setdefault('items',[]).append(entry(itype=itype))
+              p.write_text(json.dumps(j,ensure_ascii=False,indent=2))
+          Path('rss/data/details/beta/qidian-next.json').write_text(json.dumps({'kind':'source','title':'🌈 起点增强 · Beta','summary':summary,'badges':['Beta',VERSION,'情无免登录'],'sections':[{'title':'本版更新','text':'修复小雨来源章节 C 字段解码顺序：Hex → Base64 → JSON，恢复情无正文映射。'},{'title':'账号管理','text':'情无为免登录来源，已从最终账号管理 Provider 列表移除；正文限免源仍保留情无。'},{'title':'版本状态','text':'Beta / 测试通道，等待真机确认。'}],'sourceUrl':raw,'backupUrl':backup,'importUrl':imp},ensure_ascii=False,indent=2))
+          bp=Path('bundles/all-beta.json'); ba=json.loads(bp.read_text()); src_obj=arr[0] if isinstance(arr,list) else arr; hit=False
+          if not isinstance(ba,list):ba=[]
+          for i,o in enumerate(ba):
+              if isinstance(o,dict) and o.get('bookSourceUrl')==src_obj.get('bookSourceUrl'): ba[i]=src_obj; hit=True; break
+          if not hit:ba.append(src_obj)
+          bp.write_text(json.dumps(ba,ensure_ascii=False,indent=2))
+          rp=Path('docs/RELEASE_LOG.md'); oldlog=rp.read_text(); rp.write_text('## 2026-09-11 · 起点增强 1.1.0-beta40 — 情无章节解码修复 / 账号入口移除\n\n- Stable 保持 1.1.0 不变。\n- 修复新情无目录 `C` 字段解析：严格按附件原实现执行 Hex 解码 → Base64 解码 → JSON，取得 bookId/chapterId/time/epub/vip。\n- 账号管理最终覆盖层移除情无；正文设置和 Provider Registry 中的情无继续保留且免登录。\n- 两段推广尾注过滤继续保留；其它域冻结。\n- 状态：Beta，等待真机确认。\n\n'+oldlog)
+          hp=Path('docs/sources/qidian-next/PROJECT_HANDOFF.md'); h=hp.read_text(); hp.write_text('## 2026-09-11 · Current Beta 1.1.0-beta40 — 情无 Hex→Base64 章节解码修复\n\n- Stable remains 1.1.0.\n- New 情无 backend follows the attachment exactly: catalog C is hex-decoded first, then Base64-decoded to chapter JSON.\n- Account Management removes 情无; content Provider keeps 情无 as no-login source.\n- Awaiting real-device verification.\n\n'+h)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git commit -m 'fix: publish qidian-next beta40 qingwu hex decode and account cleanup'
+          git push origin main
