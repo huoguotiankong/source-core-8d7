@@ -1,3 +1,10 @@
+## 2026-09-11 · Current Beta 1.1.0-beta40 — 情无 Hex→Base64 章节解码修复
+
+- Stable remains 1.1.0.
+- New 情无 backend follows the attachment exactly: catalog C is hex-decoded first, then Base64-decoded to chapter JSON.
+- Account Management removes 情无; content Provider keeps 情无 as no-login source.
+- Awaiting real-device verification.
+
 ## 2026-09-11 · Current Beta 1.1.0-beta39 — 情无免登录 / 章节匹配修复
 
 - Stable remains 1.1.0.

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-11T07:45:00+08:00",
+  "updatedAt": "2026-09-11T07:58:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -80,30 +80,30 @@
       "name": "🌈 起点增强 · Beta",
       "category": "novel",
       "channel": "beta",
-      "version": "1.1.0-beta39",
-      "versionCode": 11039,
-      "updatedAt": "2026-09-11T07:45:00+08:00",
+      "version": "1.1.0-beta40",
+      "versionCode": 11040,
+      "updatedAt": "2026-09-11T07:58:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11039",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11040",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "Beta39：修复新情无章节时间戳匹配；情无改为完全免登录并从账号管理移除。",
+      "summary": "Beta40：修复新情无章节 C 字段 Hex→Base64 解码链；账号管理彻底移除情无。",
       "tags": [
         "起点",
         "测试版",
         "限免源",
         "情无",
         "免登录",
-        "章节匹配",
+        "章节解码",
         "小雨来源",
         "评论页"
       ],
       "changelog": [
-        "情无继续使用 full.hnxianxin.cn/qd 免费正文链，不要求账号、Token 或会话",
-        "章节解析升级为 chapterId→标题→章节号→索引多级匹配，修复“未从新来源目录解析到章节时间戳”",
-        "账号管理移除情无入口；正文 Provider 名称和限免路由仍保留情无",
-        "继续默认过滤来源附带的两段推广尾注；Beta37 评论点赞结构修复及其它域不变"
+        "情无目录章节 C 字段按附件原规则先 hexDecodeToString，再 Base64 解析 bookId/chapterId/time/epub/vip",
+        "修复 Beta39 新情无仍提示“新来源未匹配当前章节”的核心解析问题",
+        "账号管理最终 qfMultiAccountsV423 覆盖层移除情无，只显示神魔/晴天/同人/X；正文设置仍保留情无",
+        "继续过滤来源两段推广尾注；Beta37 评论点赞结构及其它业务域冻结"
       ],
-      "sha256": "1d24c99e5e76933c94bcacbfd8efb61aae749426b8f5bdaf717f94cdd351a556"
+      "sha256": "0544334e2d4c1b1a8b0a8dac5dd6ca74d2092f62b64560f0cb2ac5d98a04a117"
     },
     {
       "id": "picacg",
