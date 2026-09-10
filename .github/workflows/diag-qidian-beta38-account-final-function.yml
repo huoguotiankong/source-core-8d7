@@ -1,0 +1,48 @@
+name: diag-qidian-beta38-account-final-function
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta38-account-final-function.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Extract effective account functions
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          s=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text())[0]
+          lib=s['jsLib']
+          for name in ['qfMultiAccountsV423','qfAccountHtml','qfAccount']:
+            p='function '+name
+            st=0
+            while True:
+              i=lib.find(p,st)
+              if i<0: break
+              # brace-balanced function
+              b=lib.find('{',i); depth=0; q=None; esc=False; end=None
+              for k in range(b,len(lib)):
+                c=lib[k]
+                if q:
+                  if esc: esc=False
+                  elif c=='\\': esc=True
+                  elif c==q: q=None
+                  continue
+                if c in "'\"`": q=c; continue
+                if c=='{': depth+=1
+                elif c=='}':
+                  depth-=1
+                  if depth==0: end=k+1; break
+              print('\n===',name,'@',i,'===\n'+lib[i:(end or i+12000)])
+              st=(end or i+1)
+          # all compact context around exact polished provider array markers
+          for needle in ['["情无","神魔","晴天","同人","X"]','[\'情无\',\'神魔\',\'晴天\',\'同人\',\'X\']','情无账号']:
+            st=0
+            while True:
+              i=lib.find(needle,st)
+              if i<0: break
+              print('\n=== MARKER',needle,'@',i,'===\n'+lib[max(0,i-1800):i+5000])
+              st=i+len(needle)
+          PY
