@@ -1,0 +1,34 @@
+name: patch-qidian-beta39-qw-resolver-no-account-v10
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta39-qw-resolver-no-account-v10.trigger']
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Publish Beta39 with effective account override patched
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/patch-qidian-beta39-qw-resolver-no-account-v6.yml')
+          lines=p.read_text().splitlines(); out=[]; inside=False
+          for line in lines:
+              if "python3 - <<'PY'" in line:
+                  inside=True; continue
+              if inside and line.strip()=='PY': break
+              if inside: out.append(line[10:] if line.startswith('          ') else line)
+          code='\n'.join(out)+'\n'
+          code=code.replace("marker='function '+name\n              start=src.rfind(marker)","markers=['function '+name,name+'=function']\n              start=max(src.rfind(markers[0]),src.rfind(markers[1]))")
+          code=code.replace("fn=re.sub(r',\\s*[\"\\']情无[\"\\']\\s*([\\]])',r'\\1',fn)","fn=re.sub(r',\\s*[\"\\']情无[\"\\']\\s*([\\]])',r'\\1',fn)\n              fn=fn.replace(\"qfMGet423('账号管理Provider','情无')\",\"qfMGet423('账号管理Provider','神魔')\")")
+          assert "name+'=function'" in code
+          Path('/tmp/beta39_v10.py').write_text(code)
+          PY
+          python3 /tmp/beta39_v10.py
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git commit -m 'fix: publish qidian-next beta39 qingwu no-account v10'
+          git push origin main
