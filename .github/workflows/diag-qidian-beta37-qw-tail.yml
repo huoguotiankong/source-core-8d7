@@ -1,0 +1,30 @@
+name: diag-qidian-beta37-qw-tail
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta37-qw-tail.trigger']
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Dump limited_qw exports and tail
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(p.read_text()); s=arr[0] if isinstance(arr,list) else arr
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+          ek='var QF_MOD38_EXPORTS='; ea=lib.index(ek,b)+len(ek); eb=lib.index(';\nvar QF_MOD38_CACHE=',ea); exports=json.loads(lib[ea:eb])
+          v=pack['limited_qw']; z=v[3:]; z += '='*((4-len(z)%4)%4); code=gzip.decompress(base64.b64decode(z)).decode()
+          lines=code.splitlines()
+          out='EXPORTS='+json.dumps(exports.get('limited_qw'),ensure_ascii=False)+'\n\nTAIL:\n'+'\n'.join(lines[-100:])+'\n\nFUNCTIONS:\n'+'\n'.join(re.findall(r'function\s+(qfQw\w+)\s*\(',code))
+          Path('.staging/limited_qw-beta37-tail.txt').write_text(out)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/limited_qw-beta37-tail.txt
+          git commit -m 'chore: dump qidian beta37 qw exports and tail' || true
+          git push origin main
