@@ -1,3 +1,11 @@
+## 2026-09-11 · Current Beta 1.1.0-beta38 — 情无来源替换
+
+- Stable remains 1.1.0.
+- 情无 display/provider name stays unchanged, but its limited-content backend is replaced by the user-supplied 小雨 source (`full.hnxianxin.cn/qd`).
+- Runtime resolves chapter `t/epub/vip` from the new catalog before content fetch; no old 情无 auth/token requirement is used for the default path.
+- Two provider-added promotional footer paragraphs are stripped before returning chapter text.
+- Beta37 review UI is preserved; unrelated domains are frozen. Awaiting real-device verification.
+
 ## 2026-09-08 · Current Beta 1.1.0-beta32 — X-QD limited Provider
 
 - Stable remains 1.1.0.
