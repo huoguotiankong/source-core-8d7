@@ -1,0 +1,42 @@
+name: diag-qidian-beta38-account-compressed
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta38-account-compressed.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Inspect compressed account modules
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64
+          from pathlib import Path
+          s=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text())[0]
+          lib=s['jsLib'];mk='var QF_MOD38_PACK=';a=lib.index(mk)+len(mk);b=lib.index(';\nvar QF_MOD38_EXPORTS=',a);pack=json.loads(lib[a:b])
+          def dec(v):
+            if not isinstance(v,str):return ''
+            if not v.startswith('gz:'):return v
+            z=v[3:]+'='*((4-len(v[3:])%4)%4);return gzip.decompress(base64.b64decode(z)).decode()
+          for n,v in pack.items():
+            c=dec(v)
+            if 'qfMultiAccounts' in c or ('情无' in c and ('账号管理' in c or 'Provider' in c or 'provider' in c)):
+              print('\n=== MODULE',n,'LEN',len(c),'===')
+              for needle in ['qfMultiAccounts','情无']:
+                st=0;ct=0
+                while True:
+                  i=c.find(needle,st)
+                  if i<0 or ct>=5:break
+                  print('\n--',needle,i,'--\n'+c[max(0,i-2500):i+6500])
+                  st=i+len(needle);ct+=1
+          print('\n=== LOGINURL ===')
+          lu=str(s.get('loginUrl',''))
+          for needle in ['qfMultiAccounts','情无']:
+            st=0;ct=0
+            while True:
+              i=lu.find(needle,st)
+              if i<0 or ct>=6:break
+              print('\n--',needle,i,'--\n'+lu[max(0,i-2500):i+6500])
+              st=i+len(needle);ct+=1
+          PY
