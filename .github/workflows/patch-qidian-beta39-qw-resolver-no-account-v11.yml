@@ -1,0 +1,61 @@
+name: patch-qidian-beta39-qw-resolver-no-account-v11
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta39-qw-resolver-no-account-v11.trigger']
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Publish Beta39 v11 with captured diagnostics
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          src=Path('.github/workflows/patch-qidian-beta39-qw-resolver-no-account-v6.yml').read_text().splitlines()
+          out=[]; inside=False
+          for line in src:
+              if "python3 - <<'PY'" in line:
+                  inside=True; continue
+              if inside and line.strip()=='PY': break
+              if inside: out.append(line[10:] if line.startswith('          ') else line)
+          code='\n'.join(out)+'\n'
+          needle="assert changed, 'no effective account-management function containing 情无 was patched'"
+          inject=r'''
+          # v11: actual account UI is the later qfMultiAccountsV423 override in top-level loginUrl.
+          # Only modify loginUrl UI; do not touch packed content routing/provider registry.
+          login=str(s.get('loginUrl','') or '')
+          before_login=login
+          login=login.replace("['情无','神魔','晴天','同人']","['神魔','晴天','同人']")
+          login=login.replace('["情无","神魔","晴天","同人"]','["神魔","晴天","同人"]')
+          login=login.replace("qfMGet423('账号管理Provider','情无')","qfMGet423('账号管理Provider','神魔')")
+          login=login.replace('qfMGet423("账号管理Provider","情无")','qfMGet423("账号管理Provider","神魔")')
+          login=login.replace("var provider=qfMGet423('账号管理Provider','神魔');","var provider=qfMGet423('账号管理Provider','神魔');if(provider==='情无')provider='神魔';")
+          login=login.replace("var ik=['email','password','情无接口地址','神魔账号或邮箱'","var ik=['神魔账号或邮箱'")
+          login=login.replace("<b>🌙 情无</b>","<b style=\"display:none\">🌙 情无</b>")
+          s['loginUrl']=login
+          if login!=before_login: changed.append('loginUrl:effective-qfMultiAccountsV423')
+          '''
+          inject='\n'.join(x[10:] if x.startswith('          ') else x for x in inject.strip('\n').splitlines())
+          assert needle in code
+          code=code.replace(needle,inject+'\n'+needle)
+          Path('/tmp/beta39_v11.py').write_text(code)
+          PY
+          set +e
+          python3 /tmp/beta39_v11.py >/tmp/beta39-v11.out 2>/tmp/beta39-v11.err
+          rc=$?
+          set -e
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          if [ "$rc" -ne 0 ]; then
+            { echo "Beta39 v11 failure rc=$rc"; echo '--- stdout ---'; cat /tmp/beta39-v11.out; echo '--- stderr ---'; cat /tmp/beta39-v11.err; } > .staging/beta39-v11-error.txt
+            git add .staging/beta39-v11-error.txt
+            git commit -m 'diag: capture beta39 v11 failure'
+            git push origin main
+            exit "$rc"
+          fi
+          cat /tmp/beta39-v11.out
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git commit -m 'fix: publish qidian-next beta39 qingwu no-account v11'
+          git push origin main
