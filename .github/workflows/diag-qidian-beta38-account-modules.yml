@@ -1,0 +1,37 @@
+name: diag-qidian-beta38-account-modules
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta38-account-modules.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Find effective account modules and provider call sites
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          s=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text())[0]
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+          def dec(v):
+            if not isinstance(v,str): return ''
+            if not v.startswith('gz:'): return v
+            z=v[3:]+'='*((4-len(v[3:])%4)%4); return gzip.decompress(base64.b64decode(z)).decode()
+          for name,v in pack.items():
+            c=dec(v)
+            if ('情无' in c and ('账号' in c or 'Provider' in c or 'provider' in c)) or 'qfQwContentV44' in c:
+              print('\n=== MODULE',name,'===')
+              for needle in ['情无','qfQwContentV44']:
+                i=c.find(needle)
+                if i>=0: print(c[max(0,i-2000):i+5000])
+          print('\n=== MAIN CALLS ===')
+          for needle in ['qfQwContentV44','账号管理','情无']:
+            st=0;n=0
+            while True:
+              i=lib.find(needle,st)
+              if i<0 or n>=5: break
+              print('\n--',needle,i,'--\n',lib[max(0,i-1800):i+3500])
+              st=i+len(needle);n+=1
+          PY
