@@ -1,0 +1,31 @@
+name: diag-qidian-limited-qw-rawdecode-v2
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-limited-qw-rawdecode-v2.trigger'
+permissions:
+  contents: write
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Decode limited_qw
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64
+          s=json.load(open('sources/novel/qidian-next/qidian-next.json',encoding='utf-8'))[0]
+          js=s['jsLib']; i=js.find('QF_MOD38_PACK='); start=js.find('{',i)
+          pack,end=json.JSONDecoder().raw_decode(js[start:])
+          v=pack['limited_qw']; raw=v[3:] if v.startswith('gz:') else v
+          raw=raw.replace('-','+').replace('_','/') + '='*((4-len(raw)%4)%4)
+          t=gzip.decompress(base64.b64decode(raw)).decode('utf-8')
+          open('.staging/qidian-limited-qw-decoded.txt','w',encoding='utf-8').write(t)
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .staging/qidian-limited-qw-decoded.txt
+          git commit -m 'diag: decode current limited_qw module v2' || exit 0
+          git push origin HEAD:main
