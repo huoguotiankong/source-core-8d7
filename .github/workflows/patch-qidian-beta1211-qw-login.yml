@@ -1,0 +1,127 @@
+name: patch-qidian-beta1211-qw-login
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta1211-qw-login.trigger']
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Publish 1.2.1-beta1 Qingwu optional login
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,hashlib,re
+          from pathlib import Path
+          VERSION='1.2.1-beta1'; CODE=12011; NOW='2026-09-11T22:40:00+08:00'; DAY='2026-09-11'
+          root=Path('.')
+          sp=root/'sources/novel/qidian-next/qidian-next-beta.json'
+          arr=json.loads(sp.read_text()); src=arr[0] if isinstance(arr,list) else arr
+          # Keep Stable 1.2.0 untouched; patch only Beta source.
+          login=str(src.get('loginUrl','') or '')
+          old='http://103.236.85.8:7878/qd'; new='https://full.hnxianxin.cn/qd'
+          login=login.replace(old,new)
+          # Effective polished account UI: expose Qingwu tab again.
+          n=login.count('var providers=["神魔","晴天","同人","X"]')
+          if n < 1: raise SystemExit('effective provider tab anchor not found')
+          login=login.replace('var providers=["神魔","晴天","同人","X"]','var providers=["情无","神魔","晴天","同人","X"]')
+          # Make all legacy hidden Qingwu labels visible too; final UI still controls actual rendering.
+          login=login.replace('<b style="display:none">🌙 情无</b>','<b>🌙 情无</b>')
+          # Force legacy Qingwu auth helpers onto the current Xiaoyu/Qingwu host. This avoids stale saved old endpoint.
+          login += '''\n/* 1.2.1-beta1: Qingwu optional account session on current Xiaoyu backend. Anonymous reading remains valid. */\nqfQwNativeBaseV52=function(){return "https://full.hnxianxin.cn/qd";};\nqfQwNativeRootV52=function(){return "https://full.hnxianxin.cn";};\n'''
+          src['loginUrl']=login
+          # Patch only limited_qw lazy module so successful session headers are optional enhancements, not requirements.
+          lib=src['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a)
+          pack=json.loads(lib[a:b])
+          def dec(v):
+              if not v.startswith('gz:'): return v
+              z=v[3:]+'='*((4-len(v[3:])%4)%4)
+              return gzip.decompress(base64.b64decode(z)).decode()
+          def enc(t): return 'gz:'+base64.b64encode(gzip.compress(t.encode(),compresslevel=9,mtime=0)).decode()
+          qw=dec(pack['limited_qw'])
+          pat=r'function qfQwHeadersV44\(\)\{return \{"Accept":"application/json,text/plain,\*/\*","User-Agent":"Mozilla/5\.0 \(Linux; Android 13\) AppleWebKit/537\.36 Chrome/124\.0 Mobile Safari/537\.36","Referer":qfQwBaseV44\.call\(this\)\+"/"\};\}'
+          repl='''function qfQwHeadersV44(){\n              var h={"Accept":"application/json,text/plain,*/*","User-Agent":"Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36","Referer":qfQwBaseV44.call(this)+"/"};\n              /* Optional account acceleration/entitlement: never require login. */\n              try{var s=qfQwSrcV39(this),ck=s?String(s.get("qf_qw_cookie_v317")||""):"",tk=s?String(s.get("qf_qw_token_v317")||""):"";if(ck)h.Cookie=ck;if(tk)h["X-Content-Token"]=tk;}catch(_auth){}\n              return h;\n          }'''
+          qw2,c=re.subn(pat,repl,qw,count=1)
+          if c!=1: raise SystemExit('qfQwHeadersV44 exact anchor not patched')
+          pack['limited_qw']=enc(qw2)
+          src['jsLib']=lib[:a]+json.dumps(pack,ensure_ascii=False,separators=(',',':'))+lib[b:]
+          src['bookSourceComment']='v1.2.1-beta1：情无账号登录重新接入当前“小雨的世界”后端；账号管理恢复情无标签，支持登录/检测/网页登录/退出。登录会话仅作为可选增强，未登录仍沿用已真机确认的 Beta41 免费正文链；其它域冻结。'
+          sp.write_text(json.dumps(arr if isinstance(arr,list) else src,ensure_ascii=False,indent=2))
+          sha=hashlib.sha256(sp.read_bytes()).hexdigest()
+          summary='Beta 1.2.1-beta1：情无恢复可选账号登录；未登录继续使用已验证的免费正文链。'
+          tags=['起点','测试版','限免源','情无','账号登录','免登录回退','小雨来源','X','评论页']
+          changelog=[
+            '在账号管理最终 Provider 页恢复“情无”标签，支持登录、检测、网页登录和退出',
+            '情无账号接口切换到当前小雨后端 full.hnxianxin.cn；清除旧 103.236.85.8 默认地址依赖',
+            '登录成功后 limited_qw 可选携带 Cookie / X-Content-Token；未登录时请求头与 Beta41 保持一致',
+            '不把登录设为正文前置条件，Beta41 已真机确认的免费 catalog/content 链继续作为默认回退',
+            'Stable 1.2.0、评论、角色卡、书友圈、其它 Provider 均不修改'
+          ]
+          raw=f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={CODE}'
+          cdn=f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v={CODE}'
+          detail='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json'
+          item={'id':'qidian-next-beta','name':'🌈 起点增强 · Beta','summary':summary,'icon':'','channel':'beta','version':VERSION,'updatedAt':DAY,'tags':tags,'changelog':changelog,'sourceUrl':raw,'backupUrl':cdn,'importUrl':'legado://import/importonline?src='+raw,'detailUrl':detail,'versionCode':CODE}
+          # beta subscription upsert
+          p=root/'subscription/beta.json'; d=json.loads(p.read_text()); d['updatedAt']=NOW; d['generatedAt']=NOW
+          found=False
+          for i,x in enumerate(d.get('items',[])):
+              if x.get('id')=='qidian-next-beta': d['items'][i]=item; found=True; break
+          if not found:d.setdefault('items',[]).append(item)
+          p.write_text(json.dumps(d,ensure_ascii=False,indent=2))
+          # novel active logical entry switches to this Beta while Stable remains separately available in stable catalog.
+          p=root/'subscription/novel.json'; d=json.loads(p.read_text()); d['updatedAt']=NOW; d['generatedAt']=NOW
+          ni=dict(item); ni['type']='novel'
+          out=[]; placed=False
+          for x in d.get('items',[]):
+              if x.get('id') in ('qidian-next','qidian-next-beta'):
+                  if not placed: out.append(ni); placed=True
+              else: out.append(x)
+          if not placed: out.append(ni)
+          d['items']=out; p.write_text(json.dumps(d,ensure_ascii=False,indent=2))
+          # manifest only updates beta entry; stable qidian-next remains untouched.
+          p=root/'manifest.json'; d=json.loads(p.read_text()); d['updatedAt']=NOW
+          me={'id':'qidian-next-beta','name':'🌈 起点增强 · Beta','category':'novel','channel':'beta','version':VERSION,'versionCode':CODE,'updatedAt':NOW,'sourcePath':'sources/novel/qidian-next/qidian-next-beta.json','sourceUrl':raw,'bookSourceUrl':'https://m.qidian.com/?qf_source=qidian_next_8d7','summary':summary,'tags':tags,'changelog':changelog,'sha256':sha}
+          found=False
+          for i,x in enumerate(d.get('sources',[])):
+              if x.get('id')=='qidian-next-beta':d['sources'][i]=me;found=True;break
+          if not found:d.setdefault('sources',[]).append(me)
+          p.write_text(json.dumps(d,ensure_ascii=False,indent=2))
+          # all-beta bundle: replace same identity Beta object, preserving unrelated sources.
+          p=root/'bundles/all-beta.json'; bd=json.loads(p.read_text()); src_obj=arr[0] if isinstance(arr,list) else arr
+          if isinstance(bd,list):
+              replaced=False
+              for i,x in enumerate(bd):
+                  if isinstance(x,dict) and (x.get('bookSourceUrl')==src_obj.get('bookSourceUrl') or x.get('bookSourceName')=='🌈 起点增强 · Beta'):
+                      bd[i]=src_obj;replaced=True;break
+              if not replaced:bd.append(src_obj)
+          elif isinstance(bd,dict) and isinstance(bd.get('sources'),list):
+              replaced=False
+              for i,x in enumerate(bd['sources']):
+                  if isinstance(x,dict) and (x.get('bookSourceUrl')==src_obj.get('bookSourceUrl') or x.get('bookSourceName')=='🌈 起点增强 · Beta'):
+                      bd['sources'][i]=src_obj;replaced=True;break
+              if not replaced:bd['sources'].append(src_obj)
+              if 'updatedAt' in bd:bd['updatedAt']=NOW
+          else: raise SystemExit('unknown beta bundle structure')
+          p.write_text(json.dumps(bd,ensure_ascii=False,indent=2))
+          # Beta detail current-state page.
+          p=root/'rss/data/details/beta/qidian-next.json'
+          dd={'kind':'source','title':'🌈 起点增强 · Beta','summary':summary,'badges':['Beta',VERSION,'情无可选登录'],'sections':[
+            {'title':'本轮测试','text':'在 Beta41 已验证免费正文链上恢复情无账号会话；登录是可选增强，不是正文前置条件。'},
+            {'title':'情无账号','text':'账号管理新增情无：邮箱/密码登录、会话检测、网页登录、退出；当前接口地址固定为 https://full.hnxianxin.cn/qd。'},
+            {'title':'回退策略','text':'无账号或登录失败时继续走 Beta41 已真机确认的匿名 catalog.php / content.php 链，不影响正常限免正文。'},
+            {'title':'版本状态','text':'Beta / 测试通道，等待真机确认。'}],
+            'sourceUrl':raw,'backupUrl':cdn,'importUrl':'legado://import/importonline?src='+raw}
+          p.write_text(json.dumps(dd,ensure_ascii=False,indent=2))
+          # Release log / handoff prepend.
+          p=root/'docs/RELEASE_LOG.md'; oldtxt=p.read_text(); head=f'''## 2026-09-11 · 起点增强 {VERSION} — 情无可选账号登录\n\n- Stable 1.2.0 保持不变；本轮只进入 Beta。\n- 账号管理恢复情无 Provider 标签及登录/检测/网页登录/退出动作，目标后端统一为 `https://full.hnxianxin.cn/qd`。\n- 登录后的 Cookie / X-Content-Token 仅作为情无正文可选请求头；未登录仍走 Beta41 已真机确认的免费正文链。\n- 不修改评论、角色卡、书友圈、X/神魔/晴天/同人等其它域。\n- 状态：Beta，等待真机验证。\n\n'''; p.write_text(head+oldtxt)
+          p=root/'docs/sources/qidian-next/PROJECT_HANDOFF.md'; oldtxt=p.read_text(); head=f'''## 2026-09-11 · Current Beta {VERSION} — 情无 optional account session\n\n- Stable remains 1.2.0.\n- Re-exposes Qingwu in the effective polished Account Management provider tabs.\n- Qingwu auth helpers now target `https://full.hnxianxin.cn/qd`; successful Cookie / X-Content-Token are optional headers for `limited_qw`.\n- Anonymous Beta41 catalog/content behavior remains the mandatory fallback and is not gated by login.\n- Awaiting real-device verification.\n\n'''; p.write_text(head+oldtxt)
+          # sanity
+          json.loads(sp.read_text()); json.loads((root/'manifest.json').read_text()); json.loads((root/'subscription/beta.json').read_text()); json.loads((root/'subscription/novel.json').read_text()); json.loads((root/'bundles/all-beta.json').read_text())
+          print('patched provider tabs:',n,'sha',sha)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git commit -m 'feat: qidian beta 1.2.1-beta1 qingwu optional login'
+          git push origin main
