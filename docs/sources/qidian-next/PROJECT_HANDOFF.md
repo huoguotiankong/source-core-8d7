@@ -1,3 +1,10 @@
+## 2026-09-11 · Current Beta 1.2.1-beta2 — Xiaoyu current auth
+
+- Stable remains 1.2.0.
+- Supersedes invalid 1.2.1-beta1 email/password attempt.
+- Current Xiaoyu auth is source-author / feedback-group / temporary-password guest token or web registration/login, using X-Sec-Token + X-Android-Id.
+- No-login content fallback remains the verified Stable behavior.
+
 ## 2026-09-11 · Current Beta 1.2.1-beta1 — 情无 optional account session
 
 - Stable remains 1.2.0.

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-11T22:40:00+08:00",
+  "updatedAt": "2026-09-11T23:12:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -82,30 +82,32 @@
       "name": "🌈 起点增强 · Beta",
       "category": "novel",
       "channel": "beta",
-      "version": "1.2.1-beta1",
-      "versionCode": 12011,
-      "updatedAt": "2026-09-11T22:40:00+08:00",
+      "version": "1.2.1-beta2",
+      "versionCode": 12012,
+      "updatedAt": "2026-09-11T23:12:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12011",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12012",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "Beta 1.2.1-beta1：情无恢复可选账号登录；未登录继续使用已验证的免费正文链。",
+      "summary": "Beta 1.2.1-beta2：按最新“小雨的世界”附件重接情无用户系统；游客 Token/网页登录均使用当前接口，免登录正文保持 Stable 1.2.0 基线。",
       "tags": [
         "起点",
         "测试版",
         "限免源",
         "情无",
-        "账号登录",
+        "小雨用户系统",
+        "游客Token",
+        "网页登录",
         "免登录回退",
-        "小雨来源",
         "X",
         "评论页"
       ],
       "changelog": [
-        "在账号管理最终 Provider 页恢复“情无”标签，支持登录、检测、网页登录和退出",
-        "情无账号接口切换到当前小雨后端 full.hnxianxin.cn；清除旧 103.236.85.8 默认地址依赖",
-        "登录成功后 limited_qw 可选携带 Cookie / X-Content-Token；未登录时请求头与 Beta41 保持一致",
-        "不把登录设为正文前置条件，Beta41 已真机确认的免费 catalog/content 链继续作为默认回退",
-        "Stable 1.2.0、评论、角色卡、书友圈、其它 Provider 均不修改"
+        "废弃 Beta1 错误的邮箱/密码情无登录，不再调用旧 auth.php?action=login / Cookie / X-Content-Token 体系",
+        "情无游客授权改为“源作者 + 官方反馈群 + 临时口令 + AndroidId”，POST user_api.php?action=guest",
+        "普通账号改为 auth.php?mode=legado&android_id=... 网页注册/登录，回写当前 X-Sec-Token",
+        "用户状态/次数通过 user_api.php?action=me + X-Sec-Token + X-Android-Id 获取",
+        "limited_qw 仅在 Token 存在时附加当前认证头；未登录正文请求保持 Stable 1.2.0 已真机确认免费链",
+        "Stable 1.2.0、评论、角色卡、书友圈、其它 Provider 全部冻结"
       ],
       "sha256": "308e995470f9a8dcc12522e041747cb8bcfb122f91f7002f469d8558308bf5b9"
     },

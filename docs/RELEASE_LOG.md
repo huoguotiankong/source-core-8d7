@@ -1,3 +1,11 @@
+## 2026-09-11 · 起点增强 1.2.1-beta2 — 情无当前“小雨”用户系统
+
+- Stable 1.2.0 保持不变；本版从已确认 Stable 基线重新构建，废弃错误 Beta1。
+- 严格对齐最新附件：游客授权字段为“源作者 / 官方反馈群 / 临时口令”，接口为 `user_api.php?action=guest`，并绑定 AndroidId。
+- 普通账号通过 `auth.php?mode=legado&android_id=...` 网页注册/登录，Token 体系为 `X-Sec-Token + X-Android-Id`；不再使用旧邮箱密码/Cookie/X-Content-Token。
+- 情无正文只有在当前 Token 存在时才附加新认证头；未登录继续保持 Stable 1.2.0 已真机确认的免费正文链。
+- 其它域冻结，等待真机验证。
+
 ## 2026-09-11 · 起点增强 1.2.1-beta1 — 情无可选账号登录
 
 - Stable 1.2.0 保持不变；本轮只进入 Beta。
