@@ -1,0 +1,134 @@
+name: promote-qidian-next-beta41-stable-120
+on:
+  push:
+    paths: ['.staging/promote-qidian-next-beta41-stable-120.trigger']
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Promote Beta41 to Stable 1.2.0
+        run: |
+          python3 - <<'PY'
+          import json, hashlib, copy
+          from pathlib import Path
+
+          BETA=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          STABLE=Path('sources/novel/qidian-next/qidian-next.json')
+          beta_arr=json.loads(BETA.read_text())
+          beta=beta_arr[0] if isinstance(beta_arr,list) else beta_arr
+          old_stable_arr=json.loads(STABLE.read_text())
+          old_stable=old_stable_arr[0] if isinstance(old_stable_arr,list) else old_stable_arr
+          assert beta.get('bookSourceUrl')==old_stable.get('bookSourceUrl'), 'Stable/Beta identity mismatch'
+          assert 'beta41' in str(beta.get('bookSourceComment','')).lower(), 'Beta41 baseline not found'
+
+          stable=copy.deepcopy(beta)
+          stable['bookSourceName']='🌈 起点增强'
+          stable['bookSourceComment']='v1.2.0 Stable：由 1.1.0-beta41 真机确认基线晋升正式版。保留新版情无免登录正文链、X 限免源、评论页紧凑布局/点赞元信息行、版权信息首发标签、角色卡性能回退及此前已验证功能。'
+          stable_arr=[stable] if isinstance(beta_arr,list) else stable
+          STABLE.write_text(json.dumps(stable_arr,ensure_ascii=False,indent=2))
+
+          VERSION='1.2.0'; VC=12000; DATE='2026-09-11'; TS='2026-09-11T11:40:00+08:00'
+          summary='正式版 1.2.0：由 Beta41 真机确认基线晋升；新情无免登录正文、X 限免、评论页与版权/角色卡优化正式上线。'
+          tags=['起点','正式版','限免源','情无免登录','X','评论页','段评','书友圈','角色卡','版权信息']
+          changes=[
+            '由 1.1.0-beta41 真机确认基线原样晋升 Stable，不新增业务逻辑',
+            '情无 Provider 切换为“小雨的世界”免费正文链：免登录，目录缓存隔离，并按附件原生 ajax 请求链读取正文',
+            '新增 X 限免 Provider；保留神魔/晴天/同人等现有限免线路和自动路由',
+            '评论页点赞固定到时间/IP元信息行，压缩无效占位，提高同屏文字与楼中楼信息密度',
+            '版权信息日期标签由“上架”修正为“首发”；角色卡保留已验证的标签切换与性能回退方案'
+          ]
+          raw=f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v={VC}'
+          backup=f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v={VC}'
+          imp='legado://import/importonline?src='+raw
+          detail='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json'
+          sha=hashlib.sha256(STABLE.read_bytes()).hexdigest()
+
+          def stable_entry(base=None, itype=False):
+              e=dict(base or {})
+              e.update({
+                'id':'qidian-next','name':'🌈 起点增强','summary':summary,'icon':e.get('icon',''),
+                'channel':'stable','version':VERSION,'updatedAt':DATE,'tags':tags,'changelog':changes,
+                'sourceUrl':raw,'backupUrl':backup,'importUrl':imp,'detailUrl':detail,'versionCode':VC
+              })
+              if itype:e['type']='novel'
+              return e
+
+          # manifest stable entry
+          mp=Path('manifest.json'); m=json.loads(mp.read_text()); m['updatedAt']=TS
+          found=False
+          for i,e in enumerate(m.get('sources',[])):
+              if e.get('id')=='qidian-next':
+                  ne=dict(e); ne.update({
+                    'name':'🌈 起点增强','category':'novel','channel':'stable','version':VERSION,'versionCode':VC,
+                    'updatedAt':TS,'sourcePath':'sources/novel/qidian-next/qidian-next.json','sourceUrl':raw,
+                    'bookSourceUrl':stable.get('bookSourceUrl'),'summary':summary,'tags':tags,'changelog':changes,'sha256':sha
+                  }); m['sources'][i]=ne; found=True; break
+          assert found, 'manifest stable qidian-next entry missing'
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2))
+
+          # stable channel
+          sp=Path('subscription/stable.json'); sj=json.loads(sp.read_text()); sj['updatedAt']=TS; sj['generatedAt']=TS
+          for i,e in enumerate(sj.get('items',[])):
+              if e.get('id')=='qidian-next': sj['items'][i]=stable_entry(e); break
+          else: sj.setdefault('items',[]).append(stable_entry())
+          sp.write_text(json.dumps(sj,ensure_ascii=False,indent=2))
+
+          # novel category: current active qidian-next should now be Stable, while Beta remains available in beta channel
+          np=Path('subscription/novel.json'); nj=json.loads(np.read_text()); nj['updatedAt']=TS; nj['generatedAt']=TS
+          replaced=False
+          for i,e in enumerate(nj.get('items',[])):
+              if e.get('id') in ('qidian-next','qidian-next-beta'):
+                  nj['items'][i]=stable_entry(e,True); replaced=True; break
+          if not replaced:nj.setdefault('items',[]).append(stable_entry(itype=True))
+          # remove duplicate qidian-next/qidian-next-beta entries after replacement
+          seen=False; items=[]
+          for e in nj.get('items',[]):
+              if e.get('id') in ('qidian-next','qidian-next-beta'):
+                  if seen: continue
+                  seen=True; e['id']='qidian-next'
+              items.append(e)
+          nj['items']=items
+          np.write_text(json.dumps(nj,ensure_ascii=False,indent=2))
+
+          # stable RSS detail
+          Path('rss/data/details/stable/qidian-next.json').write_text(json.dumps({
+            'kind':'source','title':'🌈 起点增强','summary':summary,
+            'badges':['Stable',VERSION,'Beta41 已真机确认'],
+            'sections':[
+              {'title':'正式版更新','text':'由 1.1.0-beta41 真机确认基线晋升，不额外改变正文、评论或 Provider 行为。'},
+              {'title':'正文 Provider','text':'情无现为免登录免费正文链，并保留 X、神魔、晴天、同人等线路及自动路由。'},
+              {'title':'评论与界面','text':'保留评论页紧凑布局、点赞元信息行、角色卡切换/性能优化和版权信息“首发”语义修正。'},
+              {'title':'版本状态','text':'Stable / 正式通道。'}
+            ],'sourceUrl':raw,'backupUrl':backup,'importUrl':imp
+          },ensure_ascii=False,indent=2))
+
+          # stable bundle
+          bp=Path('bundles/all-stable.json'); ba=json.loads(bp.read_text()); hit=False
+          if not isinstance(ba,list): ba=[]
+          for i,o in enumerate(ba):
+              if isinstance(o,dict) and (o.get('bookSourceUrl')==stable.get('bookSourceUrl') or o.get('bookSourceName')=='🌈 起点增强'):
+                  ba[i]=stable; hit=True; break
+          if not hit: ba.append(stable)
+          bp.write_text(json.dumps(ba,ensure_ascii=False,indent=2))
+
+          # release log / handoff
+          rp=Path('docs/RELEASE_LOG.md'); old=rp.read_text(); rp.write_text(
+            '## 2026-09-11 · 起点增强 1.2.0 Stable — Beta41 真机确认晋升\n\n'
+            '- 用户明确要求上正式版；目标仓库为 `source-core-8d7`，Stable 由已真机确认可用的 `1.1.0-beta41` 原样晋升。\n'
+            '- 情无 Provider 使用“小雨的世界”免登录免费正文链；Beta41 已真机确认正文恢复正常。\n'
+            '- 同步保留 X 限免、评论页紧凑布局/点赞元信息行、版权信息“首发”标签、角色卡性能回退等 Beta41 基线能力。\n'
+            '- Stable source / Manifest / Stable Subscription / Novel 分类 / Stable Bundle / RSS Detail 已同步。\n\n'+old)
+          hp=Path('docs/sources/qidian-next/PROJECT_HANDOFF.md'); h=hp.read_text(); hp.write_text(
+            '## 2026-09-11 · Current Stable 1.2.0 — promoted from verified Beta41\n\n'
+            '- User explicitly requested Stable promotion after real-device confirmation that the new Qingwu content path works.\n'
+            '- Stable is a logic-preserving copy of Beta41 with Stable metadata/name only.\n'
+            '- Beta channel remains available separately for future development.\n\n'+h)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next.json manifest.json subscription/stable.json subscription/novel.json bundles/all-stable.json rss/data/details/stable/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git commit -m 'release: promote qidian-next beta41 to stable 1.2.0'
+          git push origin main
