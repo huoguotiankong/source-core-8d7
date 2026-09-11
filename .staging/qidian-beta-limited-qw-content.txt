@@ -1,0 +1,23 @@
+ows[k]&&rows[k].time)return rows[k];}if(d===0&&idx<rows.length&&rows[idx]&&rows[idx].time)return rows[idx];}}
+              return null;
+          }
+          function qfQwPickContentV39(obj,raw){
+              if(obj){if(obj.error)throw new Error(String(obj.error));if(obj.detail)throw new Error(String(obj.detail));if(obj.code!==undefined&&Number(obj.code)!==0&&obj.msg)throw new Error(String(obj.msg));if(obj.content!==undefined)return String(obj.content||"");if(obj.Content!==undefined)return String(obj.Content||"");if(obj.Data){if(obj.Data.Content!==undefined)return String(obj.Data.Content||"");if(obj.Data.content!==undefined)return String(obj.Data.content||"");}}
+              return String(raw||"");
+          }
+          function qfQwStripFooterV39(text){
+              var s=String(text||"").replace(/\\r\\n/g,"\n").replace(/\\n/g,"\n").replace(/\r\n?/g,"\n");
+              s=s.replace(/\s*所有接口算法来自于\s*(?:\[?https?:\/\/m\.tb\.cn\/h\.8pvBZxh\?tk=R4fMTSqAOiS\]?(?:\([^\n)]*\))?)?\s*/gi,"\n");
+              s=s.replace(/\s*免费看七天请求无限制[，,]?\s*喜欢就来闲鱼支持一下吧\s*/g,"\n");
+              return s.replace(/\n[ \t]+/g,"\n").replace(/\n{3,}/g,"\n\n").replace(/^\s+|\s+$/g,"");
+          }
+          function qfQwContentV44(meta){
+              meta=meta||{};var bid=String(meta.bookId||""),cid=String(meta.chapterId||""),isPaid=String(meta.vip||"0")==="1";
+              if(!bid){qfLimSetErrV30.call(this,"情无","章节参数错误：缺少 BookId");return null;}
+              var rows=qfQwCatalogRowsV39.call(this,bid),it=qfQwResolveChapterV39.call(this,meta,rows);
+              if(!it||!String(it.time||"")){var valid=0,sample=[];for(var qi=0;qi<rows.length;qi++){if(String(rows[qi]&&rows[qi].time||""))valid++;if(sample.length<3&&rows[qi])sample.push(String(rows[qi].title||"")+"#"+String(rows[qi].chapterId||"")+"@"+String(rows[qi].time||""));}qfLimSetErrV30.call(this,"情无","新来源未匹配当前章节："+String(meta.title||cid||"未知章节")+"｜目录"+rows.length+"条/有效"+valid+"条｜样例："+sample.join("；"));return null;}
+              var v=isPaid?1:(Number(it.vip||0)?1:0),api=qfQwBaseV44.call(this)+"/content.php?bookId="+encodeURIComponent(bid)+"&chapterId="+encodeURIComponent(String(it.chapterId||cid))+"&t="+encodeURIComponent(String(it.time))+"&epub="+(Number(it.epub||0)?1:0)+"&v="+v;
+              var j=qfQwJavaV39(this);if(!j){qfLimSetErrV30.call(this,"情无","java context unavailable");return null;}
+              try{var _tk="",_aid="";try{var _src=qfQwSrcV39(this);if(_src){_tk=String(_src.get("qf_xy_user_token_v1212")||"");_aid=String(_src.get("qf_xy_android_id_v1212")||"");}}catch(_ae){}var _req=String(api);if(_tk&&_aid)_req+=","+JSON.stringify({headers:{"X-Sec-Token":_tk,"X-Android-Id":_aid,"Accept":"application/json"}});var raw=String(j.ajax(_req)||""),obj=null;try{obj=JSON.parse(raw);}catch(_j){}var txt=qfQwStripFooterV39(qfQwPickContentV39(obj,raw));if(!txt){qfLimSetErrV30.call(this,"情无","新来源正文为空");return null;}qfLimSetErrV30.call(this,"情无","");return txt;}catch(e){qfLimSetErrV30.call(this,"情无","新来源正文请求失败："+String(e));return null;}
+          }
+          
