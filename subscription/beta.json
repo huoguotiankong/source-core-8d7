@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-09-12T00:28:00+08:00",
+  "updatedAt": "2026-09-12T00:40:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -38,11 +38,11 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "Beta 1.2.1-beta2：按最新“小雨的世界”附件重接情无用户系统；游客 Token/网页登录均使用当前接口，免登录正文保持 Stable 1.2.0 基线。",
+      "summary": "情无/小雨新版用户系统 Beta3：正文自动游客 Token；账号页支持游客授权、网页登录、次数查询。",
       "icon": "",
       "channel": "beta",
-      "version": "1.2.1-beta2",
-      "updatedAt": "2026-09-11",
+      "version": "1.2.1-beta3",
+      "updatedAt": "2026-09-12",
       "tags": [
         "起点",
         "测试版",
@@ -63,11 +63,12 @@
         "limited_qw 仅在 Token 存在时附加当前认证头；未登录正文请求保持 Stable 1.2.0 已真机确认免费链",
         "Stable 1.2.0、评论、角色卡、书友圈、其它 Provider 全部冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12012",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12013",
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12012",
       "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12012",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
-      "versionCode": 12012
+      "versionCode": 12013,
+      "sha256": "3fadfe57c53ad667b286524072d8fa4ce1dc172f6cf35215d83d2392eb5479b3"
     },
     {
       "id": "manwa",
