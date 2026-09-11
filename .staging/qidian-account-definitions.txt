@@ -1,0 +1,200 @@
+===== DEF 1 @ 40486 =====
+function qfMultiAccountsV423(){
+    var ik=['神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址','🎬X佬密钥'];
+    var inner=
+      '<div class="card"><div class="lab"><b style="display:none">🌙 情无</b><small>填写后选择下方动作，再点右上角 ✓。</small></div>'+
+      qfMInput423('邮箱','email','text','','QQ邮箱')+
+      qfMInput423('密码','password','password','','情无密码')+
+      qfMInput423('接口地址','情无接口地址','text','http://103.236.85.8:7878/qd','可自定义')+
+      '<div class="grid"><button class="act primary" onclick="act(\'qw-login\')">登录</button><button class="act" onclick="act(\'qw-check\')">检测</button><button class="act" onclick="act(\'qw-web\')">网页登录</button><button class="act" onclick="act(\'qw-logout\')">退出</button></div></div>'+
+      '<div class="card"><div class="lab"><b>⚔️ 神魔</b></div>'+
+      qfMInput423('账号或邮箱','神魔账号或邮箱','text','','')+
+      qfMInput423('密码','神魔密码','password','','')+
+      '<div class="grid"><button class="act primary" onclick="act(\'sm-login\')">登录</button><button class="act" onclick="act(\'sm-check\')">检测</button><button class="act" onclick="act(\'sm-backend\')">后台</button><button class="act" onclick="act(\'sm-logout\')">退出</button></div></div>'+
+      '<div class="card"><div class="lab"><b>☀️ 晴天</b></div>'+
+      qfMInput423('密钥','晴天密钥','password','','')+
+      qfMInput423('口令','晴天口令','password','','')+
+      qfMInput423('接口地址','晴天接口地址','text','https://sb.shazi.tk','')+
+      '<div class="grid"><button class="act primary" onclick="act(\'qt-login\')">登录</button><button class="act" onclick="act(\'qt-check\')">检测</button><button class="act" onclick="act(\'qt-backend\')">后台</button><button class="act" onclick="act(\'qt-logout\')">退出</button></div></div>'+
+      '<div class="card"><div class="lab"><b>❎ X</b><small>仅用于 X-QD 限免正文；可网页登录自动获取 Token，也可手工填写。</small></div>'+qfMInput423('X 密钥','🎬X佬密钥','password','','X-QD Token')+'<div class="grid"><button class="act primary" onclick="act(\'x-login\')">网页登录</button><button class="act" onclick="act(\'x-check\')">检测</button><button class="act" onclick="act(\'x-clear\')">清除</button></div></div>'+
+      '<div class="card"><div class="lab"><b>🍋 同人</b></div><div class="grid"><button class="act primary" onclick="act(\'tr-check\')">检测共享Token</button><button class="act" onclick="act(\'tr-console\')">打开后台</button></div></div>';
+    for(var i=0;i<ik.length;i++)inner+=qfMSpan423('v_'+i,qfMGet423(ik[i],""));
+    inner+=qfMSpan423('action',"");
+    var js=qfMScript423([],[],ik)+
+      'function act(v){sync();document.getElementById("action").textContent=v;document.title="已选择："+v+"；请点右上角✓";}';
+    var body=qfMOpen423('🔐 Provider 账号',inner,js);
+    if(!body)return;
+    qfMSave423(body,ik);
+    var a=qfMRead423(body,'action');
+    try{
+        if(a==='qw-login')qfQwNativeLoginV52();
+        else if(a==='qw-check')qfQwNativeCheckV317();
+        else if(a==='qw-web')qfQwNativeWebLoginV52();
+        else if(a==='qw-logout')qfQwNativeLogoutV317();
+        else if(a==='sm-login')qfSmLoginV30();
+        else if(a==='sm-check')qfSmCheckV30();
+        else if(a==='sm-backend')qfSmOpenBackendV30();
+        else if(a==='sm-logout')qfSmLogoutV30();
+        else if(a==='qt-login')qfQtLoginV328();
+        else if(a==='qt-check')qfQtCheckV328();
+        else if(a==='qt-backend')qfQtOpenBackendV328();
+        else if(a==='qt-logout')qfQtLogoutV328();
+        else if(a==='x-login')qfXLoginV32();
+        else if(a==='x-check')qfXCheckV32();
+        else if(a==='x-clear')qfXClearV32();
+        else if(a==='tr-check')qfTrCheckV102();
+        else if(a==='tr-console')qfTrOpenConsoleV102();
+    }catch(e){try{java.longToast("账号操作失败："+String(e));}catch(_e){}}
+}
+
+===== DEF 2 @ 48866 =====
+qfMultiAccountsV423=function(){
+    try{source.remove('qf_next_action_v011');}catch(_e){}
+    var ik=['神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址'];
+    var inner=
+      '<div class="card"><div class="lab"><b style="display:none">🌙 情无</b><small>填写后点动作按钮；看到提示后点右上角 ✓ 返回执行。</small></div>'+qfMInput423('邮箱','email','text','','QQ邮箱')+qfMInput423('密码','password','password','','情无密码')+qfMInput423('接口地址','情无接口地址','text','http://103.236.85.8:7878/qd','可自定义')+'<div class="grid"><button class="act primary" onclick="fire(\'qw-login\')">登录</button><button class="act" onclick="fire(\'qw-check\')">检测</button><button class="act" onclick="fire(\'qw-web\')">网页登录</button><button class="act" onclick="fire(\'qw-logout\')">退出</button></div></div>'+ 
+      '<div class="card"><div class="lab"><b>⚔️ 神魔</b></div>'+qfMInput423('账号或邮箱','神魔账号或邮箱','text','','')+qfMInput423('密码','神魔密码','password','','')+'<div class="grid"><button class="act primary" onclick="fire(\'sm-login\')">登录</button><button class="act" onclick="fire(\'sm-check\')">检测</button><button class="act" onclick="fire(\'sm-backend\')">后台</button><button class="act" onclick="fire(\'sm-logout\')">退出</button></div></div>'+ 
+      '<div class="card"><div class="lab"><b>☀️ 晴天</b></div>'+qfMInput423('密钥','晴天密钥','password','','')+qfMInput423('口令','晴天口令','password','','')+qfMInput423('接口地址','晴天接口地址','text','https://sb.shazi.tk','')+'<div class="grid"><button class="act primary" onclick="fire(\'qt-login\')">登录</button><button class="act" onclick="fire(\'qt-check\')">检测</button><button class="act" onclick="fire(\'qt-backend\')">后台</button><button class="act" onclick="fire(\'qt-logout\')">退出</button></div></div>'+ 
+      '<div class="card"><div class="lab"><b>🍋 同人</b></div><div class="grid"><button class="act primary" onclick="fire(\'tr-check\')">检测共享Token</button><button class="act" onclick="fire(\'tr-console\')">打开后台</button></div></div>'+ 
+      '<div class="card"><button class="act primary" style="width:100%" onclick="fire(\'save-only\')">💾 只保存账号设置</button><div class="tip">动作会先把当前输入写入阅读登录信息，再在返回后执行。</div></div>';
+    var js=qfMScript423([],[],ik)+'function fire(a){sync();var q=[],ks='+JSON.stringify(ik)+';for(var i=0;i<ks.length;i++){var el=document.getElementById(fid(ks[i]));if(el)q.push(encodeURIComponent(ks[i])+"="+encodeURIComponent(el.value||""));}document.title="已选择："+a+"；请点右上角✓";location.href="qfnext://account?action="+encodeURIComponent(a)+"&"+q.join("&");}';
+    qfMOpen423('🔐 Provider 账号',inner,js);
+    var a=qfNextTakeActionV011();if(a)qfNextAccountRunV011(a);
+}
+
+===== DEF 3 @ 52364 =====
+qfMultiAccountsV423=function(){
+    var sk=['账号操作'];
+    var ik=['神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址'];
+    var actionOpts=['不执行','情无·登录','情无·检测','情无·网页登录','情无·退出','神魔·登录','神魔·检测','神魔·后台','神魔·退出','晴天·登录','晴天·检测','晴天·后台','晴天·退出','同人·检测Token','同人·打开后台'];
+    var inner=
+      '<div class="card">'+
+      qfMSelect423('执行动作','账号操作',actionOpts,'不执行','修改账号后选择一个动作，再点阅读右上角 ✓ 返回；返回后立即执行。')+
+      '<div class="tip">兼容当前阅读版本：不再使用网页按钮触发书源 JS，也不会跳转其它应用。</div></div>'+
+      '<div class="card"><div class="lab"><b style="display:none">🌙 情无</b></div>'+qfMInput423('邮箱','email','text','','QQ邮箱')+qfMInput423('密码','password','password','','情无密码')+qfMInput423('接口地址','情无接口地址','text','http://103.236.85.8:7878/qd','可自定义')+'</div>'+
+      '<div class="card"><div class="lab"><b>⚔️ 神魔</b></div>'+qfMInput423('账号或邮箱','神魔账号或邮箱','text','','')+qfMInput423('密码','神魔密码','password','','')+'</div>'+
+      '<div class="card"><div class="lab"><b>☀️ 晴天</b></div>'+qfMInput423('密钥','晴天密钥','password','','')+qfMInput423('口令','晴天口令','password','','')+qfMInput423('接口地址','晴天接口地址','text','https://sb.shazi.tk','')+'</div>'+
+      '<div class="card"><div class="lab"><b>🍋 同人</b><small>共享 Token 仍在“设置源变量”中维护。</small></div></div>';
+    var all=sk.concat(ik);
+    for(var i=0;i<all.length;i++)inner+=qfMSpan423('v_'+i,qfMGet423(all[i],i===0?'不执行':''));
+    var body=qfMOpen423('🔐 Provider 账号',inner,qfMScript423(sk,[],ik));
+    if(!body)return;
+    qfMSave423(body,all);
+    var a=qfMRead423(body,'v_0');
+    qfMSet423('账号操作','不执行',true);
+    try{
+        if(a==='情无·登录')qfQwNativeLoginV52();
+        else if(a==='情无·检测')qfQwNativeCheckV317();
+        else if(a==='情无·网页登录')qfQwNativeWebLoginV52();
+        else if(a==='情无·退出')qfQwNativeLogoutV317();
+        else if(a==='神魔·登录')qfSmLoginV30();
+        else if(a==='神魔·检测')qfSmCheckV30();
+        else if(a==='神魔·后台')qfSmOpenBackendV30();
+        else if(a==='神魔·退出')qfSmLogoutV30();
+        else if(a==='晴天·登录')qfQtLoginV328();
+        else if(a==='晴天·检测')qfQtCheckV328();
+        else if(a==='晴天·后台')qfQtOpenBackendV328();
+        else if(a==='晴天·退出')qfQtLogoutV328();
+        else if(a==='同人·检测Token')qfTrCheckV102();
+        else if(a==='同人·打开后台')qfTrOpenConsoleV102();
+        else try{java.toast('账号设置已保存');}catch(_t){}
+    }catch(e){try{java.longToast('账号操作失败：'+String(e));}catch(_e){}}
+}
+
+===== DEF 4 @ 57085 =====
+qfMultiAccountsV423=function(){
+    var sk=['账号管理Provider','账号管理动作'];
+    var ik=['神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址'];
+    var provider=qfMGet423('账号管理Provider','神魔');if(provider==='情无')provider='神魔';
+    var inner='<div class="card">'+
+      qfMSelect423('Provider','账号管理Provider',['神魔','晴天','同人'],provider,'一次只管理一个 Provider，页面会自动切换对应账号字段。')+
+      '</div>'+
+      '<div id="pv_qw" class="card"><div class="lab"><b style="display:none">🌙 情无</b><small>邮箱 / 密码 / 接口地址</small></div>'+qfMInput423('邮箱','email','text','','QQ邮箱')+qfMInput423('密码','password','password','','情无密码')+qfMInput423('接口地址','情无接口地址','text','http://103.236.85.8:7878/qd','可自定义')+'</div>'+
+      '<div id="pv_sm" class="card"><div class="lab"><b>⚔️ 神魔</b><small>账号或邮箱 / 密码</small></div>'+qfMInput423('账号或邮箱','神魔账号或邮箱','text','','')+qfMInput423('密码','神魔密码','password','','')+'</div>'+
+      '<div id="pv_qt" class="card"><div class="lab"><b>☀️ 晴天</b><small>密钥 / 口令 / 接口地址</small></div>'+qfMInput423('密钥','晴天密钥','password','','')+qfMInput423('口令','晴天口令','password','','')+qfMInput423('接口地址','晴天接口地址','text','https://sb.shazi.tk','')+'</div>'+
+      '<div id="pv_tr" class="card"><div class="lab"><b>🍋 同人</b><small>共享 Token 由书源内部维护，无需填写账号。</small></div><div class="tip">可执行：检测、后台。</div></div>'+
+      '<div class="card">'+qfMSelect423('执行动作','账号管理动作',['不执行','登录','检测','网页登录','后台','退出'],'不执行','选好动作后点击阅读右上角 ✓；返回后立即执行。单纯保存账号时保持“不执行”。')+'</div>';
+    var all=sk.concat(ik);
+    for(var i=0;i<all.length;i++)inner+=qfMSpan423('v_'+i,qfMGet423(all[i],all[i]==='账号管理Provider'?provider:(all[i]==='账号管理动作'?'不执行':'')));
+    var pid=qfMIdV011('账号管理Provider');
+    var js=qfMScript423(sk,[],ik)+
+      'function showPv(){var p=document.getElementById("'+pid+'").value;var map={"情无":"pv_qw","神魔":"pv_sm","晴天":"pv_qt","同人":"pv_tr"};["pv_qw","pv_sm","pv_qt","pv_tr"].forEach(function(x){document.getElementById(x).style.display=(x===map[p]?"block":"none");});sync();}document.getElementById("'+pid+'").addEventListener("change",showPv);showPv();';
+    var body=qfMOpen423('🔐 Provider 账号',inner,js);
+    if(!body)return;
+    qfMSave423(body,all);
+    var p=qfMRead423(body,'v_0')||provider;
+    var a=qfMRead423(body,'v_1')||'不执行';
+    qfMSet423('账号管理Provider',p,true);
+    qfMSet423('账号管理动作','不执行',true);
+    if(a!=='不执行')qfNextAccountExecV013(p,a);
+}
+
+===== DEF 5 @ 61652 =====
+qfMultiAccountsV423=function(){
+    var sk=['账号管理Provider','账号管理动作'];
+    var ik=['神魔账号或邮箱','神魔密码','晴天密钥','晴天口令','晴天接口地址'];
+    var provider=qfMGet423('账号管理Provider','神魔');if(provider==='情无')provider='神魔';
+    if(['神魔','晴天','同人','X'].indexOf(provider)<0)provider='情无';
+    var actions=qfNextActionsV014(provider);
+    var savedAction=qfMGet423('账号管理动作','不执行');
+    if(actions.indexOf(savedAction)<0)savedAction='不执行';
+    var inner='<div class="card">'+
+      qfMSelect423('Provider','账号管理Provider',['神魔','晴天','同人'],provider,'一次只管理一个 Provider；切换后只显示对应账号字段。')+
+      qfMSelect423('执行动作','账号管理动作',actions,savedAction,'选好动作后点右上角 ✓ 返回执行；只保存账号时保持“不执行”。')+
+      '</div>'+
+      '<div class="card" id="qf_card_qw"><div class="lab"><b style="display:none">🌙 情无</b><small>邮箱 / 密码 / 接口地址</small></div>'+qfMInput423('邮箱','email','text','','QQ邮箱')+qfMInput423('密码','password','password','','情无密码')+qfMInput423('接口地址','情无接口地址','text','http://103.236.85.8:7878/qd','可自定义')+'</div>'+
+      '<div class="card" id="qf_card_sm"><div class="lab"><b>⚔️ 神魔</b><small>账号或邮箱 / 密码</small></div>'+qfMInput423('账号或邮箱','神魔账号或邮箱','text','','')+qfMInput423('密码','神魔密码','password','','')+'</div>'+
+      '<div class="card" id="qf_card_qt"><div class="lab"><b>☀️ 晴天</b><small>密钥 / 口令 / 接口地址</small></div>'+qfMInput423('密钥','晴天密钥','password','','')+qfMInput423('口令','晴天口令','password','','')+qfMInput423('接口地址','晴天接口地址','text','https://sb.shazi.tk','')+'</div>'+
+      '<div class="card" id="qf_card_tr"><div class="lab"><b>🍋 同人</b><small>使用共享 Token；无需填写账号字段。</small></div></div>';
+    var all=sk.concat(ik);
+    for(var i=0;i<all.length;i++)inner+=qfMSpan423('v_'+i,qfMGet423(all[i],all[i]==='账号管理Provider'?provider:(all[i]==='账号管理动作'?'不执行':'')));
+    var pId=qfMIdV011('账号管理Provider'),aId=qfMIdV011('账号管理动作');
+    var js=qfMScript423(sk,[],ik)+
+      'var __pid='+JSON.stringify(pId)+',__aid='+JSON.stringify(aId)+';'+
+      'var __am={"情无":["不执行","登录","检测","网页登录","退出"],"神魔":["不执行","登录","检测","后台","退出"],"晴天":["不执行","登录","检测","后台","退出"],"同人":["不执行","检测","后台"]};'+
+      'function __refresh(reset){var p=document.getElementById(__pid).value||"情无";var ids={"情无":"qf_card_qw","神魔":"qf_card_sm","晴天":"qf_card_qt","同人":"qf_card_tr"};for(var k in ids){var c=document.getElementById(ids[k]);if(c)c.style.display=(k===p?"block":"none");}var a=document.getElementById(__aid),old=a.value,arr=__am[p]||["不执行"];a.innerHTML="";for(var i=0;i<arr.length;i++){var o=document.createElement("option");o.value=arr[i];o.textContent=arr[i];a.appendChild(o);}a.value=(!reset&&arr.indexOf(old)>=0)?old:"不执行";sync();}'+
+      'document.getElementById(__pid).addEventListener("change",function(){__refresh(true);});__refresh(false);';
+    var body=qfMOpen423('🔐 Provider 账号',inner,js);
+    if(!body)return;
+    qfMSave423(body,all);
+    provider=qfMRead423(body,'v_0')||'情无';
+    var action=qfMRead423(body,'v_1')||'不执行';
+    qfMSet423('账号管理Provider',provider,true);
+    qfMSet423('账号管理动作','不执行',true);
+    if(action!=='不执行')qfNextAccountExecV013(provider,action);
+}
+
+===== DEF 6 @ 74867 =====
+qfMultiAccountsV423=function(){
+    var provider=qfMGet423('账号管理Provider','神魔');if(provider==='情无')provider='神魔';
+    if(['神魔','晴天','同人'].indexOf(provider)<0)provider='情无';
+    var qwe=qfMGet423('email',''),qwp=qfMGet423('password',''),qwb=qfMGet423('情无接口地址','http://103.236.85.8:7878/qd');
+    var sma=qfMGet423('神魔账号或邮箱',''),smp=qfMGet423('神魔密码','');
+    var qtk=qfMGet423('晴天密钥',''),qtp=qfMGet423('晴天口令',''),qtb=qfMGet423('晴天接口地址','https://sb.shazi.tk');
+    var xt=qfMGet423('🎬X佬密钥','');
+    var inner=''+
+      '<div class="section"><div class="sectionHead"><div><h3>Provider</h3><p>切换后只展示当前 Provider 的账号字段和可用动作。</p></div><span class="miniBadge" id="providerBadge">'+qfUxEscV015(provider)+'</span></div><div class="tabs" id="providerTabs"></div></div>'+
+      '<div class="section providerCard" data-p="情无"><div class="sectionHead"><div><h3>🌙 情无账号</h3><p>邮箱、密码和接口地址。</p></div></div>'+qfUxFieldV015('qw_email','邮箱',qwe,'text','QQ 邮箱')+qfUxFieldV015('qw_password','密码',qwp,'password','情无密码')+qfUxFieldV015('qw_base','接口地址',qwb,'text','可自定义')+'</div>'+
+      '<div class="section providerCard" data-p="神魔"><div class="sectionHead"><div><h3>⚔️ 神魔账号</h3><p>账号/邮箱和密码；支持后台管理。</p></div></div>'+qfUxFieldV015('sm_account','账号或邮箱',sma,'text','神魔后台账号')+qfUxFieldV015('sm_password','密码',smp,'password','神魔密码')+'</div>'+
+      '<div class="section providerCard" data-p="晴天"><div class="sectionHead"><div><h3>☀️ 晴天账号</h3><p>密钥、口令和接口地址。</p></div></div>'+qfUxFieldV015('qt_key','密钥',qtk,'password','')+qfUxFieldV015('qt_pass','口令',qtp,'password','')+qfUxFieldV015('qt_base','接口地址',qtb,'text','默认 https://sb.shazi.tk')+'</div>'+
+      '<div class="section providerCard" data-p="同人"><div class="sectionHead"><div><h3>🍋 同人</h3><p>使用共享 Token，无需填写账号字段。</p></div><span class="miniBadge">共享</span></div><div class="state">可直接进行 Token 检测或打开后台。</div></div>'+
+      '<div class="section providerCard" data-p="X"><div class="sectionHead"><div><h3>❎ X-QD</h3><p>独立 Token，仅用于 X 限免正文。</p></div><span class="miniBadge">X</span></div>'+qfUxFieldV015('x_token','X 密钥',xt,'password','可网页登录自动获取，也可手工填写')+'<div class="state">可执行：网页登录、检测、清除。</div></div>'+
+      '<div class="section"><div class="sectionHead"><div><h3>执行动作</h3><p>点击只是选择待执行动作；真正执行发生在点右上角 ✓ 返回后。</p></div></div><div class="actionGrid" id="actionGrid"></div><div class="state">当前待执行：<b id="actionText">仅保存</b></div></div>'+
+      qfUxSpanV015('ux_provider',provider)+qfUxSpanV015('ux_action','不执行')+qfUxSpanV015('ux_qwe',qwe)+qfUxSpanV015('ux_qwp',qwp)+qfUxSpanV015('ux_qwb',qwb)+qfUxSpanV015('ux_sma',sma)+qfUxSpanV015('ux_smp',smp)+qfUxSpanV015('ux_qtk',qtk)+qfUxSpanV015('ux_qtp',qtp)+qfUxSpanV015('ux_qtb',qtb)+qfUxSpanV015('ux_xt',xt);
+    var js='var provider='+JSON.stringify(provider)+',action="不执行";'+
+      'var providers=["神魔","晴天","同人","X"],acts={"情无":["不执行","登录","检测","网页登录","退出"],"神魔":["不执行","登录","检测","后台","退出"],"晴天":["不执行","登录","检测","后台","退出"],"同人":["不执行","检测","后台"],"X":["不执行","网页登录","检测","清除"]};'+
+      'function sync(){document.getElementById("ux_provider").textContent=provider;document.getElementById("ux_action").textContent=action;document.getElementById("ux_qwe").textContent=document.getElementById("qw_email").value;document.getElementById("ux_qwp").textContent=document.getElementById("qw_password").value;document.getElementById("ux_qwb").textContent=document.getElementById("qw_base").value;document.getElementById("ux_sma").textContent=document.getElementById("sm_account").value;document.getElementById("ux_smp").textContent=document.getElementById("sm_password").value;document.getElementById("ux_qtk").textContent=document.getElementById("qt_key").value;document.getElementById("ux_qtp").textContent=document.getElementById("qt_pass").value;document.getElementById("ux_qtb").textContent=document.getElementById("qt_base").value;document.getElementById("ux_xt").textContent=document.getElementById("x_token").value;document.getElementById("providerBadge").textContent=provider;document.getElementById("actionText").textContent=action==="不执行"?"仅保存":action;}'+
+      'function renderProviders(){var b=document.getElementById("providerTabs");b.innerHTML="";providers.forEach(function(p){var x=document.createElement("button");x.type="button";x.textContent=p;x.className=p===provider?"on":"";x.onclick=function(){provider=p;action="不执行";renderProviders();renderCards();renderActions();sync();};b.appendChild(x);});}'+
+      'function renderCards(){Array.prototype.forEach.call(document.querySelectorAll(".providerCard"),function(c){c.className=c.getAttribute("data-p")===provider?"section providerCard":"section providerCard hide";});}'+
+      'function renderActions(){var b=document.getElementById("actionGrid"),arr=acts[provider]||["不执行"];b.innerHTML="";arr.forEach(function(a){var x=document.createElement("button");x.type="button";x.textContent=a==="不执行"?"仅保存":a;x.className=(a===action?"on ":"")+(a==="退出"?"danger":"");x.onclick=function(){action=a;renderActions();sync();};b.appendChild(x);});}'+
+      'Array.prototype.forEach.call(document.querySelectorAll("input"),function(x){x.addEventListener("input",sync);});renderProviders();renderCards();renderActions();sync();';
+    var body=qfUxOpenV015('账号管理','🔐','Provider','一次只管理一个 Provider，字段、动作和状态都聚合在同一页。',inner,js);
+    if(!body)return;
+    var map=[['ux_provider','账号管理Provider'],['ux_qwe','email'],['ux_qwp','password'],['ux_qwb','情无接口地址'],['ux_sma','神魔账号或邮箱'],['ux_smp','神魔密码'],['ux_qtk','晴天密钥'],['ux_qtp','晴天口令'],['ux_qtb','晴天接口地址'],['ux_xt','🎬X佬密钥']];
+    qfUxSaveV015(body,map);
+    provider=qfUxReadV015(body,'ux_provider')||provider;
+    var action=qfUxReadV015(body,'ux_action')||'不执行';
+    qfMSet423('账号管理动作','不执行',true);
+    if(action!=='不执行')qfNextAccountExecV013(provider,action);
+}
+
