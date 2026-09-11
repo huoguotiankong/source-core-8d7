@@ -1,0 +1,23 @@
+name: patch-qidian-beta1212-xiaoyu-auth-v2
+on:
+  push:
+    paths:
+      - '.staging/patch-qidian-beta1212-xiaoyu-auth-v2.trigger'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch and publish Beta 1.2.1-beta2
+        run: python3 .github/scripts/patch_qidian_beta1212_xiaoyu_auth.py
+      - name: Commit publication
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git commit -m 'feat(qidian-next): beta 1.2.1-beta2 current Xiaoyu auth'
+          git push origin HEAD:main
