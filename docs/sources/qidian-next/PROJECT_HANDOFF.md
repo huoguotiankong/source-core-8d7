@@ -1,3 +1,9 @@
+## 2026-09-11 · Current Beta 1.1.0-beta41 — 情无 fresh cache / native ajax diagnostics
+
+- Stable remains 1.1.0.
+- QW catalog cache key bumped to v41; catalog/content now mirror attachment java.ajax.
+- Resolver failure now exposes real catalog/effective row counts and samples for device diagnosis.
+
 ## 2026-09-11 · Current Beta 1.1.0-beta40 — 情无 Hex→Base64 章节解码修复
 
 - Stable remains 1.1.0.

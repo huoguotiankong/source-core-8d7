@@ -1,27 +1,27 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta40：修复新情无章节 C 字段 Hex→Base64 解码链；账号管理彻底移除情无。",
+  "summary": "Beta41：新情无清除旧目录缓存并对齐附件原生 ajax 请求；失败时输出真实目录诊断。",
   "badges": [
     "Beta",
-    "1.1.0-beta40",
+    "1.1.0-beta41",
     "情无免登录"
   ],
   "sections": [
     {
       "title": "本版更新",
-      "text": "修复小雨来源章节 C 字段解码顺序：Hex → Base64 → JSON，恢复情无正文映射。"
+      "text": "清除旧情无目录缓存，并将目录/正文请求改为附件原生 java.ajax 链。"
     },
     {
-      "title": "账号管理",
-      "text": "情无为免登录来源，已从最终账号管理 Provider 列表移除；正文限免源仍保留情无。"
+      "title": "失败诊断",
+      "text": "若仍匹配失败，错误页会直接显示目录总数、有效章节数和章节样例。"
     },
     {
       "title": "版本状态",
       "text": "Beta / 测试通道，等待真机确认。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11040",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11040",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11040"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11041",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11041",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11041"
 }
