@@ -1,0 +1,51 @@
+name: diag-qidian-qw-content-lines
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-qw-content-lines.trigger'
+permissions:
+  contents: write
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Locate qingwu content runtime
+        run: |
+          python3 - <<'PY'
+          import json,re,gzip,base64
+          s=json.load(open('sources/novel/qidian-next/qidian-next.json',encoding='utf-8'))[0]
+          sources=[]
+          for k,v in s.items():
+            if isinstance(v,str): sources.append(('top:'+k,v))
+            elif isinstance(v,dict):
+              for k2,v2 in v.items():
+                if isinstance(v2,str): sources.append(('top:'+k+'.'+k2,v2))
+          js=s.get('jsLib','')
+          m=re.search(r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});\s*var\s+QF_MOD38_EXPORTS',js,re.S)
+          if m:
+            pack=json.loads(m.group(1))
+            for k,v in pack.items():
+              if isinstance(v,str) and v.startswith('gz:'):
+                try:t=gzip.decompress(base64.b64decode(v[3:])).decode('utf-8')
+                except Exception:continue
+                sources.append(('module:'+k,t))
+          needles=['catalog.php','content.php','未匹配当前章节','qfQw','qf_qw_catalog','hnxianxin','章节时间戳']
+          out=[]
+          for name,t in sources:
+            for nd in needles:
+              start=0
+              while True:
+                i=t.find(nd,start)
+                if i<0:break
+                out.append('===== %s :: %s @ %d =====\n%s\n\n'%(name,nd,i,t[max(0,i-500):min(len(t),i+1400)]))
+                start=i+len(nd)
+          open('.staging/qidian-qw-content-lines.txt','w',encoding='utf-8').write(''.join(out))
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .staging/qidian-qw-content-lines.txt
+          git commit -m 'diag: capture qingwu content runtime lines' || exit 0
+          git push origin HEAD:main
