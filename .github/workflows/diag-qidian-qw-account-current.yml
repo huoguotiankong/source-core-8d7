@@ -1,0 +1,46 @@
+name: diag-qidian-qw-account-current
+on:
+  push:
+    paths: ['.staging/diag-qidian-qw-account-current.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Extract current account/content anchors
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          arr=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text())
+          s=arr[0] if isinstance(arr,list) else arr
+          login=str(s.get('loginUrl','') or '')
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+          def dec(v):
+              if not isinstance(v,str): return ''
+              if not v.startswith('gz:'): return v
+              z=v[3:]+'='*((4-len(v[3:])%4)%4)
+              return gzip.decompress(base64.b64decode(z)).decode()
+          qw=dec(pack.get('limited_qw',''))
+          def grabs(txt, needles, span=3500):
+              out=[]
+              for needle in needles:
+                  pos=0
+                  while True:
+                      i=txt.find(needle,pos)
+                      if i<0: break
+                      out.append('\n### '+needle+' @ '+str(i)+'\n'+txt[max(0,i-span):min(len(txt),i+span)])
+                      pos=i+len(needle)
+              return '\n'.join(out)
+          report=[]
+          report.append('# loginUrl\n'+grabs(login,['qfMultiAccountsV423','账号管理Provider','神魔','X'],2200))
+          report.append('# limited_qw\n'+grabs(qw,['qfQwHeadersV44','qfQwContentV44','qfQwAcquireTokenV44'],2200))
+          Path('.staging/diag-qidian-qw-account-current.txt').write_text('\n\n'.join(report))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/diag-qidian-qw-account-current.txt
+          git commit -m 'diag: capture current qidian qingwu account anchors'
+          git push origin main
