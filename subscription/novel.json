@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "type": "novel",
   "name": "小说源",
-  "updatedAt": "2026-09-11T11:40:00+08:00",
+  "updatedAt": "2026-09-11T22:40:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -38,39 +38,38 @@
       "type": "novel"
     },
     {
-      "id": "qidian-next",
-      "name": "🌈 起点增强",
-      "summary": "正式版 1.2.0：由 Beta41 真机确认基线晋升；新情无免登录正文、X 限免、评论页与版权/角色卡优化正式上线。",
+      "id": "qidian-next-beta",
+      "name": "🌈 起点增强 · Beta",
+      "summary": "Beta 1.2.1-beta1：情无恢复可选账号登录；未登录继续使用已验证的免费正文链。",
       "icon": "",
-      "channel": "stable",
-      "version": "1.2.0",
+      "channel": "beta",
+      "version": "1.2.1-beta1",
       "updatedAt": "2026-09-11",
       "tags": [
         "起点",
-        "正式版",
+        "测试版",
         "限免源",
-        "情无免登录",
+        "情无",
+        "账号登录",
+        "免登录回退",
+        "小雨来源",
         "X",
-        "评论页",
-        "段评",
-        "书友圈",
-        "角色卡",
-        "版权信息"
+        "评论页"
       ],
       "changelog": [
-        "由 1.1.0-beta41 真机确认基线原样晋升 Stable，不新增业务逻辑",
-        "情无 Provider 切换为“小雨的世界”免费正文链：免登录，目录缓存隔离，并按附件原生 ajax 请求链读取正文",
-        "新增 X 限免 Provider；保留神魔/晴天/同人等现有限免线路和自动路由",
-        "评论页点赞固定到时间/IP元信息行，压缩无效占位，提高同屏文字与楼中楼信息密度",
-        "版权信息日期标签由“上架”修正为“首发”；角色卡保留已验证的标签切换与性能回退方案"
+        "在账号管理最终 Provider 页恢复“情无”标签，支持登录、检测、网页登录和退出",
+        "情无账号接口切换到当前小雨后端 full.hnxianxin.cn；清除旧 103.236.85.8 默认地址依赖",
+        "登录成功后 limited_qw 可选携带 Cookie / X-Content-Token；未登录时请求头与 Beta41 保持一致",
+        "不把登录设为正文前置条件，Beta41 已真机确认的免费 catalog/content 链继续作为默认回退",
+        "Stable 1.2.0、评论、角色卡、书友圈、其它 Provider 均不修改"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12000",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12000",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12000",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json",
-      "type": "novel",
-      "versionCode": 12000
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12011",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12011",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12011",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
+      "versionCode": 12011,
+      "type": "novel"
     }
   ],
-  "generatedAt": "2026-09-11T11:40:00+08:00"
+  "generatedAt": "2026-09-11T22:40:00+08:00"
 }

@@ -1,27 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta41：新情无清除旧目录缓存并对齐附件原生 ajax 请求；失败时输出真实目录诊断。",
+  "summary": "Beta 1.2.1-beta1：情无恢复可选账号登录；未登录继续使用已验证的免费正文链。",
   "badges": [
     "Beta",
-    "1.1.0-beta41",
-    "情无免登录"
+    "1.2.1-beta1",
+    "情无可选登录"
   ],
   "sections": [
     {
-      "title": "本版更新",
-      "text": "清除旧情无目录缓存，并将目录/正文请求改为附件原生 java.ajax 链。"
+      "title": "本轮测试",
+      "text": "在 Beta41 已验证免费正文链上恢复情无账号会话；登录是可选增强，不是正文前置条件。"
     },
     {
-      "title": "失败诊断",
-      "text": "若仍匹配失败，错误页会直接显示目录总数、有效章节数和章节样例。"
+      "title": "情无账号",
+      "text": "账号管理新增情无：邮箱/密码登录、会话检测、网页登录、退出；当前接口地址固定为 https://full.hnxianxin.cn/qd。"
+    },
+    {
+      "title": "回退策略",
+      "text": "无账号或登录失败时继续走 Beta41 已真机确认的匿名 catalog.php / content.php 链，不影响正常限免正文。"
     },
     {
       "title": "版本状态",
       "text": "Beta / 测试通道，等待真机确认。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11041",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11041",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11041"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12011",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12011",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12011"
 }

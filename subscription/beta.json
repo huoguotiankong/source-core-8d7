@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-09-11T08:27:00+08:00",
+  "updatedAt": "2026-09-11T22:40:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -38,32 +38,34 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "Beta41：新情无清除旧目录缓存并对齐附件原生 ajax 请求；失败时输出真实目录诊断。",
+      "summary": "Beta 1.2.1-beta1：情无恢复可选账号登录；未登录继续使用已验证的免费正文链。",
       "icon": "",
       "channel": "beta",
-      "version": "1.1.0-beta41",
+      "version": "1.2.1-beta1",
       "updatedAt": "2026-09-11",
       "tags": [
         "起点",
         "测试版",
         "限免源",
         "情无",
-        "免登录",
-        "目录诊断",
+        "账号登录",
+        "免登录回退",
         "小雨来源",
+        "X",
         "评论页"
       ],
       "changelog": [
-        "情无目录缓存键升级到 v41，避免 Beta39/40 错误解码结果继续命中内存缓存",
-        "catalog.php 与 content.php 改为与附件完全一致的 java.ajax 请求链",
-        "匹配失败时输出目录总数、有效 time 数量和前三条章节样例，停止盲猜",
-        "账号管理沿用 Beta40：不显示情无；正文 Provider 仍保留情无且免登录"
+        "在账号管理最终 Provider 页恢复“情无”标签，支持登录、检测、网页登录和退出",
+        "情无账号接口切换到当前小雨后端 full.hnxianxin.cn；清除旧 103.236.85.8 默认地址依赖",
+        "登录成功后 limited_qw 可选携带 Cookie / X-Content-Token；未登录时请求头与 Beta41 保持一致",
+        "不把登录设为正文前置条件，Beta41 已真机确认的免费 catalog/content 链继续作为默认回退",
+        "Stable 1.2.0、评论、角色卡、书友圈、其它 Provider 均不修改"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11041",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=11041",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=11041",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12011",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12011",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12011",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
-      "versionCode": 11041
+      "versionCode": 12011
     },
     {
       "id": "manwa",
@@ -97,5 +99,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-09-11T08:27:00+08:00"
+  "generatedAt": "2026-09-11T22:40:00+08:00"
 }

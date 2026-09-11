@@ -1,3 +1,11 @@
+## 2026-09-11 · Current Beta 1.2.1-beta1 — 情无 optional account session
+
+- Stable remains 1.2.0.
+- Re-exposes Qingwu in the effective polished Account Management provider tabs.
+- Qingwu auth helpers now target `https://full.hnxianxin.cn/qd`; successful Cookie / X-Content-Token are optional headers for `limited_qw`.
+- Anonymous Beta41 catalog/content behavior remains the mandatory fallback and is not gated by login.
+- Awaiting real-device verification.
+
 ## 2026-09-11 · Current Stable 1.2.0 — promoted from verified Beta41
 
 - User explicitly requested Stable promotion after real-device confirmation that the new Qingwu content path works.
