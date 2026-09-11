@@ -1,0 +1,54 @@
+name: diag-qidian-qw-v41-provider-report
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-qw-v41-provider-report.trigger'
+permissions:
+  contents: write
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Build focused report
+        run: |
+          python3 - <<'PY'
+          import json,re,gzip,base64
+          p='sources/novel/qidian-next/qidian-next.json'
+          s=json.load(open(p,encoding='utf-8'))[0]
+          texts=[('loginUrl',s.get('loginUrl','')),('jsLib',s.get('jsLib',''))]
+          js=s.get('jsLib','')
+          m=re.search(r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});\s*var\s+QF_MOD38_EXPORTS',js,re.S)
+          if m:
+            pack=json.loads(m.group(1))
+            for k,v in pack.items():
+              if isinstance(v,str) and v.startswith('gz:'):
+                try:t=gzip.decompress(base64.b64decode(v[3:])).decode('utf-8')
+                except Exception:continue
+                texts.append(('module:'+k,t))
+          needles=['full.hnxianxin.cn','catalog.php','content.php','limited_qw','qfQw','QW41','情无']
+          out=[]
+          for name,t in texts:
+            hits=[]
+            for nd in needles:
+              pos=0;count=0
+              while True:
+                i=t.find(nd,pos)
+                if i<0:break
+                count+=1
+                if count<=12:
+                  hits.append((i,nd,t[max(0,i-900):min(len(t),i+2200)]))
+                pos=i+len(nd)
+            if hits:
+              out.append('\n===== '+name+' =====\n')
+              for i,nd,snip in sorted(hits):
+                out.append('\n--- '+nd+' @ '+str(i)+' ---\n'+snip+'\n')
+          open('.staging/qidian-qw-v41-provider-report.txt','w',encoding='utf-8').write(''.join(out))
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .staging/qidian-qw-v41-provider-report.txt
+          git commit -m 'diag: capture qidian qingwu runtime report' || exit 0
+          git push origin HEAD:main
