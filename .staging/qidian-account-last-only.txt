@@ -1,0 +1,32 @@
+qfMultiAccountsV423=function(){
+    var provider=qfMGet423('账号管理Provider','神魔');if(provider==='情无')provider='神魔';
+    if(['神魔','晴天','同人'].indexOf(provider)<0)provider='情无';
+    var qwe=qfMGet423('email',''),qwp=qfMGet423('password',''),qwb=qfMGet423('情无接口地址','http://103.236.85.8:7878/qd');
+    var sma=qfMGet423('神魔账号或邮箱',''),smp=qfMGet423('神魔密码','');
+    var qtk=qfMGet423('晴天密钥',''),qtp=qfMGet423('晴天口令',''),qtb=qfMGet423('晴天接口地址','https://sb.shazi.tk');
+    var xt=qfMGet423('🎬X佬密钥','');
+    var inner=''+
+      '<div class="section"><div class="sectionHead"><div><h3>Provider</h3><p>切换后只展示当前 Provider 的账号字段和可用动作。</p></div><span class="miniBadge" id="providerBadge">'+qfUxEscV015(provider)+'</span></div><div class="tabs" id="providerTabs"></div></div>'+
+      '<div class="section providerCard" data-p="情无"><div class="sectionHead"><div><h3>🌙 情无账号</h3><p>邮箱、密码和接口地址。</p></div></div>'+qfUxFieldV015('qw_email','邮箱',qwe,'text','QQ 邮箱')+qfUxFieldV015('qw_password','密码',qwp,'password','情无密码')+qfUxFieldV015('qw_base','接口地址',qwb,'text','可自定义')+'</div>'+
+      '<div class="section providerCard" data-p="神魔"><div class="sectionHead"><div><h3>⚔️ 神魔账号</h3><p>账号/邮箱和密码；支持后台管理。</p></div></div>'+qfUxFieldV015('sm_account','账号或邮箱',sma,'text','神魔后台账号')+qfUxFieldV015('sm_password','密码',smp,'password','神魔密码')+'</div>'+
+      '<div class="section providerCard" data-p="晴天"><div class="sectionHead"><div><h3>☀️ 晴天账号</h3><p>密钥、口令和接口地址。</p></div></div>'+qfUxFieldV015('qt_key','密钥',qtk,'password','')+qfUxFieldV015('qt_pass','口令',qtp,'password','')+qfUxFieldV015('qt_base','接口地址',qtb,'text','默认 https://sb.shazi.tk')+'</div>'+
+      '<div class="section providerCard" data-p="同人"><div class="sectionHead"><div><h3>🍋 同人</h3><p>使用共享 Token，无需填写账号字段。</p></div><span class="miniBadge">共享</span></div><div class="state">可直接进行 Token 检测或打开后台。</div></div>'+
+      '<div class="section providerCard" data-p="X"><div class="sectionHead"><div><h3>❎ X-QD</h3><p>独立 Token，仅用于 X 限免正文。</p></div><span class="miniBadge">X</span></div>'+qfUxFieldV015('x_token','X 密钥',xt,'password','可网页登录自动获取，也可手工填写')+'<div class="state">可执行：网页登录、检测、清除。</div></div>'+
+      '<div class="section"><div class="sectionHead"><div><h3>执行动作</h3><p>点击只是选择待执行动作；真正执行发生在点右上角 ✓ 返回后。</p></div></div><div class="actionGrid" id="actionGrid"></div><div class="state">当前待执行：<b id="actionText">仅保存</b></div></div>'+
+      qfUxSpanV015('ux_provider',provider)+qfUxSpanV015('ux_action','不执行')+qfUxSpanV015('ux_qwe',qwe)+qfUxSpanV015('ux_qwp',qwp)+qfUxSpanV015('ux_qwb',qwb)+qfUxSpanV015('ux_sma',sma)+qfUxSpanV015('ux_smp',smp)+qfUxSpanV015('ux_qtk',qtk)+qfUxSpanV015('ux_qtp',qtp)+qfUxSpanV015('ux_qtb',qtb)+qfUxSpanV015('ux_xt',xt);
+    var js='var provider='+JSON.stringify(provider)+',action="不执行";'+
+      'var providers=["神魔","晴天","同人","X"],acts={"情无":["不执行","登录","检测","网页登录","退出"],"神魔":["不执行","登录","检测","后台","退出"],"晴天":["不执行","登录","检测","后台","退出"],"同人":["不执行","检测","后台"],"X":["不执行","网页登录","检测","清除"]};'+
+      'function sync(){document.getElementById("ux_provider").textContent=provider;document.getElementById("ux_action").textContent=action;document.getElementById("ux_qwe").textContent=document.getElementById("qw_email").value;document.getElementById("ux_qwp").textContent=document.getElementById("qw_password").value;document.getElementById("ux_qwb").textContent=document.getElementById("qw_base").value;document.getElementById("ux_sma").textContent=document.getElementById("sm_account").value;document.getElementById("ux_smp").textContent=document.getElementById("sm_password").value;document.getElementById("ux_qtk").textContent=document.getElementById("qt_key").value;document.getElementById("ux_qtp").textContent=document.getElementById("qt_pass").value;document.getElementById("ux_qtb").textContent=document.getElementById("qt_base").value;document.getElementById("ux_xt").textContent=document.getElementById("x_token").value;document.getElementById("providerBadge").textContent=provider;document.getElementById("actionText").textContent=action==="不执行"?"仅保存":action;}'+
+      'function renderProviders(){var b=document.getElementById("providerTabs");b.innerHTML="";providers.forEach(function(p){var x=document.createElement("button");x.type="button";x.textContent=p;x.className=p===provider?"on":"";x.onclick=function(){provider=p;action="不执行";renderProviders();renderCards();renderActions();sync();};b.appendChild(x);});}'+
+      'function renderCards(){Array.prototype.forEach.call(document.querySelectorAll(".providerCard"),function(c){c.className=c.getAttribute("data-p")===provider?"section providerCard":"section providerCard hide";});}'+
+      'function renderActions(){var b=document.getElementById("actionGrid"),arr=acts[provider]||["不执行"];b.innerHTML="";arr.forEach(function(a){var x=document.createElement("button");x.type="button";x.textContent=a==="不执行"?"仅保存":a;x.className=(a===action?"on ":"")+(a==="退出"?"danger":"");x.onclick=function(){action=a;renderActions();sync();};b.appendChild(x);});}'+
+      'Array.prototype.forEach.call(document.querySelectorAll("input"),function(x){x.addEventListener("input",sync);});renderProviders();renderCards();renderActions();sync();';
+    var body=qfUxOpenV015('账号管理','🔐','Provider','一次只管理一个 Provider，字段、动作和状态都聚合在同一页。',inner,js);
+    if(!body)return;
+    var map=[['ux_provider','账号管理Provider'],['ux_qwe','email'],['ux_qwp','password'],['ux_qwb','情无接口地址'],['ux_sma','神魔账号或邮箱'],['ux_smp','神魔密码'],['ux_qtk','晴天密钥'],['ux_qtp','晴天口令'],['ux_qtb','晴天接口地址'],['ux_xt','🎬X佬密钥']];
+    qfUxSaveV015(body,map);
+    provider=qfUxReadV015(body,'ux_provider')||provider;
+    var action=qfUxReadV015(body,'ux_action')||'不执行';
+    qfMSet423('账号管理动作','不执行',true);
+    if(action!=='不执行')qfNextAccountExecV013(provider,action);
+}
