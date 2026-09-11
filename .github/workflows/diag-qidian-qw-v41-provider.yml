@@ -1,0 +1,41 @@
+name: diag-qidian-qw-v41-provider
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-qw-v41-provider.trigger'
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Inspect stable qingwu runtime
+        run: |
+          python3 - <<'PY'
+          import json,re,gzip,base64
+          p='sources/novel/qidian-next/qidian-next.json'
+          arr=json.load(open(p,encoding='utf-8')); s=arr[0]
+          texts=[('loginUrl',s.get('loginUrl','')),('jsLib',s.get('jsLib',''))]
+          js=s.get('jsLib','')
+          m=re.search(r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});\s*var\s+QF_MOD38_EXPORTS',js,re.S)
+          if m:
+            pack=json.loads(m.group(1))
+            for k,v in pack.items():
+              if isinstance(v,str) and v.startswith('gz:'):
+                try:t=gzip.decompress(base64.b64decode(v[3:])).decode('utf-8')
+                except Exception:continue
+                texts.append(('module:'+k,t))
+          needles=['full.hnxianxin.cn/qd','catalog.php','content.php','qfQw','limited_qw','QW41','情无']
+          for name,t in texts:
+            if any(x in t for x in needles):
+              print('\n===== '+name+' =====')
+              for nd in needles:
+                pos=0;n=0
+                while True:
+                  i=t.find(nd,pos)
+                  if i<0: break
+                  n+=1
+                  if n<=8: print('\n--- '+nd+' @ '+str(i)+' ---\n'+t[max(0,i-1200):i+2800])
+                  pos=i+len(nd)
+          PY
