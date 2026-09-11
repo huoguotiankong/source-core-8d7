@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强",
-  "summary": "正式版 1.1.0：由 Beta14 真机确认基线晋升；详情富数据、最近更新时间、固定双列与正文设置直达均保留。",
+  "summary": "正式版 1.2.0：由 Beta41 真机确认基线晋升；新情无免登录正文、X 限免、评论页与版权/角色卡优化正式上线。",
   "badges": [
     "Stable",
-    "1.1.0",
-    "Beta14 真机确认"
+    "1.2.0",
+    "Beta41 已真机确认"
   ],
   "sections": [
     {
-      "title": "详情页",
-      "text": "保留作品富数据、标签/荣誉与内容简介；作品资料只显示最近更新时间。"
+      "title": "正式版更新",
+      "text": "由 1.1.0-beta41 真机确认基线晋升，不额外改变正文、评论或 Provider 行为。"
     },
     {
-      "title": "作品数据",
-      "text": "固定双列：月票、收藏、粉丝在左列；总推荐、盟主、首订、在看、评分、投资等可用指标在右列。"
+      "title": "正文 Provider",
+      "text": "情无现为免登录免费正文链，并保留 X、神魔、晴天、同人等线路及自动路由。"
     },
     {
-      "title": "快捷入口",
-      "text": "书友圈、角色卡、正文设置保持紧凑布局；正文设置可从详情直接打开。"
+      "title": "评论与界面",
+      "text": "保留评论页紧凑布局、点赞元信息行、角色卡切换/性能优化和版权信息“首发”语义修正。"
     },
     {
-      "title": "稳定基线",
-      "text": "本正式版由 1.1.0-beta14 原样晋升；搜索、目录、正文 Provider、评论、角色卡、书友圈和账号链没有新增改动。"
+      "title": "版本状态",
+      "text": "Stable / 正式通道。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=11000",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=11000",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=11000"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12000",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12000",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12000"
 }

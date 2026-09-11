@@ -1,3 +1,9 @@
+## 2026-09-11 · Current Stable 1.2.0 — promoted from verified Beta41
+
+- User explicitly requested Stable promotion after real-device confirmation that the new Qingwu content path works.
+- Stable is a logic-preserving copy of Beta41 with Stable metadata/name only.
+- Beta channel remains available separately for future development.
+
 ## 2026-09-11 · Current Beta 1.1.0-beta41 — 情无 fresh cache / native ajax diagnostics
 
 - Stable remains 1.1.0.

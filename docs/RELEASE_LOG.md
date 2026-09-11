@@ -1,3 +1,10 @@
+## 2026-09-11 · 起点增强 1.2.0 Stable — Beta41 真机确认晋升
+
+- 用户明确要求上正式版；目标仓库为 `source-core-8d7`，Stable 由已真机确认可用的 `1.1.0-beta41` 原样晋升。
+- 情无 Provider 使用“小雨的世界”免登录免费正文链；Beta41 已真机确认正文恢复正常。
+- 同步保留 X 限免、评论页紧凑布局/点赞元信息行、版权信息“首发”标签、角色卡性能回退等 Beta41 基线能力。
+- Stable source / Manifest / Stable Subscription / Novel 分类 / Stable Bundle / RSS Detail 已同步。
+
 ## 2026-09-11 · 起点增强 1.1.0-beta41 — 情无缓存隔离 / 原生请求 / 真机诊断
 
 - Stable 保持 1.1.0 不变。
