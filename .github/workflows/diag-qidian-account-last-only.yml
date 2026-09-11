@@ -1,0 +1,40 @@
+name: diag-qidian-account-last-only
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-account-last-only.trigger'
+permissions:
+  contents: write
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Extract last qfMultiAccountsV423
+        run: |
+          python3 - <<'PY'
+          import json,re
+          t=json.load(open('sources/novel/qidian-next/qidian-next.json',encoding='utf-8'))[0].get('loginUrl','')
+          starts=[m.start() for m in re.finditer(r'(?:function\s+qfMultiAccountsV423\s*\(|qfMultiAccountsV423\s*=\s*function\s*\()',t)]
+          st=starts[-1]; b=t.find('{',st); depth=0; quote=None; esc=False; end=len(t)
+          for i in range(b,len(t)):
+            c=t[i]
+            if quote:
+              if esc:esc=False
+              elif c=='\\':esc=True
+              elif c==quote:quote=None
+            else:
+              if c in "'\"`":quote=c
+              elif c=='{':depth+=1
+              elif c=='}':
+                depth-=1
+                if depth==0:end=i+1;break
+          open('.staging/qidian-account-last-only.txt','w',encoding='utf-8').write(t[st:end])
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .staging/qidian-account-last-only.txt
+          git commit -m 'diag: capture last account override only' || exit 0
+          git push origin HEAD:main
