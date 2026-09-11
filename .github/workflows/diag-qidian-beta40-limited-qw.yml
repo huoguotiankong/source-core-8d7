@@ -1,0 +1,32 @@
+name: diag-qidian-beta40-limited-qw
+on:
+  push:
+    paths: ['.staging/diag-qidian-beta40-limited-qw.trigger']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Dump limited_qw anchors
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(p.read_text()); s=arr[0] if isinstance(arr,list) else arr
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a)
+          pack=json.loads(lib[a:b]); v=pack['limited_qw']; z=v[3:]+'='*((4-len(v[3:])%4)%4); code=gzip.decompress(base64.b64decode(z)).decode()
+          out=[]
+          for pat in ['function qfQw','catalog.php','content.php','新来源未匹配当前章节','hexDecodeToString','qfQwDecodePayloadV39']:
+            out.append('\n## '+pat+'\n')
+            for m in list(re.finditer(re.escape(pat),code))[:10]:
+              st=max(0,m.start()-1200); en=min(len(code),m.start()+2800); out.append(code[st:en])
+          Path('.staging/beta40-limited-qw-diag.txt').write_text('\n'.join(out))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/beta40-limited-qw-diag.txt
+          git commit -m 'diag: capture beta40 limited_qw anchors'
+          git push origin main
