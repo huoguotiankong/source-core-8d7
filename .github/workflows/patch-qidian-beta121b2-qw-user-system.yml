@@ -1,0 +1,130 @@
+name: patch-qidian-beta121b2-qw-user-system
+on:
+  push:
+    paths:
+      - '.staging/patch-qidian-beta121b2-qw-user-system.trigger'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch qidian-next Beta 1.2.1-beta2
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,re,gzip,base64,datetime
+          from pathlib import Path
+
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(p.read_text(encoding='utf-8'))
+          s=arr[0]
+          js=s['jsLib']
+          mark='QF_MOD38_PACK='
+          i=js.find(mark)
+          if i<0: raise SystemExit('QF_MOD38_PACK missing')
+          start=js.find('{',i)
+          pack,end=json.JSONDecoder().raw_decode(js[start:])
+          old=pack['limited_qw']
+          prefix=''
+          raw=old
+          if ':' in old[:12]:
+              prefix,raw=old.split(':',1)
+              prefix += ':'
+          raw += '='*((4-len(raw)%4)%4)
+          blob=base64.urlsafe_b64decode(raw.encode())
+          text=gzip.decompress(blob).decode('utf-8')
+
+          old_headers='function qfQwHeadersV44(){return {"Accept":"application/json,text/plain,*/*","User-Agent":"Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36","Referer":qfQwBaseV44.call(this)+"/"};}'
+          new_headers='function qfQwHeadersV44(){var h={"Accept":"application/json,text/plain,*/*","User-Agent":"Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36","Referer":qfQwBaseV44.call(this)+"/"};try{var s=qfQwSrcV39(this),tok=s&&s.get?String(s.get("qf_qw_xy_token_v2")||""):"",aid=s&&s.get?String(s.get("qf_qw_xy_android_v2")||""):"";if(tok){h["X-Sec-Token"]=tok;if(aid)h["X-Android-Id"]=aid;}}catch(_a){}return h;}'
+          if old_headers not in text: raise SystemExit('limited_qw headers anchor missing')
+          text=text.replace(old_headers,new_headers,1)
+          old_req='try{var raw=String(j.ajax(String(api))||""),obj=null;'
+          new_req='try{var req=String(api)+","+JSON.stringify({headers:qfQwHeadersV44.call(this)}),raw=String(j.ajax(req)||""),obj=null;'
+          if old_req not in text: raise SystemExit('limited_qw content request anchor missing')
+          text=text.replace(old_req,new_req,1)
+          comp=gzip.compress(text.encode('utf-8'),compresslevel=9,mtime=0)
+          pack['limited_qw']=prefix+base64.b64encode(comp).decode()
+          new_pack=json.dumps(pack,ensure_ascii=False,separators=(',',':'))
+          js=js[:start]+new_pack+js[start+end:]
+
+          login=s['loginUrl']
+          override=r'''
+/* ============================================================
+ * 1.2.1-beta2 · 情无/小雨的世界新版用户系统
+ * 严格按附件实现：游客三字段 + 网页注册/登录 + Token/AndroidId。
+ * 不再使用旧邮箱/密码/auth.php?action=login 体系。
+ * ============================================================ */
+function qfQwXYGetV2(k,d){try{var v=source.get(String(k));return v==null?String(d||''):String(v);}catch(e){return String(d||'');}}
+function qfQwXYPutV2(k,v){try{source.put(String(k),String(v==null?'':v));}catch(e){}}
+function qfQwXYAndroidV2(){var v=qfQwXYGetV2('qf_qw_xy_android_v2','');if(v)return v;try{v=String(java.androidId()||'').trim();}catch(e){}if(!v){var c='0123456789abcdef';for(var i=0;i<16;i++)v+=c.charAt(Math.floor(Math.random()*16));}v=String(v).toUpperCase();qfQwXYPutV2('qf_qw_xy_android_v2',v);return v;}
+function qfQwXYReqV2(action,data,auth,method){var h={'Accept':'application/json'};if(method!=='GET')h['Content-Type']='application/json';if(auth){var t=qfQwXYGetV2('qf_qw_xy_token_v2',''),a=qfQwXYAndroidV2();if(t)h['X-Sec-Token']=t;if(a)h['X-Android-Id']=a;}var o={method:method||'POST',headers:h};if((method||'POST')!=='GET')o.body=JSON.stringify(data||{});var raw=String(java.ajax('https://full.hnxianxin.cn/qd/user_api.php?action='+encodeURIComponent(action)+','+JSON.stringify(o))||'');var r=JSON.parse(raw||'{}');if(r.error)throw new Error(String(r.error));return r;}
+function qfQwXYStoreV2(r,aid){var u=(r&&r.user)||{};qfQwXYPutV2('qf_qw_xy_token_v2',String((r&&r.token)||''));qfQwXYPutV2('qf_qw_xy_android_v2',String(aid||qfQwXYAndroidV2()));qfQwXYPutV2('qf_qw_xy_user_v2',String(u.username||''));qfQwXYPutV2('qf_qw_xy_level_v2',String(u.level||'guest'));return u;}
+function qfQwXYGuestV2(){var a=qfMGet423('情无源作者',''),g=qfMGet423('情无官方反馈群',''),p=qfMGet423('情无临时口令','');if(!a||!g||!p){try{java.toast('请填写源作者、官方反馈群和临时口令');}catch(e){}return;}try{var id=qfQwXYAndroidV2(),r=qfQwXYReqV2('guest',{source_author:a,feedback_group:g,temporary_password:p,android_id:id},false,'POST'),u=qfQwXYStoreV2(r,id);java.toast('游客授权成功：'+String(u.privilege||u.level_name||''));}catch(e){java.toast(String(e&&e.message||e));}}
+function qfQwXYWebV2(){var id=qfQwXYAndroidV2();var preload=["window.xySaveLegadoAuth=function(payload){","var u=(payload&&payload.user)||{};","source.put('qf_qw_xy_token_v2',String((payload&&payload.token)||''));","source.put('qf_qw_xy_android_v2',String((payload&&payload.android_id)||'"+id+"'));","source.put('qf_qw_xy_user_v2',String(u.username||''));","source.put('qf_qw_xy_level_v2',String(u.level||'guest'));","return true;","};"].join('\n');java.showBrowser('https://full.hnxianxin.cn/qd/auth.php?mode=legado&android_id='+encodeURIComponent(id),null,preload);try{java.toast('请在网页完成注册/登录，成功后会自动写入 Token');}catch(e){}}
+function qfQwXYUsageV2(){var t=qfQwXYGetV2('qf_qw_xy_token_v2','');if(!t){try{java.toast('请先申请游客 Token 或网页登录');}catch(e){}return;}try{var r=qfQwXYReqV2('me',{},true,'GET'),u=r.user||{};java.longToast('\n用户：'+String(u.username||'游客用户')+'\n等级：'+String(u.level_name||'--')+'\n权益：'+String(u.privilege||'--')+'\n今日：'+Number(u.today_count||0)+'\n昨日：'+Number(u.yesterday_count||0)+'\n累计：'+Number(u.total_count||0));}catch(e){java.toast(String(e&&e.message||e));}}
+function qfQwXYLogoutV2(){try{if(qfQwXYGetV2('qf_qw_xy_token_v2',''))qfQwXYReqV2('logout',{},true,'POST');}catch(e){}qfQwXYPutV2('qf_qw_xy_token_v2','');qfQwXYPutV2('qf_qw_xy_user_v2','');qfQwXYPutV2('qf_qw_xy_level_v2','');try{java.toast('已退出情无用户系统');}catch(e){}}
+qfMultiAccountsV423=function(){
+    var provider=qfMGet423('账号管理Provider','神魔');if(['情无','神魔','晴天','同人','X'].indexOf(provider)<0)provider='情无';
+    var qa=qfMGet423('情无源作者',''),qg=qfMGet423('情无官方反馈群',''),qp=qfMGet423('情无临时口令','');
+    var sma=qfMGet423('神魔账号或邮箱',''),smp=qfMGet423('神魔密码',''),qtk=qfMGet423('晴天密钥',''),qtp=qfMGet423('晴天口令',''),qtb=qfMGet423('晴天接口地址','https://sb.shazi.tk'),xt=qfMGet423('🎬X佬密钥','');
+    var tok=qfQwXYGetV2('qf_qw_xy_token_v2',''),un=qfQwXYGetV2('qf_qw_xy_user_v2',''),lv=qfQwXYGetV2('qf_qw_xy_level_v2','');
+    var inner=''+
+      '<div class="section"><div class="sectionHead"><div><h3>Provider</h3><p>切换后只展示当前 Provider 的账号字段和可用动作。</p></div><span class="miniBadge" id="providerBadge">'+qfUxEscV015(provider)+'</span></div><div class="tabs" id="providerTabs"></div></div>'+
+      '<div class="section providerCard" data-p="情无"><div class="sectionHead"><div><h3>🌙 情无账号</h3><p>新版小雨用户系统：游客授权或网页注册/登录，不使用邮箱密码直登。</p></div><span class="miniBadge">'+(tok?'已授权':'未授权')+'</span></div><div class="state">'+(tok?('当前：'+qfUxEscV015(un||lv||'guest')):'未登录；不影响当前免费正文链。')+'</div>'+qfUxFieldV015('qw_author','源作者',qa,'text','')+qfUxFieldV015('qw_group','官方反馈群',qg,'text','')+qfUxFieldV015('qw_pass','临时口令',qp,'password','')+'</div>'+
+      '<div class="section providerCard" data-p="神魔"><div class="sectionHead"><div><h3>⚔️ 神魔账号</h3></div></div>'+qfUxFieldV015('sm_account','账号或邮箱',sma,'text','')+qfUxFieldV015('sm_password','密码',smp,'password','')+'</div>'+
+      '<div class="section providerCard" data-p="晴天"><div class="sectionHead"><div><h3>☀️ 晴天账号</h3></div></div>'+qfUxFieldV015('qt_key','密钥',qtk,'password','')+qfUxFieldV015('qt_pass','口令',qtp,'password','')+qfUxFieldV015('qt_base','接口地址',qtb,'text','')+'</div>'+
+      '<div class="section providerCard" data-p="同人"><div class="sectionHead"><div><h3>🍋 同人</h3><p>共享 Token。</p></div></div></div>'+
+      '<div class="section providerCard" data-p="X"><div class="sectionHead"><div><h3>❎ X-QD</h3></div></div>'+qfUxFieldV015('x_token','X 密钥',xt,'password','')+'</div>'+
+      '<div class="section"><div class="sectionHead"><div><h3>执行动作</h3><p>选择动作后点右上角 ✓ 返回执行。</p></div></div><div class="actionGrid" id="actionGrid"></div><div class="state">当前待执行：<b id="actionText">仅保存</b></div></div>'+
+      qfUxSpanV015('ux_provider',provider)+qfUxSpanV015('ux_action','不执行')+qfUxSpanV015('ux_qa',qa)+qfUxSpanV015('ux_qg',qg)+qfUxSpanV015('ux_qp',qp)+qfUxSpanV015('ux_sma',sma)+qfUxSpanV015('ux_smp',smp)+qfUxSpanV015('ux_qtk',qtk)+qfUxSpanV015('ux_qtp',qtp)+qfUxSpanV015('ux_qtb',qtb)+qfUxSpanV015('ux_xt',xt);
+    var js='var provider='+JSON.stringify(provider)+',action="不执行";var providers=["情无","神魔","晴天","同人","X"],acts={"情无":["不执行","申请游客Token","网页注册/登录","查看使用次数","退出"],"神魔":["不执行","登录","检测","后台","退出"],"晴天":["不执行","登录","检测","后台","退出"],"同人":["不执行","检测","后台"],"X":["不执行","网页登录","检测","清除"]};'+
+      'function sync(){document.getElementById("ux_provider").textContent=provider;document.getElementById("ux_action").textContent=action;var m=[["qw_author","ux_qa"],["qw_group","ux_qg"],["qw_pass","ux_qp"],["sm_account","ux_sma"],["sm_password","ux_smp"],["qt_key","ux_qtk"],["qt_pass","ux_qtp"],["qt_base","ux_qtb"],["x_token","ux_xt"]];m.forEach(function(z){var a=document.getElementById(z[0]),b=document.getElementById(z[1]);if(a&&b)b.textContent=a.value||"";});document.getElementById("providerBadge").textContent=provider;document.getElementById("actionText").textContent=action==="不执行"?"仅保存":action;}'+
+      'function rp(){var b=document.getElementById("providerTabs");b.innerHTML="";providers.forEach(function(p){var x=document.createElement("button");x.type="button";x.textContent=p;x.className=p===provider?"on":"";x.onclick=function(){provider=p;action="不执行";rp();rc();ra();sync();};b.appendChild(x);});}function rc(){Array.prototype.forEach.call(document.querySelectorAll(".providerCard"),function(c){c.className=c.getAttribute("data-p")===provider?"section providerCard":"section providerCard hide";});}function ra(){var b=document.getElementById("actionGrid"),ar=acts[provider]||["不执行"];b.innerHTML="";ar.forEach(function(a){var x=document.createElement("button");x.type="button";x.textContent=a==="不执行"?"仅保存":a;x.className=(a===action?"on ":"")+(a==="退出"?"danger":"");x.onclick=function(){action=a;ra();sync();};b.appendChild(x);});}Array.prototype.forEach.call(document.querySelectorAll("input"),function(x){x.addEventListener("input",sync);});rp();rc();ra();sync();';
+    var body=qfUxOpenV015('账号管理','🔐','Provider','一次只管理一个 Provider。情无采用新版小雨用户系统。',inner,js);if(!body)return;
+    qfUxSaveV015(body,[['ux_provider','账号管理Provider'],['ux_qa','情无源作者'],['ux_qg','情无官方反馈群'],['ux_qp','情无临时口令'],['ux_sma','神魔账号或邮箱'],['ux_smp','神魔密码'],['ux_qtk','晴天密钥'],['ux_qtp','晴天口令'],['ux_qtb','晴天接口地址'],['ux_xt','🎬X佬密钥']]);
+    provider=qfUxReadV015(body,'ux_provider')||provider;var action=qfUxReadV015(body,'ux_action')||'不执行';qfMSet423('账号管理动作','不执行',true);
+    if(action==='不执行')return;if(provider==='情无'){if(action==='申请游客Token')qfQwXYGuestV2();else if(action==='网页注册/登录')qfQwXYWebV2();else if(action==='查看使用次数')qfQwXYUsageV2();else if(action==='退出')qfQwXYLogoutV2();}else qfNextAccountExecV013(provider,action);
+};
+'''
+          login += '\n'+override
+          s['loginUrl']=login
+          s['jsLib']=js
+          s['bookSourceName']='🌈 起点增强 · Beta'
+          s['bookSourceComment']='v1.2.1-beta2：情无账号体系按“小雨的世界”最新实现重做：游客授权需源作者/官方反馈群/临时口令，普通账号走网页注册/登录并自动写入 Token；成功授权后正文自动携带 X-Sec-Token/X-Android-Id，未登录仍保留已验证免费正文链。撤销 beta1 的旧邮箱/密码直登方案。'
+          p.write_text(json.dumps(arr,ensure_ascii=False,indent=2),encoding='utf-8')
+
+          version='1.2.1-beta2'; code=12012; today='2026-09-12'; url='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12012'
+          def patch_items(obj):
+              if isinstance(obj,dict):
+                  if obj.get('id')=='qidian-next' or obj.get('sourceId')=='qidian-next':
+                      if 'version' in obj: obj['version']=version
+                      if 'versionCode' in obj: obj['versionCode']=code
+                      if 'url' in obj: obj['url']=url
+                      if 'sourceUrl' in obj: obj['sourceUrl']=url
+                      if 'updatedAt' in obj: obj['updatedAt']=today
+                      if 'summary' in obj: obj['summary']='起点增强 Beta：情无/小雨新版用户系统接入，游客授权 + 网页注册登录；授权后正文自动携带 Token，未登录免费链保持可用。'
+                      if 'changelog' in obj: obj['changelog']=['情无改用小雨新版用户系统：源作者/官方反馈群/临时口令申请游客 Token','普通账号通过网页注册/登录并自动回写 Token','授权后情无正文自动携带 X-Sec-Token / X-Android-Id','撤销 beta1 错误的旧邮箱/密码登录方案','Stable 1.2.0 不变']
+                  for v in obj.values(): patch_items(v)
+              elif isinstance(obj,list):
+                  for v in obj: patch_items(v)
+          for fp in ['manifest.json','subscription/beta.json','bundles/all-beta.json']:
+              q=Path(fp)
+              if not q.exists(): continue
+              data=json.loads(q.read_text(encoding='utf-8'));patch_items(data)
+              if isinstance(data,dict) and 'updatedAt' in data: data['updatedAt']='2026-09-12T00:20:00+08:00'
+              q.write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
+          r=Path('docs/RELEASE_LOG.md')
+          if r.exists():
+              txt=r.read_text(encoding='utf-8')
+              note='\n## 2026-09-12 · qidian-next 1.2.1-beta2\n- 情无账号体系按附件“小雨的世界”最新实现重做：游客 Token 使用“源作者 / 官方反馈群 / 临时口令”，普通账号使用网页注册/登录。\n- 登录成功保存 Token + AndroidId；情无正文请求自动携带 `X-Sec-Token` / `X-Android-Id`。\n- 未登录仍保留 Beta41 已真机确认的免费正文链；撤销 1.2.1-beta1 错误的旧邮箱/密码直登方案。\n- Stable 1.2.0 不变。\n'
+              if 'qidian-next 1.2.1-beta2' not in txt: r.write_text(note+txt,encoding='utf-8')
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
+          git commit -m 'qidian-next: beta 1.2.1-b2 correct qingwu user system'
+          git push origin HEAD:main
