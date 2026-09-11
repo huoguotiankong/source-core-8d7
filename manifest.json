@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-11T23:12:00+08:00",
+  "updatedAt": "2026-09-12T00:28:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -49,13 +49,13 @@
       "name": "🌈 起点增强",
       "category": "novel",
       "channel": "stable",
-      "version": "1.2.0",
-      "versionCode": 12000,
-      "updatedAt": "2026-09-11T11:40:00+08:00",
+      "version": "1.2.1-beta2",
+      "versionCode": 12012,
+      "updatedAt": "2026-09-12",
       "sourcePath": "sources/novel/qidian-next/qidian-next.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12000",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12012",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "正式版 1.2.0：由 Beta41 真机确认基线晋升；新情无免登录正文、X 限免、评论页与版权/角色卡优化正式上线。",
+      "summary": "起点增强 Beta：情无/小雨新版用户系统接入，游客授权 + 网页注册登录；授权 Token 与正文请求链对齐。",
       "tags": [
         "起点",
         "正式版",
@@ -69,11 +69,11 @@
         "版权信息"
       ],
       "changelog": [
-        "由 1.1.0-beta41 真机确认基线原样晋升 Stable，不新增业务逻辑",
-        "情无 Provider 切换为“小雨的世界”免费正文链：免登录，目录缓存隔离，并按附件原生 ajax 请求链读取正文",
-        "新增 X 限免 Provider；保留神魔/晴天/同人等现有限免线路和自动路由",
-        "评论页点赞固定到时间/IP元信息行，压缩无效占位，提高同屏文字与楼中楼信息密度",
-        "版权信息日期标签由“上架”修正为“首发”；角色卡保留已验证的标签切换与性能回退方案"
+        "情无新版游客授权：源作者/官方反馈群/临时口令",
+        "普通账号走网页注册/登录并自动回写 Token",
+        "Token 与正文现有认证头键完全对齐",
+        "未登录免费正文链保持可用",
+        "Stable 1.2.0 不变"
       ],
       "sha256": "56100e54c86e7dc900c184e180c9d22a1632bd722c2bc1477c896624df9bc089"
     },
