@@ -1,0 +1,44 @@
+name: diag-qidian-account-final-function
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-account-final-function.trigger'
+permissions:
+  contents: write
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Extract final account override
+        run: |
+          python3 - <<'PY'
+          import json,re
+          s=json.load(open('sources/novel/qidian-next/qidian-next.json',encoding='utf-8'))[0]
+          t=s.get('loginUrl','')
+          starts=[m.start() for m in re.finditer(r'(?:function\s+qfMultiAccountsV423\s*\(|qfMultiAccountsV423\s*=\s*function\s*\()',t)]
+          out=[]
+          for n,st in enumerate(starts):
+            b=t.find('{',st); depth=0; quote=None; esc=False; end=len(t)
+            for i in range(b,len(t)):
+              c=t[i]
+              if quote:
+                if esc: esc=False
+                elif c=='\\': esc=True
+                elif c==quote: quote=None
+              else:
+                if c in "'\"`": quote=c
+                elif c=='{': depth+=1
+                elif c=='}':
+                  depth-=1
+                  if depth==0: end=i+1; break
+            out.append('===== DEF %d @ %d =====\n%s\n\n'%(n+1,st,t[st:end]))
+          open('.staging/qidian-account-definitions.txt','w',encoding='utf-8').write(''.join(out))
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .staging/qidian-account-definitions.txt
+          git commit -m 'diag: capture account function definitions' || exit 0
+          git push origin HEAD:main
