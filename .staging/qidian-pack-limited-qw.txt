@@ -1,0 +1,2 @@
+PATTERN MATCH QF_MOD38_PACK\s*=\s*(\{.*?\})\s*;
+json fail JSONDecodeError('Unterminated string starting at: line 1 column 325620 (char 325619)')
