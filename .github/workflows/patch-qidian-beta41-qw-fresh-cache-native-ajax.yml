@@ -1,0 +1,78 @@
+name: patch-qidian-beta41-qw-fresh-cache-native-ajax
+on:
+  push:
+    paths: ['.staging/patch-qidian-beta41-qw-fresh-cache-native-ajax.trigger']
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Publish Beta41
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,hashlib,re
+          from pathlib import Path
+          SRC=Path('sources/novel/qidian-next/qidian-next-beta.json'); STABLE=Path('sources/novel/qidian-next/qidian-next.json')
+          arr=json.loads(SRC.read_text()); s=arr[0] if isinstance(arr,list) else arr
+          stable_hash=hashlib.sha256(STABLE.read_bytes()).hexdigest()
+          lib=s['jsLib']; mk='var QF_MOD38_PACK='; a=lib.index(mk)+len(mk); b=lib.index(';\nvar QF_MOD38_EXPORTS=',a); pack=json.loads(lib[a:b])
+          def dec(v):
+              if not isinstance(v,str): return ''
+              if not v.startswith('gz:'): return v
+              z=v[3:]+'='*((4-len(v[3:])%4)%4); return gzip.decompress(base64.b64decode(z)).decode()
+          def enc(code): return 'gz:'+base64.b64encode(gzip.compress(code.encode(),mtime=0)).decode().rstrip('=')
+          code=dec(pack['limited_qw'])
+          # 1) discard Beta39/40 memory rows decoded with old logic.
+          assert 'qf_qw_xy_rows_v39_' in code
+          code=code.replace('qf_qw_xy_rows_v39_','qf_qw_xy_rows_v41_',1)
+          # 2) mirror attachment transport: java.ajax(catalog/content URL), then parse raw JSON.
+          old_cat='var url=qfQwBaseV44.call(this)+"/catalog.php?bookId="+encodeURIComponent(bid),res=j.get(String(url),qfQwHeadersV44.call(this),12000),obj=JSON.parse(String(res.body()||"{}"));'
+          new_cat='var url=qfQwBaseV44.call(this)+"/catalog.php?bookId="+encodeURIComponent(bid),rawCat=String(j.ajax(String(url))||""),obj=JSON.parse(rawCat||"{}");'
+          assert old_cat in code, 'catalog transport anchor missing'
+          code=code.replace(old_cat,new_cat,1)
+          old_cont='try{var res=j.get(String(api),qfQwHeadersV44.call(this),12000),raw=String(res.body()||""),obj=null;try{obj=JSON.parse(raw);}catch(_j){}var txt=qfQwStripFooterV39(qfQwPickContentV39(obj,raw));'
+          new_cont='try{var raw=String(j.ajax(String(api))||""),obj=null;try{obj=JSON.parse(raw);}catch(_j){}var txt=qfQwStripFooterV39(qfQwPickContentV39(obj,raw));'
+          assert old_cont in code, 'content transport anchor missing'
+          code=code.replace(old_cont,new_cont,1)
+          # 3) stronger resolver diagnostics after repeated real-device failures.
+          old_err='if(!it||!String(it.time||"")){qfLimSetErrV30.call(this,"情无","新来源未匹配当前章节："+String(meta.title||cid||"未知章节"));return null;}'
+          new_err='if(!it||!String(it.time||"")){var valid=0,sample=[];for(var qi=0;qi<rows.length;qi++){if(String(rows[qi]&&rows[qi].time||""))valid++;if(sample.length<3&&rows[qi])sample.push(String(rows[qi].title||"")+"#"+String(rows[qi].chapterId||"")+"@"+String(rows[qi].time||""));}qfLimSetErrV30.call(this,"情无","新来源未匹配当前章节："+String(meta.title||cid||"未知章节")+"｜目录"+rows.length+"条/有效"+valid+"条｜样例："+sample.join("；"));return null;}'
+          assert old_err in code, 'resolver error anchor missing'
+          code=code.replace(old_err,new_err,1)
+          pack['limited_qw']=enc(code); s['jsLib']=lib[:a]+json.dumps(pack,ensure_ascii=False,separators=(',',':'))+lib[b:]
+          s['bookSourceComment']='v1.1.0-beta41：新情无继续免登录。清除 beta39/40 旧目录内存缓存，并严格复刻附件 java.ajax 请求 catalog/content；匹配失败时显示目录条数、有效解码数和章节样例，便于真机定位。账号管理沿用 beta40 已移除情无。其它域冻结。'
+          SRC.write_text(json.dumps(arr,ensure_ascii=False,indent=2)); assert hashlib.sha256(STABLE.read_bytes()).hexdigest()==stable_hash
+          VERSION='1.1.0-beta41'; VC=11041; DATE='2026-09-11'; TS='2026-09-11T08:27:00+08:00'
+          summary='Beta41：新情无清除旧目录缓存并对齐附件原生 ajax 请求；失败时输出真实目录诊断。'
+          tags=['起点','测试版','限免源','情无','免登录','目录诊断','小雨来源','评论页']
+          changes=['情无目录缓存键升级到 v41，避免 Beta39/40 错误解码结果继续命中内存缓存','catalog.php 与 content.php 改为与附件完全一致的 java.ajax 请求链','匹配失败时输出目录总数、有效 time 数量和前三条章节样例，停止盲猜','账号管理沿用 Beta40：不显示情无；正文 Provider 仍保留情无且免登录']
+          raw=f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={VC}'; backup=f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v={VC}'; imp='legado://import/importonline?src='+raw; detail='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json'; sha=hashlib.sha256(SRC.read_bytes()).hexdigest()
+          def entry(base=None,itype=False):
+              e=dict(base or {}); e.update({'id':'qidian-next-beta','name':'🌈 起点增强 · Beta','summary':summary,'icon':e.get('icon',''),'channel':'beta','version':VERSION,'updatedAt':DATE,'tags':tags,'changelog':changes,'sourceUrl':raw,'backupUrl':backup,'importUrl':imp,'detailUrl':detail,'versionCode':VC});
+              if itype:e['type']='novel'
+              return e
+          mp=Path('manifest.json'); m=json.loads(mp.read_text()); m['updatedAt']=TS
+          for i,e in enumerate(m.get('sources',[])):
+              if e.get('id')=='qidian-next-beta':
+                  ne=dict(e); ne.update({'name':'🌈 起点增强 · Beta','category':'novel','channel':'beta','version':VERSION,'versionCode':VC,'updatedAt':TS,'sourcePath':'sources/novel/qidian-next/qidian-next-beta.json','sourceUrl':raw,'bookSourceUrl':'https://m.qidian.com/?qf_source=qidian_next_8d7','summary':summary,'tags':tags,'changelog':changes,'sha256':sha}); m['sources'][i]=ne; break
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2))
+          for p,itype in [(Path('subscription/beta.json'),False),(Path('subscription/novel.json'),True)]:
+              j=json.loads(p.read_text()); j['updatedAt']=TS; j['generatedAt']=TS
+              for i,e in enumerate(j.get('items',[])):
+                  if e.get('id')=='qidian-next-beta': j['items'][i]=entry(e,itype); break
+              p.write_text(json.dumps(j,ensure_ascii=False,indent=2))
+          Path('rss/data/details/beta/qidian-next.json').write_text(json.dumps({'kind':'source','title':'🌈 起点增强 · Beta','summary':summary,'badges':['Beta',VERSION,'情无免登录'],'sections':[{'title':'本版更新','text':'清除旧情无目录缓存，并将目录/正文请求改为附件原生 java.ajax 链。'},{'title':'失败诊断','text':'若仍匹配失败，错误页会直接显示目录总数、有效章节数和章节样例。'},{'title':'版本状态','text':'Beta / 测试通道，等待真机确认。'}],'sourceUrl':raw,'backupUrl':backup,'importUrl':imp},ensure_ascii=False,indent=2))
+          bp=Path('bundles/all-beta.json'); ba=json.loads(bp.read_text()); src_obj=arr[0] if isinstance(arr,list) else arr
+          for i,o in enumerate(ba):
+              if isinstance(o,dict) and o.get('bookSourceUrl')==src_obj.get('bookSourceUrl'): ba[i]=src_obj; break
+          bp.write_text(json.dumps(ba,ensure_ascii=False,indent=2))
+          rp=Path('docs/RELEASE_LOG.md'); old=rp.read_text(); rp.write_text('## 2026-09-11 · 起点增强 1.1.0-beta41 — 情无缓存隔离 / 原生请求 / 真机诊断\n\n- Stable 保持 1.1.0 不变。\n- 情无目录缓存键升级，避免旧错误解码结果继续命中。\n- catalog/content 请求严格对齐附件 java.ajax。\n- 匹配失败直接输出目录总数、有效 time 数和章节样例，用真机结果继续收口。\n- 账号管理沿用 Beta40，不显示情无。\n\n'+old)
+          hp=Path('docs/sources/qidian-next/PROJECT_HANDOFF.md'); old=hp.read_text(); hp.write_text('## 2026-09-11 · Current Beta 1.1.0-beta41 — 情无 fresh cache / native ajax diagnostics\n\n- Stable remains 1.1.0.\n- QW catalog cache key bumped to v41; catalog/content now mirror attachment java.ajax.\n- Resolver failure now exposes real catalog/effective row counts and samples for device diagnosis.\n\n'+old)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git commit -m 'fix: publish qidian-next beta41 qingwu fresh-cache diagnostics'
+          git push origin main
