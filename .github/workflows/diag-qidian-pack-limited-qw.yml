@@ -1,0 +1,48 @@
+name: diag-qidian-pack-limited-qw
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-pack-limited-qw.trigger'
+permissions:
+  contents: write
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Inspect pack
+        run: |
+          python3 - <<'PY'
+          import json,re,gzip,base64
+          s=json.load(open('sources/novel/qidian-next/qidian-next.json',encoding='utf-8'))[0]
+          js=s['jsLib']
+          out=[]
+          for pat in [r'QF_MOD38_PACK\s*=\s*(\{.*?\})\s*;',r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});']:
+            m=re.search(pat,js,re.S)
+            if not m: continue
+            out.append('PATTERN MATCH '+pat+'\n')
+            try:
+              pack=json.loads(m.group(1)); out.append('keys='+','.join(pack.keys())+'\n')
+              v=pack.get('limited_qw'); out.append('type='+str(type(v))+' len='+str(len(v) if isinstance(v,str) else None)+' prefix='+repr(v[:80] if isinstance(v,str) else v)+'\n')
+              if isinstance(v,str):
+                raw=v[3:] if v.startswith('gz:') else v
+                for mode in ['gzip','zlib']:
+                  try:
+                    data=base64.b64decode(raw)
+                    if mode=='gzip': t=gzip.decompress(data).decode('utf-8')
+                    else:
+                      import zlib;t=zlib.decompress(data).decode('utf-8')
+                    out.append('\nDECODE '+mode+' OK\n'+t+'\n')
+                    break
+                  except Exception as e: out.append('DECODE '+mode+' FAIL '+repr(e)+'\n')
+            except Exception as e: out.append('json fail '+repr(e)+'\n')
+            break
+          open('.staging/qidian-pack-limited-qw.txt','w',encoding='utf-8').write(''.join(out))
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .staging/qidian-pack-limited-qw.txt
+          git commit -m 'diag: capture limited_qw pack' || exit 0
+          git push origin HEAD:main
