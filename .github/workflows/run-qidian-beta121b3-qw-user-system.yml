@@ -1,4 +1,4 @@
-name: run-qidian-beta121b3-qw-user-system
+name: run-qidian-beta121b4-qw-reviews
 on:
   push:
     paths:
@@ -12,25 +12,22 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Run beta4 review patch
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('.staging/patch_qidian_beta121b4_qw_reviews.py')
-          t=p.read_text(encoding='utf-8')
-          t=t.replace("raw=v.split(':',1)[1] if v.startswith('gz:') else v","raw=v.split(':',1)[1] if ':' in v[:12] else v")
-          t=t.replace("mods={k:dec(v) for k,v in pack.items()}","mods={}\nfor k,v in pack.items():\n    try: mods[k]=dec(v)\n    except Exception: pass")
-          p.write_text(t,encoding='utf-8')
-          PY
-          python3 .staging/patch_qidian_beta121b4_qw_reviews.py
-      - name: Validate
+      - name: Patch current Qingwu review adapter
+        run: python3 .staging/patch_qidian_beta121b4_qw_reviews.py
+      - name: Validate beta4
         run: |
           python3 -m json.tool sources/novel/qidian-next/qidian-next-beta.json >/dev/null
-          grep -q '1.2.1-beta4' sources/novel/qidian-next/manifest.json
-      - name: Commit
+          python3 -m json.tool manifest.json >/dev/null
+          python3 -m json.tool subscription/beta.json >/dev/null
+          python3 -m json.tool subscription/novel.json >/dev/null
+          python3 -m json.tool bundles/all-beta.json >/dev/null
+          grep -q '1.2.1-beta4' manifest.json
+          grep -q '情无段评' sources/novel/qidian-next/qidian-next-beta.json
+      - name: Commit beta4
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add sources/novel/qidian-next/qidian-next-beta.json sources/novel/qidian-next/manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
-          git commit -m 'qidian beta4: qingwu reviews and chapter preview'
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json docs/RELEASE_LOG.md
+          if [ -f rss/data/details/beta/qidian-next.json ]; then git add rss/data/details/beta/qidian-next.json; fi
+          git commit -m 'qidian beta4: qingwu current review server adapter'
           git push origin HEAD:main
