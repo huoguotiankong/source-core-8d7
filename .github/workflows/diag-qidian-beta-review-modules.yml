@@ -1,0 +1,43 @@
+name: diag-qidian-beta-review-modules
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-beta-review-modules.trigger'
+permissions:
+  contents: read
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Inspect compressed modules
+        run: |
+          python3 - <<'PY'
+          import json,re,base64,gzip
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(p.read_text(encoding='utf-8'))
+          src=arr[0] if isinstance(arr,list) else arr
+          js=src.get('jsLib','')
+          m=re.search(r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});\s*var\s+QF_MOD38_EXPORTS',js,re.S)
+          if not m:
+            raise SystemExit('pack not found')
+          pack=json.loads(m.group(1))
+          keys=['review','comment','本章说','章名','ParagraphId','Getparagraphscommentcounts','chapterreview','chapter comment','段评','书友评论','qfReview']
+          for name,v in pack.items():
+            try:
+              raw=v.split(':',1)[1] if ':' in v[:12] else v
+              data=base64.b64decode(raw)
+              try: text=gzip.decompress(data).decode('utf-8')
+              except Exception: text=data.decode('utf-8')
+            except Exception:
+              continue
+            hit=[k for k in keys if k.lower() in text.lower()]
+            if hit:
+              print('MODULE',name,'HITS',hit,'LEN',len(text))
+              for k in hit[:5]:
+                i=text.lower().find(k.lower())
+                print(' ',k,repr(text[max(0,i-180):i+500]))
+          PY
