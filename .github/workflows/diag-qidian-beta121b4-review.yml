@@ -1,0 +1,37 @@
+name: diag-qidian-beta121b4-review
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-beta121b4-review.trigger'
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Scan review modules
+        run: |
+          python3 - <<'PY'
+          import json,gzip,base64,re
+          p='sources/novel/qidian-next/qidian-next-beta.json'
+          s=json.load(open(p,encoding='utf-8'))[0]
+          js=s['jsLib']; pos=js.find('QF_MOD38_PACK='); st=js.find('{',pos); pack,_=json.JSONDecoder().raw_decode(js[st:])
+          keys=['段评','本章说','章名','review','comment','评论设置','评论数据','review_local']
+          for n,v in pack.items():
+            try:
+              raw=v.split(':',1)[1] if ':' in v[:12] else v
+              raw+='='*((4-len(raw)%4)%4)
+              t=gzip.decompress(base64.urlsafe_b64decode(raw)).decode('utf-8')
+            except: continue
+            if any(k.lower() in t.lower() for k in keys):
+              print('\n===== MODULE',n,'len',len(t),'=====')
+              for k in keys:
+                for m in list(re.finditer(re.escape(k),t,re.I))[:6]:
+                  a=max(0,m.start()-700); b=min(len(t),m.end()+1200)
+                  print('\n--',k,'--\n',t[a:b].replace('\n',' '))
+          print('\n===== JSLIB SETTINGS SNIPS =====')
+          for k in ['段评','本章说','章名','评论设置','review']:
+            for m in list(re.finditer(re.escape(k),js,re.I))[:12]:
+              print('\n--',k,'--\n',js[max(0,m.start()-600):min(len(js),m.end()+1000)].replace('\n',' '))
+          PY
