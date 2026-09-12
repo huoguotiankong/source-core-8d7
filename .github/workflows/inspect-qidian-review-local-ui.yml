@@ -4,7 +4,7 @@ on:
     paths:
       - '.staging/inspect-qidian-review-local-ui.trigger'
 permissions:
-  contents: read
+  contents: write
 jobs:
   inspect:
     runs-on: ubuntu-latest
@@ -13,7 +13,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 1
-      - name: Inspect review_local_ui
+      - name: Extract review_local_ui
         shell: bash
         run: |
           python3 - <<'PY'
@@ -35,7 +35,19 @@ jobs:
               text=gzip.decompress(base64.b64decode(b)).decode('utf-8')
           else:
               text=s
-          print('===== review_local_ui BEGIN =====')
-          print(text)
-          print('===== review_local_ui END =====')
+          out=Path('.staging/review_local_ui.inspect.js')
+          out.write_text(text,encoding='utf-8')
+          print('wrote',out,'bytes',len(text.encode('utf-8')))
           PY
+      - name: Commit extracted module
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/review_local_ui.inspect.js
+          if git diff --cached --quiet; then
+            echo 'No changes'
+            exit 0
+          fi
+          git commit -m 'chore: expose qidian local review module for inspection'
+          git push origin HEAD:main
