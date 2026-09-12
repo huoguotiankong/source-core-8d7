@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Decode review_local_ui and inspect chapter card
+      - name: Decode review_local_ui and inspect exact chapter card
         run: |
           python - <<'PY'
           import base64,gzip,json,re
@@ -35,20 +35,10 @@ jobs:
           b+='='*((4-len(b)%4)%4)
           mod=gzip.decompress(base64.b64decode(b)).decode('utf-8')
           print('MODULE_BYTES',len(mod.encode()))
-          for token in ['本章说','getBuiltInCommentHtmlV21','qfBuildLocalCommentCardV338','qfShowLocalCommentCardV322']:
-              print('\n===== TOKEN',token,'COUNT',mod.count(token),'=====')
-              pos=0
-              n=0
-              while True:
-                  i=mod.find(token,pos)
-                  if i<0: break
-                  n+=1
-                  lo=max(0,i-5000); hi=min(len(mod),i+8000)
+          for token in ['本章说','条评论','qfcount','chapterReview','ChapterReview','reviewCount','CommentCount','data:image/svg','<svg']:
+              hits=[x.start() for x in re.finditer(re.escape(token),mod)]
+              print('\n===== TOKEN',token,'COUNT',len(hits),'=====')
+              for n,i in enumerate(hits,1):
+                  lo=max(0,i-2600); hi=min(len(mod),i+4300)
                   print('\n---',token,n,'AT',i,'---\n'+mod[lo:hi])
-                  pos=i+len(token)
-                  if n>=4: break
-          print('\n===== COLOR/CSS LINES NEAR 本章说 =====')
-          for i,line in enumerate(mod.splitlines(),1):
-              if '本章说' in line or ('#' in line and any(x in line for x in ['fill','stroke','background','color','linearGradient','rect','text'])):
-                  print(f'{i}: {line[:1500]}')
           PY
