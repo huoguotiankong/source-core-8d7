@@ -1,0 +1,41 @@
+name: inspect-qidian-review-local-ui
+on:
+  push:
+    paths:
+      - '.staging/inspect-qidian-review-local-ui.trigger'
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Inspect review_local_ui
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,re,base64,gzip
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(p.read_text(encoding='utf-8'))
+          src=arr[0] if isinstance(arr,list) else arr
+          js=src.get('jsLib','')
+          m=re.search(r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});\s*var\s+QF_MOD38_EXPORTS',js,re.S)
+          if not m: raise SystemExit('QF_MOD38_PACK not found')
+          pack=json.loads(m.group(1))
+          v=pack.get('review_local_ui')
+          if v is None: raise SystemExit('review_local_ui missing')
+          s=str(v)
+          if s.startswith('gz:'):
+              b=s[3:].strip().replace('-','+').replace('_','/')
+              b += '='*((4-len(b)%4)%4)
+              text=gzip.decompress(base64.b64decode(b)).decode('utf-8')
+          else:
+              text=s
+          print('===== review_local_ui BEGIN =====')
+          print(text)
+          print('===== review_local_ui END =====')
+          PY
