@@ -10,43 +10,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {ref: main}
-      - name: Print review normalizer and chapter-end functions
+      - name: Print local review functions
         run: |
           python3 - <<'PY'
           import json,re,base64,gzip
           a=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8')); s=a[0] if isinstance(a,list) else a
           m=re.search(r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});\s*var\s+QF_MOD38_EXPORTS',s['jsLib'],re.S); pack=json.loads(m.group(1))
-          def dec(v):
-            r=v.split(':',1)[1] if ':' in v[:12] else v; b=base64.b64decode(r)
-            try:return gzip.decompress(b).decode()
-            except:return b.decode()
-          def body(text,name):
-            p=text.find('function '+name)
-            if p<0:return None
-            b=text.find('{',p); dep=0; ins=None; esc=False
-            for i in range(b,len(text)):
-              c=text[i]
-              if ins:
-                if esc: esc=False
-                elif c=='\\': esc=True
-                elif c==ins: ins=None
-                continue
-              if c in "'\"`": ins=c; continue
-              if c=='{': dep+=1
-              elif c=='}':
-                dep-=1
-                if dep==0:return text[p:i+1]
-            return text[p:p+12000]
-          core=dec(pack['review_server_core'])
-          for n in ['qfServerNormV315','qfServerChapterPackV315','qfShowServerCommentV315','qfServerCommentHtmlV315']:
-            x=body(core,n)
-            if x: print('\n===== CORE '+n+' =====\n'+x)
-          for mod in ['review_sunny','review_common','review_server_ui']:
-            if mod not in pack: continue
-            text=dec(pack[mod]); print('\n### MODULE',mod,'FUNCTIONS')
-            fns=re.findall(r'function\s+([A-Za-z0-9_$]+)\s*\(',text)
-            for fn in fns:
-              x=body(text,fn)
-              if x and any(k in x for k in ['本章说','chapterEnd','chapter end','ChapterEnd','章末','serverParaId','titleItem']):
-                print('\n===== '+mod+' '+fn+' =====\n'+x)
+          v=pack['review']; r=v.split(':',1)[1] if ':' in v[:12] else v; r += '='*((4-len(r)%4)%4); b=base64.b64decode(r)
+          try:text=gzip.decompress(b).decode()
+          except:text=b.decode()
+          fns=re.findall(r'function\s+([A-Za-z0-9_$]+)\s*\(',text)
+          for fn in fns:
+            if any(k.lower() in fn.lower() for k in ['fetch','comment','show','open','paragraph','chapter']): print(fn)
+          for kw in ['qdFetchChapterCommentsV22','qdFetchParagraph','chapter title','章名','paragraphId']:
+            i=text.find(kw)
+            if i>=0: print('\n===== '+kw+' =====\n'+text[max(0,i-2000):i+7000])
           PY
