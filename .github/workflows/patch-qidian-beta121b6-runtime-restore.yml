@@ -1,0 +1,236 @@
+name: patch-qidian-beta121b6-runtime-restore
+on:
+  push:
+    paths:
+      - '.staging/patch-qidian-beta121b6-runtime-restore.trigger'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Restore Beta4 runtime and apply isolated Base64URL decoder fix
+        run: |
+          python3 - <<'PY'
+          import json,re,hashlib,base64,gzip,subprocess,tempfile,os
+          from pathlib import Path
+          from datetime import datetime,timezone,timedelta
+
+          REPO='huoguotiankong/source-core-8d7'
+          SRC=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          STABLE=Path('sources/novel/qidian-next/qidian-next.json')
+          BASE_REF='90c2a479ed7e9fb0c348160de479f3c1b0198598'  # verified Beta4 source state before Beta5 patch
+          VERSION='1.2.1-beta6'
+          CODE=12016
+          stable_before=hashlib.sha256(STABLE.read_bytes()).hexdigest()
+
+          def git_show(ref,path):
+              return subprocess.check_output(['git','show',f'{ref}:{path}'],text=True,encoding='utf-8')
+
+          # Start from the verified Beta4 source, not the damaged Beta5 jsLib.
+          base_arr=json.loads(git_show(BASE_REF,str(SRC)))
+          arr=json.loads(json.dumps(base_arr,ensure_ascii=False))
+          src=arr[0] if isinstance(arr,list) else arr
+          base_src=base_arr[0] if isinstance(base_arr,list) else base_arr
+          base_js=base_src.get('jsLib','')
+
+          fn='function qfModuleUnpackV41(v){'
+          marker='/* alpha84：lazy module 首次加载并发保护。'
+          start=base_js.find(fn)
+          end=base_js.find(marker,start)
+          if start<0 or end<0:
+              raise SystemExit('Beta4 loader/alpha84 boundary not found')
+          old_loader=base_js[start:end]
+          if 'GZIPInputStream' not in old_loader:
+              raise SystemExit('unexpected Beta4 unpack function')
+          if 'function qfModuleThreadIdV84' not in base_js or 'function qfModuleWaitV84' not in base_js:
+              raise SystemExit('verified Beta4 runtime functions missing')
+
+          # IMPORTANT: ordinary triple-quoted string = real newlines. Never use raw r'''...\\n...'''.
+          new_loader='''function qfModuleUnpackV41(v){
+    var s=String(v||"");
+    if(s.indexOf("gz:")!==0)return s;
+    try{
+        var b64=String(s.substring(3)||"").replace(/\\s+/g,"");
+        var std=b64.replace(/-/g,"+").replace(/_/g,"/");
+        while(std.length%4)std+="=";
+        var bytes=null;
+        try{bytes=Packages.android.util.Base64.decode(std,0);}catch(_a){
+            try{bytes=Packages.java.util.Base64.getDecoder().decode(std);}catch(_b){
+                bytes=Packages.java.util.Base64.getUrlDecoder().decode(b64);
+            }
+        }
+        var input=new Packages.java.io.ByteArrayInputStream(bytes);
+        var gz=new Packages.java.util.zip.GZIPInputStream(input);
+        var out=new Packages.java.io.ByteArrayOutputStream();
+        var buf=Packages.java.lang.reflect.Array.newInstance(Packages.java.lang.Byte.TYPE,4096),n=0;
+        while((n=gz.read(buf))>0)out.write(buf,0,n);
+        gz.close();
+        return String(new Packages.java.lang.String(out.toByteArray(),"UTF-8"));
+    }catch(e){
+        throw new Error("模块解压失败："+String(e&&e.message||e));
+    }
+}
+
+'''
+          js=base_js[:start]+new_loader+base_js[end:]
+          src['jsLib']=js
+          src['bookSourceComment']='v1.2.1-beta6：回退到已验证 Beta4 运行时基线，仅隔离修复懒模块 Base64URL 解码。修复 Beta5 误删 alpha84 并发运行时导致 qfModuleThreadIdV84 未定义，以及错误写入字面量 \\n 导致 Rhino“不允许的字符：\\”从而破坏正文的问题。情无/小雨评论、正文链、账号系统和其它 Provider 均保持 Beta4 逻辑不变。Stable 1.2.0 不变。'
+          for k in ('version','sourceVersion'):
+              if k in src: src[k]=VERSION
+          for k in ('versionCode','sourceVersionCode'):
+              if k in src: src[k]=CODE
+
+          # Structural guard: outside qfModuleUnpackV41, jsLib must be byte-for-byte Beta4.
+          new_start=js.find(fn); new_end=js.find(marker,new_start)
+          if base_js[:start] != js[:new_start]:
+              raise SystemExit('unexpected jsLib change before loader')
+          if base_js[end:] != js[new_end:]:
+              raise SystemExit('unexpected jsLib change after loader / alpha84 runtime')
+
+          # Regression guards for the two real-device failures.
+          must=[
+              'function qfModuleThreadIdV84(){',
+              'function qfModuleWaitV84(name,owner){',
+              'replace(/-/g,"+")',
+              'replace(/_/g,"/")',
+              'while(std.length%4)std+="=";',
+              'GZIPInputStream'
+          ]
+          for needle in must:
+              if needle not in js: raise SystemExit('runtime assertion failed: '+needle)
+          if js.count('function qfModuleThreadIdV84(){')!=1 or js.count('function qfModuleWaitV84(name,owner){')!=1:
+              raise SystemExit('alpha84 runtime definition count invalid')
+          if js.count(fn)!=1:
+              raise SystemExit('unpack function count invalid')
+          # Beta5 bug wrote literal backslash+n immediately after JS tokens.
+          if 'function qfModuleUnpackV41(v){\\n' in js:
+              raise SystemExit('literal backslash-n still present in loader')
+          if not js.startswith(base_js[:start]):
+              raise SystemExit('jsLib prefix drift')
+
+          SRC.write_text(json.dumps(arr,ensure_ascii=False,indent=2),encoding='utf-8')
+
+          # Verify every packed lazy module decodes + gunzips with the repaired algorithm.
+          m=re.search(r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});\s*var\s+QF_MOD38_EXPORTS',js,re.S)
+          if not m: raise SystemExit('module pack not found')
+          pack=json.loads(m.group(1)); checked=0
+          decoded=[]
+          for name,val in pack.items():
+              s=str(val)
+              if not s.startswith('gz:'): continue
+              b=s[3:].strip().replace('-','+').replace('_','/')
+              b += '='*((4-len(b)%4)%4)
+              try:
+                  raw=base64.b64decode(b,validate=True)
+                  text=gzip.decompress(raw).decode('utf-8')
+              except Exception as e:
+                  raise SystemExit(f'module decode failed {name}: {e}')
+              if text.startswith('\\n') or text.startswith('\\r'):
+                  raise SystemExit(f'module {name} starts with literal backslash escape')
+              decoded.append((name,text)); checked+=1
+          if checked!=31:
+              raise SystemExit(f'expected 31 compressed modules, got {checked}')
+
+          # JS parser smoke test catches the exact Rhino-style stray backslash class of regression.
+          node_script='''const fs=require("fs");const a=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));const s=Array.isArray(a)?a[0]:a;new Function(s.jsLib);console.log("jsLib syntax OK");'''
+          with tempfile.NamedTemporaryFile('w',suffix='.js',delete=False,encoding='utf-8') as tf:
+              tf.write(node_script); npath=tf.name
+          try:
+              cp=subprocess.run(['node',npath,str(SRC)],capture_output=True,text=True)
+              if cp.returncode!=0:
+                  raise SystemExit('jsLib syntax check failed: '+cp.stderr[:2000])
+              print(cp.stdout.strip())
+          finally:
+              os.unlink(npath)
+
+          sha=hashlib.sha256(SRC.read_bytes()).hexdigest()
+          now=datetime.now(timezone(timedelta(hours=8))).replace(microsecond=0).isoformat()
+          summary='Beta5 紧急回归修复：恢复 Beta4 完整运行时，仅保留 Base64URL 解码兼容；修复正文非法反斜杠与评论运行时函数丢失。'
+          changes=[
+              '修复正文偶发“EvaluatorException: 不允许的字符：\\”',
+              '恢复 Beta5 误删的 alpha84 并发加载运行时（qfModuleThreadIdV84 / qfModuleWaitV84）',
+              '保留 Base64URL -/_ 与缺失 = 补位兼容，31 个压缩模块全部解压校验',
+              '除 qfModuleUnpackV41 外 jsLib 与已验证 Beta4 基线逐字节一致',
+              '情无/小雨评论、正文链、账号系统及其它 Provider 保持 Beta4；Stable 1.2.0 不变'
+          ]
+          raw=f'https://raw.githubusercontent.com/{REPO}/main/{SRC}?v={CODE}'
+          cdn=f'https://cdn.jsdelivr.net/gh/{REPO}@main/{SRC}?v={CODE}'
+          imp='legado://import/importonline?src='+raw
+
+          def update_item(v):
+              v['name']='🌈 起点增强 · Beta'; v['channel']='beta'; v['version']=VERSION; v['versionCode']=CODE
+              v['updatedAt']=now; v['summary']=summary; v['changelog']=changes
+              v['sourcePath']=str(SRC); v['sourceUrl']=raw; v['backupUrl']=cdn; v['importUrl']=imp; v['sha256']=sha
+              tags=list(v.get('tags') or [])
+              for tag in ['起点','测试版','限免源','情无','小雨用户系统','游客Token','网页登录','免登录回退','X','评论页','Base64URL','运行时回归修复']:
+                  if tag not in tags: tags.append(tag)
+              v['tags']=tags
+
+          for fp in ['subscription/beta.json','subscription/novel.json','manifest.json']:
+              p=Path(fp); d=json.loads(p.read_text(encoding='utf-8')); hit=[0]
+              def walk(x):
+                  if isinstance(x,list):
+                      for v in x: walk(v)
+                  elif isinstance(x,dict):
+                      if x.get('id')=='qidian-next-beta': update_item(x); hit[0]+=1
+                      else:
+                          for v in x.values(): walk(v)
+              walk(d)
+              if hit[0]!=1: raise SystemExit(f'{fp}: expected 1 qidian-next-beta item, got {hit[0]}')
+              if isinstance(d,dict):
+                  if 'updatedAt' in d:d['updatedAt']=now
+                  if 'generatedAt' in d:d['generatedAt']=now
+              p.write_text(json.dumps(d,ensure_ascii=False,indent=2),encoding='utf-8')
+
+          # Replace only qidian-next Beta object in the beta bundle.
+          bp=Path('bundles/all-beta.json'); bd=json.loads(bp.read_text(encoding='utf-8')); hit=[0]
+          def repl(x):
+              if isinstance(x,list):
+                  for i,v in enumerate(x):
+                      if isinstance(v,dict) and v.get('bookSourceUrl')==src.get('bookSourceUrl') and 'Beta' in str(v.get('bookSourceName','')):
+                          x[i]=json.loads(json.dumps(src,ensure_ascii=False)); hit[0]+=1
+                      else: repl(v)
+              elif isinstance(x,dict):
+                  for v in x.values(): repl(v)
+          repl(bd)
+          if hit[0]!=1: raise SystemExit(f'bundle beta source target count={hit[0]}')
+          bp.write_text(json.dumps(bd,ensure_ascii=False,indent=2),encoding='utf-8')
+
+          dp=Path('rss/data/details/beta/qidian-next.json')
+          detail={
+            'kind':'source','title':'🌈 起点增强 · Beta','summary':'Beta 1.2.1-beta6：紧急回归修复。恢复 Beta4 完整运行时，仅保留隔离的 Base64URL 解码兼容。',
+            'badges':['Beta','1.2.1-beta6','运行时回归修复'],
+            'sections':[
+              {'title':'正文修复','text':'修复 Beta5 将字面量 \\n 写入 jsLib 后触发 Rhino “不允许的字符：\\”的问题；正文 Provider 逻辑回到 Beta4 基线。'},
+              {'title':'评论修复','text':'恢复 Beta5 误删的 alpha84 并发加载函数 qfModuleThreadIdV84 / qfModuleWaitV84，解决点击段评/本章说 ReferenceError。'},
+              {'title':'Base64URL','text':'仅在 qfModuleUnpackV41 内兼容 -/_ 和缺失 =；31 个压缩懒模块全部完成 Base64 解码与 gzip 解压校验。'},
+              {'title':'冻结范围','text':'情无/小雨评论业务、账号系统、正文链及其它 Provider 不改；Stable 1.2.0 不变。'}
+            ],'sourceUrl':raw,'backupUrl':cdn,'importUrl':imp
+          }
+          dp.write_text(json.dumps(detail,ensure_ascii=False,indent=2),encoding='utf-8')
+
+          entry=f'''\n## 2026-09-12 · qidian-next {VERSION}\n- 紧急修复 Beta5 回归：正文出现 `EvaluatorException: 不允许的字符：\\`。根因是热修脚本用 raw Python 字符串把 `\\n` 字面量写进 `jsLib`。\n- 恢复 Beta5 误删的 alpha84 lazy-module 并发运行时，补回 `qfModuleThreadIdV84` / `qfModuleWaitV84`，修复点击段评/本章说 `ReferenceError`。\n- 修复基线改为已验证 Beta4；仅 `qfModuleUnpackV41` 做 Base64URL `-` / `_` 和缺失 `=` 兼容。\n- 门禁：31 个压缩模块逐个 Base64+gzip 解压；`jsLib` JS 语法检查；loader 外与 Beta4 基线逐字节一致。\n- Stable 1.2.0 不变，继续仅进入 Beta 真机验证。\n'''
+          for fp in ['docs/RELEASE_LOG.md','docs/sources/qidian-next/PROJECT_HANDOFF.md']:
+              p=Path(fp); t=p.read_text(encoding='utf-8')
+              if f'qidian-next {VERSION}' not in t:
+                  p.write_text(entry+t,encoding='utf-8')
+
+          if hashlib.sha256(STABLE.read_bytes()).hexdigest()!=stable_before:
+              raise SystemExit('stable source changed unexpectedly')
+
+          print('Beta6 ready', 'modules=',checked, 'sha256=',sha, 'time=',now)
+          PY
+      - name: Final diff guard and publish
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json subscription/beta.json subscription/novel.json manifest.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git diff --cached --check
+          git diff --cached --stat
+          git commit -m "fix qidian beta6 restore runtime and isolate base64url decoder"
+          git push origin main
