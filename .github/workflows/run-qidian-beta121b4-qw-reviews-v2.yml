@@ -1,0 +1,37 @@
+name: run-qidian-beta121b4-qw-reviews-v2
+on:
+  push:
+    paths:
+      - '.staging/run-qidian-beta121b4-qw-reviews-v2.trigger'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch decoder and run
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('.staging/patch_qidian_beta121b4_qw_reviews.py')
+          t=p.read_text(encoding='utf-8')
+          t=t.replace("raw=v.split(':',1)[1] if v.startswith('gz:') else v","raw=v.split(':',1)[1] if ':' in v[:12] else v")
+          t=t.replace("mods={k:dec(v) for k,v in pack.items()}","mods={}\nfor k,v in pack.items():\n    try: mods[k]=dec(v)\n    except Exception: pass")
+          p.write_text(t,encoding='utf-8')
+          PY
+          python3 .staging/patch_qidian_beta121b4_qw_reviews.py
+      - name: Validate
+        run: |
+          python3 -m json.tool sources/novel/qidian-next/qidian-next-beta.json >/dev/null
+          grep -q '1.2.1-beta4' sources/novel/qidian-next/manifest.json
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next-beta.json sources/novel/qidian-next/manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
+          git diff --cached --quiet && exit 0
+          git commit -m 'qidian beta4: add qingwu review server and chapter preview'
+          git push origin main
