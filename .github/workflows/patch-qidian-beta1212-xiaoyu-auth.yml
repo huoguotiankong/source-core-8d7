@@ -12,39 +12,27 @@ jobs:
       - name: Patch qingwu review routing
         run: |
           python3 - <<'PY'
-          import json,gzip,base64,re
+          import json,gzip,base64
           from pathlib import Path
-          p=Path('sources/novel/qidian-next/qidian-next-beta.json');arr=json.loads(p.read_text(encoding='utf-8'));s=arr[0];js=s['jsLib'];st=js.find('{',js.find('QF_MOD38_PACK='));pack,used=json.JSONDecoder().raw_decode(js[st:])
-          changed=[]
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json');arr=json.loads(p.read_text(encoding='utf-8'));s=arr[0];js=s['jsLib'];st=js.find('{',js.find('QF_MOD38_PACK='));pack,used=json.JSONDecoder().raw_decode(js[st:]);changed=[]
           for k,v in list(pack.items()):
             if not isinstance(v,str) or ':' not in v[:12]: continue
-            pref,raw=v.split(':',1); raw+='='*((4-len(raw)%4)%4)
+            pref,raw=v.split(':',1);raw+='='*((4-len(raw)%4)%4)
             try:t=gzip.decompress(base64.urlsafe_b64decode(raw)).decode()
             except:continue
             old=t
-            # expose 情无 as selectable review provider wherever the provider choices are defined
-            t=t.replace('["review_local","xianren","review_server"]','["review_local","xianren","review_server","情无"]')
-            t=t.replace("['review_local','xianren','review_server']","['review_local','xianren','review_server','情无']")
-            t=t.replace('["本地","仙人","服务器"]','["本地","仙人","服务器","情无"]')
-            # 情无章末卡始终取两条真实预览；现有代码已把点击详情与 Provider 路由解耦
-            t=t.replace('var qwPreviewChapter=!!(actualProvider==="情无"&&(qwLocalMode||qwChapterLocal));','var qwPreviewChapter=!!(actualProvider==="情无");')
-            # server policy: 情无选择后不再强制本地模式，走已有情无 serverProvider 分支
-            t=t.replace('actualProvider==="情无"&&(qwLocalMode||qwChapterLocal)','actualProvider==="情无"')
-            if t!=old:
-              comp=gzip.compress(t.encode(),9);pack[k]=pref+':'+base64.urlsafe_b64encode(comp).decode().rstrip('=');changed.append(k)
-          if not changed: raise SystemExit('no review routing markers patched')
-          js=js[:st]+json.dumps(pack,ensure_ascii=False,separators=(',',':'))+js[st+used:];s['jsLib']=js;s['bookSourceComment']='v1.2.1-beta4：段评数据源开放“情无/小雨”服务器路由；情无章名评论优先服务器、无数据时沿现有本地回退；情无本章说固定获取前2条真实评论预览。其它域冻结。';p.write_text(json.dumps(arr,ensure_ascii=False,indent=2),encoding='utf-8')
-          mp=Path('sources/novel/qidian-next/manifest.json');m=json.loads(mp.read_text(encoding='utf-8'));m['beta']['version']='1.2.1-beta4';m['beta']['versionCode']=12104;m['beta']['source']='qidian-next-beta.json?v=12104';m['beta']['summary']='段评开放情无服务器路由；章名评论服务器优先/本地回退；本章说显示2条真实评论预览。';mp.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          for fp in ['subscription/beta.json','bundles/all-beta.json']:
-            q=Path(fp);x=q.read_text(encoding='utf-8').replace('1.2.1-beta3','1.2.1-beta4').replace('12103','12104').replace('qidian-next-beta.json?v=12103','qidian-next-beta.json?v=12104');q.write_text(x,encoding='utf-8')
-          rl=Path('docs/RELEASE_LOG.md');rl.write_text('\n## 2026-09-12 · qidian-next `1.2.1-beta4`\n- 段评数据源开放“情无/小雨”服务器路由。\n- 情无章名评论按服务器优先、无数据本地回退。\n- 情无本章说恢复前 2 条真实评论预览。\n- Stable 不变，其它域冻结。\n'+rl.read_text(encoding='utf-8'),encoding='utf-8')
-          print('patched modules',changed)
+            for a,b in [('["review_local","xianren","review_server"]','["review_local","xianren","review_server","情无"]'),("['review_local','xianren','review_server']","['review_local','xianren','review_server','情无']"),('["本地","仙人","服务器"]','["本地","仙人","服务器","情无"]'),('var qwPreviewChapter=!!(actualProvider==="情无"&&(qwLocalMode||qwChapterLocal));','var qwPreviewChapter=!!(actualProvider==="情无");')]:t=t.replace(a,b)
+            if t!=old:pack[k]=pref+':'+base64.urlsafe_b64encode(gzip.compress(t.encode(),9)).decode().rstrip('=');changed.append(k)
+          if not changed:raise SystemExit('no review routing markers patched')
+          s['jsLib']=js[:st]+json.dumps(pack,ensure_ascii=False,separators=(',',':'))+js[st+used:];s['bookSourceComment']='v1.2.1-beta4：段评数据源开放“情无/小雨”；情无段评走服务器；章名评论服务器有则使用、无则回退本地；本章说显示前2条真实评论。其它域冻结。';p.write_text(json.dumps(arr,ensure_ascii=False,indent=2),encoding='utf-8')
+          rl=Path('docs/RELEASE_LOG.md');rl.write_text('\n## 2026-09-12 · qidian-next `1.2.1-beta4`\n- 段评数据源开放“情无/小雨”服务器路由。\n- 章名评论服务器优先，无数据回退本地。\n- 本章说恢复前 2 条真实评论预览。\n- Stable 不变，其它域冻结。\n'+rl.read_text(encoding='utf-8'),encoding='utf-8')
+          print('patched',changed)
           PY
       - name: Commit
         run: |
           python3 -m json.tool sources/novel/qidian-next/qidian-next-beta.json >/dev/null
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add sources/novel/qidian-next/qidian-next-beta.json sources/novel/qidian-next/manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
+          git add sources/novel/qidian-next/qidian-next-beta.json docs/RELEASE_LOG.md
           git commit -m 'qidian beta4: enable qingwu review routing and previews'
           git push origin HEAD:main
