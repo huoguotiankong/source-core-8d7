@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {ref: main}
-      - name: Print current server review functions
+      - name: Print review normalizer and chapter-end functions
         run: |
           python3 - <<'PY'
           import json,re,base64,gzip
@@ -20,10 +20,7 @@ jobs:
             r=v.split(':',1)[1] if ':' in v[:12] else v; b=base64.b64decode(r)
             try:return gzip.decompress(b).decode()
             except:return b.decode()
-          text=dec(pack['review_server_core'])
-          print('FUNCTION NAMES:')
-          print('\n'.join(re.findall(r'function\s+(qf[A-Za-z0-9_]+)\s*\(',text)))
-          def body(name):
+          def body(text,name):
             p=text.find('function '+name)
             if p<0:return None
             b=text.find('{',p); dep=0; ins=None; esc=False
@@ -39,9 +36,17 @@ jobs:
               elif c=='}':
                 dep-=1
                 if dep==0:return text[p:i+1]
-            return text[p:p+8000]
-          names=['qfQwCommentCandidatesV321','qfQwCommentApiV315','qfQwSummaryV315','qfQwCommentPackV315','qfServerSummaryV315','qfServerCommentPackV315','qfServerReviewSummaryV315','qfServerCommentOpenV315','qfServerReviewProviderV315','qfServerCommentProviderV315']
-          for n in names:
-            x=body(n)
-            if x: print('\n===== '+n+' =====\n'+x)
+            return text[p:p+12000]
+          core=dec(pack['review_server_core'])
+          for n in ['qfServerNormV315','qfServerChapterPackV315','qfShowServerCommentV315','qfServerCommentHtmlV315']:
+            x=body(core,n)
+            if x: print('\n===== CORE '+n+' =====\n'+x)
+          for mod in ['review_sunny','review_common','review_server_ui']:
+            if mod not in pack: continue
+            text=dec(pack[mod]); print('\n### MODULE',mod,'FUNCTIONS')
+            fns=re.findall(r'function\s+([A-Za-z0-9_$]+)\s*\(',text)
+            for fn in fns:
+              x=body(text,fn)
+              if x and any(k in x for k in ['本章说','chapterEnd','chapter end','ChapterEnd','章末','serverParaId','titleItem']):
+                print('\n===== '+mod+' '+fn+' =====\n'+x)
           PY
