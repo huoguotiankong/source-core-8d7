@@ -1,0 +1,44 @@
+name: promote-qidian-next-121-stable
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/promote-qidian-next-121-stable.trigger'
+permissions:
+  contents: write
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Promote qidian-next 1.2.1
+        run: |
+          python3 .staging/promote_qidian_next_121_stable.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          for p in [
+              'sources/novel/qidian-next/qidian-next.json',
+              'subscription/stable.json','subscription/beta.json','subscription/novel.json',
+              'manifest.json','bundles/all-stable.json','bundles/all-beta.json',
+              'rss/data/details/stable/qidian-next.json']:
+              json.loads(Path(p).read_text(encoding='utf-8'))
+          print('JSON_OK')
+          PY
+          git diff --check
+      - name: Publish Stable 1.2.1
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add sources/novel/qidian-next/qidian-next.json \
+                  subscription/stable.json subscription/beta.json subscription/novel.json \
+                  manifest.json bundles/all-stable.json bundles/all-beta.json \
+                  rss/data/details/stable/qidian-next.json \
+                  docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git diff --cached --check
+          git diff --cached --stat
+          git commit -m "release qidian-next stable 1.2.1 from beta7"
+          git push origin main
