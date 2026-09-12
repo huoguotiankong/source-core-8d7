@@ -8,19 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: main
-      - name: Inspect review module
+        with: {ref: main}
+      - name: Inspect current review functions
         run: |
           python3 - <<'PY'
-          import json,gzip,base64
-          s=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8'))[0];js=s['jsLib'];st=js.find('{',js.find('QF_MOD38_PACK='));pack,_=json.JSONDecoder().raw_decode(js[st:])
-          print('keys',list(pack.keys()))
-          for k in ['review','review_v410','review_b19']:
-            if k not in pack: continue
-            v=pack[k]; print('KEY',k,'prefix',repr(v[:40]),'len',len(v))
-            for mode in [0,1]:
-              try:
-                raw=v.split(':',1)[1] if mode and ':' in v[:12] else v; raw+='='*((4-len(raw)%4)%4);t=gzip.decompress(base64.urlsafe_b64decode(raw)).decode();print('decoded',mode,'len',len(t),'qfReviewV410',('qfReviewV410' in t));print(t[:300])
-              except Exception as e: print('decode fail',mode,type(e).__name__,str(e)[:120])
+          import json,gzip,base64,re
+          s=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8'))[0];js=s['jsLib'];st=js.find('{',js.find('QF_MOD38_PACK='));pack,_=json.JSONDecoder().raw_decode(js[st:]);v=pack['review'];raw=v.split(':',1)[1];raw+='='*((4-len(raw)%4)%4);t=gzip.decompress(base64.urlsafe_b64decode(raw)).decode()
+          for pat in [r'function\s+(qf\w*Review\w*)\s*\([^)]*\)',r'function\s+(qf\w*Comment\w*)\s*\([^)]*\)',r'reviewProvider.{0,250}',r'段评数据源.{0,400}',r'本章说.{0,300}']:
+            print('\nPAT',pat)
+            for x in re.findall(pat,t,re.I|re.S)[:80]: print(x if isinstance(x,str) else x[0])
           PY
