@@ -14,7 +14,9 @@ jobs:
           ref: main
           fetch-depth: 0
       - name: Build and validate Beta6
-        run: python3 .staging/patch_qidian_beta121b6_runtime_restore.py
+        run: |
+          sed -i 's/process.argv\[1\]/process.argv[2]/g' .staging/patch_qidian_beta121b6_runtime_restore.py
+          python3 .staging/patch_qidian_beta121b6_runtime_restore.py
       - name: Publish Beta6
         run: |
           git config user.name github-actions
