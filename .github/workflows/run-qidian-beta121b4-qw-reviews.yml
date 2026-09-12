@@ -14,7 +14,14 @@ jobs:
           ref: main
       - name: Run patch
         run: |
-          sed -i "s/mods={k:dec(v) for k,v in pack.items()}/mods={k:dec(v) for k,v in pack.items() if isinstance(v,str) and v.startswith('gz:')}/" .staging/patch_qidian_beta121b4_qw_reviews.py
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('.staging/patch_qidian_beta121b4_qw_reviews.py')
+          t=p.read_text(encoding='utf-8')
+          t=t.replace("raw=v.split(':',1)[1] if v.startswith('gz:') else v","raw=v.split(':',1)[1] if ':' in v[:12] else v")
+          t=t.replace("mods={k:dec(v) for k,v in pack.items()}","mods={}\nfor k,v in pack.items():\n    try: mods[k]=dec(v)\n    except Exception: pass")
+          p.write_text(t,encoding='utf-8')
+          PY
           python3 .staging/patch_qidian_beta121b4_qw_reviews.py
       - name: Validate JSON and markers
         run: |
