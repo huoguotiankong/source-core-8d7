@@ -13,7 +13,9 @@ jobs:
         with:
           ref: main
       - name: Run patch
-        run: python3 .staging/patch_qidian_beta121b4_qw_reviews.py
+        run: |
+          sed -i "s/mods={k:dec(v) for k,v in pack.items()}/mods={k:dec(v) for k,v in pack.items() if isinstance(v,str) and v.startswith('gz:')}/" .staging/patch_qidian_beta121b4_qw_reviews.py
+          python3 .staging/patch_qidian_beta121b4_qw_reviews.py
       - name: Validate JSON and markers
         run: |
           python3 -m json.tool sources/novel/qidian-next/qidian-next-beta.json >/dev/null
