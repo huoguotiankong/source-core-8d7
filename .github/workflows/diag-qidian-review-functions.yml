@@ -2,35 +2,46 @@ name: diag-qidian-review-functions
 on:
   push:
     paths: ['.staging/diag-qidian-review-functions.trigger']
+permissions:
+  contents: read
 jobs:
   diag:
     runs-on: ubuntu-latest
-    permissions: {contents: write}
     steps:
       - uses: actions/checkout@v4
         with: {ref: main}
-      - name: Extract review UI functions
+      - name: Print current server review functions
         run: |
           python3 - <<'PY'
-          import json,gzip,base64,re
-          from pathlib import Path
-          a=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text()); s=a[0] if isinstance(a,list) else a
-          lib=s['jsLib']; x=lib.index('var QF_MOD38_PACK=')+len('var QF_MOD38_PACK='); y=lib.index(';\nvar QF_MOD38_EXPORTS=',x); pack=json.loads(lib[x:y])
-          v=pack['review']; z=v[3:]; z+='='*((4-len(z)%4)%4); code=gzip.decompress(base64.b64decode(z)).decode()
-          # save compact keyword windows with nearest function name
-          kws=['LikeCount','likeCount','digg_count','点赞','回复','replyCount','reply_count','loadMore','更多回复','thumb','👍','♡','楼']
-          out=[]
-          for kw in kws:
-            for m in re.finditer(re.escape(kw),code,re.I):
-              pre=code[:m.start()]
-              fm=list(re.finditer(r'function\s+([A-Za-z0-9_$]+)\s*\(',pre))
-              fn=fm[-1].group(1) if fm else '?'
-              st=max(0,m.start()-2200); en=min(len(code),m.start()+5200)
-              out.append('### KW '+kw+' FN '+fn+' @'+str(m.start())+'\n'+code[st:en])
-          Path('.staging/qidian-review-functions.txt').write_text('\n\n'.join(out)[:180000])
+          import json,re,base64,gzip
+          a=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8')); s=a[0] if isinstance(a,list) else a
+          m=re.search(r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});\s*var\s+QF_MOD38_EXPORTS',s['jsLib'],re.S); pack=json.loads(m.group(1))
+          def dec(v):
+            r=v.split(':',1)[1] if ':' in v[:12] else v; b=base64.b64decode(r)
+            try:return gzip.decompress(b).decode()
+            except:return b.decode()
+          text=dec(pack['review_server_core'])
+          print('FUNCTION NAMES:')
+          print('\n'.join(re.findall(r'function\s+(qf[A-Za-z0-9_]+)\s*\(',text)))
+          def body(name):
+            p=text.find('function '+name)
+            if p<0:return None
+            b=text.find('{',p); dep=0; ins=None; esc=False
+            for i in range(b,len(text)):
+              c=text[i]
+              if ins:
+                if esc: esc=False
+                elif c=='\\': esc=True
+                elif c==ins: ins=None
+                continue
+              if c in "'\"`": ins=c; continue
+              if c=='{': dep+=1
+              elif c=='}':
+                dep-=1
+                if dep==0:return text[p:i+1]
+            return text[p:p+8000]
+          names=['qfQwCommentCandidatesV321','qfQwCommentApiV315','qfQwSummaryV315','qfQwCommentPackV315','qfServerSummaryV315','qfServerCommentPackV315','qfServerReviewSummaryV315','qfServerCommentOpenV315','qfServerReviewProviderV315','qfServerCommentProviderV315']
+          for n in names:
+            x=body(n)
+            if x: print('\n===== '+n+' =====\n'+x)
           PY
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add .staging/qidian-review-functions.txt
-          git commit -m 'chore: dump focused review UI functions'
-          git push origin main
