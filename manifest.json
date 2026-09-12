@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-12T17:25:10+08:00",
+  "updatedAt": "2026-09-12T17:45:41+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -47,74 +47,39 @@
     {
       "id": "qidian-next",
       "name": "🌈 起点增强",
-      "category": "novel",
+      "summary": "正式版 1.2.1：由 1.2.1-beta7 按用户明确要求原样晋升；正文 Rhino 非法反斜杠问题已真机确认修复，并恢复兼容的 Scanner/GZIP 懒模块解压。",
+      "icon": "",
       "channel": "stable",
-      "version": "1.2.1-beta4",
-      "versionCode": 12104,
+      "version": "1.2.1",
       "updatedAt": "2026-09-12",
-      "sourcePath": "sources/novel/qidian-next/qidian-next.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12012",
-      "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "情无/小雨段评服务器可选；章名评论服务器优先、本地回退；修复本章说具体评论展示。",
       "tags": [
         "起点",
         "正式版",
         "限免源",
-        "情无免登录",
+        "情无",
+        "小雨用户系统",
         "X",
         "评论页",
         "段评",
         "书友圈",
-        "角色卡",
-        "版权信息"
-      ],
-      "changelog": [
-        "情无新版游客授权：源作者/官方反馈群/临时口令",
-        "普通账号走网页注册/登录并自动回写 Token",
-        "Token 与正文现有认证头键完全对齐",
-        "未登录免费正文链保持可用",
-        "Stable 1.2.0 不变"
-      ],
-      "sha256": "56100e54c86e7dc900c184e180c9d22a1632bd722c2bc1477c896624df9bc089"
-    },
-    {
-      "id": "qidian-next-beta",
-      "name": "🌈 起点增强 · Beta",
-      "category": "novel",
-      "channel": "beta",
-      "version": "1.2.1-beta7",
-      "versionCode": 12017,
-      "updatedAt": "2026-09-12T17:25:10+08:00",
-      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12017",
-      "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "真机回归修复：正文单JS执行，恢复Beta4 Scanner解压并保留Base64URL兼容；移除Rhino不兼容反射数组。",
-      "tags": [
-        "起点",
-        "测试版",
-        "限免源",
-        "情无",
-        "小雨用户系统",
-        "游客Token",
-        "网页登录",
-        "免登录回退",
-        "X",
-        "评论页",
         "Base64URL",
-        "运行时回归修复",
         "Rhino兼容",
         "正文回归修复"
       ],
       "changelog": [
-        "修复正文 EvaluatorException：Beta4 评论补丁的字面量 \\n@js:\\n 改为单一真实 JS 块",
-        "懒模块解压恢复 Beta4 已验证 Scanner/GZIP 路径，移除 java.lang.reflect.Array.newInstance",
-        "Base64URL 仅做 -/_ 标准化和 = 补位，不改评论业务接口",
-        "32 个 lazy module（31 压缩 + provider_common）全部解包/语法校验",
-        "Stable 1.2.0 不变，继续仅发布 Beta 等待真机确认"
+        "由 1.2.1-beta7 按用户明确要求原样晋升 Stable，不新增业务逻辑",
+        "修复正文 EvaluatorException：移除 ruleContent 中会被 Rhino 当成非法字符的字面量反斜杠拼接",
+        "懒模块解压恢复已验证的 Scanner + GZIPInputStream 路径，移除 Rhino 不兼容的 java.lang.reflect.Array.newInstance 调用",
+        "Base64URL 仅保留 -/_ 标准化与 = 补位；32 个 lazy module 已完成解包/语法门禁",
+        "情无/小雨评论、账号系统、正文 Provider 与其它功能沿用 Beta7 代码"
       ],
-      "sha256": "da35222d62c59e8eecb876ccfec1f0e6872f26c3a621c814f31b348620047b88",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12017",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12017"
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12010",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12010",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12010",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json",
+      "versionCode": 12010,
+      "sha256": "1ee474c209b48d069344ffa4409379a0d39012cbaf2acecbd5ffcaba5404ab7e",
+      "sourcePath": "sources/novel/qidian-next/qidian-next.json"
     },
     {
       "id": "picacg",

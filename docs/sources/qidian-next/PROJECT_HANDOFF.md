@@ -1,4 +1,11 @@
 
+## 2026-09-12 · qidian-next Stable 1.2.1
+- 用户真机确认 `1.2.1-beta7` 正文修复成功，并明确要求将这一版先晋升正式版。
+- Stable 直接沿用 Beta7 业务代码，不新增业务逻辑；修复 `EvaluatorException: 不允许的字符：\`，恢复单一真实 JS 正文执行块。
+- 懒模块解压使用已验证的 `Scanner + GZIPInputStream`，移除 Rhino 不兼容的 `java.lang.reflect.Array.newInstance`；Base64URL 兼容保留。
+- `sources/novel/qidian-next/qidian-next.json`、Manifest、Stable/Novel Subscription、Stable Bundle、RSS Stable Detail、Release Log 已同步；活动 Beta/Novel 重复项移除。
+- Beta7 独立文件继续保留作历史/后续开发基线；Stable/Beta 继续共享同一 Legado `bookSourceUrl` 身份。
+
 ## 2026-09-12 · qidian-next 1.2.1-beta7
 - 真机确认 Beta6 仍有两类故障：正文 `EvaluatorException: 不允许的字符：\`；评论页解压时报 `java.lang.reflect.Array.newInstance` 不是函数。
 - 根因一：Beta4 评论补丁已把第二个 `@js` 以字面量 `\n@js:\n` 拼入 `ruleContent.content`；Beta5/Beta6沿用了该字段。Beta7 改成单一真实 JS 块，正文主链仍调用 `qfContentEntryV38`，随后再执行原情无/小雨装饰逻辑。

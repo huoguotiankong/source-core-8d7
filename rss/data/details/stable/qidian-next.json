@@ -1,31 +1,32 @@
 {
   "kind": "source",
   "title": "🌈 起点增强",
-  "summary": "正式版 1.2.0：由 Beta41 真机确认基线晋升；新情无免登录正文、X 限免、评论页与版权/角色卡优化正式上线。",
+  "summary": "Stable 1.2.1：由 1.2.1-beta7 按用户明确要求原样晋升；正文 Rhino 非法反斜杠问题已真机确认修复。",
   "badges": [
     "Stable",
-    "1.2.0",
-    "Beta41 已真机确认"
+    "1.2.1",
+    "正文回归修复",
+    "Rhino兼容"
   ],
   "sections": [
     {
-      "title": "正式版更新",
-      "text": "由 1.1.0-beta41 真机确认基线晋升，不额外改变正文、评论或 Provider 行为。"
+      "title": "本次晋升",
+      "text": "用户真机确认 Beta7 正文已经修复，并明确要求先将这一版升为正式版。Stable 1.2.1 直接沿用 Beta7 业务代码，不再追加新逻辑。"
     },
     {
-      "title": "正文 Provider",
-      "text": "情无现为免登录免费正文链，并保留 X、神魔、晴天、同人等线路及自动路由。"
+      "title": "正文修复",
+      "text": "ruleContent 改为单一真实 JS 执行块，消除字面量反斜杠导致的 EvaluatorException。"
     },
     {
-      "title": "评论与界面",
-      "text": "保留评论页紧凑布局、点赞元信息行、角色卡切换/性能优化和版权信息“首发”语义修正。"
+      "title": "模块兼容",
+      "text": "恢复已验证的 Scanner + GZIPInputStream 懒模块解压路径；Base64URL 仅做 -/_ 标准化与缺失 = 补位。"
     },
     {
-      "title": "版本状态",
-      "text": "Stable / 正式通道。"
+      "title": "版本策略",
+      "text": "Stable 与 Beta 保持同一 bookSourceUrl 身份，但使用独立物理 JSON 路径；Beta7 文件保留作历史/后续开发基线，不再作为当前活动目录项。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12000",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12000",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12000"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12010",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12010",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12010"
 }

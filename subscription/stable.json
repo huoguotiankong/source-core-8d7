@@ -2,40 +2,44 @@
   "schemaVersion": 1,
   "channel": "stable",
   "name": "正式版",
-  "updatedAt": "2026-09-11T11:40:00+08:00",
+  "updatedAt": "2026-09-12T17:45:41+08:00",
   "items": [
     {
       "id": "qidian-next",
       "name": "🌈 起点增强",
-      "summary": "正式版 1.2.0：由 Beta41 真机确认基线晋升；新情无免登录正文、X 限免、评论页与版权/角色卡优化正式上线。",
+      "summary": "正式版 1.2.1：由 1.2.1-beta7 按用户明确要求原样晋升；正文 Rhino 非法反斜杠问题已真机确认修复，并恢复兼容的 Scanner/GZIP 懒模块解压。",
       "icon": "",
       "channel": "stable",
-      "version": "1.2.0",
-      "updatedAt": "2026-09-11",
+      "version": "1.2.1",
+      "updatedAt": "2026-09-12",
       "tags": [
         "起点",
         "正式版",
         "限免源",
-        "情无免登录",
+        "情无",
+        "小雨用户系统",
         "X",
         "评论页",
         "段评",
         "书友圈",
-        "角色卡",
-        "版权信息"
+        "Base64URL",
+        "Rhino兼容",
+        "正文回归修复"
       ],
       "changelog": [
-        "由 1.1.0-beta41 真机确认基线原样晋升 Stable，不新增业务逻辑",
-        "情无 Provider 切换为“小雨的世界”免费正文链：免登录，目录缓存隔离，并按附件原生 ajax 请求链读取正文",
-        "新增 X 限免 Provider；保留神魔/晴天/同人等现有限免线路和自动路由",
-        "评论页点赞固定到时间/IP元信息行，压缩无效占位，提高同屏文字与楼中楼信息密度",
-        "版权信息日期标签由“上架”修正为“首发”；角色卡保留已验证的标签切换与性能回退方案"
+        "由 1.2.1-beta7 按用户明确要求原样晋升 Stable，不新增业务逻辑",
+        "修复正文 EvaluatorException：移除 ruleContent 中会被 Rhino 当成非法字符的字面量反斜杠拼接",
+        "懒模块解压恢复已验证的 Scanner + GZIPInputStream 路径，移除 Rhino 不兼容的 java.lang.reflect.Array.newInstance 调用",
+        "Base64URL 仅保留 -/_ 标准化与 = 补位；32 个 lazy module 已完成解包/语法门禁",
+        "情无/小雨评论、账号系统、正文 Provider 与其它功能沿用 Beta7 代码"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12000",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12000",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12000",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12010",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12010",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12010",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json",
-      "versionCode": 12000
+      "versionCode": 12010,
+      "sha256": "1ee474c209b48d069344ffa4409379a0d39012cbaf2acecbd5ffcaba5404ab7e",
+      "sourcePath": "sources/novel/qidian-next/qidian-next.json"
     },
     {
       "id": "picacg",
@@ -103,5 +107,5 @@
       "type": "comic"
     }
   ],
-  "generatedAt": "2026-09-11T11:40:00+08:00"
+  "generatedAt": "2026-09-12T17:45:41+08:00"
 }

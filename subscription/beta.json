@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-09-12T17:25:10+08:00",
+  "updatedAt": "2026-09-12T17:45:41+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -36,45 +36,6 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/qidian-official.json"
     },
     {
-      "id": "qidian-next-beta",
-      "name": "🌈 起点增强 · Beta",
-      "summary": "真机回归修复：正文单JS执行，恢复Beta4 Scanner解压并保留Base64URL兼容；移除Rhino不兼容反射数组。",
-      "icon": "",
-      "channel": "beta",
-      "version": "1.2.1-beta7",
-      "updatedAt": "2026-09-12T17:25:10+08:00",
-      "tags": [
-        "起点",
-        "测试版",
-        "限免源",
-        "情无",
-        "小雨用户系统",
-        "游客Token",
-        "网页登录",
-        "免登录回退",
-        "X",
-        "评论页",
-        "Base64URL",
-        "运行时回归修复",
-        "Rhino兼容",
-        "正文回归修复"
-      ],
-      "changelog": [
-        "修复正文 EvaluatorException：Beta4 评论补丁的字面量 \\n@js:\\n 改为单一真实 JS 块",
-        "懒模块解压恢复 Beta4 已验证 Scanner/GZIP 路径，移除 java.lang.reflect.Array.newInstance",
-        "Base64URL 仅做 -/_ 标准化和 = 补位，不改评论业务接口",
-        "32 个 lazy module（31 压缩 + provider_common）全部解包/语法校验",
-        "Stable 1.2.0 不变，继续仅发布 Beta 等待真机确认"
-      ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12017",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12017",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12017",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
-      "versionCode": 12017,
-      "sha256": "da35222d62c59e8eecb876ccfec1f0e6872f26c3a621c814f31b348620047b88",
-      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json"
-    },
-    {
       "id": "manwa",
       "name": "◈ 漫蛙漫画",
       "summary": "Beta13：取消猜测式 fetch，保留漫蛙原评论 DOM 与原生滚动环境，并加入 8 秒加载 watchdog，避免永久“加载中”。",
@@ -106,5 +67,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-09-12T17:25:10+08:00"
+  "generatedAt": "2026-09-12T17:45:41+08:00"
 }
