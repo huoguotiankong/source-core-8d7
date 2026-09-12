@@ -1,4 +1,4 @@
-name: patch-qidian-beta121b6-runtime-restore
+name: patch-qidian-beta121b7-rhino-compat
 on:
   push:
     paths:
@@ -13,16 +13,14 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-      - name: Build and validate Beta6
-        run: |
-          sed -i 's/process.argv\[1\]/process.argv[2]/g' .staging/patch_qidian_beta121b6_runtime_restore.py
-          python3 .staging/patch_qidian_beta121b6_runtime_restore.py
-      - name: Publish Beta6
+      - name: Build and validate Beta7
+        run: python3 .staging/patch_qidian_beta121b6_runtime_restore.py
+      - name: Publish Beta7
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add sources/novel/qidian-next/qidian-next-beta.json subscription/beta.json subscription/novel.json manifest.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
           git diff --cached --check
           git diff --cached --stat
-          git commit -m "fix qidian beta6 restore runtime and isolate base64url decoder"
+          git commit -m "fix qidian beta7 Rhino loader and content rule"
           git push origin main
