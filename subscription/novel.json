@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "type": "novel",
   "name": "小说源",
-  "updatedAt": "2026-09-12T17:45:41+08:00",
+  "updatedAt": "2026-09-12T19:32:00+08:00",
   "items": [
     {
       "id": "qidian-next",
@@ -42,6 +42,41 @@
       "sourcePath": "sources/novel/qidian-next/qidian-next.json"
     },
     {
+      "id": "qidian-next-beta",
+      "name": "🌈 起点增强 · Beta",
+      "summary": "1.2.2-beta1：仅修复情无/小雨服务器段评气泡映射；章名评论继续保持起点本地。Stable 1.2.1 与正文链冻结。",
+      "icon": "",
+      "channel": "beta",
+      "version": "1.2.2-beta1",
+      "versionCode": 12021,
+      "updatedAt": "2026-09-12",
+      "tags": [
+        "起点",
+        "小说",
+        "测试版",
+        "情无",
+        "小雨服务器",
+        "段评",
+        "ParagraphId",
+        "章名评论本地",
+        "正文冻结"
+      ],
+      "changelog": [
+        "段评 ParagraphId 改为段号-1并按正文图片数动态补偿",
+        "气泡点击继续传服务器原始 ParagraphId",
+        "ParagraphId=-1 不再覆盖本地章名评论，也不再作为本章说",
+        "增加低开销 QW-RV 计数/映射诊断日志",
+        "Stable 1.2.1、正文链、目录、搜索、账号及其它 Provider 不变"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12021",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12021",
+      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12021",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
+      "sha256": "faeba9977dc50810456aedee8382d83e358aa666799cc89bb5c6d9774760d93e",
+      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
+      "type": "novel"
+    },
+    {
       "id": "qidian-official",
       "name": "🔅 起点官方生态",
       "summary": "起点官方生态大型书源：官方搜索/目录/评论体系 + 多正文 Provider；本测试版新增 STV 独立正文入口。",
@@ -75,5 +110,5 @@
       "type": "novel"
     }
   ],
-  "generatedAt": "2026-09-12T17:45:41+08:00"
+  "generatedAt": "2026-09-12T19:32:00+08:00"
 }
