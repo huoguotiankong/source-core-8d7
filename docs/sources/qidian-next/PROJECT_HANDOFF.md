@@ -1,3 +1,11 @@
+## 2026-09-12 · qidian-next 1.2.2-beta4 — 情无头像 / 楼中楼桥接修复
+- 真机确认 Beta3 已恢复情无/小雨段评气泡和主评论列表；剩余问题为头像空白、楼中楼显示“回复加载失败”。
+- 对照当前“小雨的世界”实现确认：`list.php` / `reply.php` 与评论 UI 不同源且接口无 CORS 头，浏览器直接 `fetch` 会被拦；评论请求应由书源侧 `java.ajax` 代理。
+- Beta4 仅替换情无段评点击后的 Viewer：主列表走 `list.php`、回复走 `reply.php`，均经 `java.ajax`；接口大整数 ID 在 JSON 解析前做字符串保护。
+- 评论字段新增当前服务端 `avatarUrl/reviewId/nickname/createTime/replyCount/likeCount/isGod/imageUrl/audioUrl/quoteNickname` 适配；头像 URL 兼容协议相对/HTTP/相对路径并使用 no-referrer。
+- Viewer 获取或打开失败仍回退原 `index.html`；Beta3 Argus 气泡快通道、正文、目录、搜索、账号和 Stable 1.2.1 冻结。
+- 状态：Beta，等待真机确认头像与楼中楼。
+
 ## 2026-09-12 · qidian-next 1.2.2-beta3 — 妙想天开段评快通道借鉴
 - 重新按用户当前上传的 `bookSource_妙想天开.json` 核对：该版段评计数实际走 `druidv6.if.qidian.com/argus/api/v1/chapterreview/getchapterrepagesummary`，读取 `Data.Getparagraphscommentcounts.DataList`；神评另用同端点 `strategy=3`，本章说用 `assembly/getchapteractivity`。
 - Beta3 先吸收低风险且收益最大的“整章段评计数一次取回”思路：新增 Argus `getchapterrepagesummary` 快通道，归一化为 qidian-next 既有 `paragraphId/segmentId/count` 模型并写入 ReviewCache。

@@ -1,41 +1,40 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "1.2.2-beta3：借鉴妙想天开当前上传版的 Argus 段评计数快路径，先用一次官方章节摘要请求建立段评气泡索引；失败保持原链回退。正文与目录冻结。",
+  "summary": "1.2.2-beta4：情无/小雨段评气泡与主列表已恢复，本版集中修复头像与回复楼中楼。",
   "badges": [
     "Beta",
-    "1.2.2-beta3",
-    "Argus段评快通道",
-    "本地段评",
-    "气泡索引",
-    "正文冻结",
-    "目录冻结"
+    "1.2.2-beta4",
+    "头像修复",
+    "楼中楼修复",
+    "CORS桥接",
+    "正文冻结"
   ],
   "sections": [
     {
-      "title": "本版改进",
-      "text": "本地段评 summary 与情无/小雨气泡元数据优先复用 v1/chapterreview/getchapterrepagesummary 的 Getparagraphscommentcounts.DataList；只要直连非空即可跳过较慢的 Web 镜像摘要。"
+      "title": "真机结果",
+      "text": "Beta3 已确认情无/小雨服务器段评气泡和主评论列表可以显示；当前问题收敛为头像空白、回复加载失败。"
     },
     {
-      "title": "回退策略",
-      "text": "官方快通道失败、格式异常或合法空时，不把空结果当作权威，继续执行 Beta2 原有 www/m/read 或情无 review.php 链，避免再次出现“整章无气泡”。"
+      "title": "回复修复",
+      "text": "当前小雨接口 list.php/reply.php 与评论 UI 不同源；Beta4 把两者统一改由书源 java.ajax 请求，避免 WebView fetch 被 CORS 拦截。"
     },
     {
-      "title": "未跨域改动",
-      "text": "当前目录已经具备 APP v3/getsimple/pager/Web fallback、多层缓存与完整度诊断，整体能力强于妙想天开的单一 v1 chapterlist。本版只记录可借鉴点，不改目录。"
+      "title": "头像修复",
+      "text": "评论适配器新增 avatarUrl 等当前服务器字段，并兼容协议相对、HTTP 和相对路径，图片使用 no-referrer。"
     },
     {
-      "title": "待真机验证",
-      "text": "重点观察：正文是否仍正常、气泡出现速度/数量、情无/小雨点击评论是否仍能打开、本地段评是否明显减少等待。"
+      "title": "冻结范围",
+      "text": "Beta3 Argus 段评气泡快通道、正文、目录、搜索、账号和 Stable 1.2.1 均不修改。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12023",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12023",
-  "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12023",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12024",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12024",
+  "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12024",
   "links": {
-    "source": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12023",
-    "backup": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12023",
-    "import": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12023"
+    "source": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12024",
+    "backup": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12024",
+    "import": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12024"
   },
   "updatedAt": "2026-09-12"
 }
