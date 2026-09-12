@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "type": "novel",
   "name": "小说源",
-  "updatedAt": "2026-09-12T16:52:00+08:00",
+  "updatedAt": "2026-09-12T17:07:07+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -40,11 +40,11 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "修复评论气泡点击时懒模块解压失败；兼容 URL-safe Base64，不改动情无评论与正文业务链。",
+      "summary": "Beta5 紧急回归修复：恢复 Beta4 完整运行时，仅保留 Base64URL 解码兼容；修复正文非法反斜杠与评论运行时函数丢失。",
       "icon": "",
       "channel": "beta",
-      "version": "1.2.1-beta5",
-      "updatedAt": "2026-09-12T16:52:00+08:00",
+      "version": "1.2.1-beta6",
+      "updatedAt": "2026-09-12T17:07:07+08:00",
       "tags": [
         "起点",
         "测试版",
@@ -56,23 +56,25 @@
         "免登录回退",
         "X",
         "评论页",
-        "Base64URL"
+        "Base64URL",
+        "运行时回归修复"
       ],
       "changelog": [
-        "修复点击段评/本章说时“模块解压失败 / Illegal base64 character 5f”",
-        "懒模块解包统一兼容 Base64URL 的 -/_ 与缺失补位",
-        "评论业务逻辑、情无/小雨接口及其它 Provider 保持 Beta4 不变",
-        "Stable 1.2.0 不变"
+        "修复正文偶发 EvaluatorException：不允许的字符（反斜杠）",
+        "恢复 Beta5 误删的 alpha84 并发加载运行时（qfModuleThreadIdV84 / qfModuleWaitV84）",
+        "保留 Base64URL -/_ 与缺失 = 补位兼容，31 个压缩模块全部解压校验",
+        "除 qfModuleUnpackV41 外 jsLib 与已验证 Beta4 基线逐字节一致",
+        "情无/小雨评论、正文链、账号系统及其它 Provider 保持 Beta4；Stable 1.2.0 不变"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12015",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12015",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12015",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12016",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12016",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12016",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
-      "versionCode": 12015,
+      "versionCode": 12016,
       "type": "novel",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sha256": "ce3bb33273dda91c86ea5ee647e7b9ff0845bbf9432fa6c1cae8ddd61c8f066c"
+      "sha256": "9ada1019aa7f0f862c4be048f0f810267f41cacd0c792f4faa4fde584efcc51e"
     }
   ],
-  "generatedAt": "2026-09-12T16:52:00+08:00"
+  "generatedAt": "2026-09-12T17:07:07+08:00"
 }

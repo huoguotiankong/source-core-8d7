@@ -1,27 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.1-beta5：修复评论气泡点击时懒模块 Base64URL 解压失败；评论业务链保持 Beta4 不变。",
+  "summary": "Beta 1.2.1-beta6：紧急回归修复。恢复 Beta4 完整运行时，仅保留隔离的 Base64URL 解码兼容。",
   "badges": [
     "Beta",
-    "1.2.1-beta5",
-    "模块解压修复"
+    "1.2.1-beta6",
+    "运行时回归修复"
   ],
   "sections": [
     {
-      "title": "本轮修复",
-      "text": "修复点击段评/本章说时 Illegal base64 character 5f；懒模块解包兼容 URL-safe Base64 的 -/_ 及缺失补位。"
+      "title": "正文修复",
+      "text": "移除 Beta5 误写进 jsLib 的字面量反斜杠+n，修复 Rhino 不允许的字符错误；正文 Provider 逻辑回到 Beta4 基线。"
     },
     {
-      "title": "保持不变",
-      "text": "情无/小雨 review/list/reply 评论接口、正文链、账号系统以及 X/神魔/晴天/同人等 Provider 不改动。"
+      "title": "评论修复",
+      "text": "恢复 Beta5 误删的 alpha84 并发加载函数 qfModuleThreadIdV84 / qfModuleWaitV84，解决点击段评/本章说 ReferenceError。"
+    },
+    {
+      "title": "Base64URL",
+      "text": "仅在 qfModuleUnpackV41 内兼容 -/_ 和缺失 =；31 个压缩懒模块全部完成 Base64 解码与 gzip 解压校验。"
     },
     {
       "title": "冻结范围",
-      "text": "Stable 1.2.0 不变；本版本仅进入 Beta 真机验证。"
+      "text": "情无/小雨评论业务、账号系统、正文链及其它 Provider 不改；Stable 1.2.0 不变。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12015",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12015",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12015"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12016",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12016",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12016"
 }

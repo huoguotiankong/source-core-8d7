@@ -1,4 +1,11 @@
 
+## 2026-09-12 · qidian-next 1.2.1-beta6
+- 紧急修复 Beta5 回归：正文出现 `EvaluatorException: 不允许的字符：\`。根因是 Beta5 热修脚本把字面量反斜杠+n 写进 `jsLib`。
+- 恢复 Beta5 误删的 alpha84 lazy-module 并发运行时，补回 `qfModuleThreadIdV84` / `qfModuleWaitV84`，修复点击段评/本章说 `ReferenceError`。
+- 修复基线改为已验证 Beta4；仅 `qfModuleUnpackV41` 做 Base64URL `-` / `_` 和缺失 `=` 兼容。
+- 门禁：31 个压缩模块逐个 Base64+gzip 解压；`jsLib` JS 语法检查；loader 外与 Beta4 基线逐字节一致。
+- Stable 1.2.0 不变，继续仅进入 Beta 真机验证。
+
 ## 2026-09-12 · qidian-next 1.2.1-beta5
 - 修复点击段评/本章说时 `模块解压失败 / Illegal base64 character 5f`。
 - `qfModuleUnpackV41` 统一兼容 Base64URL 的 `-` / `_`，并自动补齐 `=`。
