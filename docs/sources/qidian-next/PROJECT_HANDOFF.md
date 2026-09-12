@@ -1,4 +1,10 @@
 
+## 2026-09-12 · qidian-next 1.2.1-beta5
+- 修复点击段评/本章说时 `模块解压失败 / Illegal base64 character 5f`。
+- `qfModuleUnpackV41` 统一兼容 Base64URL 的 `-` / `_`，并自动补齐 `=`。
+- 情无/小雨评论接口、正文链、账号系统及其它 Provider 保持 Beta4 不变。
+- Stable 1.2.0 不变，等待真机确认后再考虑晋升。
+
 ## 2026-09-12 · qidian-next 1.2.1-beta4
 - 评论设置新增情无/小雨服务器适配：段评可走 `full.hnxianxin.cn/qd/review.php`。
 - 章名评论优先使用服务器 `ParagraphId=-1`；服务器无章名评论时保留本地段评章名评论。

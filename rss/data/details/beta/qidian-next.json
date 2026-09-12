@@ -1,27 +1,27 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.1-beta2：按最新“小雨的世界”附件重接情无用户系统；游客 Token/网页登录均使用当前接口，免登录正文保持 Stable 1.2.0 基线。",
+  "summary": "Beta 1.2.1-beta5：修复评论气泡点击时懒模块 Base64URL 解压失败；评论业务链保持 Beta4 不变。",
   "badges": [
     "Beta",
-    "1.2.1-beta2",
-    "情无当前用户系统"
+    "1.2.1-beta5",
+    "模块解压修复"
   ],
   "sections": [
     {
-      "title": "本轮测试",
-      "text": "按最新“小雨的世界”附件重做情无账号系统，Beta1 邮箱/密码方案已废弃。"
+      "title": "本轮修复",
+      "text": "修复点击段评/本章说时 Illegal base64 character 5f；懒模块解包兼容 URL-safe Base64 的 -/_ 及缺失补位。"
     },
     {
-      "title": "情无授权",
-      "text": "游客：源作者 + 官方反馈群 + 临时口令；普通账号：网页注册/登录。未登录仍走已验证免费正文链。"
+      "title": "保持不变",
+      "text": "情无/小雨 review/list/reply 评论接口、正文链、账号系统以及 X/神魔/晴天/同人等 Provider 不改动。"
     },
     {
       "title": "冻结范围",
-      "text": "Stable 1.2.0、评论、角色卡、书友圈、X/神魔/晴天/同人等其它域不变。"
+      "text": "Stable 1.2.0 不变；本版本仅进入 Beta 真机验证。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12012",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12012",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12012"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12015",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12015",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12015"
 }
