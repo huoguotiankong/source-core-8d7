@@ -9,12 +9,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {ref: main}
-      - name: Inspect current review functions
+      - name: Inspect qingwu routing
         run: |
           python3 - <<'PY'
-          import json,gzip,base64,re
+          import json,gzip,base64
           s=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8'))[0];js=s['jsLib'];st=js.find('{',js.find('QF_MOD38_PACK='));pack,_=json.JSONDecoder().raw_decode(js[st:]);v=pack['review'];raw=v.split(':',1)[1];raw+='='*((4-len(raw)%4)%4);t=gzip.decompress(base64.urlsafe_b64decode(raw)).decode()
-          for pat in [r'function\s+(qf\w*Review\w*)\s*\([^)]*\)',r'function\s+(qf\w*Comment\w*)\s*\([^)]*\)',r'reviewProvider.{0,250}',r'段评数据源.{0,400}',r'本章说.{0,300}']:
-            print('\nPAT',pat)
-            for x in re.findall(pat,t,re.I|re.S)[:80]: print(x if isinstance(x,str) else x[0])
+          for key in ['actualProvider','qwLocalMode','serverProvider=','qfCommentPolicyV83','qdReviewSummary','chapterPreviewPack']:
+            print('\n===== '+key+' =====')
+            p=0
+            for z in range(8):
+              i=t.find(key,p)
+              if i<0: break
+              print(t[max(0,i-1200):min(len(t),i+2400)].replace('\n',' '));p=i+len(key)
           PY
