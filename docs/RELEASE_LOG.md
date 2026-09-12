@@ -1,3 +1,10 @@
+## 2026-09-12 · qidian-next 1.2.2-beta2 — 情无/小雨段评气泡回归修复
+- 真机确认 Beta1 选择情无服务器后连段评气泡都没有。
+- 根因：Beta1 将 `CommentCount` 放在 `TextCount` 前；服务器行存在 `CommentCount=0` 时遮蔽有效 `TextCount`，从而把全部段评行过滤掉。
+- Beta2 恢复 Stable/Beta7 已验证的 `TextCount` 优先语义，仅当 TextCount 无有效值时回退 CommentCount。
+- 保留 Beta1 的 `ParagraphId - 1 + 图片补偿` 定位与原始 ParagraphId 点击参数；正文与 Stable 1.2.1 冻结。
+- 状态：Beta，等待真机确认气泡恢复后再继续评论列表/楼中楼。
+
 ## 2026-09-12 · qidian-next 1.2.2-beta1 — 情无/小雨服务器段评映射修复
 - 从已真机确认正文正常的 Stable 1.2.1 重新构建，仅修改情无/小雨服务器段评域。
 - 对齐起点X-QD现有逻辑：服务器 `ParagraphId` 按“`ParagraphId - 1 + 正文图片补偿`”定位气泡，点击继续传服务器原始 ParagraphId。
