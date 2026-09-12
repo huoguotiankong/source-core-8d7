@@ -1,3 +1,11 @@
+## 2026-09-12 · qidian-next 1.2.2-beta3 — 妙想天开段评快通道借鉴
+- 重新按用户当前上传的 `bookSource_妙想天开.json` 核对：该版段评计数实际走 `druidv6.if.qidian.com/argus/api/v1/chapterreview/getchapterrepagesummary`，读取 `Data.Getparagraphscommentcounts.DataList`；神评另用同端点 `strategy=3`，本章说用 `assembly/getchapteractivity`。
+- Beta3 先吸收低风险且收益最大的“整章段评计数一次取回”思路：新增 Argus `getchapterrepagesummary` 快通道，归一化为 qidian-next 既有 `paragraphId/segmentId/count` 模型并写入 ReviewCache。
+- 本地段评：官方快通道有非空计数时直接返回；接口空/失败继续走原 www/m/read 多镜像摘要链，不把空结果当权威。
+- 情无/小雨：只把气泡位置/数量元数据改为官方快通道优先；完整评论点击 Provider 不变，快通道失败继续回退 `review.php`。
+- 目录评估：妙想天开使用单一 v1 `chapterlist/chapterlist` 读取 `N/C/V/T/W`；qidian-next 当前已有 APP v3 + getsimple + pager + Web fallback + 多层缓存/完整度诊断，本版不替换目录，避免跨域回归。
+- `strategy=3` 神评与 `getchapteractivity` 本章说暂不替换现有成熟链，待本版真机确认后再单域 A/B。Stable 1.2.1、正文、目录、搜索、账号及其它 Provider 不变。
+
 ## 2026-09-12 · qidian-next 1.2.2-beta2 — 情无/小雨段评气泡回归修复
 - 真机确认 Beta1 选择情无服务器后连段评气泡都没有。
 - 根因：Beta1 将 `CommentCount` 放在 `TextCount` 前；服务器行存在 `CommentCount=0` 时遮蔽有效 `TextCount`，从而把全部段评行过滤掉。

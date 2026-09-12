@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-09-12T19:50:00+08:00",
+  "updatedAt": "2026-09-12T20:35:00+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -41,31 +41,35 @@
       "category": "novel",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "1.2.2-beta2",
-      "versionCode": 12022,
+      "version": "1.2.2-beta3",
+      "versionCode": 12023,
       "updatedAt": "2026-09-12",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12022",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12022",
-      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12022",
-      "summary": "Beta2：修复情无/小雨服务器段评气泡全部消失；恢复 TextCount 优先计数语义，保留 ParagraphId 图片补偿映射。Stable 1.2.1 与正文冻结。",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12023",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12023",
+      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12023",
+      "summary": "Beta3：借鉴妙想天开直连 Argus 的单章段评计数快通道；本地段评与情无/小雨气泡优先复用官方章节计数图，失败保持原链回退。Stable 1.2.1 与正文/目录冻结。",
       "tags": [
         "起点",
         "测试版",
+        "本地段评",
         "情无",
         "小雨服务器",
-        "段评",
-        "TextCount",
-        "ParagraphId",
-        "正文冻结"
+        "Argus",
+        "GetChapterRePageSummary",
+        "段评气泡",
+        "正文冻结",
+        "目录冻结"
       ],
       "changelog": [
-        "修复 Beta1 回归：CommentCount=0 不再遮蔽有效 TextCount",
-        "服务器段评筛选恢复 Stable/Beta7 已验证的 TextCount 优先语义",
-        "保留 ParagraphId-1+图片补偿与原始 ParagraphId 点击参数",
-        "Stable 1.2.1、正文链、目录、搜索、账号及其它 Provider 不变"
+        "新增 v1/chapterreview/getchapterrepagesummary 官方快通道，一次请求取得整章 ParagraphId/TextCount 计数图",
+        "本地段评 summary 非空快命中直接写入既有 ReviewCache；接口空/失败继续走原 www/m/read 镜像链",
+        "情无/小雨仅将气泡元数据改为官方快通道优先；完整评论点击页与服务器 Provider 不变，官方快通道失败继续回退 review.php",
+        "妙想天开的 strategy=3 神评与 getchapteractivity 本章说只纳入后续评估，本版不替换现有成熟热评/本章说链",
+        "当前 qidian-next 目录已有 APP v3 + getsimple + pager + Web fallback + 缓存体系，本版不改目录，避免跨域回归",
+        "Stable 1.2.1、正文、目录、搜索、账号及其它 Provider 不变"
       ],
-      "sha256": "41066a9d81525c1093e451ac703db7e36946aee316f372a666477ab74cf33623",
+      "sha256": "b26a99d4ff92c1e93ccb6af8fe4e685b14c6b793e79e17e7c2ccaf2bad16e5f1",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
     },
     {
@@ -100,5 +104,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-09-12T19:50:00+08:00"
+  "generatedAt": "2026-09-12T20:35:00+08:00"
 }
