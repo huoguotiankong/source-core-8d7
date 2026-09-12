@@ -34,7 +34,19 @@ jobs:
           out=[]
           n=0
           for line in lines:
-              if "var tag='<script>'+script.replace(" in line:
+              if line.startswith('function safe(raw)'):
+                  out.append(r'''function safe(raw){raw=txt(raw);try{raw=raw.replace(/([:,\[]\s*)(\d{16,})(?=\s*[,}\]])/g,'$1"$2"');return JSON.parse(raw||'{}')}catch(e){throw new Error('评论数据解析失败：'+e)}}''')
+                  n+=1
+              elif line.startswith('function avatar(v)'):
+                  out.append(r'''function avatar(v){v=txt(v).trim();if(!v)return '';var low=v.toLowerCase();if(v.indexOf('//')===0)return 'https:'+v;if(low.indexOf('http://')===0)return 'https://'+v.substring(7);if(v.charAt(0)==='/')return 'https://full.hnxianxin.cn'+v;if(low.indexOf('https://')!==0){while(v.charAt(0)==='/')v=v.substring(1);return BASE+v}return v}''')
+                  n+=1
+              elif line.startswith('function ctext(v)'):
+                  out.append(r'''function ctext(v){return txt(v).replace(/\[fn=(\d+)\]/g,function(_,n){var m={'31':'😳','21':'😍','11':'🙄','32':'😎','12':'😭','43':'☺️','50':'🤐','45':'😴','19':'😂'};return m[n]||_})}''')
+                  n+=1
+              elif "document.addEventListener('error'" in line:
+                  out.append(r'''function register(){if(!window.commentAdapters||typeof window.commentAdapters.replace!=='function'){setTimeout(register,80);return}var ad={buildRequest:function(ctx){var p=(ctx&&ctx.cursor)?ctx.cursor:1;return {url:'__qfqwcmt__?mode='+(C.mode||'paragraph')+'&para='+encodeURIComponent(C.paragraphId||'0')+'&page='+p,method:'GET'}},parseResponse:function(data){var d=(data&&data.data)||(data&&data.Data)||data||{},ls=arr(d),out=[];for(var i=0;i<ls.length;i++)out.push(item(ls[i],false));return {comments:out,nextCursor:ls.length>=20?((Number((C._page||1))+1)):null,totalCount:num(d.totalCount||d.TotalCount||d.count||d.Count)||out.length}},buildReplyRequest:function(ctx){return {url:'__qfqwcmt__?mode=reply&para='+encodeURIComponent(C.paragraphId||'0')+'&page=1&review='+encodeURIComponent(ctx&&ctx.commentId||''),method:'GET'}},parseReplyResponse:function(data){var d=(data&&data.data)||(data&&data.Data)||data||{},ls=arr(d),out=[];for(var i=0;i<ls.length;i++)out.push(item(ls[i],true));return out}};window.commentAdapters.replace('paragraph',ad);window.commentAdapters.replace('chapter',ad);try{var m=document.createElement('meta');m.name='referrer';m.content='no-referrer';document.head.appendChild(m)}catch(_m){}try{document.addEventListener('error',function(e){var im=e.target;if(im&&im.tagName==='IMG'&&im.src&&im.src.toLowerCase().indexOf('http://')===0){im.src='https://'+im.src.substring(7)}},true)}catch(_e){}}''')
+                  n+=1
+              elif "var tag='<script>'+script.replace(" in line:
                   out.append("    var tag='<script>'+script+'</script>';" )
                   n+=1
               elif "if(/<" in line and "/body>/i.test(html))" in line:
@@ -45,10 +57,10 @@ jobs:
                   n+=1
               else:
                   out.append(line)
-          if n!=3:
-              raise SystemExit('expected three helper syntax normalizations, got '+str(n))
+          if n!=7:
+              raise SystemExit('expected seven viewer syntax normalizations, got '+str(n))
           p.write_text('\n'.join(out)+'\n')
-          print('normalized helper lines',n)
+          print('normalized viewer lines',n)
           PY
       - name: Build Beta4
         run: python .staging/patch_qidian_122b4_qw_viewer_bridge.py
