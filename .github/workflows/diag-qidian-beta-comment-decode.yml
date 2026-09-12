@@ -1,50 +1,24 @@
-name: diag-qidian-beta-comment-decode
+name: patch-qidian-beta121b5-runner
 on:
   push:
     paths:
-      - '.staging/diag-qidian-beta-comment-decode.trigger'
+      - '.staging/patch-qidian-beta121b5-runner.trigger'
 permissions:
-  contents: read
+  contents: write
 jobs:
-  diag:
+  patch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Inspect comment decode paths
+      - name: Apply Beta5 module Base64URL hotfix
+        run: python3 .staging/patch_qidian_beta121b5_module_base64.py
+      - name: Validate and publish
         run: |
-          python3 - <<'PY'
-          import json,re,base64,gzip
-          from pathlib import Path
-          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
-          a=json.loads(p.read_text(encoding='utf-8')); s=a[0] if isinstance(a,list) else a
-          js=s.get('jsLib','')
-          m=re.search(r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});\s*var\s+QF_MOD38_EXPORTS',js,re.S)
-          pack=json.loads(m.group(1))
-          def dec(v):
-            raw=v.split(':',1)[1] if ':' in v[:12] else v
-            b=base64.b64decode(raw)
-            try:return gzip.decompress(b).decode('utf-8')
-            except:return b.decode('utf-8')
-          needles=['qdBubbleDataV20','showCmtV20','base64','Base64','decodeToString','getDecoder','getUrlDecoder','urlSafe','urlsafe','replace(/-/','replace(/_/']
-          for name,v in pack.items():
-            try:t=dec(v)
-            except:continue
-            hits=[]
-            for n in needles:
-              if n in t:hits.append(n)
-            if hits:
-              print('\n===',name,'HITS',hits,'===')
-              for n in hits:
-                pos=0; shown=0
-                while True:
-                  i=t.find(n,pos)
-                  if i<0 or shown>=4:break
-                  print('\n--',n,'@',i,'--\n',t[max(0,i-700):i+1600])
-                  pos=i+len(n); shown+=1
-          print('\n=== top-level jsLib ===')
-          for n in needles:
-            if n in js:
-              i=js.find(n); print('\n--',n,'--\n',js[max(0,i-700):i+1600])
-          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json subscription/beta.json subscription/novel.json manifest.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git diff --cached --check
+          git commit -m "fix qidian beta5 url-safe module base64 decode"
+          git push origin main
