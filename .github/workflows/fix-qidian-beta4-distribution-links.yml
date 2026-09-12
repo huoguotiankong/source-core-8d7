@@ -1,0 +1,37 @@
+name: fix-qidian-beta4-distribution-links
+on:
+  push:
+    paths: ['.staging/fix-qidian-beta4-distribution-links.trigger']
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Fix Beta4 distribution URLs
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          raw='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12014'
+          cdn='https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12014'
+          imp='legado://import/importonline?src='+raw
+          def walk(x):
+            if isinstance(x,dict):
+              if x.get('id')=='qidian-next-beta':
+                x['sourceUrl']=raw;x['backupUrl']=cdn;x['importUrl']=imp;x['version']='1.2.1-beta4';x['versionCode']=12014
+              for v in x.values():walk(v)
+            elif isinstance(x,list):
+              for v in x:walk(v)
+          for f in ['manifest.json','subscription/beta.json','subscription/novel.json']:
+            p=Path(f);d=json.loads(p.read_text(encoding='utf-8'));walk(d);p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+      - name: Commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add manifest.json subscription/beta.json subscription/novel.json
+          git commit -m 'qidian beta4: sync distribution import URLs' || exit 0
+          git push origin HEAD:main
