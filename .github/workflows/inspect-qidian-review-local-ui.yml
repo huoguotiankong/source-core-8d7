@@ -13,7 +13,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 1
-      - name: Extract review_local_ui
+      - name: Extract review modules and card candidates
         shell: bash
         run: |
           python3 - <<'PY'
@@ -26,28 +26,49 @@ jobs:
           m=re.search(r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});\s*var\s+QF_MOD38_EXPORTS',js,re.S)
           if not m: raise SystemExit('QF_MOD38_PACK not found')
           pack=json.loads(m.group(1))
-          v=pack.get('review_local_ui')
-          if v is None: raise SystemExit('review_local_ui missing')
-          s=str(v)
-          if s.startswith('gz:'):
+          def unpack(v):
+              s=str(v)
+              if not s.startswith('gz:'): return s
               b=s[3:].strip().replace('-','+').replace('_','/')
               b += '='*((4-len(b)%4)%4)
-              text=gzip.decompress(base64.b64decode(b)).decode('utf-8')
-          else:
-              text=s
-          out=Path('.staging/review_local_ui.inspect.js')
-          out.write_text(text,encoding='utf-8')
-          print('wrote',out,'bytes',len(text.encode('utf-8')))
+              return gzip.decompress(base64.b64decode(b)).decode('utf-8')
+          text=unpack(pack['review_local_ui'])
+          Path('.staging/review_local_ui.inspect.js').write_text(text,encoding='utf-8')
+          needles=['本章说','条评论','qfcount','chapterCard','chapter card','ChapterReview','chapter-review','chapter_review']
+          report=[]
+          for name,val in pack.items():
+              t=unpack(val)
+              hits=[]
+              for needle in needles:
+                  start=0
+                  while True:
+                      i=t.find(needle,start)
+                      if i<0: break
+                      hits.append((i,needle))
+                      start=i+len(needle)
+              if not hits: continue
+              report.append('\n===== MODULE '+name+' =====\n')
+              seen=[]
+              for i,needle in sorted(hits)[:40]:
+                  lo=max(0,i-1600); hi=min(len(t),i+2600)
+                  key=(lo,hi)
+                  if any(not (hi<a or lo>b) for a,b in seen): continue
+                  seen.append(key)
+                  report.append('\n--- HIT '+needle+' @ '+str(i)+' ---\n')
+                  report.append(t[lo:hi])
+                  report.append('\n')
+          Path('.staging/qidian-local-card-candidates.inspect.txt').write_text(''.join(report),encoding='utf-8')
+          print('modules',len(pack),'report bytes',sum(len(x.encode('utf-8')) for x in report))
           PY
-      - name: Commit extracted module
+      - name: Commit inspection outputs
         shell: bash
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add .staging/review_local_ui.inspect.js
+          git add .staging/review_local_ui.inspect.js .staging/qidian-local-card-candidates.inspect.txt
           if git diff --cached --quiet; then
             echo 'No changes'
             exit 0
           fi
-          git commit -m 'chore: expose qidian local review module for inspection'
+          git commit -m 'chore: inspect qidian local chapter card candidates'
           git push origin HEAD:main
