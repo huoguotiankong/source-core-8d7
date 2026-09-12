@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-12T22:45:00+08:00",
+  "updatedAt": "2026-09-13T00:18:31+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -87,14 +87,14 @@
       "category": "novel",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "1.2.2-beta4",
-      "versionCode": 12024,
-      "updatedAt": "2026-09-12",
+      "version": "1.2.1-beta8",
+      "versionCode": 12018,
+      "updatedAt": "2026-09-13T00:18:31+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12024",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12024",
-      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12024",
-      "summary": "Beta4：情无/小雨段评主列表已真机恢复；本版修复头像空白与楼中楼回复加载失败，list.php/reply.php 改走书源 java.ajax 跨域桥接。Stable 1.2.1、正文与目录冻结。",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12018",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12018",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12018",
+      "summary": "本地本章说卡片视觉统一：近白浅灰卡片 + 珊瑚红强调；评论数据与点击逻辑不变。",
       "tags": [
         "起点",
         "测试版",
@@ -105,18 +105,21 @@
         "楼中楼",
         "java.ajax",
         "CORS桥接",
-        "正文冻结"
+        "正文冻结",
+        "本地段评",
+        "本章说",
+        "评论页",
+        "UI统一",
+        "珊瑚红"
       ],
       "changelog": [
-        "真机确认 Beta3 情无段评气泡和主评论列表恢复",
-        "评论详情不再直接依赖服务器 H5 的跨域 fetch，优先使用书源托管 Viewer",
-        "list.php 与 reply.php 统一通过 java.ajax 请求，规避评论 UI 与接口不同源时的 CORS 拦截",
-        "适配 avatarUrl、reviewId、nickname、createTime、replyCount、likeCount、isGod、imageUrl、audioUrl、quoteNickname 当前字段",
-        "头像 URL 兼容 //、http:// 与相对路径并使用 no-referrer",
-        "Viewer 准备/打开失败保留原 index.html 回退；Beta3 Argus 气泡快通道不改",
-        "Stable 1.2.1、正文、目录、搜索、账号及其它 Provider 不变"
+        "本章说标签由绿色改为浅珊瑚红底+珊瑚红字，统一评论页强调色",
+        "卡片背景/边框改为近白+浅灰，昵称、正文、回复与点赞统一中性灰阶",
+        "保留评论总数、两条真实评论预览、点赞/回复统计和点击进入本章说",
+        "仅替换 review lazy module 视觉层；ruleContent、Rhino loader 与其它31个模块保持不变",
+        "Stable 1.2.0 不变，继续仅发布 Beta 等待真机确认"
       ],
-      "sha256": "794c2eb6992a05c711c3cff3be2eab69f0fe65ef0f145ac14d625d73794980a2"
+      "sha256": "057823878d1dd496430610a34283558b64344f8abcd1bb1bae2dba3b3a228d89"
     },
     {
       "id": "picacg",

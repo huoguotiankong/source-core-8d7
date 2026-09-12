@@ -1,40 +1,45 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "1.2.2-beta4：情无/小雨段评气泡与主列表已恢复，本版集中修复头像与回复楼中楼。",
+  "summary": "Beta 1.2.1-beta8：统一本地本章说章末卡片与评论页视觉主题。",
   "badges": [
     "Beta",
-    "1.2.2-beta4",
-    "头像修复",
-    "楼中楼修复",
-    "CORS桥接",
-    "正文冻结"
+    "1.2.1-beta8",
+    "本地段评",
+    "本章说",
+    "UI统一"
   ],
   "sections": [
     {
-      "title": "真机结果",
-      "text": "Beta3 已确认情无/小雨服务器段评气泡和主评论列表可以显示；当前问题收敛为头像空白、回复加载失败。"
+      "title": "视觉",
+      "text": "章末本章说由绿色主题改为近白浅灰卡片，标签使用评论页同系浅珊瑚红底与珊瑚红文字；边框、分隔线及正文信息改为统一中性灰阶。"
     },
     {
-      "title": "回复修复",
-      "text": "当前小雨接口 list.php/reply.php 与评论 UI 不同源；Beta4 把两者统一改由书源 java.ajax 请求，避免 WebView fetch 被 CORS 拦截。"
+      "title": "功能",
+      "text": "评论总数、两条真实评论预览、点赞/回复统计以及点击进入本章说全部保留。"
     },
     {
-      "title": "头像修复",
-      "text": "评论适配器新增 avatarUrl 等当前服务器字段，并兼容协议相对、HTTP 和相对路径，图片使用 no-referrer。"
+      "title": "隔离",
+      "text": "只修改 review lazy module 的 qdChapterTalkCardV20 视觉层；正文 ruleContent、Beta7 Rhino Scanner/GZIP 加载器及其余31个 lazy module 均保持不变。"
     },
     {
-      "title": "冻结范围",
-      "text": "Beta3 Argus 段评气泡快通道、正文、目录、搜索、账号和 Stable 1.2.1 均不修改。"
+      "title": "发布",
+      "text": "Stable 1.2.0 保持不变，Beta8 等待真机截图确认后再决定后续处理。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12024",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12024",
-  "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12024",
-  "links": {
-    "source": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12024",
-    "backup": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12024",
-    "import": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12024"
-  },
-  "updatedAt": "2026-09-12"
+  "links": [
+    {
+      "label": "导入 Beta",
+      "url": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12018"
+    },
+    {
+      "label": "Raw",
+      "url": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12018"
+    },
+    {
+      "label": "CDN",
+      "url": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12018"
+    }
+  ],
+  "updatedAt": "2026-09-13T00:18:31+08:00"
 }
