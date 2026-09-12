@@ -40,11 +40,11 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "Beta 1.2.1-beta2：按最新“小雨的世界”附件重接情无用户系统；游客 Token/网页登录均使用当前接口，免登录正文保持 Stable 1.2.0 基线。",
+      "summary": "情无段评接入当前小雨服务器；章名评论服务器优先/本地兜底；本章说服务器详情接通。",
       "icon": "",
       "channel": "beta",
-      "version": "1.2.1-beta2",
-      "updatedAt": "2026-09-11",
+      "version": "1.2.1-beta4",
+      "updatedAt": "2026-09-12T16:15:00+08:00",
       "tags": [
         "起点",
         "测试版",
@@ -58,19 +58,19 @@
         "评论页"
       ],
       "changelog": [
-        "废弃 Beta1 错误的邮箱/密码情无登录，不再调用旧 auth.php?action=login / Cookie / X-Content-Token 体系",
-        "情无游客授权改为“源作者 + 官方反馈群 + 临时口令 + AndroidId”，POST user_api.php?action=guest",
-        "普通账号改为 auth.php?mode=legado&android_id=... 网页注册/登录，回写当前 X-Sec-Token",
-        "用户状态/次数通过 user_api.php?action=me + X-Sec-Token + X-Android-Id 获取",
-        "limited_qw 仅在 Token 存在时附加当前认证头；未登录正文请求保持 Stable 1.2.0 已真机确认免费链",
-        "Stable 1.2.0、评论、角色卡、书友圈、其它 Provider 全部冻结"
+        "情无段评计数改走当前小雨 review.php",
+        "段评详情/本章说改走 list.php，楼中楼走 reply.php",
+        "章名评论服务器有则服务器，无详情时只回退起点本地",
+        "Stable 1.2.0 与其它域冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12012",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12014",
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12012",
       "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12012",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
-      "versionCode": 12012,
-      "type": "novel"
+      "versionCode": 12014,
+      "type": "novel",
+      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
+      "sha256": "a37b72570f21f3e2812e57862ec87b582efb7afe98df68c9f321e8931b6cc49e"
     }
   ],
   "generatedAt": "2026-09-11T23:12:00+08:00"

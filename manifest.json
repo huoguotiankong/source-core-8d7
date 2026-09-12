@@ -83,12 +83,12 @@
       "category": "novel",
       "channel": "beta",
       "version": "1.2.1-beta4",
-      "versionCode": 12104,
-      "updatedAt": "2026-09-12T00:40:00+08:00",
+      "versionCode": 12014,
+      "updatedAt": "2026-09-12T16:15:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12013",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12014",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "情无/小雨段评服务器可选；章名评论服务器优先、本地回退；修复本章说具体评论展示。",
+      "summary": "情无段评接入当前小雨服务器；章名评论服务器优先/本地兜底；本章说服务器详情接通。",
       "tags": [
         "起点",
         "测试版",
@@ -102,13 +102,12 @@
         "评论页"
       ],
       "changelog": [
-        "正文无 Token 时按附件 xyEnsureUser 自动 POST user_api.php?action=guest，仅提交 android_id",
-        "账号管理情无使用源作者/官方反馈群/临时口令进行手工游客授权",
-        "普通账号使用 auth.php?mode=legado&android_id=... 网页注册/登录并回写 Token",
-        "查看使用次数走 user_api.php?action=me，退出走 logout",
-        "Stable 1.2.0 与其它功能域冻结"
+        "情无段评计数改走当前小雨 review.php",
+        "段评详情/本章说改走 list.php，楼中楼走 reply.php",
+        "章名评论服务器有则服务器，无详情时只回退起点本地",
+        "Stable 1.2.0 与其它域冻结"
       ],
-      "sha256": "3fadfe57c53ad667b286524072d8fa4ce1dc172f6cf35215d83d2392eb5479b3"
+      "sha256": "a37b72570f21f3e2812e57862ec87b582efb7afe98df68c9f321e8931b6cc49e"
     },
     {
       "id": "picacg",
