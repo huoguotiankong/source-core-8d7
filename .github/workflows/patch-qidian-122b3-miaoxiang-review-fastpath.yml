@@ -1,0 +1,61 @@
+name: Patch Qidian 1.2.2-Beta3 Miaoxiang Review Fast Path
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.staging/run-qidian-122b3-miaoxiang-review-fastpath.trigger'
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: patch-qidian-122b3-miaoxiang-review-fastpath
+  cancel-in-progress: false
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build Beta3
+        run: python .staging/patch_qidian_122b3_miaoxiang_review_fastpath.py
+      - name: Static and isolation gates
+        run: |
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          stable=Path('sources/novel/qidian-next/qidian-next.json')
+          beta=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          assert hashlib.sha256(stable.read_bytes()).hexdigest()=='1ee474c209b48d069344ffa4409379a0d39012cbaf2acecbd5ffcaba5404ab7e'
+          a=json.loads(beta.read_text()); s=a[0] if isinstance(a,list) else a; js=s['jsLib']
+          assert 'v1.2.2-beta3' in s.get('bookSourceComment','')
+          assert js.count('function qfReviewFastSummaryV1223')==1
+          assert js.count("QF_ReviewApi.request(ctx,'v1/chapterreview/getchapterrepagesummary'")>=1
+          assert 'fast1223.items.length' in js
+          assert 'source=ARGUS-REPAGE' in js and 'source=QW-SERVER' in js
+          assert 'https://full.hnxianxin.cn/qd/review.php?bookId=' in js
+          assert js.count('function qfQwDecorateV1214')==1
+          assert js.count('function qfContentEntryV38')==1
+          assert str(s['ruleContent']['content']).count('@js:')==1
+          n=json.loads(Path('subscription/novel.json').read_text())
+          assert any(x.get('id')=='qidian-next-beta' and x.get('version')=='1.2.2-beta3' and x.get('versionCode')==12023 for x in n['items'])
+          Path('/tmp/qidian-beta3-jslib.js').write_text(js)
+          print('python gates ok; beta sha',hashlib.sha256(beta.read_bytes()).hexdigest())
+          PY
+          node --check /tmp/qidian-beta3-jslib.js
+      - name: Commit Beta3 publication
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          if git diff --cached --quiet; then echo 'No changes'; exit 0; fi
+          git commit -m 'qidian beta: 1.2.2-beta3 add Argus review summary fast path'
+          git push origin HEAD:main
