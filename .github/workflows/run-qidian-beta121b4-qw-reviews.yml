@@ -1,0 +1,29 @@
+name: run-qidian-beta121b4-qw-reviews
+on:
+  push:
+    paths:
+      - '.staging/run-qidian-beta121b4-qw-reviews.trigger'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Run patch
+        run: python3 .staging/patch_qidian_beta121b4_qw_reviews.py
+      - name: Validate JSON and markers
+        run: |
+          python3 -m json.tool sources/novel/qidian-next/qidian-next-beta.json >/dev/null
+          python3 -m json.tool sources/novel/qidian-next/manifest.json >/dev/null
+          grep -q '1.2.1-beta4' sources/novel/qidian-next/manifest.json
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next-beta.json sources/novel/qidian-next/manifest.json subscription/beta.json bundles/all-beta.json docs/RELEASE_LOG.md
+          git diff --cached --quiet && exit 0
+          git commit -m 'qidian beta4: add qingwu review server and chapter preview'
+          git push origin main
