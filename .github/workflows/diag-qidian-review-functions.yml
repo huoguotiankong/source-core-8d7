@@ -10,19 +10,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {ref: main}
-      - name: Print local review functions
+      - name: Print review exports
         run: |
           python3 - <<'PY'
-          import json,re,base64,gzip
+          import json,re
           a=json.load(open('sources/novel/qidian-next/qidian-next-beta.json',encoding='utf-8')); s=a[0] if isinstance(a,list) else a
-          m=re.search(r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});\s*var\s+QF_MOD38_EXPORTS',s['jsLib'],re.S); pack=json.loads(m.group(1))
-          v=pack['review']; r=v.split(':',1)[1] if ':' in v[:12] else v; r += '='*((4-len(r)%4)%4); b=base64.b64decode(r)
-          try:text=gzip.decompress(b).decode()
-          except:text=b.decode()
-          fns=re.findall(r'function\s+([A-Za-z0-9_$]+)\s*\(',text)
-          for fn in fns:
-            if any(k.lower() in fn.lower() for k in ['fetch','comment','show','open','paragraph','chapter']): print(fn)
-          for kw in ['qdFetchChapterCommentsV22','qdFetchParagraph','chapter title','章名','paragraphId']:
-            i=text.find(kw)
-            if i>=0: print('\n===== '+kw+' =====\n'+text[max(0,i-2000):i+7000])
+          js=s['jsLib']
+          m=re.search(r'var\s+QF_MOD38_EXPORTS\s*=\s*(\{.*?\});\s*var\s+QF_MOD38_CACHE',js,re.S)
+          if not m: raise SystemExit('exports not found')
+          ex=json.loads(m.group(1))
+          print('review=',json.dumps(ex.get('review'),ensure_ascii=False,indent=2))
+          print('review_server_core=',json.dumps(ex.get('review_server_core'),ensure_ascii=False,indent=2))
           PY
