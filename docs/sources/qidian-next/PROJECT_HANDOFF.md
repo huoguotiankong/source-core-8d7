@@ -1,3 +1,9 @@
+
+## 2026-09-12 · qidian-next 1.2.1-beta4
+- 评论设置新增情无/小雨服务器适配：段评可走 `full.hnxianxin.cn/qd/review.php`。
+- 章名评论优先使用服务器 `ParagraphId=-1`；服务器无章名评论时保留本地段评章名评论。
+- 本章说改用小雨评论入口，修复只显示总数卡、不显示具体评论的问题。
+- Stable 1.2.0 与其它功能域不变。
 ## 2026-09-11 · Current Beta 1.2.1-beta2 — Xiaoyu current auth
 
 - Stable remains 1.2.0.
