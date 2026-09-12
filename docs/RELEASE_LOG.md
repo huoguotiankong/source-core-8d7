@@ -1,4 +1,11 @@
 
+## 2026-09-12 · qidian-next 1.2.1-beta7
+- 真机确认 Beta6 仍有两类故障：正文 `EvaluatorException: 不允许的字符：\`；评论页解压时报 `java.lang.reflect.Array.newInstance` 不是函数。
+- 根因一：Beta4 评论补丁已把第二个 `@js` 以字面量 `\n@js:\n` 拼入 `ruleContent.content`；Beta5/Beta6沿用了该字段。Beta7 改成单一真实 JS 块，正文主链仍调用 `qfContentEntryV38`，随后再执行原情无/小雨装饰逻辑。
+- 根因二：Beta6 自行改写 GZIP 读取为反射 byte[]，与当前 Legado Rhino 不兼容。Beta7 恢复 Beta4 已验证的 `Scanner + GZIPInputStream`，只在 Base64 解码前做 URL-safe 标准化。
+- 门禁升级：32 个 lazy module（31 压缩 + 1 明文）全部解包并按实际 factory 包装逐个 JS 语法检查；另校验 `jsLib` 与单块 `ruleContent`。
+- Stable 1.2.0 不变，仅进入 Beta 真机验证。
+
 ## 2026-09-12 · qidian-next 1.2.1-beta6
 - 紧急修复 Beta5 回归：正文出现 `EvaluatorException: 不允许的字符：\`。根因是 Beta5 热修脚本把字面量反斜杠+n 写进 `jsLib`。
 - 恢复 Beta5 误删的 alpha84 lazy-module 并发运行时，补回 `qfModuleThreadIdV84` / `qfModuleWaitV84`，修复点击段评/本章说 `ReferenceError`。

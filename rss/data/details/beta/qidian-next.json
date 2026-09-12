@@ -1,31 +1,32 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.1-beta6：紧急回归修复。恢复 Beta4 完整运行时，仅保留隔离的 Base64URL 解码兼容。",
+  "summary": "Beta 1.2.1-beta7：修复正文反斜杠 EvaluatorException 与 Rhino Scanner/解压兼容问题。",
   "badges": [
     "Beta",
-    "1.2.1-beta6",
-    "运行时回归修复"
+    "1.2.1-beta7",
+    "Rhino兼容",
+    "正文回归修复"
   ],
   "sections": [
     {
-      "title": "正文修复",
-      "text": "移除 Beta5 误写进 jsLib 的字面量反斜杠+n，修复 Rhino 不允许的字符错误；正文 Provider 逻辑回到 Beta4 基线。"
+      "title": "正文",
+      "text": "Beta4 评论补丁把第二段 @js 以字面量反斜杠+n 拼进 ruleContent；Beta7 合并为一个真实 JS 块，正文主调用仍是 qfContentEntryV38。"
     },
     {
-      "title": "评论修复",
-      "text": "恢复 Beta5 误删的 alpha84 并发加载函数 qfModuleThreadIdV84 / qfModuleWaitV84，解决点击段评/本章说 ReferenceError。"
+      "title": "懒模块",
+      "text": "恢复 Beta4 真机已验证的 Scanner + GZIPInputStream 读取方式；删除 Beta6 在 Rhino 下不可调用的 java.lang.reflect.Array.newInstance。"
     },
     {
       "title": "Base64URL",
-      "text": "仅在 qfModuleUnpackV41 内兼容 -/_ 和缺失 =；31 个压缩懒模块全部完成 Base64 解码与 gzip 解压校验。"
+      "text": "解码前只做 -→+、_→/ 与缺失 = 补位；不修改情无/小雨评论接口和业务结构。"
     },
     {
-      "title": "冻结范围",
-      "text": "情无/小雨评论业务、账号系统、正文链及其它 Provider 不改；Stable 1.2.0 不变。"
+      "title": "门禁",
+      "text": "32 个 lazy module 全部解包并逐模块语法检查；jsLib 与 ruleContent 单独语法检查；Stable 1.2.0 不变。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12016",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12016",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12016"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12017",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12017",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12017"
 }
