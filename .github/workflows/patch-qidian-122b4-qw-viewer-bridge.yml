@@ -1,4 +1,4 @@
-name: Patch Qidian 1.2.2-Beta4 QW Viewer Bridge
+name: Inspect Qidian Local Chapter Card
 on:
   push:
     branches: [ main ]
@@ -6,100 +6,49 @@ on:
       - '.staging/run-qidian-122b4-qw-viewer-bridge.trigger'
   workflow_dispatch: {}
 permissions:
-  contents: write
+  contents: read
 concurrency:
-  group: patch-qidian-122b4-qw-viewer-bridge
+  group: inspect-qidian-local-chapter-card
   cancel-in-progress: false
 jobs:
-  patch:
+  inspect:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Normalize generated helper syntax
+      - name: Decode review_local_ui and inspect chapter card
         run: |
           python - <<'PY'
+          import base64,gzip,json,re
           from pathlib import Path
-          p=Path('.staging/patch_qidian_122b4_qw_viewer_bridge.py')
-          lines=p.read_text().splitlines()
-          out=[]
-          n=0
-          for line in lines:
-              if line.startswith('function safe(raw)'):
-                  out.append(r'''function safe(raw){raw=txt(raw);try{raw=raw.replace(/([:,\[]\s*)(\d{16,})(?=\s*[,}\]])/g,'$1"$2"');return JSON.parse(raw||'{}')}catch(e){throw new Error('评论数据解析失败：'+e)}}''')
+          a=json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text())
+          s=a[0] if isinstance(a,list) else a
+          js=s['jsLib']
+          m=re.search(r'"review_local_ui":"(gz:[^"]+)"',js)
+          if not m: raise SystemExit('review_local_ui not found')
+          b=m.group(1)[3:].replace('-','+').replace('_','/')
+          b+='='*((4-len(b)%4)%4)
+          mod=gzip.decompress(base64.b64decode(b)).decode('utf-8')
+          print('MODULE_BYTES',len(mod.encode()))
+          for token in ['本章说','getBuiltInCommentHtmlV21','qfBuildLocalCommentCardV338','qfShowLocalCommentCardV322']:
+              print('\n===== TOKEN',token,'COUNT',mod.count(token),'=====')
+              pos=0
+              n=0
+              while True:
+                  i=mod.find(token,pos)
+                  if i<0: break
                   n+=1
-              elif line.startswith('function avatar(v)'):
-                  out.append(r'''function avatar(v){v=txt(v).trim();if(!v)return '';var low=v.toLowerCase();if(v.indexOf('//')===0)return 'https:'+v;if(low.indexOf('http://')===0)return 'https://'+v.substring(7);if(v.charAt(0)==='/')return 'https://full.hnxianxin.cn'+v;if(low.indexOf('https://')!==0){while(v.charAt(0)==='/')v=v.substring(1);return BASE+v}return v}''')
-                  n+=1
-              elif line.startswith('function ctext(v)'):
-                  out.append(r'''function ctext(v){return txt(v).replace(/\[fn=(\d+)\]/g,function(_,n){var m={'31':'😳','21':'😍','11':'🙄','32':'😎','12':'😭','43':'☺️','50':'🤐','45':'😴','19':'😂'};return m[n]||_})}''')
-                  n+=1
-              elif "document.addEventListener('error'" in line:
-                  out.append(r'''function register(){if(!window.commentAdapters||typeof window.commentAdapters.replace!=='function'){setTimeout(register,80);return}var ad={buildRequest:function(ctx){var p=(ctx&&ctx.cursor)?ctx.cursor:1;return {url:'__qfqwcmt__?mode='+(C.mode||'paragraph')+'&para='+encodeURIComponent(C.paragraphId||'0')+'&page='+p,method:'GET'}},parseResponse:function(data){var d=(data&&data.data)||(data&&data.Data)||data||{},ls=arr(d),out=[];for(var i=0;i<ls.length;i++)out.push(item(ls[i],false));return {comments:out,nextCursor:ls.length>=20?((Number((C._page||1))+1)):null,totalCount:num(d.totalCount||d.TotalCount||d.count||d.Count)||out.length}},buildReplyRequest:function(ctx){return {url:'__qfqwcmt__?mode=reply&para='+encodeURIComponent(C.paragraphId||'0')+'&page=1&review='+encodeURIComponent(ctx&&ctx.commentId||''),method:'GET'}},parseReplyResponse:function(data){var d=(data&&data.data)||(data&&data.Data)||data||{},ls=arr(d),out=[];for(var i=0;i<ls.length;i++)out.push(item(ls[i],true));return out}};window.commentAdapters.replace('paragraph',ad);window.commentAdapters.replace('chapter',ad);try{var m=document.createElement('meta');m.name='referrer';m.content='no-referrer';document.head.appendChild(m)}catch(_m){}try{document.addEventListener('error',function(e){var im=e.target;if(im&&im.tagName==='IMG'&&im.src&&im.src.toLowerCase().indexOf('http://')===0){im.src='https://'+im.src.substring(7)}},true)}catch(_e){}}''')
-                  n+=1
-              elif "var tag='<script>'+script.replace(" in line:
-                  out.append("    var tag='<script>'+script+'</script>';" )
-                  n+=1
-              elif "if(/<" in line and "/body>/i.test(html))" in line:
-                  out.append("    var bi=html.toLowerCase().lastIndexOf('</body>');if(bi>=0)html=html.substring(0,bi)+tag+html.substring(bi);else html+=tag;")
-                  n+=1
-              elif "out.pre='window.java=java;window.__QF_QW_CTX__='+JSON.stringify(cfg).replace(" in line:
-                  out.append("    out.pre='window.java=java;window.__QF_QW_CTX__='+JSON.stringify(cfg)+';';")
-                  n+=1
-              else:
-                  out.append(line)
-          if n!=7:
-              raise SystemExit('expected seven viewer syntax normalizations, got '+str(n))
-          p.write_text('\n'.join(out)+'\n')
-          print('normalized viewer lines',n)
+                  lo=max(0,i-5000); hi=min(len(mod),i+8000)
+                  print('\n---',token,n,'AT',i,'---\n'+mod[lo:hi])
+                  pos=i+len(token)
+                  if n>=4: break
+          print('\n===== COLOR/CSS LINES NEAR 本章说 =====')
+          for i,line in enumerate(mod.splitlines(),1):
+              if '本章说' in line or ('#' in line and any(x in line for x in ['fill','stroke','background','color','linearGradient','rect','text'])):
+                  print(f'{i}: {line[:1500]}')
           PY
-      - name: Build Beta4
-        run: python .staging/patch_qidian_122b4_qw_viewer_bridge.py
-      - name: Static and isolation gates
-        run: |
-          python - <<'PY'
-          import json,hashlib,base64,re
-          from pathlib import Path
-          stable=Path('sources/novel/qidian-next/qidian-next.json')
-          beta=Path('sources/novel/qidian-next/qidian-next-beta.json')
-          assert hashlib.sha256(stable.read_bytes()).hexdigest()=='1ee474c209b48d069344ffa4409379a0d39012cbaf2acecbd5ffcaba5404ab7e'
-          a=json.loads(beta.read_text()); s=a[0] if isinstance(a,list) else a; js=s['jsLib']
-          assert 'v1.2.2-beta4' in s.get('bookSourceComment','')
-          assert js.count('function qfQwViewerPackV1224')==1
-          assert js.count('function qfQwOpenV1214')==1
-          assert 'QF_QW_VIEWER_JS_B64_V1224' in js
-          assert 'raw.giteeusercontent.com/syiism/legado-source/raw/main/ui/comment-viewer.html' in js
-          assert 'qfQwH5V1214(bid,cid,pid)' in js
-          assert 'qfReviewFastSummaryV1223' in js and 'ARGUS-REPAGE' in js
-          assert str(s['ruleContent']['content']).count('@js:')==1
-          m=re.search(r"var QF_QW_VIEWER_JS_B64_V1224='([^']+)'",js); assert m
-          browser=base64.b64decode(m.group(1)).decode()
-          for token in ['list.php?bookId=','reply.php?bookId=','avatarUrl','reviewId','nickname','window.java.ajax','no-referrer','__qfqwcmt__?']:
-              assert token in browser, token
-          Path('/tmp/qidian-beta4-jslib.js').write_text(js)
-          Path('/tmp/qidian-beta4-browser.js').write_text(browser)
-          n=json.loads(Path('subscription/novel.json').read_text())
-          assert any(x.get('id')=='qidian-next-beta' and x.get('version')=='1.2.2-beta4' and x.get('versionCode')==12024 for x in n['items'])
-          d=json.loads(Path('rss/data/details/beta/qidian-next.json').read_text())
-          assert d.get('sourceUrl') and d.get('backupUrl') and d.get('importUrl') and d.get('links',{}).get('import')
-          print('python gates ok; beta sha',hashlib.sha256(beta.read_bytes()).hexdigest())
-          PY
-          node --check /tmp/qidian-beta4-jslib.js
-          node --check /tmp/qidian-beta4-browser.js
-      - name: Commit Beta4 publication
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
-          if git diff --cached --quiet; then echo 'No changes'; exit 0; fi
-          git commit -m 'qidian beta: 1.2.2-beta4 fix qingwu avatars and replies'
-          git push origin HEAD:main
