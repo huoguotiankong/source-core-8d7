@@ -1,0 +1,126 @@
+import json,re,hashlib,base64,gzip
+from pathlib import Path
+
+SRC=Path('sources/novel/qidian-next/qidian-next-beta.json')
+STABLE=Path('sources/novel/qidian-next/qidian-next.json')
+stable_before=hashlib.sha256(STABLE.read_bytes()).hexdigest()
+arr=json.loads(SRC.read_text(encoding='utf-8'))
+src=arr[0] if isinstance(arr,list) else arr
+js=src.get('jsLib','')
+start=js.find('function qfModuleUnpackV41(v){')
+end=js.find('function qfModuleEnsureV38', start)
+if start<0 or end<0: raise SystemExit('qfModuleUnpackV41 boundary not found')
+old=js[start:end]
+if 'GZIPInputStream' not in old: raise SystemExit('unexpected unpack function')
+new=r'''function qfModuleUnpackV41(v){
+    var s=String(v||"");
+    if(s.indexOf("gz:")!==0)return s;
+    try{
+        var b64=String(s.substring(3)||"").replace(/\s+/g,"");
+        var std=b64.replace(/-/g,"+").replace(/_/g,"/");
+        while(std.length%4)std+="=";
+        var bytes=null;
+        try{bytes=Packages.android.util.Base64.decode(std,0);}catch(_a){
+            try{bytes=Packages.java.util.Base64.getDecoder().decode(std);}catch(_b){
+                bytes=Packages.java.util.Base64.getUrlDecoder().decode(b64);
+            }
+        }
+        var input=new Packages.java.io.ByteArrayInputStream(bytes);
+        var gz=new Packages.java.util.zip.GZIPInputStream(input);
+        var out=new Packages.java.io.ByteArrayOutputStream();
+        var buf=Packages.java.lang.reflect.Array.newInstance(Packages.java.lang.Byte.TYPE,4096),n=0;
+        while((n=gz.read(buf))>0)out.write(buf,0,n);
+        gz.close();
+        return String(new Packages.java.lang.String(out.toByteArray(),"UTF-8"));
+    }catch(e){
+        throw new Error("模块解压失败："+String(e&&e.message||e));
+    }
+}
+
+'''
+js=js[:start]+new+js[end:]
+src['jsLib']=js
+src['bookSourceComment']='v1.2.1-beta5：修复点击段评/本章说时懒模块解压失败（Illegal base64 character 5f）；模块解包兼容 Base64URL 的 -/_ 与缺失补位。情无/小雨评论接口、正文链及其它 Provider 保持 Beta4 不变。Stable 1.2.0 不变。'
+for k in ('version','sourceVersion'):
+    if k in src: src[k]='1.2.1-beta5'
+for k in ('versionCode','sourceVersionCode'):
+    if k in src: src[k]=12015
+SRC.write_text(json.dumps(arr,ensure_ascii=False,indent=2),encoding='utf-8')
+
+chk=json.loads(SRC.read_text(encoding='utf-8'))
+csrc=chk[0] if isinstance(chk,list) else chk
+cjs=csrc.get('jsLib','')
+for needle in ['replace(/-/g,"+")','replace(/_/g,"/")','while(std.length%4)','getUrlDecoder()','GZIPInputStream']:
+    if needle not in cjs: raise SystemExit('loader assertion failed: '+needle)
+m=re.search(r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});\s*var\s+QF_MOD38_EXPORTS',cjs,re.S)
+if not m: raise SystemExit('module pack not found')
+pack=json.loads(m.group(1)); checked=0
+for name,val in pack.items():
+    s=str(val)
+    if not s.startswith('gz:'): continue
+    b=s[3:].strip().replace('-','+').replace('_','/')
+    b += '='*((4-len(b)%4)%4)
+    try:
+        raw=base64.b64decode(b)
+        gzip.decompress(raw).decode('utf-8')
+    except Exception as e:
+        raise SystemExit(f'module decode failed {name}: {e}')
+    checked+=1
+if checked<1: raise SystemExit('no compressed modules checked')
+
+sha=hashlib.sha256(SRC.read_bytes()).hexdigest()
+version='1.2.1-beta5'; code=12015; now='2026-09-12T16:52:00+08:00'
+summary='修复评论气泡点击时懒模块解压失败；兼容 URL-safe Base64，不改动情无评论与正文业务链。'
+changes=['修复点击段评/本章说时“模块解压失败 / Illegal base64 character 5f”','懒模块解包统一兼容 Base64URL 的 -/_ 与缺失补位','评论业务逻辑、情无/小雨接口及其它 Provider 保持 Beta4 不变','Stable 1.2.0 不变']
+raw=f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={code}'
+cdn=f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v={code}'
+imp='legado://import/importonline?src='+raw
+
+def update_item(v):
+    v['name']='🌈 起点增强 · Beta'; v['channel']='beta'; v['version']=version; v['versionCode']=code
+    v['updatedAt']=now; v['summary']=summary; v['changelog']=changes
+    v['sourcePath']='sources/novel/qidian-next/qidian-next-beta.json'; v['sourceUrl']=raw
+    v['backupUrl']=cdn; v['importUrl']=imp; v['sha256']=sha
+    tags=list(v.get('tags') or [])
+    for tag in ['起点','测试版','限免源','情无','小雨用户系统','游客Token','网页登录','免登录回退','X','评论页','Base64URL']:
+        if tag not in tags: tags.append(tag)
+    v['tags']=tags
+
+for fp in ['subscription/beta.json','subscription/novel.json','manifest.json']:
+    p=Path(fp); d=json.loads(p.read_text(encoding='utf-8')); hit=[0]
+    def walk(x):
+        if isinstance(x,list):
+            for v in x: walk(v)
+        elif isinstance(x,dict):
+            if x.get('id')=='qidian-next-beta':
+                update_item(x); hit[0]+=1
+            else:
+                for v in x.values(): walk(v)
+    walk(d)
+    if hit[0]!=1: raise SystemExit(f'{fp}: expected 1 beta item, got {hit[0]}')
+    if isinstance(d,dict):
+        if 'updatedAt' in d:d['updatedAt']=now
+        if 'generatedAt' in d:d['generatedAt']=now
+    p.write_text(json.dumps(d,ensure_ascii=False,indent=2),encoding='utf-8')
+
+bp=Path('bundles/all-beta.json'); bd=json.loads(bp.read_text(encoding='utf-8')); hits=[0]
+def repl(x):
+    if isinstance(x,list):
+        for i,v in enumerate(x):
+            if isinstance(v,dict) and v.get('bookSourceUrl')==src.get('bookSourceUrl') and 'beta4' in str(v.get('bookSourceComment','')).lower():
+                x[i]=json.loads(json.dumps(src,ensure_ascii=False)); hits[0]+=1
+            else: repl(v)
+    elif isinstance(x,dict):
+        for v in x.values(): repl(v)
+repl(bd)
+if hits[0]!=1: raise SystemExit(f'bundle beta source target count={hits[0]}')
+bp.write_text(json.dumps(bd,ensure_ascii=False,indent=2),encoding='utf-8')
+
+detail={'kind':'source','title':'🌈 起点增强 · Beta','summary':'Beta 1.2.1-beta5：修复评论气泡点击时懒模块 Base64URL 解压失败；评论业务链保持 Beta4 不变。','badges':['Beta','1.2.1-beta5','模块解压修复'],'sections':[{'title':'本轮修复','text':'修复点击段评/本章说时 Illegal base64 character 5f；懒模块解包兼容 URL-safe Base64 的 -/_ 及缺失补位。'},{'title':'保持不变','text':'情无/小雨 review/list/reply 评论接口、正文链、账号系统以及 X/神魔/晴天/同人等 Provider 不改动。'},{'title':'冻结范围','text':'Stable 1.2.0 不变；本版本仅进入 Beta 真机验证。'}],'sourceUrl':raw,'backupUrl':cdn,'importUrl':imp}
+Path('rss/data/details/beta/qidian-next.json').write_text(json.dumps(detail,ensure_ascii=False,indent=2),encoding='utf-8')
+entry='''\n## 2026-09-12 · qidian-next 1.2.1-beta5\n- 修复点击段评/本章说时 `模块解压失败 / Illegal base64 character 5f`。\n- `qfModuleUnpackV41` 统一兼容 Base64URL 的 `-` / `_`，并自动补齐 `=`。\n- 情无/小雨评论接口、正文链、账号系统及其它 Provider 保持 Beta4 不变。\n- Stable 1.2.0 不变，等待真机确认后再考虑晋升。\n'''
+for fp in ['docs/RELEASE_LOG.md','docs/sources/qidian-next/PROJECT_HANDOFF.md']:
+    p=Path(fp); t=p.read_text(encoding='utf-8')
+    if 'qidian-next 1.2.1-beta5' not in t: p.write_text(entry+t,encoding='utf-8')
+if hashlib.sha256(STABLE.read_bytes()).hexdigest()!=stable_before: raise SystemExit('stable source changed unexpectedly')
+print('Beta5 ready; modules checked=',checked,'sha256=',sha)
