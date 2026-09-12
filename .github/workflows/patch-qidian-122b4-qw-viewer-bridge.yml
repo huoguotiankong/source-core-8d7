@@ -37,13 +37,16 @@ jobs:
               if "var tag='<script>'+script.replace(" in line:
                   out.append("    var tag='<script>'+script+'</script>';" )
                   n+=1
+              elif "if(/<" in line and "/body>/i.test(html))" in line:
+                  out.append("    var bi=html.toLowerCase().lastIndexOf('</body>');if(bi>=0)html=html.substring(0,bi)+tag+html.substring(bi);else html+=tag;")
+                  n+=1
               elif "out.pre='window.java=java;window.__QF_QW_CTX__='+JSON.stringify(cfg).replace(" in line:
                   out.append("    out.pre='window.java=java;window.__QF_QW_CTX__='+JSON.stringify(cfg)+';';")
                   n+=1
               else:
                   out.append(line)
-          if n!=2:
-              raise SystemExit('expected two helper syntax normalizations, got '+str(n))
+          if n!=3:
+              raise SystemExit('expected three helper syntax normalizations, got '+str(n))
           p.write_text('\n'.join(out)+'\n')
           print('normalized helper lines',n)
           PY
