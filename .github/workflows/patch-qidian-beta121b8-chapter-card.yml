@@ -1,0 +1,68 @@
+name: patch-qidian-beta121b8-chapter-card
+on:
+  push:
+    paths:
+      - '.staging/patch-qidian-beta121b8-chapter-card.trigger'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Patch and validate Beta8 local chapter card
+        shell: bash
+        run: |
+          python3 .staging/patch_qidian_beta121b8_chapter_card.py
+      - name: Remove temporary inspection files
+        shell: bash
+        run: |
+          rm -f .staging/review_local_ui.inspect.js
+          rm -f .staging/qidian-local-card-candidates.inspect.txt
+          rm -f .staging/inspect-qidian-review-local-ui.trigger
+          rm -f .github/workflows/inspect-qidian-review-local-ui.yml
+      - name: Verify isolated file set
+        shell: bash
+        run: |
+          git add -A
+          git diff --cached --name-only | sort > /tmp/changed.txt
+          cat /tmp/changed.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          allowed={
+            'sources/novel/qidian-next/qidian-next-beta.json',
+            'subscription/beta.json',
+            'subscription/novel.json',
+            'manifest.json',
+            'bundles/all-beta.json',
+            'rss/data/details/beta/qidian-next.json',
+            'docs/RELEASE_LOG.md',
+            'docs/sources/qidian-next/PROJECT_HANDOFF.md',
+            '.staging/review_local_ui.inspect.js',
+            '.staging/qidian-local-card-candidates.inspect.txt',
+            '.staging/inspect-qidian-review-local-ui.trigger',
+            '.github/workflows/inspect-qidian-review-local-ui.yml',
+          }
+          changed=set(Path('/tmp/changed.txt').read_text().splitlines())
+          extra=changed-allowed
+          required={
+            'sources/novel/qidian-next/qidian-next-beta.json',
+            'subscription/beta.json','subscription/novel.json','manifest.json',
+            'bundles/all-beta.json','rss/data/details/beta/qidian-next.json',
+            'docs/RELEASE_LOG.md','docs/sources/qidian-next/PROJECT_HANDOFF.md',
+          }
+          missing=required-changed
+          if extra: raise SystemExit('unexpected files: '+repr(sorted(extra)))
+          if missing: raise SystemExit('missing publication files: '+repr(sorted(missing)))
+          print('FILE_SET_OK')
+          PY
+      - name: Publish Beta8
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m 'style: qidian beta8 local chapter review card'
+          git push origin HEAD:main
