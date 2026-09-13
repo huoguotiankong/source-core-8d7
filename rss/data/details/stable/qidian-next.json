@@ -1,32 +1,43 @@
 {
   "kind": "source",
   "title": "🌈 起点增强",
-  "summary": "Stable 1.2.1：由 1.2.1-beta7 按用户明确要求原样晋升；正文 Rhino 非法反斜杠问题已真机确认修复。",
+  "summary": "Stable 1.2.2：由已真机确认的 1.2.2-beta5 直接晋升，本章说卡片主题统一。",
   "badges": [
     "Stable",
-    "1.2.1",
-    "正文回归修复",
-    "Rhino兼容"
+    "1.2.2",
+    "本地段评",
+    "本章说",
+    "UI统一"
   ],
   "sections": [
     {
-      "title": "本次晋升",
-      "text": "用户真机确认 Beta7 正文已经修复，并明确要求先将这一版升为正式版。Stable 1.2.1 直接沿用 Beta7 业务代码，不再追加新逻辑。"
+      "title": "本章说卡片",
+      "text": "近白浅灰卡片、浅灰边框、评论页同系珊瑚红标签；昵称、正文、点赞与回复统一中性灰阶。"
     },
     {
-      "title": "正文修复",
-      "text": "ruleContent 改为单一真实 JS 执行块，消除字面量反斜杠导致的 EvaluatorException。"
+      "title": "功能保持",
+      "text": "评论总数、两条真实评论预览、点赞/回复统计及点击进入本章说均保持 Beta5 原逻辑。"
     },
     {
-      "title": "模块兼容",
-      "text": "恢复已验证的 Scanner + GZIPInputStream 懒模块解压路径；Base64URL 仅做 -/_ 标准化与缺失 = 补位。"
-    },
-    {
-      "title": "版本策略",
-      "text": "Stable 与 Beta 保持同一 bookSourceUrl 身份，但使用独立物理 JSON 路径；Beta7 文件保留作历史/后续开发基线，不再作为当前活动目录项。"
+      "title": "晋升说明",
+      "text": "本版直接沿用真机确认的 1.2.2-beta5 业务代码，不新增业务逻辑；Beta5 物理文件继续保留。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12010",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12010",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12010"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12020",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12020",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12020",
+  "links": [
+    {
+      "label": "导入正式版",
+      "url": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12020"
+    },
+    {
+      "label": "Raw",
+      "url": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12020"
+    },
+    {
+      "label": "备用",
+      "url": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12020"
+    }
+  ]
 }

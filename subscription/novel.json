@@ -2,16 +2,16 @@
   "schemaVersion": 1,
   "type": "novel",
   "name": "小说源",
-  "updatedAt": "2026-09-13T10:20:02+08:00",
+  "updatedAt": "2026-09-13T10:32:03+08:00",
   "items": [
     {
       "id": "qidian-next",
       "name": "🌈 起点增强",
-      "summary": "正式版 1.2.1：由 1.2.1-beta7 按用户明确要求原样晋升；正文 Rhino 非法反斜杠问题已真机确认修复，并恢复兼容的 Scanner/GZIP 懒模块解压。",
+      "summary": "正式版 1.2.2：由真机确认的 1.2.2-beta5 直接晋升；本地本章说卡片视觉统一，沿用已验证功能链，不新增业务逻辑。",
       "icon": "",
       "channel": "stable",
-      "version": "1.2.1",
-      "updatedAt": "2026-09-12",
+      "version": "1.2.2",
+      "updatedAt": "2026-09-13T10:32:03+08:00",
       "tags": [
         "起点",
         "正式版",
@@ -24,64 +24,26 @@
         "书友圈",
         "Base64URL",
         "Rhino兼容",
-        "正文回归修复"
-      ],
-      "changelog": [
-        "由 1.2.1-beta7 按用户明确要求原样晋升 Stable，不新增业务逻辑",
-        "修复正文 EvaluatorException：移除 ruleContent 中会被 Rhino 当成非法字符的字面量反斜杠拼接",
-        "懒模块解压恢复已验证的 Scanner + GZIPInputStream 路径，移除 Rhino 不兼容的 java.lang.reflect.Array.newInstance 调用",
-        "Base64URL 仅保留 -/_ 标准化与 = 补位；32 个 lazy module 已完成解包/语法门禁",
-        "情无/小雨评论、账号系统、正文 Provider 与其它功能沿用 Beta7 代码"
-      ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12010",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12010",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12010",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json",
-      "versionCode": 12010,
-      "sha256": "1ee474c209b48d069344ffa4409379a0d39012cbaf2acecbd5ffcaba5404ab7e",
-      "sourcePath": "sources/novel/qidian-next/qidian-next.json"
-    },
-    {
-      "id": "qidian-next-beta",
-      "name": "🌈 起点增强 · Beta",
-      "category": "novel",
-      "artifactType": "bookSource",
-      "channel": "beta",
-      "version": "1.2.2-beta5",
-      "versionCode": 12025,
-      "updatedAt": "2026-09-13T10:20:02+08:00",
-      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12025",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12025",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12025",
-      "summary": "本地本章说卡片视觉统一：近白浅灰卡片 + 珊瑚红强调；沿用 1.2.2-beta4 功能链，评论数据与点击逻辑不变。",
-      "tags": [
-        "起点",
-        "测试版",
-        "情无",
-        "小雨服务器",
-        "段评",
-        "头像",
-        "楼中楼",
-        "java.ajax",
-        "CORS桥接",
-        "正文冻结",
+        "正文回归修复",
         "本地段评",
         "本章说",
-        "评论页",
         "UI统一",
         "珊瑚红"
       ],
       "changelog": [
-        "本章说标签改为浅珊瑚红底 + 珊瑚红字，统一评论页面强调色",
-        "卡片背景/边框改为近白浅灰，昵称、正文、点赞与回复统一中性灰阶",
+        "由用户真机确认的 1.2.2-beta5 直接晋升 Stable，不新增业务逻辑",
+        "本章说卡片统一为近白浅灰背景、浅灰边框与珊瑚红标签",
+        "昵称、正文、点赞与回复统一中性灰阶",
         "评论总数、两条真实评论预览、点赞/回复统计及点击进入本章说逻辑保持不变",
-        "沿用 1.2.2-beta4 的 Argus 段评快通道与服务器评论兼容代码，本轮不再修改情无/小雨链",
-        "正文、目录、搜索、账号、ruleContent、Rhino loader 及其它 lazy module 不变；Stable 1.2.1 不变"
+        "沿用 1.2.2-beta4 功能链，情无/小雨服务器段评链及正文、目录、搜索、账号等模块不改"
       ],
-      "sha256": "8a5a8b7c0b1adeedcdd9ee695bb538e7994d4916f75e0ef1dc75f69b2f13cb32",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
-      "type": "novel"
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12020",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12020",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12020",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json",
+      "versionCode": 12020,
+      "sha256": "1eaffa24543b2af58aed1368578368ea326ffb0170338971bde558df725bed87",
+      "sourcePath": "sources/novel/qidian-next/qidian-next.json"
     },
     {
       "id": "qidian-official",
@@ -117,5 +79,5 @@
       "type": "novel"
     }
   ],
-  "generatedAt": "2026-09-13T10:20:02+08:00"
+  "generatedAt": "2026-09-13T10:32:03+08:00"
 }

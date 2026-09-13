@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-09-13T10:20:02+08:00",
+  "updatedAt": "2026-09-13T10:32:03+08:00",
   "items": [
     {
       "id": "qidian-official",
@@ -36,47 +36,6 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/qidian-official.json"
     },
     {
-      "id": "qidian-next-beta",
-      "name": "🌈 起点增强 · Beta",
-      "category": "novel",
-      "artifactType": "bookSource",
-      "channel": "beta",
-      "version": "1.2.2-beta5",
-      "versionCode": 12025,
-      "updatedAt": "2026-09-13T10:20:02+08:00",
-      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12025",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12025",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12025",
-      "summary": "本地本章说卡片视觉统一：近白浅灰卡片 + 珊瑚红强调；沿用 1.2.2-beta4 功能链，评论数据与点击逻辑不变。",
-      "tags": [
-        "起点",
-        "测试版",
-        "情无",
-        "小雨服务器",
-        "段评",
-        "头像",
-        "楼中楼",
-        "java.ajax",
-        "CORS桥接",
-        "正文冻结",
-        "本地段评",
-        "本章说",
-        "评论页",
-        "UI统一",
-        "珊瑚红"
-      ],
-      "changelog": [
-        "本章说标签改为浅珊瑚红底 + 珊瑚红字，统一评论页面强调色",
-        "卡片背景/边框改为近白浅灰，昵称、正文、点赞与回复统一中性灰阶",
-        "评论总数、两条真实评论预览、点赞/回复统计及点击进入本章说逻辑保持不变",
-        "沿用 1.2.2-beta4 的 Argus 段评快通道与服务器评论兼容代码，本轮不再修改情无/小雨链",
-        "正文、目录、搜索、账号、ruleContent、Rhino loader 及其它 lazy module 不变；Stable 1.2.1 不变"
-      ],
-      "sha256": "8a5a8b7c0b1adeedcdd9ee695bb538e7994d4916f75e0ef1dc75f69b2f13cb32",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json"
-    },
-    {
       "id": "manwa",
       "name": "◈ 漫蛙漫画",
       "summary": "Beta13：取消猜测式 fetch，保留漫蛙原评论 DOM 与原生滚动环境，并加入 8 秒加载 watchdog，避免永久“加载中”。",
@@ -108,5 +67,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-09-13T10:20:02+08:00"
+  "generatedAt": "2026-09-13T10:32:03+08:00"
 }

@@ -1,3 +1,10 @@
+## 2026-09-13 · qidian-next Stable 1.2.2
+- 用户真机确认 `1.2.2-beta5` 本章说卡片优化正常，并明确要求晋升正式版。
+- Stable 直接沿用 Beta5 业务代码，不新增业务逻辑；保留近白浅灰卡片、浅灰边框、珊瑚红标签及统一中性灰阶。
+- 评论总数、两条真实评论预览、点赞/回复统计与点击进入本章说逻辑不变；沿用 1.2.2-beta4 功能链。
+- `sources/novel/qidian-next/qidian-next.json`、Manifest、Stable/Novel Subscription、Stable Bundle、RSS Stable Detail 已同步；活动 Beta/Novel 重复项移除。
+- Beta5 独立物理文件继续保留作历史/后续开发基线；Stable/Beta 继续共享同一 Legado `bookSourceUrl` 身份。
+
 ## 2026-09-13 · qidian-next 1.2.2-beta5 — 本地本章说卡片主题统一
 - 延续 1.2.2-beta4 功能链，仅保留已完成的 `qdChapterTalkCardV20` 视觉改造；上一轮误写成 1.2.1-beta8 的版本序列在本版纠正为 1.2.2-beta5。
 - 卡片由绿色/米黄改为近白浅灰底、浅灰边框和评论页同系珊瑚红标签；昵称、正文、点赞与回复统一中性灰阶。
