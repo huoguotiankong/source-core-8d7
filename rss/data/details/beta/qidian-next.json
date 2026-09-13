@@ -1,32 +1,32 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.4-beta3：紧急恢复 Stable 1.2.2 目录链；保留 beta2 评论首屏加速与身份排版。",
+  "summary": "Beta 1.2.4-beta4：目录恢复隔离版，业务运行代码完整复制已确认 Stable 1.2.2。",
   "badges": [
     "Beta",
-    "1.2.4-beta3",
-    "目录回归修复",
-    "评论加速"
+    "1.2.4-beta4",
+    "目录恢复",
+    "Stable 1.2.2 隔离基线"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12043",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12043",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12043",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12044",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12044",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12044",
   "sections": [
     {
-      "title": "紧急修复",
-      "text": "真机确认 beta2 目录整页空白并显示 null(1/0)。本版首先恢复目录可用性。"
+      "title": "为什么再回退一层",
+      "text": "真机确认 beta3 目录仍为空，说明仅撤销 W 字段还不足以恢复。beta3 仍保留了重新打包后的评论模块，因此本版把整个业务运行代码恢复为 Stable 1.2.2。"
     },
     {
-      "title": "目录策略",
-      "text": "完全撤销 beta1 的 W 字段底层扩展，目录代码回到已真机确认的 Stable 1.2.2；章节字数暂缓，后续独立实现。"
+      "title": "强隔离门禁",
+      "text": "除 bookSourceName / bookSourceComment 外，Beta 源每一个字段都必须与 Stable 1.2.2 相同；jsLib、ruleToc、ruleContent 等均做精确相等校验。"
     },
     {
-      "title": "保留优化",
-      "text": "仅保留 beta2 的 review_local_ui：评论首屏10条、兼容时一次结构化根评论/回复、真实 TitleInfoList 标签及排版优化。"
+      "title": "本版暂时撤出的优化",
+      "text": "章节字数 W、评论首屏10条快通道和 beta2/beta3 评论排版实验全部暂时撤出。先恢复目录，再逐个模块重新引入。"
     },
     {
-      "title": "隔离范围",
-      "text": "正文、搜索、账号、情无/小雨、本章说、其它 Provider 全部不改。"
+      "title": "测试重点",
+      "text": "只需确认目录能否恢复正常加载、章节数量和更新时间是否正常。"
     }
   ]
 }

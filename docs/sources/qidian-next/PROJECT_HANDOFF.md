@@ -1,3 +1,10 @@
+## 2026-09-13 · qidian-next 1.2.4-beta4 — 目录恢复隔离版
+- 真机确认 `1.2.4-beta3` 目录仍无法加载，因此停止在现有 Beta 上继续猜测式修补。
+- 从已真机确认的 Stable 1.2.2 重新完整复制业务源；不继承 beta1 的目录 W 字段扩展，也不继承 beta2/beta3 的 `review_local_ui` 重打包。
+- 强门禁：除 `bookSourceName` / `bookSourceComment` 外，所有书源字段与 Stable 1.2.2 精确相等，包括 `jsLib`、`ruleToc`、`ruleContent`。
+- 本版只验证目录恢复；章节字数和评论优化全部暂缓，待恢复确认后再逐域重新引入。
+- Stable 1.2.2 保持不变。
+
 ## 2026-09-13 · qidian-next 1.2.4-beta3 — 仓库详情缓存热修
 - 真机反馈仓库详情仍显示 beta2；核对 main 后确认 Beta catalog 与 detail payload 已是 beta3，问题来自阅读本地持久化的旧 RSS 文章详情。
 - 对 Beta 详情文章执行一次性 identity reset：`detailUrl` 固定改为 `qidian-next.json?article=2`，用于让刷新后的测试版分类删除旧 beta2 文章并重新抓取 beta3。
