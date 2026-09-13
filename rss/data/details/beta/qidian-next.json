@@ -1,32 +1,33 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.3-beta2：修正楼主点赞与楼号、时间、地点的纵向基线，让整条元信息真正处于同一水平行。",
+  "summary": "Beta 1.2.3-beta3：参考真机目标样式，点赞锚定元信息右下角，正文列真正填满头像右侧剩余宽度。",
   "badges": [
     "Beta",
-    "1.2.3-beta2",
+    "1.2.3-beta3",
     "段评UI",
-    "点赞对齐"
+    "参考布局",
+    "正文宽度"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12032",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12032",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12032",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12033",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12033",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12033",
   "sections": [
     {
-      "title": "本轮修正",
-      "text": "楼主点赞区域改为和楼号、时间、地点同一元信息行垂直居中；点赞图标与数字不再整体偏上。"
+      "title": "点赞位置",
+      "text": "点赞脱离普通 flex 分布，固定在主评论元信息行右下角，并以底线方式和楼号、时间、地点对齐。"
+    },
+    {
+      "title": "正文宽度",
+      "text": "主评论 body 改为 flex 填满头像右侧剩余区域，content 明确占满 body 可用宽度，减少右侧无效留白。"
     },
     {
       "title": "尺寸保持",
-      "text": "继续沿用 beta1 的 13px 点赞图标、10px 数字，不重新放大点赞。"
-    },
-    {
-      "title": "布局保持",
-      "text": "beta1 已完成的右侧留白压缩与正文宽度释放继续保留。"
+      "text": "继续保持 13px 点赞图标与 10px 数字，不重新放大点赞视觉层级。"
     },
     {
       "title": "严格隔离",
-      "text": "仅修改 review_local_ui 样式；评论请求、楼中楼、正文、目录、搜索、账号、本章说等逻辑不变。"
+      "text": "仅修改 review_local_ui 样式；楼中楼、回复加载和其它业务模块全部冻结。"
     }
   ]
 }
