@@ -1,4 +1,4 @@
-name: patch-qidian-123b3-review-layout
+name: patch-qidian-123b4-review-like-flow
 on:
   push:
     paths:
@@ -12,8 +12,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Publish qidian-next 1.2.3-beta3 review layout refine
-        run: python3 .staging/patch_qidian_123b3_review_layout.py
+      - name: Publish qidian-next 1.2.3-beta4 review like-flow fix
+        run: python3 .staging/patch_qidian_123b4_review_like_flow.py
       - name: Commit generated Beta
         run: |
           git config user.name github-actions[bot]
@@ -28,5 +28,5 @@ jobs:
             docs/RELEASE_LOG.md \
             docs/sources/qidian-next/PROJECT_HANDOFF.md
           git diff --cached --quiet && { echo 'No generated changes'; exit 1; }
-          git commit -m 'qidian beta: 1.2.3-beta3 refine review layout'
+          git commit -m 'qidian beta: 1.2.3-beta4 restore review like flow'
           git push origin main
