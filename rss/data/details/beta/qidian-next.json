@@ -1,48 +1,32 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.2-beta5：先完成本地段评章末‘本章说’卡片主题统一；服务器段评本轮冻结。",
+  "summary": "Beta 1.2.3-beta1：缩小楼主点赞并回收评论右侧无效留白，让楼号/时间/点赞层级更统一、正文获得更多横向空间。",
   "badges": [
     "Beta",
-    "1.2.2-beta5",
-    "本地段评",
-    "本章说",
-    "UI统一"
+    "1.2.3-beta1",
+    "段评UI",
+    "更宽正文"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12025",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12025",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12025",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12031",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12031",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12031",
   "sections": [
     {
-      "title": "卡片主题",
-      "text": "绿色/米黄视觉改为近白浅灰卡片，使用评论页同系珊瑚红标签；正文、昵称、点赞与回复统一中性灰阶。"
+      "title": "点赞层级",
+      "text": "楼主点赞图标缩至 13px、数字缩至 10px，并继续贴合楼号/时间所在的元信息行，避免点赞喧宾夺主。"
     },
     {
-      "title": "功能保持",
-      "text": "评论总数、两条真实评论预览、点赞/回复统计及点击进入本章说均保持原逻辑。"
+      "title": "文字空间",
+      "text": "压缩评论卡右内边距与元信息间距，解除正文容器的右侧宽度约束，让长评论尽量使用卡片的有效宽度，减少无意义换行。"
     },
     {
       "title": "严格隔离",
-      "text": "沿用 1.2.2-beta4 功能链；本轮不修改情无/小雨服务器段评，不修改正文、目录、搜索、账号和评论请求链。"
+      "text": "本版只改 review_local_ui 视觉层。楼中楼请求、情无/小雨 java.ajax 桥接、Argus 段评计数、正文、目录、搜索、账号、本章说卡片等全部保持 Stable 1.2.2 行为。"
     },
     {
-      "title": "版本策略",
-      "text": "Stable 1.2.1 保持不变。本版只进入 Beta，等待真机截图确认。"
+      "title": "版本状态",
+      "text": "Beta / 测试通道，等待真机确认点赞尺寸、右侧留白和正文换行效果。"
     }
-  ],
-  "links": [
-    {
-      "label": "导入 Beta",
-      "url": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12025"
-    },
-    {
-      "label": "Raw",
-      "url": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12025"
-    },
-    {
-      "label": "CDN",
-      "url": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12025"
-    }
-  ],
-  "updatedAt": "2026-09-13T10:20:02+08:00"
+  ]
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-13T10:32:03+08:00",
+  "updatedAt": "2026-09-13T10:45:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -84,6 +84,43 @@
       "versionCode": 12020,
       "sha256": "1eaffa24543b2af58aed1368578368ea326ffb0170338971bde558df725bed87",
       "sourcePath": "sources/novel/qidian-next/qidian-next.json"
+    },
+    {
+      "id": "qidian-next-beta",
+      "name": "🌈 起点增强 · Beta",
+      "category": "novel",
+      "artifactType": "bookSource",
+      "channel": "beta",
+      "version": "1.2.3-beta1",
+      "versionCode": 12031,
+      "updatedAt": "2026-09-13T10:45:00+08:00",
+      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12031",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12031",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12031",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
+      "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
+      "summary": "Beta 1.2.3-beta1：缩小楼主点赞并回收评论右侧无效留白，让楼号/时间/点赞层级更统一、正文获得更多横向空间。",
+      "tags": [
+        "起点",
+        "测试版",
+        "段评",
+        "评论页",
+        "UI优化",
+        "点赞",
+        "信息密度",
+        "正文宽度",
+        "Stable1.2.2基线"
+      ],
+      "changelog": [
+        "楼主点赞图标缩至 13px、数字缩至 10px，改为与楼号/时间同级的弱化元信息",
+        "根评论元信息行间距继续收紧，点赞不再形成醒目的右侧视觉块",
+        "释放 comment/mainRow/body/content 右侧约束并将评论卡右内边距收紧到 7px，正文可使用更多横向空间",
+        "楼中楼结构、点赞层级和回复加载逻辑保持不变",
+        "仅修改 review_local_ui；情无/小雨桥接、Argus、正文、目录、搜索、账号、ruleContent、Rhino loader、本章说卡片及其它 Provider 全部冻结",
+        "Stable 1.2.2 保持不变，等待真机确认"
+      ],
+      "sha256": "243b1e49a02914e8569178c4c78269df95e8bc8ee43b3b9cc5d62765a5db3160"
     },
     {
       "id": "picacg",

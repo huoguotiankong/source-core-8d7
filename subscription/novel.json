@@ -2,48 +2,43 @@
   "schemaVersion": 1,
   "type": "novel",
   "name": "小说源",
-  "updatedAt": "2026-09-13T10:32:03+08:00",
+  "updatedAt": "2026-09-13T10:45:00+08:00",
   "items": [
     {
-      "id": "qidian-next",
-      "name": "🌈 起点增强",
-      "summary": "正式版 1.2.2：由真机确认的 1.2.2-beta5 直接晋升；本地本章说卡片视觉统一，沿用已验证功能链，不新增业务逻辑。",
+      "id": "qidian-next-beta",
+      "name": "🌈 起点增强 · Beta",
+      "summary": "Beta 1.2.3-beta1：缩小楼主点赞并回收评论右侧无效留白，让楼号/时间/点赞层级更统一、正文获得更多横向空间。",
       "icon": "",
-      "channel": "stable",
-      "version": "1.2.2",
-      "updatedAt": "2026-09-13T10:32:03+08:00",
+      "channel": "beta",
+      "version": "1.2.3-beta1",
+      "updatedAt": "2026-09-13T10:45:00+08:00",
       "tags": [
         "起点",
-        "正式版",
-        "限免源",
-        "情无",
-        "小雨用户系统",
-        "X",
-        "评论页",
+        "测试版",
         "段评",
-        "书友圈",
-        "Base64URL",
-        "Rhino兼容",
-        "正文回归修复",
-        "本地段评",
-        "本章说",
-        "UI统一",
-        "珊瑚红"
+        "评论页",
+        "UI优化",
+        "点赞",
+        "信息密度",
+        "正文宽度",
+        "Stable1.2.2基线"
       ],
       "changelog": [
-        "由用户真机确认的 1.2.2-beta5 直接晋升 Stable，不新增业务逻辑",
-        "本章说卡片统一为近白浅灰背景、浅灰边框与珊瑚红标签",
-        "昵称、正文、点赞与回复统一中性灰阶",
-        "评论总数、两条真实评论预览、点赞/回复统计及点击进入本章说逻辑保持不变",
-        "沿用 1.2.2-beta4 功能链，情无/小雨服务器段评链及正文、目录、搜索、账号等模块不改"
+        "楼主点赞图标缩至 13px、数字缩至 10px，改为与楼号/时间同级的弱化元信息",
+        "根评论元信息行间距继续收紧，点赞不再形成醒目的右侧视觉块",
+        "释放 comment/mainRow/body/content 右侧约束并将评论卡右内边距收紧到 7px，正文可使用更多横向空间",
+        "楼中楼结构、点赞层级和回复加载逻辑保持不变",
+        "仅修改 review_local_ui；情无/小雨桥接、Argus、正文、目录、搜索、账号、ruleContent、Rhino loader、本章说卡片及其它 Provider 全部冻结",
+        "Stable 1.2.2 保持不变，等待真机确认"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12020",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12020",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12020",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json",
-      "versionCode": 12020,
-      "sha256": "1eaffa24543b2af58aed1368578368ea326ffb0170338971bde558df725bed87",
-      "sourcePath": "sources/novel/qidian-next/qidian-next.json"
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12031",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12031",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12031",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
+      "versionCode": 12031,
+      "sha256": "243b1e49a02914e8569178c4c78269df95e8bc8ee43b3b9cc5d62765a5db3160",
+      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
+      "type": "novel"
     },
     {
       "id": "qidian-official",
@@ -79,5 +74,5 @@
       "type": "novel"
     }
   ],
-  "generatedAt": "2026-09-13T10:32:03+08:00"
+  "generatedAt": "2026-09-13T10:45:00+08:00"
 }
