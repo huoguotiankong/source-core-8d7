@@ -1,0 +1,82 @@
+name: Promote qidian-next 1.2.2 Stable
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/promote-qidian-next-122-stable.yml']
+permissions:
+  contents: write
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Promote verified beta
+        shell: python
+        run: |
+          import json, hashlib, pathlib, copy, datetime
+          R=pathlib.Path('.')
+          beta_path=R/'sources/novel/qidian-next/qidian-next-beta.json'
+          stable_path=R/'sources/novel/qidian-next/qidian-next.json'
+          beta=json.loads(beta_path.read_text('utf-8'))
+          assert isinstance(beta,list) and len(beta)==1
+          src=copy.deepcopy(beta[0])
+          assert '1.2.2-beta5' in src.get('bookSourceComment',''), 'expected verified beta5 baseline'
+          src['bookSourceName']='🌈 起点增强'
+          src['bookSourceComment']='v1.2.2 Stable：由已真机确认的 1.2.2-beta5 直接晋升。保留 1.2.2-beta4 功能链与本地本章说卡片主题统一：近白浅灰卡片、浅灰边框、珊瑚红标签及统一中性灰阶；评论总数、两条真实评论预览、点赞/回复统计和点击进入本章说逻辑不变。本次晋升不新增业务逻辑。'
+          stable_text=json.dumps([src],ensure_ascii=False,indent=2)+'\n'
+          stable_path.write_text(stable_text,'utf-8')
+          sha=hashlib.sha256(stable_text.encode()).hexdigest()
+          now='2026-09-13T10:29:00+08:00'
+          ver='1.2.2'; code=12022
+          raw=f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v={code}'
+          backup=f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v={code}'
+          imp='legado://import/importonline?src='+raw
+          summary='由真机确认的 1.2.2-beta5 晋升：本地本章说卡片主题统一，沿用已验证功能链，不新增业务逻辑。'
+          changelog=['由用户真机确认的 1.2.2-beta5 直接晋升正式版','保留近白浅灰本章说卡片、珊瑚红标签与统一中性灰阶','评论总数、两条真实评论预览、点赞/回复统计及点击逻辑不变','沿用 1.2.2-beta4 功能链；本次晋升不新增业务逻辑']
+          def load(p): return json.loads((R/p).read_text('utf-8'))
+          def dump(p,o): (R/p).write_text(json.dumps(o,ensure_ascii=False,indent=2)+'\n','utf-8')
+          def stable_entry(old=None):
+            e=copy.deepcopy(old or {})
+            e.update({'id':'qidian-next','name':'🌈 起点增强','title':'🌈 起点增强','category':'novel','artifactType':'bookSource','channel':'stable','version':ver,'versionCode':code,'updatedAt':now,'sourcePath':'sources/novel/qidian-next/qidian-next.json','sourceUrl':raw,'backupUrl':backup,'importUrl':imp,'summary':summary,'sha256':sha})
+            tags=[x for x in e.get('tags',[]) if x not in ('测试版','Beta')]
+            for x in ['起点','正式版','本章说','UI统一']:
+              if x not in tags: tags.append(x)
+            e['tags']=tags; e['changelog']=changelog
+            return e
+          # manifest: replace all qidian-next records with one stable record
+          m=load('manifest.json'); m['updatedAt']=now
+          arr=m.get('sources',[])
+          old=next((x for x in arr if x.get('id')=='qidian-next'),{})
+          m['sources']=[x for x in arr if x.get('id')!='qidian-next']+[stable_entry(old)]
+          dump('manifest.json',m)
+          # channel/type catalogs
+          for p,mode in [('subscription/stable.json','upsert'),('subscription/beta.json','remove'),('subscription/novel.json','upsert')]:
+            a=load(p); old=next((x for x in a if x.get('id')=='qidian-next'),{}) if isinstance(a,list) else {}
+            if isinstance(a,list):
+              a=[x for x in a if x.get('id')!='qidian-next']
+              if mode=='upsert': a.append(stable_entry(old))
+            dump(p,a)
+          # bundles
+          a=load('bundles/all-stable.json'); a=[x for x in a if x.get('bookSourceUrl')!=src.get('bookSourceUrl')]; a.append(src); dump('bundles/all-stable.json',a)
+          a=load('bundles/all-beta.json'); a=[x for x in a if x.get('bookSourceUrl')!=src.get('bookSourceUrl')]; dump('bundles/all-beta.json',a)
+          # current stable detail
+          detail={'kind':'source','title':'🌈 起点增强','summary':'Stable 1.2.2：由已真机确认的 1.2.2-beta5 晋升。','badges':['Stable','1.2.2','本地段评','本章说','UI统一'],'sourceUrl':raw,'backupUrl':backup,'importUrl':imp,'sections':[{'title':'本章说卡片','text':'近白浅灰卡片、浅灰边框、评论页同系珊瑚红标签；昵称、正文、点赞与回复统一中性灰阶。'},{'title':'功能保持','text':'评论总数、两条真实评论预览、点赞/回复统计及点击进入本章说均保持原逻辑。'},{'title':'晋升说明','text':'本版直接沿用真机确认的 1.2.2-beta5 业务代码，不新增业务逻辑。'}],'links':[{'label':'导入正式版','url':imp},{'label':'Raw','url':raw},{'label':'备用','url':backup}]}
+          dump('rss/data/details/stable/qidian-next.json',detail)
+          head='## 2026-09-13 · qidian-next Stable 1.2.2\n- 用户真机确认 `1.2.2-beta5` 本章说卡片优化正常，并明确要求晋升正式版。\n- Stable 直接沿用 Beta5 业务代码，不新增业务逻辑；保留近白浅灰卡片、浅灰边框、珊瑚红标签及统一中性灰阶。\n- 评论总数、两条真实评论预览、点赞/回复统计与点击进入本章说逻辑不变；沿用 1.2.2-beta4 功能链。\n- Stable Source / Manifest / Stable+Novel Subscription / Stable Bundle / RSS Stable Detail 已同步；活动 Beta/Novel 重复项移除。\n\n'
+          for p in ['docs/RELEASE_LOG.md','docs/sources/qidian-next/PROJECT_HANDOFF.md']:
+            q=R/p; q.write_text(head+q.read_text('utf-8'),'utf-8')
+          # static consistency checks
+          assert json.loads(stable_path.read_text('utf-8'))[0]['bookSourceUrl']==beta[0]['bookSourceUrl']
+          assert json.loads(stable_path.read_text('utf-8'))[0]['bookSourceName']=='🌈 起点增强'
+          assert any(x.get('id')=='qidian-next' and x.get('version')==ver for x in load('subscription/stable.json'))
+          assert not any(x.get('id')=='qidian-next' for x in load('subscription/beta.json'))
+          assert not any(x.get('bookSourceUrl')==src.get('bookSourceUrl') for x in load('bundles/all-beta.json'))
+      - name: Commit promotion
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next.json manifest.json subscription/stable.json subscription/beta.json subscription/novel.json bundles/all-stable.json bundles/all-beta.json rss/data/details/stable/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git commit -m 'qidian stable: promote verified beta5 to 1.2.2'
+          git push origin main
