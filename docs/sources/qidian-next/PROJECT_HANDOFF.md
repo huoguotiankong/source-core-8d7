@@ -1,3 +1,10 @@
+## 2026-09-13 · qidian-next 1.2.4-beta3 — 目录空白回归紧急修复
+- 用户真机反馈 `1.2.4-beta2` 目录整页空白，底部显示 `null(1/0)`；以真机结果为最高优先级。
+- 立即撤销 beta1 的目录 `W` 字段底层 jsLib 扩展，目录业务代码完整回到已真机确认的 Stable 1.2.2。
+- 仅从 beta2 保留 `review_local_ui`：首屏10条、Reader兼容快通道、真实 `TitleInfoList` 身份标签与评论排版优化。
+- 章节字数功能暂缓，不继续和目录主链捆绑修改；后续先取证真实目录输出结构再单独实现。
+- Stable 1.2.2、正文、搜索、账号、情无/小雨、`ruleContent`、Rhino loader、本章说及其它 Provider 均不变。
+
 ## 2026-09-13 · qidian-next 1.2.4-beta2 — 评论首屏快通道与身份排版优化
 - 基于 1.2.4-beta1，仅修改 `review_local_ui`；继承目录 `W` 字数字段修复。
 - 对照妙想天开“首屏 10 条 + 后续分页”思路，修正 qidian-next 虽声明 pageSize=10 但 Reader 富身份请求实际强制至少20条的问题。
