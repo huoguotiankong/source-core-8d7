@@ -1,0 +1,21 @@
+name: extract-qidian-124b2-review
+on:
+  push:
+    branches: [qidian-124b2-review-fast-ui]
+    paths: ['.staging/extract-qidian-124b2-review.trigger']
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: qidian-124b2-review-fast-ui
+      - run: python3 .staging/extract_qidian_124b2_review.py
+      - run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-124b2-*.txt
+          git commit -m 'qidian: dump current review modules for beta2 analysis'
+          git push origin qidian-124b2-review-fast-ui
