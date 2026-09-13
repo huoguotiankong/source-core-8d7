@@ -2,39 +2,37 @@
   "schemaVersion": 1,
   "type": "novel",
   "name": "小说源",
-  "updatedAt": "2026-09-13T14:58:00+08:00",
+  "updatedAt": "2026-09-13T21:10:00+08:00",
   "items": [
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "Beta 1.2.3-beta4：撤销 beta3 导致点赞脱离评论元信息行的绝对定位，恢复同一行靠右显示。",
+      "summary": "Beta 1.2.4-beta1：目录章节字数兼容 W 字段，恢复“更新时间 + 字数”显示。",
       "icon": "",
       "channel": "beta",
-      "version": "1.2.3-beta4",
-      "updatedAt": "2026-09-13T14:58:00+08:00",
+      "version": "1.2.4-beta1",
+      "updatedAt": "2026-09-13T21:10:00+08:00",
       "tags": [
         "起点",
         "测试版",
-        "段评",
-        "评论页",
-        "UI修复",
-        "点赞",
-        "布局回归修复",
+        "目录",
+        "章节字数",
+        "兼容修复",
         "Stable1.2.2基线"
       ],
       "changelog": [
-        "根据真机截图确认 beta3 的 absolute 锚定存在布局回归，立即撤销该方案",
-        "主评论点赞恢复 normal flex flow，并通过 margin-left:auto 保持在元信息行最右侧",
-        "点赞重新和楼号、时间、地点处于同一行，不再落到回复区域或卡片底部",
-        "保留 beta3 的正文列宽度扩展，点赞仍为 13px 图标 / 10px 数字",
-        "仅修改 review_local_ui；其它业务模块和 Stable 1.2.2 全部冻结"
+        "从已真机确认 Stable 1.2.2 重建 Beta，避免继承未确认的 1.2.3 评论 UI 实验改动",
+        "目录章节字数字段新增 W 别名，兼容妙想天开当前目录结构",
+        "保留 cnt/cW/wC/wordCount 等既有别名与目录多级 fallback",
+        "不新增网络请求，不替换目录接口，只修正字段归一化与显示数据来源",
+        "正文、评论、搜索、账号及其它 Provider 全部冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12034",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12034",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12034",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12041",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12041",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12041",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
-      "versionCode": 12034,
-      "sha256": "5912fcbd26448d39d42970004c17d1789cd5e749df015cb9e233d3d4fdf254bb",
+      "versionCode": 12041,
+      "sha256": "5cecfd1ed6848adf5fbfd4bc76a9a80bd5b72aa958750f65558c9876d9869556",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
       "type": "novel"
     },
@@ -72,5 +70,5 @@
       "type": "novel"
     }
   ],
-  "generatedAt": "2026-09-13T14:58:00+08:00"
+  "generatedAt": "2026-09-13T21:10:00+08:00"
 }
