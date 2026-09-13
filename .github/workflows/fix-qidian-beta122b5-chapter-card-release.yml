@@ -1,0 +1,50 @@
+name: fix-qidian-beta122b5-chapter-card-release
+on:
+  push:
+    paths:
+      - '.staging/fix-qidian-beta122b5-chapter-card-release.trigger'
+permissions:
+  contents: write
+concurrency:
+  group: fix-qidian-beta122b5-chapter-card-release
+  cancel-in-progress: false
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Correct Beta5 release metadata and validate isolation
+        run: python3 .staging/fix_qidian_beta122b5_chapter_card_release.py
+      - name: Verify publication file set
+        shell: bash
+        run: |
+          git add sources/novel/qidian-next/qidian-next-beta.json \
+            subscription/beta.json subscription/novel.json manifest.json \
+            bundles/all-beta.json rss/data/details/beta/qidian-next.json \
+            docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git diff --cached --name-only | sort > /tmp/qidian-beta5-files.txt
+          cat /tmp/qidian-beta5-files.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          changed=set(Path('/tmp/qidian-beta5-files.txt').read_text().splitlines())
+          required={
+            'sources/novel/qidian-next/qidian-next-beta.json',
+            'subscription/beta.json','subscription/novel.json','manifest.json',
+            'bundles/all-beta.json','rss/data/details/beta/qidian-next.json',
+            'docs/RELEASE_LOG.md','docs/sources/qidian-next/PROJECT_HANDOFF.md',
+          }
+          if changed != required:
+              raise SystemExit('publication file set mismatch: '+repr(sorted(changed)))
+          print('FILE_SET_OK')
+          PY
+      - name: Publish corrected Beta5
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m 'qidian beta: 1.2.2-beta5 polish local chapter card'
+          git push origin HEAD:main
