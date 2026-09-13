@@ -1,0 +1,78 @@
+name: hotfix-qidian-beta3-rss-detail-cache
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.staging/hotfix-qidian-beta3-rss-detail-cache.trigger'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Force one-time RSS article identity refresh for qidian beta3
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          ROOT=Path('.')
+          NEW_DETAIL='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2'
+          VERSION='1.2.4-beta3'
+
+          def patch_items(path):
+              d=json.loads(path.read_text(encoding='utf-8'))
+              found=False
+              for e in d.get('items',[]):
+                  if isinstance(e,dict) and e.get('id')=='qidian-next-beta':
+                      assert e.get('version')==VERSION, (path, e.get('version'))
+                      e['detailUrl']=NEW_DETAIL
+                      found=True
+                      break
+              assert found, f'qidian-next-beta missing in {path}'
+              path.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          mp=ROOT/'manifest.json'
+          m=json.loads(mp.read_text(encoding='utf-8'))
+          found=False
+          for e in m.get('sources',[]):
+              if isinstance(e,dict) and e.get('id')=='qidian-next-beta':
+                  assert e.get('version')==VERSION, e.get('version')
+                  e['detailUrl']=NEW_DETAIL
+                  found=True
+                  break
+          assert found, 'qidian-next-beta missing in manifest'
+          mp.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          patch_items(ROOT/'subscription/beta.json')
+          patch_items(ROOT/'subscription/novel.json')
+
+          note=(
+          '## 2026-09-13 · qidian-next 1.2.4-beta3 — 仓库详情缓存热修\n'
+          '- 真机反馈仓库详情仍显示 beta2；核对 main 后确认 Beta catalog 与 detail payload 已是 beta3，问题来自阅读本地持久化的旧 RSS 文章详情。\n'
+          '- 对 Beta 详情文章执行一次性 identity reset：`detailUrl` 固定改为 `qidian-next.json?article=2`，用于让刷新后的测试版分类删除旧 beta2 文章并重新抓取 beta3。\n'
+          '- 该 `article=2` 将作为新的长期固定文章身份保留，后续版本不得继续递增，避免重新进入版本化 detailUrl 循环。\n'
+          '- 书源 `bookSourceUrl`、Beta JSON、Stable 1.2.2 与所有业务代码均不修改。\n\n'
+          )
+          for p in [ROOT/'docs/RELEASE_LOG.md',ROOT/'docs/sources/qidian-next/PROJECT_HANDOFF.md']:
+              old=p.read_text(encoding='utf-8')
+              if not old.startswith('## 2026-09-13 · qidian-next 1.2.4-beta3 — 仓库详情缓存热修'):
+                  p.write_text(note+old,encoding='utf-8')
+
+          for p in [mp,ROOT/'subscription/beta.json',ROOT/'subscription/novel.json']:
+              json.loads(p.read_text(encoding='utf-8'))
+          print('PASS one-time RSS article reset',NEW_DETAIL)
+          PY
+      - name: Commit cache hotfix
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add manifest.json subscription/beta.json subscription/novel.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git diff --cached --quiet && { echo 'No changes'; exit 1; }
+          git commit -m 'qidian beta3: refresh repository detail article identity'
+          git push origin main
