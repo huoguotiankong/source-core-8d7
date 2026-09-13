@@ -5,28 +5,23 @@
   "badges": [
     "Beta",
     "1.2.4-beta1",
-    "目录",
-    "章节字数"
+    "目录"
+  ],
+  "sections": [
+    {
+      "title": "本版更新",
+      "text": "从已真机确认 Stable 1.2.2 重建 Beta，避免继承未确认的 1.2.3 评论 UI 实验改动；目录章节字数字段新增 W 别名，兼容妙想天开当前目录结构；保留 cnt/cW/wC/wordCount 等既有别名与目录多级 fallback；不新增网络请求，不替换目录接口，只修正字段归一化与显示数据来源；正文、评论、搜索、账号及其它 Provider 全部冻结"
+    },
+    {
+      "title": "版本状态",
+      "text": "当前为 Beta / 测试通道，需真机确认后才会晋升正式版。"
+    },
+    {
+      "title": "更新方式",
+      "text": "从本订阅页重新导入/更新即可覆盖现有 🌈 起点增强 · Beta。"
+    }
   ],
   "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12041",
   "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12041",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12041",
-  "sections": [
-    {
-      "title": "本轮目标",
-      "text": "让目录在更新时间旁恢复显示章节字数，例如 2020-12-13 17:01  3326字。"
-    },
-    {
-      "title": "实现方式",
-      "text": "仅给现有目录归一化增加 W 字段别名；不新增请求，也不替换 APP/Web 多级目录 fallback。"
-    },
-    {
-      "title": "基线",
-      "text": "从用户已真机确认的 Stable 1.2.2 重建，未继承 1.2.3 系列未确认评论 UI 调整。"
-    },
-    {
-      "title": "隔离范围",
-      "text": "正文、评论、搜索、账号、情无/小雨、本章说、角色卡及其它 Provider 全部冻结。"
-    }
-  ]
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12041"
 }
