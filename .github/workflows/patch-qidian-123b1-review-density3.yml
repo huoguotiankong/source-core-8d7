@@ -13,7 +13,7 @@ jobs:
         with:
           ref: main
       - name: Publish qidian-next 1.2.3-beta1 review UI polish
-        run: python3 .staging/patch_qidian_123b1_review_density3.py
+        run: python3 .staging/run_qidian_123b1_review_density3_v2.py
       - name: Commit generated Beta
         run: |
           git config user.name github-actions[bot]
