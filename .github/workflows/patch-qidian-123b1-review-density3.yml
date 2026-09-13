@@ -1,0 +1,32 @@
+name: patch-qidian-123b1-review-density3
+on:
+  push:
+    paths:
+      - '.staging/patch-qidian-123b1-review-density3.trigger'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Publish qidian-next 1.2.3-beta1 review UI polish
+        run: python3 .staging/patch_qidian_123b1_review_density3.py
+      - name: Commit generated Beta
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            sources/novel/qidian-next/qidian-next-beta.json \
+            manifest.json \
+            subscription/beta.json \
+            subscription/novel.json \
+            bundles/all-beta.json \
+            rss/data/details/beta/qidian-next.json \
+            docs/RELEASE_LOG.md \
+            docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git diff --cached --quiet && { echo 'No generated changes'; exit 1; }
+          git commit -m 'qidian beta: 1.2.3-beta1 polish review density'
+          git push origin main
