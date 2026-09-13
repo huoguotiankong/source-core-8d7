@@ -1,32 +1,32 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.3-beta1：缩小楼主点赞并回收评论右侧无效留白，让楼号/时间/点赞层级更统一、正文获得更多横向空间。",
+  "summary": "Beta 1.2.3-beta2：修正楼主点赞与楼号、时间、地点的纵向基线，让整条元信息真正处于同一水平行。",
   "badges": [
     "Beta",
-    "1.2.3-beta1",
+    "1.2.3-beta2",
     "段评UI",
-    "更宽正文"
+    "点赞对齐"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12031",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12031",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12031",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12032",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12032",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12032",
   "sections": [
     {
-      "title": "点赞层级",
-      "text": "楼主点赞图标缩至 13px、数字缩至 10px，并继续贴合楼号/时间所在的元信息行，避免点赞喧宾夺主。"
+      "title": "本轮修正",
+      "text": "楼主点赞区域改为和楼号、时间、地点同一元信息行垂直居中；点赞图标与数字不再整体偏上。"
     },
     {
-      "title": "文字空间",
-      "text": "压缩评论卡右内边距与元信息间距，解除正文容器的右侧宽度约束，让长评论尽量使用卡片的有效宽度，减少无意义换行。"
+      "title": "尺寸保持",
+      "text": "继续沿用 beta1 的 13px 点赞图标、10px 数字，不重新放大点赞。"
+    },
+    {
+      "title": "布局保持",
+      "text": "beta1 已完成的右侧留白压缩与正文宽度释放继续保留。"
     },
     {
       "title": "严格隔离",
-      "text": "本版只改 review_local_ui 视觉层。楼中楼请求、情无/小雨 java.ajax 桥接、Argus 段评计数、正文、目录、搜索、账号、本章说卡片等全部保持 Stable 1.2.2 行为。"
-    },
-    {
-      "title": "版本状态",
-      "text": "Beta / 测试通道，等待真机确认点赞尺寸、右侧留白和正文换行效果。"
+      "text": "仅修改 review_local_ui 样式；评论请求、楼中楼、正文、目录、搜索、账号、本章说等逻辑不变。"
     }
   ]
 }
