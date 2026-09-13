@@ -1,27 +1,27 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.4-beta1：目录章节字数兼容 W 字段，恢复“更新时间 + 字数”显示。",
+  "summary": "Beta 1.2.4-beta2：评论首屏 10 条快通道、真实身份标签与评论排版增强。",
   "badges": [
     "Beta",
-    "1.2.4-beta1",
-    "目录"
+    "1.2.4-beta2",
+    "评论"
   ],
   "sections": [
     {
       "title": "本版更新",
-      "text": "从已真机确认 Stable 1.2.2 重建 Beta，避免继承未确认的 1.2.3 评论 UI 实验改动；目录章节字数字段新增 W 别名，兼容妙想天开当前目录结构；保留 cnt/cW/wC/wordCount 等既有别名与目录多级 fallback；不新增网络请求，不替换目录接口，只修正字段归一化与显示数据来源；正文、评论、搜索、账号及其它 Provider 全部冻结"
+      "text": "继承 beta1 的目录 W 字数字段兼容；Reader v2 评论请求由隐藏的至少20条改为严格跟随首屏10条；官方响应含 ReviewType/RefferCommentId 时一次请求直接结构化根评论与当前页回复，缺结构自动回退旧稳定链；保留 TitleInfoList 真实身份/等级标签、头像、楼层、时间、IP、图片、语音及楼中楼；评论正文获得完整可用宽度，点赞缩小并与元信息同排，楼中楼改为更轻的纵向层级；正文、搜索、账号、情无/小雨和其它 Provider 不变"
     },
     {
       "title": "版本状态",
-      "text": "当前为 Beta / 测试通道，需真机确认后才会晋升正式版。"
+      "text": "当前为 Beta / 测试通道，评论打开速度与新版排版需真机确认后才会晋升正式版。"
     },
     {
       "title": "更新方式",
       "text": "从本订阅页重新导入/更新即可覆盖现有 🌈 起点增强 · Beta。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12041",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12041",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12041"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12042",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12042",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12042"
 }
