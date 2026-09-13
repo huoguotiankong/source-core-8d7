@@ -1,0 +1,80 @@
+name: build-qidian-catalog-diag-1245
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.staging/qidian-catalog-diag-1245.trigger'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Build independent-identity catalog diagnostic source
+        run: |
+          python3 - <<'PY'
+          import copy, json, hashlib
+          from pathlib import Path
+
+          root = Path('.')
+          src = root / 'sources/novel/qidian-next/qidian-next.json'
+          out = root / 'sources/novel/qidian-next/qidian-next-catalog-diag.json'
+
+          arr = json.loads(src.read_text(encoding='utf-8'))
+          diag = copy.deepcopy(arr)
+          s = diag[0] if isinstance(diag, list) else diag
+          base = arr[0] if isinstance(arr, list) else arr
+
+          s['bookSourceName'] = '🌈 起点增强 · 目录诊断'
+          s['bookSourceUrl'] = 'https://m.qidian.com/?qf_source=qidian_next_catalog_diag_1245'
+          s['bookSourceComment'] = (
+              '目录独立身份诊断版：业务运行代码完整复制已真机确认的 Stable 1.2.2，'
+              '仅修改 bookSourceName / bookSourceUrl / bookSourceComment。'
+              '使用独立同源 bookSourceUrl，专门排除阅读对旧 Beta 书源、书籍记录、目录缓存的复用影响。'
+              '请从本诊断源重新搜索并加入一本新书后测试目录；不要用原书架中的旧书判断本版。'
+          )
+          s['bookSourceGroup'] = '﹅♚9、诊断源'
+
+          # Hard isolation: only these four display/identity fields may differ from Stable 1.2.2.
+          allowed = {'bookSourceName','bookSourceUrl','bookSourceComment','bookSourceGroup'}
+          for k in set(base) | set(s):
+              if k not in allowed:
+                  assert base.get(k) == s.get(k), f'unexpected runtime difference: {k}'
+          assert s['jsLib'] == base['jsLib']
+          assert s['ruleToc'] == base['ruleToc']
+          assert s['ruleContent'] == base['ruleContent']
+
+          out.write_text(json.dumps(diag, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          report = {
+              'kind': 'qidian-next-catalog-diagnostic',
+              'baseline': 'Stable 1.2.2',
+              'purpose': 'isolate Legado source/book/catalog cache and identity reuse from runtime directory logic',
+              'identity': s['bookSourceUrl'],
+              'sourcePath': str(out),
+              'sha256': hashlib.sha256(out.read_bytes()).hexdigest(),
+              'runtimeEqualToStable': True,
+              'differentFields': sorted(allowed),
+              'testProtocol': [
+                  'import this diagnostic source as a separate source',
+                  'search the same title from this diagnostic source',
+                  'add/open a newly created book record from this diagnostic source',
+                  'test catalog; do not reuse the old bookshelf book record'
+              ]
+          }
+          rp = root / '.staging/qidian-catalog-diag-1245-report.json'
+          rp.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps(report, ensure_ascii=False, indent=2))
+          PY
+      - name: Commit diagnostic source
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-catalog-diag.json .staging/qidian-catalog-diag-1245-report.json
+          git diff --cached --quiet && { echo 'No generated changes'; exit 1; }
+          git commit -m 'qidian diag: add independent-identity catalog clone'
+          git push origin main
