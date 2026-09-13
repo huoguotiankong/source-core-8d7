@@ -1,0 +1,21 @@
+{
+  "kind": "qidian-next-catalog-diagnostic",
+  "baseline": "Stable 1.2.2",
+  "purpose": "isolate Legado source/book/catalog cache and identity reuse from runtime directory logic",
+  "identity": "https://m.qidian.com/?qf_source=qidian_next_catalog_diag_1245",
+  "sourcePath": "sources/novel/qidian-next/qidian-next-catalog-diag.json",
+  "sha256": "7b2572c5c966b1e4bc65d129a11bcd0f15b4d62530f0f483e5aed3ce2399286b",
+  "runtimeEqualToStable": true,
+  "differentFields": [
+    "bookSourceComment",
+    "bookSourceGroup",
+    "bookSourceName",
+    "bookSourceUrl"
+  ],
+  "testProtocol": [
+    "import this diagnostic source as a separate source",
+    "search the same title from this diagnostic source",
+    "add/open a newly created book record from this diagnostic source",
+    "test catalog; do not reuse the old bookshelf book record"
+  ]
+}
