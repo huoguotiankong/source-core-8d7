@@ -1,33 +1,32 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.3-beta3：参考真机目标样式，点赞锚定元信息右下角，正文列真正填满头像右侧剩余宽度。",
+  "summary": "Beta 1.2.3-beta4：撤销 beta3 导致点赞脱离评论元信息行的绝对定位，恢复同一行靠右显示。",
   "badges": [
     "Beta",
-    "1.2.3-beta3",
+    "1.2.3-beta4",
     "段评UI",
-    "参考布局",
-    "正文宽度"
+    "布局回归修复"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12033",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12033",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12033",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12034",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12034",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12034",
   "sections": [
     {
-      "title": "点赞位置",
-      "text": "点赞脱离普通 flex 分布，固定在主评论元信息行右下角，并以底线方式和楼号、时间、地点对齐。"
+      "title": "回归修复",
+      "text": "撤销 beta3 的点赞绝对定位；真机已证明该方案会让点赞掉到回复区域或卡片底部。"
+    },
+    {
+      "title": "当前布局",
+      "text": "点赞恢复为元信息行内普通 flex 元素，并通过 margin-left:auto 靠右；与楼号、时间、地点保持同一行。"
     },
     {
       "title": "正文宽度",
-      "text": "主评论 body 改为 flex 填满头像右侧剩余区域，content 明确占满 body 可用宽度，减少右侧无效留白。"
-    },
-    {
-      "title": "尺寸保持",
-      "text": "继续保持 13px 点赞图标与 10px 数字，不重新放大点赞视觉层级。"
+      "text": "保留 beta3 对主评论 body/content 的宽度释放，不回退正文有效显示宽度。"
     },
     {
       "title": "严格隔离",
-      "text": "仅修改 review_local_ui 样式；楼中楼、回复加载和其它业务模块全部冻结。"
+      "text": "仅修改 review_local_ui；楼中楼、回复加载及其它业务模块不变。"
     }
   ]
 }

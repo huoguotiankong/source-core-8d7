@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-13T14:41:00+08:00",
+  "updatedAt": "2026-09-13T14:58:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -91,35 +91,34 @@
       "category": "novel",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "1.2.3-beta3",
-      "versionCode": 12033,
-      "updatedAt": "2026-09-13T14:41:00+08:00",
+      "version": "1.2.3-beta4",
+      "versionCode": 12034,
+      "updatedAt": "2026-09-13T14:58:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12033",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12033",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12033",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12034",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12034",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12034",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "Beta 1.2.3-beta3：参考真机目标样式，点赞锚定元信息右下角，正文列真正填满头像右侧剩余宽度。",
+      "summary": "Beta 1.2.3-beta4：撤销 beta3 导致点赞脱离评论元信息行的绝对定位，恢复同一行靠右显示。",
       "tags": [
         "起点",
         "测试版",
         "段评",
         "评论页",
-        "UI优化",
+        "UI修复",
         "点赞",
-        "正文宽度",
-        "参考布局",
+        "布局回归修复",
         "Stable1.2.2基线"
       ],
       "changelog": [
-        "点赞脱离元信息 flex 分布，改为右下角独立锚定，避免视觉上浮和挤占元信息宽度",
-        "保持 13px 点赞图标 / 10px 数字，并按楼号、时间、地点底线对齐",
-        "主评论正文列改为 flex:1 + min-width:0，主行 gap 收紧到 8px、评论右内边距收紧到 5px",
-        "正文 content 明确占满主评论 body 可用宽度，减少参考图中不存在的右侧无效留白",
-        "仅修改 review_local_ui；楼中楼与其它业务模块全部冻结，Stable 1.2.2 不变"
+        "根据真机截图确认 beta3 的 absolute 锚定存在布局回归，立即撤销该方案",
+        "主评论点赞恢复 normal flex flow，并通过 margin-left:auto 保持在元信息行最右侧",
+        "点赞重新和楼号、时间、地点处于同一行，不再落到回复区域或卡片底部",
+        "保留 beta3 的正文列宽度扩展，点赞仍为 13px 图标 / 10px 数字",
+        "仅修改 review_local_ui；其它业务模块和 Stable 1.2.2 全部冻结"
       ],
-      "sha256": "7b5ef527313b9050a86710eb9bfffb7d2a14978226edeb8ae8b512a6ee44e01b"
+      "sha256": "5912fcbd26448d39d42970004c17d1789cd5e749df015cb9e233d3d4fdf254bb"
     },
     {
       "id": "picacg",
