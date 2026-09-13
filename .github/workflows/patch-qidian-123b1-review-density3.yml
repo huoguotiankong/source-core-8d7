@@ -1,4 +1,4 @@
-name: patch-qidian-123b1-review-density3
+name: patch-qidian-123b2-review-meta-align
 on:
   push:
     paths:
@@ -12,8 +12,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Publish qidian-next 1.2.3-beta1 review UI polish
-        run: python3 .staging/run_qidian_123b1_review_density3_v2.py
+      - name: Publish qidian-next 1.2.3-beta2 review meta alignment
+        run: python3 .staging/patch_qidian_123b2_review_meta_align.py
       - name: Commit generated Beta
         run: |
           git config user.name github-actions[bot]
@@ -28,5 +28,5 @@ jobs:
             docs/RELEASE_LOG.md \
             docs/sources/qidian-next/PROJECT_HANDOFF.md
           git diff --cached --quiet && { echo 'No generated changes'; exit 1; }
-          git commit -m 'qidian beta: 1.2.3-beta1 polish review density'
+          git commit -m 'qidian beta: 1.2.3-beta2 align review like metadata'
           git push origin main
