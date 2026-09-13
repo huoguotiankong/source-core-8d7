@@ -1,3 +1,9 @@
+## 2026-09-13 · qidian-next 1.2.4-beta3 — 仓库详情缓存热修
+- 真机反馈仓库详情仍显示 beta2；核对 main 后确认 Beta catalog 与 detail payload 已是 beta3，问题来自阅读本地持久化的旧 RSS 文章详情。
+- 对 Beta 详情文章执行一次性 identity reset：`detailUrl` 固定改为 `qidian-next.json?article=2`，用于让刷新后的测试版分类删除旧 beta2 文章并重新抓取 beta3。
+- 该 `article=2` 将作为新的长期固定文章身份保留，后续版本不得继续递增，避免重新进入版本化 detailUrl 循环。
+- 书源 `bookSourceUrl`、Beta JSON、Stable 1.2.2 与所有业务代码均不修改。
+
 ## 2026-09-13 · qidian-next 1.2.4-beta3 — 目录空白回归紧急修复
 - 用户真机反馈 `1.2.4-beta2` 目录整页空白，底部显示 `null(1/0)`；以真机结果为最高优先级。
 - 立即撤销 beta1 的目录 `W` 字段底层 jsLib 扩展，目录业务代码完整回到已真机确认的 Stable 1.2.2。
