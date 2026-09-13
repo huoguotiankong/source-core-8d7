@@ -1,0 +1,45 @@
+name: diag-qidian-124
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-124.trigger'
+permissions:
+  contents: read
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Inspect TOC and local comment implementation
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,re,base64,gzip
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(p.read_text(encoding='utf-8')); src=arr[0]
+          print('COMMENT=',src.get('bookSourceComment','')[:1000])
+          print('RULE_TOC_START')
+          print(src.get('ruleToc','')[:16000])
+          print('RULE_TOC_END')
+          js=src.get('jsLib','')
+          m=re.search(r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});\s*var\s+QF_MOD38_EXPORTS',js,re.S)
+          pack=json.loads(m.group(1))
+          def dec(v):
+            raw=v.split(':',1)[1] if ':' in v[:12] else v
+            data=base64.b64decode(raw+'='*((4-len(raw)%4)%4),altchars=b'-_')
+            try:return gzip.decompress(data).decode()
+            except:return data.decode()
+          pats=['getparagraphscomments','pageSize','pz=','TitleInfoList','TitleImage','IpLocation','AudioUrl','ImageDetail','showCmt','showQd','ReviewCount','Floor']
+          for name in ['review','review_common','circle','review_server_ui']:
+            if name not in pack: continue
+            text=dec(pack[name]); print('MODULE',name,'LEN',len(text))
+            funs=re.findall(r'function\s+([A-Za-z0-9_$]*(?:Cmt|Comment|Review|Bubble|Reply|Page)[A-Za-z0-9_$]*)\s*\(',text,re.I)
+            print('FUNCTIONS',','.join(dict.fromkeys(funs)))
+            for pat in pats:
+              hits=[m.start() for m in re.finditer(re.escape(pat),text,re.I)]
+              print('PAT',pat,'COUNT',len(hits))
+              for i in hits[:4]: print('CTX',repr(text[max(0,i-350):i+850]))
+          PY
