@@ -1,45 +1,48 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.1-beta8：统一本地本章说章末卡片与评论页视觉主题。",
+  "summary": "Beta 1.2.2-beta5：先完成本地段评章末‘本章说’卡片主题统一；服务器段评本轮冻结。",
   "badges": [
     "Beta",
-    "1.2.1-beta8",
+    "1.2.2-beta5",
     "本地段评",
     "本章说",
     "UI统一"
   ],
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12025",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12025",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12025",
   "sections": [
     {
-      "title": "视觉",
-      "text": "章末本章说由绿色主题改为近白浅灰卡片，标签使用评论页同系浅珊瑚红底与珊瑚红文字；边框、分隔线及正文信息改为统一中性灰阶。"
+      "title": "卡片主题",
+      "text": "绿色/米黄视觉改为近白浅灰卡片，使用评论页同系珊瑚红标签；正文、昵称、点赞与回复统一中性灰阶。"
     },
     {
-      "title": "功能",
-      "text": "评论总数、两条真实评论预览、点赞/回复统计以及点击进入本章说全部保留。"
+      "title": "功能保持",
+      "text": "评论总数、两条真实评论预览、点赞/回复统计及点击进入本章说均保持原逻辑。"
     },
     {
-      "title": "隔离",
-      "text": "只修改 review lazy module 的 qdChapterTalkCardV20 视觉层；正文 ruleContent、Beta7 Rhino Scanner/GZIP 加载器及其余31个 lazy module 均保持不变。"
+      "title": "严格隔离",
+      "text": "沿用 1.2.2-beta4 功能链；本轮不修改情无/小雨服务器段评，不修改正文、目录、搜索、账号和评论请求链。"
     },
     {
-      "title": "发布",
-      "text": "Stable 1.2.0 保持不变，Beta8 等待真机截图确认后再决定后续处理。"
+      "title": "版本策略",
+      "text": "Stable 1.2.1 保持不变。本版只进入 Beta，等待真机截图确认。"
     }
   ],
   "links": [
     {
       "label": "导入 Beta",
-      "url": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12018"
+      "url": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12025"
     },
     {
       "label": "Raw",
-      "url": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12018"
+      "url": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12025"
     },
     {
       "label": "CDN",
-      "url": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12018"
+      "url": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12025"
     }
   ],
-  "updatedAt": "2026-09-13T00:18:31+08:00"
+  "updatedAt": "2026-09-13T10:20:02+08:00"
 }
