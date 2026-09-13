@@ -1,3 +1,10 @@
+## 2026-09-13 · qidian-next 1.2.4-beta1 — 目录章节字数 W 字段兼容
+- 从用户已真机确认的 Stable 1.2.2 重建 Beta，不继承 1.2.3 系列未确认的评论 UI 实验改动。
+- 对照当前上传的 `妙想天开` 目录结构，确认章节字数可直接使用 `W` 字段；现有 qidian-next 已有“时间 + 字数”格式化，但字段别名缺少 `W`。
+- 在目录 Schema 与直接章节解析两处补充 `W` 别名，保留 `cnt/cW/wC/wordCount` 等既有兼容字段。
+- 不新增网络请求，不替换 APP v3 / getsimple / pager / Web fallback、多层缓存和完整度诊断。
+- 正文、评论、搜索、账号、情无/小雨、`ruleContent`、Rhino loader、本章说及其它 Provider 全部冻结；Stable 1.2.2 不变。
+
 ## 2026-09-13 · qidian-next 1.2.3-beta4 — 段评点赞布局回归修复
 - 用户真机反馈 `1.2.3-beta3` 改得更差；截图确认主评论点赞会脱离元信息行，跑到回复区域上方或评论卡片底部。
 - 撤销 beta3 的点赞 absolute 锚定方案，恢复正常 flex 流；使用 `margin-left:auto` 将点赞保持在楼号/时间/地点同一行的最右侧。

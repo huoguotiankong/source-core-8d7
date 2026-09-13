@@ -1,32 +1,32 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.3-beta4：撤销 beta3 导致点赞脱离评论元信息行的绝对定位，恢复同一行靠右显示。",
+  "summary": "Beta 1.2.4-beta1：目录章节字数兼容 W 字段，恢复“更新时间 + 字数”显示。",
   "badges": [
     "Beta",
-    "1.2.3-beta4",
-    "段评UI",
-    "布局回归修复"
+    "1.2.4-beta1",
+    "目录",
+    "章节字数"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12034",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12034",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12034",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12041",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12041",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12041",
   "sections": [
     {
-      "title": "回归修复",
-      "text": "撤销 beta3 的点赞绝对定位；真机已证明该方案会让点赞掉到回复区域或卡片底部。"
+      "title": "本轮目标",
+      "text": "让目录在更新时间旁恢复显示章节字数，例如 2020-12-13 17:01  3326字。"
     },
     {
-      "title": "当前布局",
-      "text": "点赞恢复为元信息行内普通 flex 元素，并通过 margin-left:auto 靠右；与楼号、时间、地点保持同一行。"
+      "title": "实现方式",
+      "text": "仅给现有目录归一化增加 W 字段别名；不新增请求，也不替换 APP/Web 多级目录 fallback。"
     },
     {
-      "title": "正文宽度",
-      "text": "保留 beta3 对主评论 body/content 的宽度释放，不回退正文有效显示宽度。"
+      "title": "基线",
+      "text": "从用户已真机确认的 Stable 1.2.2 重建，未继承 1.2.3 系列未确认评论 UI 调整。"
     },
     {
-      "title": "严格隔离",
-      "text": "仅修改 review_local_ui；楼中楼、回复加载及其它业务模块不变。"
+      "title": "隔离范围",
+      "text": "正文、评论、搜索、账号、情无/小雨、本章说、角色卡及其它 Provider 全部冻结。"
     }
   ]
 }
