@@ -1,3 +1,10 @@
+## 2026-09-13 · qidian-next 1.2.4-beta2 — 评论首屏快通道与身份排版优化
+- 基于 1.2.4-beta1，仅修改 `review_local_ui`；继承目录 `W` 字数字段修复。
+- 对照妙想天开“首屏 10 条 + 后续分页”思路，修正 qidian-next 虽声明 pageSize=10 但 Reader 富身份请求实际强制至少20条的问题。
+- 新增保守 Reader 快通道：只有官方 v2 响应逐条带明确 `ReviewType/RefferCommentId` 结构时，才在一次请求内组织根评论和当前页回复并直接渲染；否则继续走原 Web/mobile 稳定结构链。
+- UI 保留真实 `TitleInfoList` 身份/等级标签、头像、楼层、时间、IP、配图、语音和楼中楼；正文宽度、点赞对齐和回复纵向层级按参考页收紧。
+- 正文、目录请求链、搜索、账号、情无/小雨、`ruleContent`、Rhino loader、本章说及其它 Provider 全部冻结；Stable 1.2.2 不变。
+
 ## 2026-09-13 · qidian-next 1.2.4-beta1 — 目录章节字数 W 字段兼容
 - 从用户已真机确认的 Stable 1.2.2 重建 Beta，不继承 1.2.3 系列未确认的评论 UI 实验改动。
 - 对照当前上传的 `妙想天开` 目录结构，确认章节字数可直接使用 `W` 字段；现有 qidian-next 已有“时间 + 字数”格式化，但字段别名缺少 `W`。

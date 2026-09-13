@@ -1,32 +1,32 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.4-beta1：目录章节字数兼容 W 字段，恢复“更新时间 + 字数”显示。",
+  "summary": "Beta 1.2.4-beta2：评论首屏 10 条快通道、真实身份标签与评论排版增强。",
   "badges": [
     "Beta",
-    "1.2.4-beta1",
-    "目录",
-    "章节字数"
+    "1.2.4-beta2",
+    "评论加速",
+    "身份标签"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12041",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12041",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12041",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12042",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12042",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12042",
   "sections": [
     {
-      "title": "本轮目标",
-      "text": "让目录在更新时间旁恢复显示章节字数，例如 2020-12-13 17:01  3326字。"
+      "title": "评论首屏",
+      "text": "首屏保持 10 条。Reader v2 返回明确评论/回复结构时直接渲染，不再先拿富身份后必等第二条结构接口链。"
     },
     {
-      "title": "实现方式",
-      "text": "仅给现有目录归一化增加 W 字段别名；不新增请求，也不替换 APP/Web 多级目录 fallback。"
+      "title": "安全回退",
+      "text": "如果 Reader 返回缺少 ReviewType/RefferCommentId 等结构字段，自动回退原 Web/mobile 多级评论链，不把兼容性换成速度。"
     },
     {
-      "title": "基线",
-      "text": "从用户已真机确认的 Stable 1.2.2 重建，未继承 1.2.3 系列未确认评论 UI 调整。"
+      "title": "身份与排版",
+      "text": "继续使用真实 TitleInfoList 标签；保留头像、楼层、时间、IP、配图、语音、回复。正文列更宽，点赞与元信息同排，楼中楼层级更轻。"
     },
     {
       "title": "隔离范围",
-      "text": "正文、评论、搜索、账号、情无/小雨、本章说、角色卡及其它 Provider 全部冻结。"
+      "text": "目录仅继承 beta1 字数修复；正文、搜索、账号、情无/小雨、本章说与其它 Provider 不改。"
     }
   ]
 }
