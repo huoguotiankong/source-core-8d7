@@ -1,0 +1,17 @@
+{
+  "version": "1.2.5-beta1",
+  "versionCode": 12051,
+  "betaSha256": "3358f4b156ea1d9ffb8d948c7e05514fb51e6c3a3b7223db1b2974022940c00c",
+  "stableRuleTocFrozen": true,
+  "stableRuleBookInfoFrozen": true,
+  "stableRuleContentFrozen": true,
+  "bookSourceUrlFrozen": true,
+  "copyrightModuleOnly": true,
+  "renderMarkers": [
+    "作品版权信息",
+    "正版版权声明",
+    "作品类型",
+    "作品状态",
+    "作品字数"
+  ]
+}

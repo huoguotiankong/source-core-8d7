@@ -1,3 +1,11 @@
+## 2026-09-14 · 1.2.5-beta1 — 当前活动 Beta：版权信息页
+
+- Stable 基线仍为 1.2.4；目录主链不得修改。
+- 本版只替换 `copyright` lazy module 的 `qfCopyrightRender`，官方数据获取逻辑保持原样。
+- UI：大封面 + 书名/作者 + 四块作品信息 + 正版版权声明；图片继续内嵌 data URI。
+- `ruleToc` / `ruleBookInfo` / `ruleContent` 与 Stable 1.2.4 精确相等。
+- 等用户真机确认视觉与字段显示后再决定晋升。
+
 ## 2026-09-14 · Stable 1.2.4 — 当前正式基线
 
 - 用户真机确认 `1.2.4-beta10` 可正常加载目录，并明确要求晋升正式版。

@@ -1,32 +1,27 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.4-beta10：参考起点X-QD，目录改为自包含 N/C/P/V/Vo/T 扁平行，恢复时间字数/分卷/版权信息且不调用旧目录模块。",
+  "summary": "Beta 1.2.5-beta1：仅重做版权信息页视觉，Stable 1.2.4 目录与其它业务链全部冻结。",
   "badges": [
     "Beta",
-    "1.2.4-beta10",
-    "X-QD目录结构",
-    "分卷/版权"
+    "1.2.5-beta1",
+    "版权信息UI"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=120410",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=120410",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=120410",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12051",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12051",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12051",
   "sections": [
     {
-      "title": "参考结论",
-      "text": "起点X-QD 的 ruleToc 很薄：catalog.php 已返回 N/C/P/V/Vo/T 完整行，阅读只按字段消费。beta10 按这个思路把 qidian-next 的目录结果层改成自包含扁平行。"
+      "title": "本版范围",
+      "text": "只优化版权信息页；Stable 1.2.4 的目录请求、时间/字数/分卷、正文与评论链全部冻结。"
     },
     {
-      "title": "为什么不同于 beta8",
-      "text": "beta8 在 ruleToc 阶段调用 qfTocNormalizeAppV70，可能依赖未在该阶段加载的 lazy 目录模块。beta10 完全不调用这些函数，只用当前 Argus JSON 和原生 JS。"
+      "title": "新版版权页",
+      "text": "大封面置顶，书名与作者居中；类型、状态、上架/首发日期、作品字数使用四块信息卡；下方独立显示正版版权声明。"
     },
     {
-      "title": "版权与分卷",
-      "text": "版权信息首行直接构造 qidian-next 原 qfType=copyright 入口；分卷优先使用 Data.Volumes 与章节 Vc/VolumeCode 映射，时间字数继续用 T/W。"
-    },
-    {
-      "title": "冻结范围",
-      "text": "正文、评论、账号、搜索、详情主体及所有正文 Provider 不修改。"
+      "title": "兼容策略",
+      "text": "继续复用 qf.copyright/1 官方数据模型与本地封面转 data:image 逻辑，只替换 renderer，不增加新的业务依赖。"
     }
   ]
 }
