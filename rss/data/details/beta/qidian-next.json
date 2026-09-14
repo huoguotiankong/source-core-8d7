@@ -1,31 +1,27 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.5-beta2：版权信息页按参考图改为阅读原生单页风格，目录与其它稳定业务全部冻结。",
+  "summary": "Beta 1.2.5-beta3：修复版权信息页在阅读中表格/浮动失效导致的竖排和大封面分页，改为紧凑固定版式。",
   "badges": [
     "Beta",
-    "1.2.5-beta2",
-    "版权信息单页"
+    "1.2.5-beta3",
+    "版权页排版修复"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12052",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12052",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12052",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12053",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12053",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12053",
   "sections": [
     {
-      "title": "本版范围",
-      "text": "只优化版权信息页；Stable 1.2.4 的目录请求、时间/字数/分卷、正文与评论链全部冻结。"
+      "title": "真机问题",
+      "text": "beta2 使用普通 HTML 表格/float 后，被阅读正文排版重写：三列信息拆成纵向文字，小封面被放大并推到第二页。"
     },
     {
-      "title": "参考图版式",
-      "text": "去掉大白卡与整页大封面，改成大标题 + 三列核心数据 + 正版声明 + 作者署名；作者/作品简介存在时在下方展示，并把小封面放在简介右侧。"
+      "title": "beta3 方案",
+      "text": "改为 720×760 的紧凑 SVG 内容块，所有位置/字号/封面尺寸固定，整体高度显著低于 beta1 大图，目标是在章节标题后直接显示在同一页。"
     },
     {
-      "title": "空白第一页修复",
-      "text": "beta1 把整个版权页做成不可拆分的大 SVG 图片，阅读分页时可能整体推到第二页。beta2 改为普通 HTML 文本和一个小封面，允许阅读正常分页。"
-    },
-    {
-      "title": "数据来源",
-      "text": "继续使用原 copyright 官方数据模型；分类、状态、简介、标签都从原 bookDetail 同一次响应里归一化，不增加新请求。"
+      "title": "冻结范围",
+      "text": "目录、章节时间/字数、真实分卷、正文、评论、账号及正文 Provider 不修改。"
     }
   ]
 }

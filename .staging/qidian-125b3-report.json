@@ -1,0 +1,13 @@
+{
+  "version": "1.2.5-beta3",
+  "versionCode": 12053,
+  "betaSha256": "4ecb110cf43eb3af758f9701640fa1835af56aa7cd8dd6ce263b3e8524b0333e",
+  "stableRuleTocFrozen": true,
+  "stableRuleBookInfoFrozen": true,
+  "stableRuleContentFrozen": true,
+  "bookSourceUrlFrozen": true,
+  "copyrightModuleOnly": true,
+  "compactSvg": "720x760",
+  "keepsBeta2IntroTags": true,
+  "noExtraNetworkRequest": true
+}
