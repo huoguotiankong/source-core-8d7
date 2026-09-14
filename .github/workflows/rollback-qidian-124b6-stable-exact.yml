@@ -1,0 +1,114 @@
+name: rollback-qidian-124b6-stable-exact
+on:
+  push:
+    paths:
+      - '.staging/rollback-qidian-124b6.trigger'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Restore Beta byte-for-byte from Stable 1.2.2
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp sources/novel/qidian-next/qidian-next.json sources/novel/qidian-next/qidian-next-beta.json
+          python3 - <<'PY'
+          import json, hashlib, pathlib
+          from datetime import datetime, timezone, timedelta
+
+          root=pathlib.Path('.')
+          src=root/'sources/novel/qidian-next/qidian-next-beta.json'
+          stable=root/'sources/novel/qidian-next/qidian-next.json'
+          assert src.read_bytes()==stable.read_bytes(), 'Beta must be byte-identical to Stable'
+          sha=hashlib.sha256(src.read_bytes()).hexdigest()
+          expected='1eaffa24543b2af58aed1368578368ea326ffb0170338971bde558df725bed87'
+          assert sha==expected, f'unexpected stable sha256: {sha}'
+
+          version='1.2.4-beta6'
+          code=12046
+          now='2026-09-14T19:50:00+08:00'
+          source_url=f'https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v={code}'
+          backup_url=f'https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v={code}'
+          import_url=f'legado://import/importonline?src={source_url}'
+          detail_url='https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2'
+          summary='Beta 1.2.4-beta6：完全撤销本轮目录/评论实验，Beta 文件逐字节恢复为已真机确认的 Stable 1.2.2。'
+          tags=['起点','测试版','完全回滚','Stable1.2.2','恢复原版']
+          changelog=[
+            '真机确认 beta1-beta5 目录实验均不如原版，本轮停止继续叠加修补',
+            'qidian-next-beta.json 直接逐字节复制 Stable 1.2.2，SHA256 与正式版完全一致',
+            '撤销 W 字数扩展、评论首屏实验、Argus v1 直连目录以及所有本轮目录相关改动',
+            '不再把目录字数优化与可用性恢复捆绑；后续若继续研究，将从独立实验文件开始，不污染活动 Beta',
+            'Stable 1.2.2 保持不变'
+          ]
+
+          def update_entry(d):
+              if not isinstance(d,dict): return False
+              sid=str(d.get('id',''))
+              sp=str(d.get('sourcePath',''))
+              if sid!='qidian-next-beta' and not sp.endswith('/qidian-next-beta.json'):
+                  return False
+              d.update({
+                'id':'qidian-next-beta','name':'🌈 起点增强 · Beta','channel':'beta',
+                'version':version,'versionCode':code,'updatedAt':now,
+                'sourcePath':'sources/novel/qidian-next/qidian-next-beta.json',
+                'sourceUrl':source_url,'backupUrl':backup_url,'importUrl':import_url,
+                'detailUrl':detail_url,'bookSourceUrl':'https://m.qidian.com/?qf_source=qidian_next_8d7',
+                'summary':summary,'tags':tags,'changelog':changelog,'sha256':sha
+              })
+              return True
+
+          def recurse(obj):
+              if isinstance(obj,dict):
+                  update_entry(obj)
+                  for v in obj.values(): recurse(v)
+              elif isinstance(obj,list):
+                  for v in obj: recurse(v)
+
+          for p in ['manifest.json','subscription/beta.json','subscription/novel.json','bundles/all-beta.json']:
+              path=root/p
+              data=json.loads(path.read_text(encoding='utf-8'))
+              recurse(data)
+              if isinstance(data,dict):
+                  if 'updatedAt' in data: data['updatedAt']=now
+                  if 'generatedAt' in data: data['generatedAt']=now
+              path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          detail={
+            'kind':'source','title':'🌈 起点增强 · Beta',
+            'summary':summary,
+            'badges':['Beta',version,'完全回滚','Stable 1.2.2 原样'],
+            'sourceUrl':source_url,'backupUrl':backup_url,'importUrl':import_url,
+            'sections':[
+              {'title':'本版处理','text':'停止 beta1-beta5 的目录与评论实验。当前 Beta 书源文件与已真机确认的 Stable 1.2.2 逐字节完全一致。'},
+              {'title':'为什么这样处理','text':'连续真机结果表明新方案没有提升可用性，且目录持续为空。先恢复原版可用基线，不再继续在活动 Beta 上做猜测式修补。'},
+              {'title':'后续原则','text':'章节字数和评论性能优化后续只在独立实验文件中验证；没有真机证明前，不再覆盖当前可用 Beta/Stable 主线。'},
+              {'title':'测试重点','text':'只确认恢复后目录、章节打开、正文和原有评论功能是否回到 Stable 1.2.2 的表现。'}
+            ]
+          }
+          (root/'rss/data/details/beta/qidian-next.json').write_text(json.dumps(detail,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          rel=root/'docs/RELEASE_LOG.md'
+          old=rel.read_text(encoding='utf-8')
+          block='''## 2026-09-14 · qidian-next 1.2.4-beta6 — 完全回滚到 Stable 1.2.2\n- 用户真机确认 beta5 目录仍不可用，并明确反馈“还不如原来的”。\n- 停止继续叠加目录修补；Beta 书源文件直接逐字节复制已真机确认的 Stable 1.2.2。\n- 撤销本轮 W 字数、评论首屏、Argus v1 直连目录等全部实验改动。\n- SHA256 与 Stable 1.2.2 完全一致；Stable 正式版文件本身不修改。\n- 后续新增优化必须先在独立实验文件真机验证，不再污染活动 Beta。\n\n'''
+          if not old.startswith(block): rel.write_text(block+old,encoding='utf-8')
+
+          hand=root/'docs/sources/qidian-next/PROJECT_HANDOFF.md'
+          old=hand.read_text(encoding='utf-8')
+          block='''## 2026-09-14 · 1.2.4-beta6 回滚结论\n\n用户真机确认 beta1-beta5 目录实验连续失败，beta5 仍“还不如原来的”。当前活动 Beta 已逐字节恢复为用户确认过的 Stable 1.2.2，SHA256 与 Stable 完全一致。章节字数、评论加速、Argus v1 直连目录全部撤出活动主线。后续如继续研究，只能先使用独立实验文件验证，真机通过后再单模块移植。\n\n'''
+          if not old.startswith(block): hand.write_text(block+old,encoding='utf-8')
+          print('rollback sha256',sha)
+          PY
+      - name: Commit rollback
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git commit -m 'qidian beta: 1.2.4-beta6 exact rollback to stable 1.2.2' || exit 0
+          git push origin HEAD:main
