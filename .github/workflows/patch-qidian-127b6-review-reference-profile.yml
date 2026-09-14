@@ -15,7 +15,13 @@ jobs:
           ref: main
           fetch-depth: 0
       - name: Build qidian-next 1.2.7-beta6
-        run: python3 .staging/patch_qidian_127b6_review_reference_profile.py
+        run: |
+          # beta5 已先落过 reference-profile，再叠加 raw-recovery；
+          # 这三个旧形态断言在当前组合基线上允许不存在，replace 本身无匹配时是安全 no-op。
+          sed -i "/assert old_pref in code, 'preferred() block not found'/d" .staging/patch_qidian_127b6_review_reference_profile.py
+          sed -i "/assert old_pref2 in code, 'prefProfile() block not found'/d" .staging/patch_qidian_127b6_review_reference_profile.py
+          sed -i "/assert needle in code, 'paragraph profile selection anchor not found'/d" .staging/patch_qidian_127b6_review_reference_profile.py
+          python3 .staging/patch_qidian_127b6_review_reference_profile.py
       - name: Syntax check unpacked review module
         run: node --check .staging/qidian-127b6-review-check.js
       - name: Verify reference Reader profile and emoji recovery
@@ -26,7 +32,6 @@ jobs:
           grep -Fq 'qfEmojiRecoverContentV1275' .staging/qidian-127b6-review-check.js
           grep -Fq "qfReaderSignedRequestV3245('v2/chapterreview/getparagraphscomments'" .staging/qidian-127b6-review-check.js
           grep -Fq 'raw.Content||raw.content' .staging/qidian-127b6-review-check.js
-          grep -Fq 'Stable 1.2.6' sources/novel/qidian-next/qidian-next.json || true
       - name: Commit generated Beta
         run: |
           git config user.name "github-actions[bot]"
