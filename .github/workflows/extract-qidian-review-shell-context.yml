@@ -1,0 +1,43 @@
+name: extract-qidian-review-shell-context
+on:
+  push:
+    paths:
+      - '.staging/qidian-review-shell-context.trigger'
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Extract review shell contexts
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(p.read_text(encoding='utf-8'))
+          s=arr[0] if isinstance(arr,list) else arr
+          js=str(s.get('jsLib',''))
+          terms=['getBuiltInCommentHtmlV21','showBrowser','__QF_COMMENT_CTX__','review_local_ui','qfReviewUiContextV420']
+          out=[]
+          for term in terms:
+              out.append('\n===== '+term+' =====\n')
+              start=0;n=0
+              while True:
+                  i=js.find(term,start)
+                  if i<0: break
+                  n+=1
+                  a=max(0,i-1800);b=min(len(js),i+2600)
+                  out.append(f'--- hit {n} at {i} ---\n'+js[a:b]+'\n')
+                  start=i+len(term)
+                  if n>=8: break
+          Path('.staging/qidian-review-shell-context.txt').write_text(''.join(out),encoding='utf-8')
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .staging/qidian-review-shell-context.txt
+          git diff --cached --quiet || git commit -m 'staging: extract qidian review shell context'
+          git push origin HEAD:main
