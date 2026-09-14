@@ -1,32 +1,32 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.4-beta6：完全撤销本轮目录/评论实验，Beta 文件逐字节恢复为已真机确认的 Stable 1.2.2。",
+  "summary": "Beta 1.2.4-beta7：按真机通过的最小目录链修复 qidian-next 的 bookInfo.init → tocUrl 生命周期。",
   "badges": [
     "Beta",
-    "1.2.4-beta6",
-    "完全回滚",
-    "Stable 1.2.2 原样"
+    "1.2.4-beta7",
+    "目录生命周期",
+    "Argus v1"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12046",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12046",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12046",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12047",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12047",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12047",
   "sections": [
     {
-      "title": "本版处理",
-      "text": "停止 beta1-beta5 的目录与评论实验。当前 Beta 书源文件与已真机确认的 Stable 1.2.2 逐字节完全一致。"
+      "title": "真机结论",
+      "text": "独立最小目录源可以正常显示目录，当前阅读环境中的 Argus v1 与 QDSign/QDInfo 本身可用。"
     },
     {
-      "title": "为什么这样处理",
-      "text": "连续真机结果表明新方案没有提升可用性，且目录持续为空。先恢复原版可用基线，不再继续在活动 Beta 上做猜测式修补。"
+      "title": "根因修正",
+      "text": "qidian-next 会先执行 ruleBookInfo.init。此前 beta5 在 init 后再生成 tocUrl，和最小源的生命周期不同；本版改为在 init 已解析出 bookId 时直接生成 tocUrl。"
     },
     {
-      "title": "后续原则",
-      "text": "章节字数和评论性能优化后续只在独立实验文件中验证；没有真机证明前，不再覆盖当前可用 Beta/Stable 主线。"
+      "title": "目录输出",
+      "text": "直接解析 Data.Chapters，保留章节名、章节链接、VIP 标记、更新时间，并将官方 W 字数字段合并到更新时间显示。"
     },
     {
-      "title": "测试重点",
-      "text": "只确认恢复后目录、章节打开、正文和原有评论功能是否回到 Stable 1.2.2 的表现。"
+      "title": "冻结范围",
+      "text": "正文、评论、账号、搜索、详情主体、Provider 与其它运行模块继续沿用 Stable 1.2.2。"
     }
   ]
 }

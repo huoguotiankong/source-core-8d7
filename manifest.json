@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-14T19:50:00+08:00",
+  "updatedAt": "2026-09-14T20:30:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -91,31 +91,32 @@
       "category": "novel",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "1.2.4-beta6",
-      "versionCode": 12046,
-      "updatedAt": "2026-09-14T19:50:00+08:00",
+      "version": "1.2.4-beta7",
+      "versionCode": 12047,
+      "updatedAt": "2026-09-14T20:30:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12046",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12046",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12046",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12047",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12047",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12047",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "Beta 1.2.4-beta6：完全撤销本轮目录/评论实验，Beta 文件逐字节恢复为已真机确认的 Stable 1.2.2。",
+      "summary": "Beta 1.2.4-beta7：按真机通过的最小目录链修复 qidian-next 的 bookInfo.init → tocUrl 生命周期。",
       "tags": [
         "起点",
         "测试版",
-        "完全回滚",
-        "Stable1.2.2",
-        "恢复原版"
+        "目录修复",
+        "Argus v1",
+        "生命周期",
+        "章节字数"
       ],
       "changelog": [
-        "真机确认 beta1-beta5 目录实验均不如原版，本轮停止继续叠加修补",
-        "qidian-next-beta.json 直接逐字节复制 Stable 1.2.2，SHA256 与正式版完全一致",
-        "撤销 W 字数扩展、评论首屏实验、Argus v1 直连目录以及所有本轮目录相关改动",
-        "不再把目录字数优化与可用性恢复捆绑；后续若继续研究，将从独立实验文件开始，不污染活动 Beta",
-        "Stable 1.2.2 保持不变"
+        "最小诊断源真机确认能正常显示目录，证明 Argus v1 与 QDSign/QDInfo 在当前阅读环境可用",
+        "定位此前 beta5 的集成差异：qidian-next 存在非空 ruleBookInfo.init，init 后再生成 tocUrl 可能丢失原始 Data.BookId",
+        "本版在 ruleBookInfo.init 已得到 bid 时直接生成已验证的 Argus v1 tocUrl，保留原 $.tocUrl 取值方式",
+        "ruleToc 直接解析 Data.Chapters，并输出 N/C/V/T/W；T 同时显示章节时间与官方字数",
+        "正文、评论、账号、搜索、详情主体、情无/小雨及其它 Provider 全部保持 Stable 1.2.2"
       ],
-      "sha256": "1eaffa24543b2af58aed1368578368ea326ffb0170338971bde558df725bed87"
+      "sha256": "cfa211a519b1b24d66127e5263511cad7c306444251013804381f50be2e94823"
     },
     {
       "id": "picacg",

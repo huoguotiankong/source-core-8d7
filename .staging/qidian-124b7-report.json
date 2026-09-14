@@ -1,0 +1,9 @@
+{
+  "version": "1.2.4-beta7",
+  "stableSha256": "1eaffa24543b2af58aed1368578368ea326ffb0170338971bde558df725bed87",
+  "betaSha256": "cfa211a519b1b24d66127e5263511cad7c306444251013804381f50be2e94823",
+  "integration": "Argus v1 toc URL generated inside ruleBookInfo.init while bid exists",
+  "ruleBookInfoTocUrl": "$.tocUrl",
+  "ruleTocChapterList": "<js>\nqfMin1247TocParse.call(this,result,baseUrl);\n</js>",
+  "ruleContentFrozen": true
+}

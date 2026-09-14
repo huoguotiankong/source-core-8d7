@@ -1,3 +1,10 @@
+## 2026-09-14 · qidian-next 1.2.4-beta7 — 目录生命周期修复
+- 用户真机确认独立最小目录源可以正常显示目录，证明 Argus v1 + QDSign/QDInfo 当前可用。
+- 根因进一步收敛到 qidian-next 的 `ruleBookInfo.init → tocUrl` 生命周期；此前 beta5 在 init 后生成直连 tocUrl，和最小源执行上下文不同。
+- 本版在 `ruleBookInfo.init` 已解析出 `bid` 时生成 Argus v1 目录请求，`ruleBookInfo.tocUrl` 仍保持 `$.tocUrl`。
+- `ruleToc` 直接解析 `Data.Chapters` 的 `N/C/V/T/W`，并显示时间 + 官方章节字数。
+- 正文、评论、账号、搜索、详情主体、Provider 全部冻结；Stable 1.2.2 不改。
+
 ## 2026-09-14 · qidian-next 1.2.4-beta6 — 完全回滚到 Stable 1.2.2
 - 用户真机确认 beta5 目录仍不可用，并明确反馈“还不如原来的”。
 - 停止继续叠加目录修补；Beta 书源文件直接逐字节复制已真机确认的 Stable 1.2.2。
