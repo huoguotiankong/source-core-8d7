@@ -1,0 +1,35 @@
+name: patch-qidian-127b8-copy-reader-content
+on:
+  push:
+    paths:
+      - '.staging/qidian-127b8-copy-reader-content.trigger'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Build qidian-next 1.2.7-beta8
+        run: python3 .staging/patch_qidian_127b8_copy_reader_content.py
+      - name: Syntax check unpacked review module
+        run: node --check .staging/qidian-127b8-review-check.js
+      - name: Verify Reader Content fusion
+        run: |
+          grep -Fq 'qfReviewCopyReaderContentV1278(st,m);' .staging/qidian-127b8-review-check.js
+          grep -Fq '_qfReaderContentRecovered' .staging/qidian-127b8-review-check.js
+          grep -Fq 'qfEmojiSuspiciousV1275' .staging/qidian-127b8-review-check.js
+          grep -Fq 'QDReaderAndroid/7.9.378/1436/1000009/' .staging/qidian-127b8-review-check.js
+          grep -Fq 'safe=safe.replace(/\[fn=(\d+)\]/g' .staging/qidian-127b8-review-check.js
+      - name: Commit generated Beta
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md .staging/qidian-127b8-report.json .staging/qidian-127b8-review-check.js
+          git diff --cached --quiet && exit 0
+          git commit -m "qidian beta: fuse Reader Content in 1.2.7-beta8"
+          git push origin HEAD:main
