@@ -1,0 +1,56 @@
+name: diag-qidian-official-emoji-assets
+on:
+  push:
+    paths:
+      - '.staging/qidian-official-emoji-assets.trigger'
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Fetch official H5 assets and inspect emoji formats
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re,json,subprocess,urllib.parse,pathlib
+          out=[]
+          ua='Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 Chrome/139 Mobile Safari/537.36'
+          base='https://h5.if.qidian.com/new/chapterreview/?qfSheet=1&bookid=1037570737&chapterid=1&paragraphid=1&segmentid=1'
+          def curl(url):
+              try:
+                  p=subprocess.run(['curl','-L','--compressed','-A',ua,'--connect-timeout','12','--max-time','25','-sS',url],capture_output=True,text=True)
+                  return p.stdout if p.returncode==0 else ''
+              except Exception:return ''
+          html=curl(base)
+          out.append('=== PAGE LEN ===\n'+str(len(html))+'\n')
+          out.append('=== PAGE HEAD ===\n'+html[:12000]+'\n')
+          urls=[]
+          for pat in [r'<script[^>]+src=["\']([^"\']+)',r'<link[^>]+href=["\']([^"\']+)']:
+              for m in re.finditer(pat,html,re.I):
+                  u=urllib.parse.urljoin(base,m.group(1))
+                  if u not in urls: urls.append(u)
+          out.append('=== ASSETS ===\n'+'\n'.join(urls)+'\n')
+          terms=re.compile(r'fn=|emoji|emot|emotion|face|expression|smile|sticker|表情|\u2612|e000|private.?use',re.I)
+          for idx,u in enumerate(urls[:40]):
+              body=curl(u)
+              if not body: continue
+              hits=[]
+              for m in terms.finditer(body):
+                  a=max(0,m.start()-450);b=min(len(body),m.start()+1600)
+                  hits.append(body[a:b])
+                  if len(hits)>=20: break
+              if hits:
+                  out.append('\n=== ASSET %d %s LEN=%d ===\n'%(idx,u,len(body)))
+                  out.append('\n---HIT---\n'.join(hits))
+          pathlib.Path('.staging/qidian-official-emoji-assets.txt').write_text(''.join(out),encoding='utf-8')
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .staging/qidian-official-emoji-assets.txt
+          git diff --cached --quiet || git commit -m 'staging: inspect qidian official emoji assets'
+          git push origin HEAD:main
