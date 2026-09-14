@@ -1,0 +1,25 @@
+name: patch-qidian-127b1-review-scroll-ui
+on:
+  push:
+    paths:
+      - '.staging/qidian-127b1-review.trigger'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Build qidian-next 1.2.7-beta1
+        run: python .staging/patch_qidian_127b1_review_scroll_ui.py
+      - name: Commit generated Beta
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md .staging/qidian-127b1-report.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'qidian: publish 1.2.7-beta1 review on-demand paging'
+          git push origin HEAD:main
