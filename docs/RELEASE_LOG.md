@@ -1,3 +1,10 @@
+## 2026-09-14 · qidian-next 1.2.4-beta6 — 完全回滚到 Stable 1.2.2
+- 用户真机确认 beta5 目录仍不可用，并明确反馈“还不如原来的”。
+- 停止继续叠加目录修补；Beta 书源文件直接逐字节复制已真机确认的 Stable 1.2.2。
+- 撤销本轮 W 字数、评论首屏、Argus v1 直连目录等全部实验改动。
+- SHA256 与 Stable 1.2.2 完全一致；Stable 正式版文件本身不修改。
+- 后续新增优化必须先在独立实验文件真机验证，不再污染活动 Beta。
+
 ## 2026-09-14 · qidian-next 1.2.4-beta5 — Argus v1 目录主链恢复
 - 独立身份、全量复用 Stable 1.2.2 的目录诊断源仍真机失败，排除 Legado 旧身份/旧目录缓存为主要原因。
 - 目录主链改为 `druidv6.if.qidian.com/argus/api/v1/chapterlist/chapterlist`，参考当前 `妙想天开` 已工作的直接目录方案。

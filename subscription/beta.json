@@ -2,38 +2,38 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-09-14T19:45:00+08:00",
+  "updatedAt": "2026-09-14T19:50:00+08:00",
   "items": [
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "Beta 1.2.4-beta5：目录改走起点 Argus v1 chapterlist 直接链，恢复章节并带时间+字数。",
+      "summary": "Beta 1.2.4-beta6：完全撤销本轮目录/评论实验，Beta 文件逐字节恢复为已真机确认的 Stable 1.2.2。",
       "icon": "",
       "channel": "beta",
-      "version": "1.2.4-beta5",
-      "updatedAt": "2026-09-14T19:45:00+08:00",
+      "version": "1.2.4-beta6",
+      "updatedAt": "2026-09-14T19:50:00+08:00",
       "tags": [
         "起点",
         "测试版",
-        "目录恢复",
-        "Argus v1",
-        "章节字数",
-        "直连目录"
+        "完全回滚",
+        "Stable1.2.2",
+        "恢复原版"
       ],
       "changelog": [
-        "独立身份 Stable 1.2.2 诊断源仍目录空白，排除阅读旧书源身份/目录缓存为主因",
-        "目录请求切换到 druidv6 Argus v1 chapterlist 直连链，复用当前参考源已验证的 QDSign/QDInfo 生成方式",
-        "直接解析官方 N/C/V/T/W，目录显示更新时间 + W 字数，不增加第二次字数请求",
-        "章节 URL 重新映射到 qidian-next 既有 /chapter/{bookId}/{chapterId} 正文入口，正文 Provider 不改",
-        "评论、账号、搜索、详情、情无/小雨、本章说和其它 Provider 全部保持 Stable 1.2.2"
+        "真机确认 beta1-beta5 目录实验均不如原版，本轮停止继续叠加修补",
+        "qidian-next-beta.json 直接逐字节复制 Stable 1.2.2，SHA256 与正式版完全一致",
+        "撤销 W 字数扩展、评论首屏实验、Argus v1 直连目录以及所有本轮目录相关改动",
+        "不再把目录字数优化与可用性恢复捆绑；后续若继续研究，将从独立实验文件开始，不污染活动 Beta",
+        "Stable 1.2.2 保持不变"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12045",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12045",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12045",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12046",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12046",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12046",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2",
-      "versionCode": 12045,
-      "sha256": "3eb19aed9bb138bb6391a8348af123e161654032b8fb9185f02f9cb22f26d33b",
-      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json"
+      "versionCode": 12046,
+      "sha256": "1eaffa24543b2af58aed1368578368ea326ffb0170338971bde558df725bed87",
+      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
+      "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7"
     },
     {
       "id": "qidian-official",
@@ -98,5 +98,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-09-14T19:45:00+08:00"
+  "generatedAt": "2026-09-14T19:50:00+08:00"
 }
