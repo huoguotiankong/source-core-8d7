@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.6-beta1：参考妙想天开优化起点本地评论页，仅替换 review_local_ui；目录/正文/版权等其它业务冻结。",
+  "summary": "Beta 1.2.7-beta1：评论页继续参考妙想天开，改为真正首屏10条、近底部再翻页，并优化楼中楼完成态。",
   "badges": [
     "Beta",
-    "1.2.6-beta1",
-    "评论页优化"
+    "1.2.7-beta1",
+    "评论交互"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12061",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12061",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12061",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12071",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12071",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12071",
   "sections": [
     {
       "title": "本版范围",
-      "text": "本版只替换起点本地评论 UI 模块 review_local_ui。目录、正文、账号、Provider 和已接受的 beta3 版权页不修改。"
+      "text": "基于已确认 Stable 1.2.6，只继续优化本地评论页交互，不修改请求签名、目录、版权、正文或 Provider。"
     },
     {
-      "title": "妙想天开参考点",
-      "text": "首屏按10条加载；Reader v2 明确结构时直接组织根评论/回复；保留真实身份标签、媒体、楼中楼，滚动接近底部自动加载下一页。"
+      "title": "分页",
+      "text": "首屏严格10条；取消后台自动预取，只有滚动接近底部600px时才继续加载下一页。"
     },
     {
-      "title": "兼容策略",
-      "text": "快速通道只在 ReviewType/RefferCommentId 结构明确时启用，否则继续使用原 Web/mobile 稳定骨架链，避免为了速度牺牲回复完整度。"
+      "title": "楼中楼",
+      "text": "继续加载按钮收紧为胶囊样式；全部回复完成后显示明确分隔提示。"
     },
     {
-      "title": "重点测试",
-      "text": "请重点比较首次打开速度、推荐/热门/最新切换、滚动翻页、楼中楼、身份标签、配图和配音。"
+      "title": "冻结项",
+      "text": "TitleInfoList、头像、时间/IP、点赞、配图、配音、楼中楼数据链，以及目录/正文/账号全部保持 Stable 1.2.6。"
     }
   ]
 }

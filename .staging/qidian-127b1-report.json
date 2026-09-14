@@ -1,0 +1,15 @@
+{
+  "version": "1.2.7-beta1",
+  "versionCode": 12071,
+  "betaSha256": "82f0854b258fe23f1411b84875224fdce199814846fede536ea692f68dd7c8a4",
+  "baseline": "Stable 1.2.6",
+  "changedPackedModule": "review_local_ui",
+  "firstPageStrict10": true,
+  "backgroundPrefetchPages": 0,
+  "scrollThresholdPx": 600,
+  "replyDoneMarker": true,
+  "ruleTocFrozen": true,
+  "ruleBookInfoFrozen": true,
+  "ruleContentFrozen": true,
+  "bookSourceUrlFrozen": true
+}

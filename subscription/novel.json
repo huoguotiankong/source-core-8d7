@@ -2,46 +2,40 @@
   "schemaVersion": 1,
   "type": "novel",
   "name": "小说源",
-  "updatedAt": "2026-09-14T21:55:00+08:00",
+  "updatedAt": "2026-09-14T22:05:00+08:00",
   "items": [
     {
-      "id": "qidian-next",
-      "name": "🌈 起点增强",
-      "summary": "正式版 1.2.6：真机确认评论功能正常；合并紧凑版权页与妙想天开参考评论优化。",
-      "channel": "stable",
-      "version": "1.2.6",
-      "updatedAt": "2026-09-14T21:55:00+08:00",
+      "id": "qidian-next-beta",
+      "name": "🌈 起点增强 · Beta",
+      "summary": "Beta 1.2.7-beta1：评论页继续参考妙想天开，改为真正首屏10条、近底部再翻页，并优化楼中楼完成态。",
+      "channel": "beta",
+      "version": "1.2.7-beta1",
+      "updatedAt": "2026-09-14T22:05:00+08:00",
       "tags": [
         "起点",
-        "正式版",
-        "目录",
-        "章节字数",
-        "分卷",
-        "版权信息",
-        "段评",
-        "本章说",
+        "测试版",
+        "评论优化",
+        "妙想天开参考",
+        "10条首屏",
+        "滚动分页",
         "楼中楼",
-        "10条分页",
         "TitleInfoList",
-        "配图",
-        "配音",
-        "情无",
-        "小雨用户系统"
+        "Stable 1.2.6基线"
       ],
       "changelog": [
-        "由用户真机确认的 1.2.6-beta1 直接晋升 Stable，不新增业务逻辑",
-        "目录继续使用已确认的 Argus v1 + QDSign/QDInfo 与轻量 N/C/P/V/Vo/T 输出，支持时间、字数、真实分卷和版权信息",
-        "版权页沿用 1.2.5-beta3 紧凑固定版式",
-        "评论页参考妙想天开：首屏 10 条、后续分页；官方 v2 结构明确时走快速组织，否则保留成熟 Web/mobile 骨架链",
-        "保留真实 TitleInfoList 身份标签、头像、时间/IP、点赞、配图、配音、楼中楼与回复分页；正文/账号/Provider 不变"
+        "基于已真机确认的 Stable 1.2.6，仅修改 review_local_ui",
+        "首屏严格只加载10条，取消原来默认后台预取后两页，减少打开评论页时的额外请求和等待",
+        "滚动接近页面底部600px时再自动加载下一页，与参考源的按需翻页思路一致",
+        "楼中楼继续加载按钮改为紧凑胶囊样式；全部回复加载完成后显示“已加载全部回复”分隔提示",
+        "评论请求/解析、TitleInfoList、配图/配音、楼中楼、目录、版权、正文、账号和Provider全部冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12060",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12060",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12060",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json",
-      "versionCode": 12060,
-      "sha256": "7bac9ae6cd240c397f58793225be71811ecbcd6ffa90e98c91697691c993848c",
-      "sourcePath": "sources/novel/qidian-next/qidian-next.json",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12071",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12071",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12071",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2",
+      "versionCode": 12071,
+      "sha256": "82f0854b258fe23f1411b84875224fdce199814846fede536ea692f68dd7c8a4",
+      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
       "type": "novel"
     },
@@ -79,5 +73,5 @@
       "type": "novel"
     }
   ],
-  "generatedAt": "2026-09-14T21:55:00+08:00"
+  "generatedAt": "2026-09-14T22:05:00+08:00"
 }
