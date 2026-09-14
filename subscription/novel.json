@@ -2,20 +2,21 @@
   "schemaVersion": 1,
   "type": "novel",
   "name": "小说源",
-  "updatedAt": "2026-09-14T22:50:00+08:00",
+  "updatedAt": "2026-09-14T22:55:00+08:00",
   "items": [
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "Beta 1.2.7-beta4：按妙想天开明文实现，评论优先读取官方 raw Content 后再替换 [fn=N] 表情。",
+      "summary": "Beta 1.2.7-beta5：评论 Reader 请求身份切换为妙想天开同款 7.9.378/1436，保留原始 [fn=N] 表情 token。",
       "channel": "beta",
-      "version": "1.2.7-beta4",
-      "updatedAt": "2026-09-14T22:50:00+08:00",
+      "version": "1.2.7-beta5",
+      "updatedAt": "2026-09-14T22:55:00+08:00",
       "tags": [
         "起点",
         "测试版",
         "评论优化",
         "妙想天开参考",
+        "QDReader 7.9.378",
         "原始Content",
         "Emoji",
         "官方标签",
@@ -25,18 +26,18 @@
         "Stable 1.2.6基线"
       ],
       "changelog": [
-        "对照妙想天开明文评论代码：官方评论先读取 c.Content/r.Content，再执行 replaceEmoji([fn=N])",
-        "修正我们的 canonical 优先级：raw.Content/ReviewContent/Body/PostContent 优先，item.text/item.content 仅作为末级兜底，避免表情 token 在 normalizer 阶段被提前损坏",
-        "表情渲染收敛为字面 [fn=N] 映射，保留 HTML 转义与 Emoji 字体兼容；映射 1-64 与参考源一致",
-        "保留 beta3 官方 TitleImage 标签、头像字段扩展/首字兜底及图片错误监听",
-        "保留首屏10条、取消后台预取、600px近底翻页、楼中楼完成态；评论请求链和其它业务全部冻结"
+        "继续逐段对照妙想天开：其 getparagraphscomments 使用 QDReaderAndroid 7.9.378/1436 + RMX3366/realme + 每请求独立 qimei",
+        "将现有 reader_ext 请求身份精确切换到该参考配置；同一套签名函数自动覆盖段评、作者说、本章说及楼中楼请求",
+        "普通段评成功拿到 reader_ext 数据后直接采用，避免因当前页无称号用户而被旧 legacy 响应替换，重新丢失 [fn=N]",
+        "继续使用 raw.Content 优先 + 字面 [fn=N]→Emoji 映射；官方 TitleImage 标签和头像兜底保留",
+        "首屏10条、无后台预取、600px近底翻页继续保持；目录/版权/正文/账号/Provider 全部冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12074",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12074",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12074",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12075",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12075",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12075",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2",
-      "versionCode": 12074,
-      "sha256": "a93f73541a3f8ccc8d90ba9b3266703cbcee00e42280ff179eac89a680f3629e",
+      "versionCode": 12075,
+      "sha256": "79999b83efd7091b6a8349f2b45dce86565bf17f0166ed026c51f4442f559b20",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
       "type": "novel"
@@ -75,5 +76,5 @@
       "type": "novel"
     }
   ],
-  "generatedAt": "2026-09-14T22:50:00+08:00"
+  "generatedAt": "2026-09-14T22:55:00+08:00"
 }

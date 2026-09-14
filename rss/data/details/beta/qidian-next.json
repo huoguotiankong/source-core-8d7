@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.7-beta4：按妙想天开明文实现，评论优先读取官方 raw Content 后再替换 [fn=N] 表情。",
+  "summary": "Beta 1.2.7-beta5：评论 Reader 请求身份切换为妙想天开同款 7.9.378/1436，保留原始 [fn=N] 表情 token。",
   "badges": [
     "Beta",
-    "1.2.7-beta4",
-    "原始Content表情"
+    "1.2.7-beta5",
+    "参考客户端签名"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12074",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12074",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12074",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12075",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12075",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12075",
   "sections": [
     {
-      "title": "根因",
-      "text": "妙想天开直接使用起点官方 Content 后再替换 [fn=N]。我们此前优先使用 item.text/item.content，表情 token 可能在前置 normalizer 中已变成缺字方框，因此后续映射无法命中。"
+      "title": "进一步定位",
+      "text": "beta4 已经优先 raw.Content，但真机仍显示方框，说明当前 Reader 7.9.394 请求本身拿到的 Content 已不是妙想天开得到的原始 [fn=N]。"
     },
     {
-      "title": "本版修复",
-      "text": "评论正文与楼中楼统一优先读取 raw.Content/ReviewContent 等官方原始字段，再执行 1-64 的 [fn=N] Emoji 映射；item.text/item.content 仅末级兜底。"
+      "title": "本版处理",
+      "text": "reader_ext 改成妙想天开同款 QDReader 7.9.378/1436、RMX3366/realme、逐请求 qimei；仍请求同一 Argus v2 评论接口。"
     },
     {
-      "title": "保留优化",
-      "text": "官方 TitleImage 标签、头像多字段兼容/首字兜底、首屏10条、无后台预取、600px近底翻页、楼中楼完成态全部保留。"
+      "title": "表情链",
+      "text": "官方 Content 保留 [fn=N] → 页面 replaceEmoji 映射；不再试图从已经变成方框的字符串反推表情。"
     },
     {
       "title": "冻结项",
-      "text": "评论请求/签名/分页接口、目录、版权、正文、账号和 Provider 均未修改。"
+      "text": "评论 UI/标签/头像/分页保持现状，目录、版权、正文、账号、Provider 均未修改。"
     }
   ]
 }

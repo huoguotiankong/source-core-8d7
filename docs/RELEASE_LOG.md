@@ -1,3 +1,10 @@
+## 2026-09-14 · qidian-next 1.2.7-beta5
+- 真机确认 beta4 `raw.Content` 优先后表情仍为方框，说明差异发生在请求返回阶段。
+- 逐段对照妙想天开明文代码后，将评论 `reader_ext` 精确切换为 QDReader 7.9.378/1436 + RMX3366/realme + 每请求 qimei。
+- 同一 signer 覆盖段评、作者说、本章说和楼中楼；旧 reader_legacy 只作兼容回退。
+- 继续使用官方 raw Content 的 `[fn=N]`→Emoji 映射；评论 UI、标签、头像、10条首屏和600px滚动分页保留。
+- 目录、版权、正文、账号、Provider 全部冻结；未经真机确认不得晋升 Stable。
+
 ## 2026-09-14 · qidian-next 1.2.7-beta4
 - 对照妙想天开明文评论实现，确认其直接使用官方 `Content` 后执行 `[fn=N]` 表情替换。
 - 修正评论 canonical 内容优先级：`raw.Content/ReviewContent/...` 优先，`item.text/item.content` 降为末级兜底，避免表情 token 在前置 normalizer 阶段损坏。

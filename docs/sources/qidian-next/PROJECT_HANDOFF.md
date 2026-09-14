@@ -1,3 +1,10 @@
+## 2026-09-14 · 1.2.7-beta5 — 妙想天开同款 Reader 7.9.378 评论请求
+
+- beta4 证明仅调整 canonical Content 优先级不足，当前 7.9.394 Reader 响应本身可能已将起点自定义表情变成占位方框。
+- beta5 将 `qfReaderSignedRequestV3245` 的 `reader_ext` 身份精确对齐妙想天开：7.9.378/1436、RMX3366/realme、每请求独立 qimei。
+- 所有既有评论流继续复用原结构，只替换 Reader 主请求身份；legacy 仍保留为 fallback。
+- 目标是让官方 `Content` 恢复字面 `[fn=N]`，再由已有映射渲染 Emoji。
+
 ## 2026-09-14 · 1.2.7-beta4 — 评论原始 Content 表情修复
 
 - 参考妙想天开明文实现：评论/回复直接使用官方 `Content`，随后 `[fn=N]` 映射 Emoji。
