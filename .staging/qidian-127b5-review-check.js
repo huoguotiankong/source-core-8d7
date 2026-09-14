@@ -1095,18 +1095,87 @@ function qfReviewUiRowBase(item,raw){
  * 只统一根评论/楼中楼目前完全相同的 payload 字段：
  * content + image + audio family。
  * frame/replies/replyTo/god 保持各自 adapter 原语义。 */
+
+/* 1.2.7-beta5：损坏表情原始 Content 定点恢复。
+ * 真机确认部分评论在进入 UI 前，[fn=N] 已被替换为 ☒/�/PUA 字符。
+ * 不猜方框对应哪个表情；仅对可疑行按评论 ID 回查官方 Argus v2 原始 DataList，
+ * 恢复 Content 后继续交给既有妙想天开同款 [fn=N] 映射。 */
+var qfEmojiRawCacheV1275={};
+function qfEmojiSuspiciousV1275(s){return /[\u2612\uFFFD\uE000-\uF8FF]/.test(String(s||''))}
+function qfEmojiIdsV1275(item,raw){
+    var out=[],seen={};
+    function take(o){
+        if(!o||typeof o!=='object')return;
+        var ks=['Id','id','ReviewId','reviewId','CommentId','commentId','SourceId','sourceId','RootReviewId','rootReviewId','PostId','postId'];
+        for(var i=0;i<ks.length;i++){
+            var v=o[ks[i]];
+            if(v!==undefined&&v!==null&&String(v)!==''){
+                var k=String(v);if(!seen[k]){seen[k]=1;out.push(k)}
+            }
+        }
+    }
+    take(item);take(raw);return out;
+}
+function qfEmojiRawTextV1275(r){
+    if(!r||typeof r!=='object')return '';
+    return String(textOf(r.Content||r.content||r.ReviewContent||r.reviewContent||r.Body||r.PostBody||r.PostContent||'')||'');
+}
+function qfEmojiOfficialPageV1275(){
+    var p=String(isAuthor?authorParagraphId:((qfUiContext&&qfUiContext.paragraphId)||para)||'');
+    var pg=String(page||1),key=[String(bid),String(cid),p,pg].join('|');
+    if(Object.prototype.hasOwnProperty.call(qfEmojiRawCacheV1275,key))return qfEmojiRawCacheV1275[key];
+    var map={};
+    try{
+        var req=qfDirectSignedRequest('v2/chapterreview/getparagraphscomments',{
+            anchorId:'0',bookId:String(bid),chapterId:String(cid),from:'0',paragraphId:p,pg:pg,pz:'10',type:'0'
+        },false);
+        var obj=parse(qfDirectAjax(req,2500)||'');
+        var rows=(obj&&obj.Data&&Array.isArray(obj.Data.DataList))?obj.Data.DataList:[];
+        if(!rows.length){try{rows=qfDirectCollectRows(obj)||[]}catch(_rows){rows=[]}}
+        function indexRow(r){
+            if(!r||typeof r!=='object')return;
+            var ids=qfEmojiIdsV1275(r,r);
+            for(var i=0;i<ids.length;i++)map[ids[i]]=r;
+            var nests=[r.Replies,r.replies,r.replyList,r.ReplyList];
+            for(var n=0;n<nests.length;n++){
+                var a=nests[n];if(!Array.isArray(a))continue;
+                for(var j=0;j<a.length;j++)indexRow(a[j]);
+            }
+        }
+        for(var i=0;i<rows.length;i++)indexRow(rows[i]);
+    }catch(_e){}
+    qfEmojiRawCacheV1275[key]=map;return map;
+}
+function qfEmojiRecoverContentV1275(item,raw){
+    try{
+        var ids=qfEmojiIdsV1275(item,raw),map=qfEmojiOfficialPageV1275();
+        for(var i=0;i<ids.length;i++){
+            var r=map[ids[i]];if(!r)continue;
+            var x=qfEmojiRawTextV1275(r);if(!x)continue;
+            if(/\[fn=\d+\]/i.test(x))return x;
+            if(!qfEmojiSuspiciousV1275(x))return x;
+        }
+    }catch(_e){}
+    return '';
+}
+
 function qfReviewUiPayloadBase(item,raw){
     item=item||{};raw=raw||item;
+    var content=String(
+        textOf(
+            raw.Content||raw.content||
+            raw.ReviewContent||raw.reviewContent||
+            raw.Body||raw.PostBody||raw.PostContent||
+            item.text||item.content||
+            raw.Subject||raw.Title
+        )||""
+    );
+    if(qfEmojiSuspiciousV1275(content)){
+        var recovered=qfEmojiRecoverContentV1275(item,raw);
+        if(recovered)content=recovered;
+    }
     return {
-        content:String(
-            textOf(
-                raw.Content||raw.content||
-                raw.ReviewContent||raw.reviewContent||
-                raw.Body||raw.PostBody||raw.PostContent||
-                raw.Subject||raw.Title||
-                item.text||item.content
-            )||""
-        ),
+        content:content,
         image:qfCommentImageV504(raw),
         audio:String(raw._qfAudioUrl||audioOf(raw)||""),
         audioPage:String(raw._qfAudioPage||""),

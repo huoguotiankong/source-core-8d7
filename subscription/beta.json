@@ -2,42 +2,41 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-09-14T22:55:00+08:00",
+  "updatedAt": "2026-09-14T23:08:00+08:00",
   "items": [
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "Beta 1.2.7-beta5：评论 Reader 请求身份切换为妙想天开同款 7.9.378/1436，保留原始 [fn=N] 表情 token。",
+      "summary": "Beta 1.2.7-beta5：对已变成方框的评论按 ID 回查起点官方原始 Content，再恢复 [fn=N] 表情。",
       "channel": "beta",
       "version": "1.2.7-beta5",
-      "updatedAt": "2026-09-14T22:55:00+08:00",
+      "updatedAt": "2026-09-14T23:08:00+08:00",
       "tags": [
         "起点",
         "测试版",
         "评论优化",
+        "表情修复",
+        "Argus原始Content",
+        "ID回查",
         "妙想天开参考",
-        "QDReader 7.9.378",
-        "原始Content",
-        "Emoji",
         "官方标签",
-        "头像兜底",
         "10条首屏",
         "滚动分页",
         "Stable 1.2.6基线"
       ],
       "changelog": [
-        "继续逐段对照妙想天开：其 getparagraphscomments 使用 QDReaderAndroid 7.9.378/1436 + RMX3366/realme + 每请求独立 qimei",
-        "将现有 reader_ext 请求身份精确切换到该参考配置；同一套签名函数自动覆盖段评、作者说、本章说及楼中楼请求",
-        "普通段评成功拿到 reader_ext 数据后直接采用，避免因当前页无称号用户而被旧 legacy 响应替换，重新丢失 [fn=N]",
-        "继续使用 raw.Content 优先 + 字面 [fn=N]→Emoji 映射；官方 TitleImage 标签和头像兜底保留",
-        "首屏10条、无后台预取、600px近底翻页继续保持；目录/版权/正文/账号/Provider 全部冻结"
+        "真机确认 beta4 仍有 ☒ 方框：说明 [fn=N] 在进入 UI 前已损坏，单纯 formatter 映射无法恢复",
+        "仅当评论含 U+2612/U+FFFD/PUA 可疑字符时，通过现有 Argus v2 签名链回查 getparagraphscomments 原始 DataList",
+        "回查结果仅按 Id/ReviewId/CommentId/SourceId/RootReviewId/PostId 精确匹配，不做正文模糊猜测",
+        "恢复官方 Content 后继续使用妙想天开同款 [fn=N] 映射；每上下文/页只请求一次并缓存",
+        "正常评论不增加请求；目录、正文、版权、账号、Provider 与 Stable 业务字段冻结"
       ],
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12075",
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12075",
       "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12075",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2",
       "versionCode": 12075,
-      "sha256": "79999b83efd7091b6a8349f2b45dce86565bf17f0166ed026c51f4442f559b20",
+      "sha256": "be8ab4a8f4af7ae20ef5d4f83c64293315bcb4c25da862ef1b0228cbaaba70d8",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7"
     },
@@ -104,5 +103,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-09-14T22:55:00+08:00"
+  "generatedAt": "2026-09-14T23:08:00+08:00"
 }

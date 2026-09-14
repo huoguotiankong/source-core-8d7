@@ -1,4 +1,10 @@
 ## 2026-09-14 · qidian-next 1.2.7-beta5
+- 真机确认 beta4 仍出现 `☒`：`[fn=N]` 在 UI formatter 前已损坏。
+- beta5 仅对可疑评论按 ID 回查官方 Argus v2 原始 `Content`，再执行 `[fn=N]` 映射；禁止根据方框猜表情。
+- 同上下文/页共享一次回查缓存，正常行不增加网络请求。
+- 目录、正文、版权、账号、Provider 冻结；未经真机确认不得晋升 Stable。
+
+## 2026-09-14 · qidian-next 1.2.7-beta5
 - 真机确认 beta4 `raw.Content` 优先后表情仍为方框，说明差异发生在请求返回阶段。
 - 逐段对照妙想天开明文代码后，将评论 `reader_ext` 精确切换为 QDReader 7.9.378/1436 + RMX3366/realme + 每请求 qimei。
 - 同一 signer 覆盖段评、作者说、本章说和楼中楼；旧 reader_legacy 只作兼容回退。

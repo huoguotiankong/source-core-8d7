@@ -1,3 +1,9 @@
+## 2026-09-14 · 1.2.7-beta5 — 评论表情原始 Content 定点恢复
+
+- beta4 真机仍有 `☒`，证实不是 Emoji 映射表缺失，而是部分评论在 UI 前已丢失 `[fn=N]`。
+- beta5 对 U+2612/U+FFFD/PUA 异常行，通过现有 Argus 签名链按评论 ID 精确回查 `v2/chapterreview/getparagraphscomments` 原始 DataList。
+- 只恢复 Content；TitleInfoList、头像、楼中楼结构、分页与其它业务域不变。
+
 ## 2026-09-14 · 1.2.7-beta5 — 妙想天开同款 Reader 7.9.378 评论请求
 
 - beta4 证明仅调整 canonical Content 优先级不足，当前 7.9.394 Reader 响应本身可能已将起点自定义表情变成占位方框。
