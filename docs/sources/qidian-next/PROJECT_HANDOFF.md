@@ -1,3 +1,9 @@
+## 2026-09-14 · 1.2.6-beta1 评论页参考妙想天开优化
+- 用户对 1.2.5-beta3 版权页表示“就这样吧”，当前 Beta 在此基础上转入 Review 域。
+- 本版只替换 `review_local_ui`，donor 来自此前 1.2.4-beta3 中已经隔离准备的妙想天开参考实现。
+- 目标：Reader 首屏10条、严格结构快通道、TitleInfoList 富身份、楼中楼/媒体完整、滚动自动翻页；结构不明时回退稳定 Web/mobile 骨架。
+- Stable 1.2.4 目录主链、正文、账号/Provider 与 beta3 copyright 模块冻结。未真机确认评论页前不得晋升 Stable。
+
 ## 2026-09-14 · 1.2.5-beta3 版权页紧凑固定版式
 - 真机证明普通 HTML 表格/float 不适合版权页：阅读正文 CSS 会重排。
 - 当前 Beta 仅把 copyright renderer 改为 720×760 紧凑 SVG；保留 beta2 intro/tags 数据模型，不新增请求。

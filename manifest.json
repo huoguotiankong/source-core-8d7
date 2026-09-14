@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-14T21:55:00+08:00",
+  "updatedAt": "2026-09-14T22:15:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -90,31 +90,33 @@
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "Beta 1.2.5-beta3：修复版权信息页在阅读中表格/浮动失效导致的竖排和大封面分页，改为紧凑固定版式。",
+      "summary": "Beta 1.2.6-beta1：参考妙想天开优化起点本地评论页，仅替换 review_local_ui；目录/正文/版权等其它业务冻结。",
       "channel": "beta",
-      "version": "1.2.5-beta3",
-      "updatedAt": "2026-09-14T21:55:00+08:00",
+      "version": "1.2.6-beta1",
+      "updatedAt": "2026-09-14T22:15:00+08:00",
       "tags": [
         "起点",
         "测试版",
-        "版权信息",
-        "排版修复",
-        "紧凑SVG",
-        "Stable 1.2.4基线"
+        "评论优化",
+        "段评",
+        "本章说",
+        "楼中楼",
+        "妙想天开参考",
+        "10条分页"
       ],
       "changelog": [
-        "根据真机截图确认：阅读正文排版会重写普通 HTML 的表格、字号和 float，beta2 三列信息被拆成纵向文字，封面被单独推到第二页",
-        "版权页改为 720×760 紧凑 SVG，只作为一个低高度内容块参与分页，避免 beta1 的整页高图与 beta2 的 HTML 重排问题",
-        "固定恢复参考图结构：大标题、三列类型/日期/字数状态、正版声明、作者署名、简介/标签和右侧小封面",
-        "继续复用 beta2 已有官方详情数据与 intro/tags 模型，不新增任何网络请求",
-        "Stable 1.2.4 的目录时间/字数/真实分卷、正文、评论、账号、Provider 全部冻结"
+        "参考妙想天开首屏10条+后续分页思路：Reader 富身份请求不再强制至少20条，减少首屏过取与等待",
+        "只有官方 v2 数据具备明确 ReviewType/RefferCommentId 结构时才走快速组织；结构不明确继续使用原稳定 Web/mobile 骨架链",
+        "保留真实 TitleInfoList 称号/等级、头像、楼层、时间/IP、点赞、配图、配音、楼中楼与回复分页",
+        "评论卡片继续使用推荐/热门/最新、全部/配图/配音与滚动自动加载，并收紧正文宽度、点赞和回复层级排版",
+        "沿用用户接受的 1.2.5-beta3 版权页；Stable 1.2.4 的目录、章节时间字数/分卷、正文、账号、Provider 不修改"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12053",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12053",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12053",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12061",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12061",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12061",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2",
-      "versionCode": 12053,
-      "sha256": "4ecb110cf43eb3af758f9701640fa1835af56aa7cd8dd6ce263b3e8524b0333e",
+      "versionCode": 12061,
+      "sha256": "08a96e7c4e3770b9cb7f708c0979f36e0a88481add8f7bad8c78833d2f9ce205",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
       "category": "novel",

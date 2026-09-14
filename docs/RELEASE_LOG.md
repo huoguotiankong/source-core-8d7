@@ -1,3 +1,9 @@
+## 2026-09-14 · qidian-next 1.2.6-beta1 — 妙想天开评论页参考优化
+- 用户接受 1.2.5-beta3 版权页后，开发域切换到 Review；本版从当前 Beta 继续，但严格只替换 `review_local_ui`。
+- 复用此前以“妙想天开”为参考准备的评论模块：Reader 富身份首屏10条、严格结构快通道、真实 TitleInfoList、楼中楼/媒体与滚动分页。
+- 快通道仅在 `ReviewType/RefferCommentId` 明确时启用；否则继续走成熟 Web/mobile 骨架，保护回复结构。
+- Stable 1.2.4 目录/正文/账号/Provider 均冻结；当前 Beta 保留 beta3 版权页。
+
 ## 2026-09-14 · qidian-next 1.2.5-beta3 — 版权信息页真机排版修复
 - beta2 真机截图确认阅读会重写普通 HTML 表格、字号与 float：三列信息被拆成纵向，封面被放大并单独分页。
 - beta3 将版权页改为 720×760 紧凑 SVG，固定大标题、三列信息、正版声明、作者署名、简介/标签及右侧小封面。

@@ -1,27 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.5-beta3：修复版权信息页在阅读中表格/浮动失效导致的竖排和大封面分页，改为紧凑固定版式。",
+  "summary": "Beta 1.2.6-beta1：参考妙想天开优化起点本地评论页，仅替换 review_local_ui；目录/正文/版权等其它业务冻结。",
   "badges": [
     "Beta",
-    "1.2.5-beta3",
-    "版权页排版修复"
+    "1.2.6-beta1",
+    "评论页优化"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12053",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12053",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12053",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12061",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12061",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12061",
   "sections": [
     {
-      "title": "真机问题",
-      "text": "beta2 使用普通 HTML 表格/float 后，被阅读正文排版重写：三列信息拆成纵向文字，小封面被放大并推到第二页。"
+      "title": "本版范围",
+      "text": "本版只替换起点本地评论 UI 模块 review_local_ui。目录、正文、账号、Provider 和已接受的 beta3 版权页不修改。"
     },
     {
-      "title": "beta3 方案",
-      "text": "改为 720×760 的紧凑 SVG 内容块，所有位置/字号/封面尺寸固定，整体高度显著低于 beta1 大图，目标是在章节标题后直接显示在同一页。"
+      "title": "妙想天开参考点",
+      "text": "首屏按10条加载；Reader v2 明确结构时直接组织根评论/回复；保留真实身份标签、媒体、楼中楼，滚动接近底部自动加载下一页。"
     },
     {
-      "title": "冻结范围",
-      "text": "目录、章节时间/字数、真实分卷、正文、评论、账号及正文 Provider 不修改。"
+      "title": "兼容策略",
+      "text": "快速通道只在 ReviewType/RefferCommentId 结构明确时启用，否则继续使用原 Web/mobile 稳定骨架链，避免为了速度牺牲回复完整度。"
+    },
+    {
+      "title": "重点测试",
+      "text": "请重点比较首次打开速度、推荐/热门/最新切换、滚动翻页、楼中楼、身份标签、配图和配音。"
     }
   ]
 }

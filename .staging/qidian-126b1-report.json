@@ -1,0 +1,21 @@
+{
+  "version": "1.2.6-beta1",
+  "versionCode": 12061,
+  "betaSha256": "08a96e7c4e3770b9cb7f708c0979f36e0a88481add8f7bad8c78833d2f9ce205",
+  "baseline": "1.2.5-beta3",
+  "donorCommit": "a4b26b8435c1bc49a7da7de976f178a90b7b2925",
+  "changedPackedModule": "review_local_ui",
+  "currentModuleSha256": "250219de17eee91e1a17043dd1cb53af11c9019e48bcdc9efbeba6e4fb93d749",
+  "donorModuleSha256": "996c777ba3d307da68a319049947b4b4ecaa1f2de4c5320c6a833ee8609592d4",
+  "ruleTocFrozen": true,
+  "ruleBookInfoFrozen": true,
+  "ruleContentFrozen": true,
+  "bookSourceUrlFrozen": true,
+  "copyrightFrozen": true,
+  "donorMarkers": {
+    "pageSize10": true,
+    "richTitleInfo": true,
+    "structuredFastPath": true,
+    "forced20Removed": true
+  }
+}
