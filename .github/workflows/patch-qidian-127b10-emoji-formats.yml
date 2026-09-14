@@ -1,0 +1,23 @@
+name: patch-qidian-127b10-emoji-formats
+on:
+  push:
+    paths:
+      - '.staging/qidian-127b10-emoji-formats.trigger'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Patch beta10 emoji protocol compatibility
+        run: |
+          python .staging/patch_qidian_127b10_emoji_formats.py
+          node --check .staging/qidian-127b10-review-check.js
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md .staging/qidian-127b10-report.json .staging/qidian-127b10-review-check.js
+          git diff --cached --quiet || git commit -m 'qidian beta: 1.2.7-beta10 emoji protocol compatibility'
+          git push origin HEAD:main
