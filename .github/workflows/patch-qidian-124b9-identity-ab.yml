@@ -1,0 +1,33 @@
+name: patch-qidian-124b9-identity-ab
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/patch-qidian-124b9-identity-ab.trigger'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Build qidian-next 1.2.4-beta9
+        run: python3 .staging/patch_qidian_124b9_identity_ab.py
+      - name: Commit generated Beta
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            sources/novel/qidian-next/qidian-next-beta.json \
+            manifest.json \
+            subscription/beta.json \
+            subscription/novel.json \
+            bundles/all-beta.json \
+            rss/data/details/beta/qidian-next.json \
+            docs/RELEASE_LOG.md \
+            docs/sources/qidian-next/PROJECT_HANDOFF.md \
+            .staging/qidian-124b9-report.json
+          git diff --cached --quiet && { echo 'No generated changes'; exit 1; }
+          git commit -m 'qidian beta: 1.2.4-beta9 identity A/B'
+          git push origin main
