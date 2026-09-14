@@ -1,0 +1,34 @@
+name: patch-qidian-127b5-emoji-raw-recovery
+on:
+  push:
+    paths:
+      - '.staging/patch_qidian_127b5_emoji_raw_recovery.trigger'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Build qidian-next 1.2.7-beta5
+        run: python3 .staging/patch_qidian_127b5_emoji_raw_recovery.py
+      - name: Syntax check unpacked review module
+        run: node --check .staging/qidian-127b5-review-check.js
+      - name: Verify direct raw Content recovery
+        run: |
+          grep -q 'qfEmojiRecoverContentV1275' .staging/qidian-127b5-review-check.js
+          grep -q "v2/chapterreview/getparagraphscomments" .staging/qidian-127b5-review-check.js
+          grep -q "from:'0'" .staging/qidian-127b5-review-check.js
+          grep -q 'U+2612/U+FFFD/PUA' .staging/qidian-127b5-report.json
+      - name: Commit generated Beta
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md .staging/qidian-127b5-report.json .staging/qidian-127b5-review-check.js
+          git diff --cached --quiet && exit 0
+          git commit -m "qidian beta: recover raw emoji content in 1.2.7-beta5"
+          git push origin HEAD:main
