@@ -1,3 +1,10 @@
+## 2026-09-14 · qidian-next 1.2.7-beta4
+- 对照妙想天开明文评论实现，确认其直接使用官方 `Content` 后执行 `[fn=N]` 表情替换。
+- 修正评论 canonical 内容优先级：`raw.Content/ReviewContent/...` 优先，`item.text/item.content` 降为末级兜底，避免表情 token 在前置 normalizer 阶段损坏。
+- 表情映射收敛为官方原始 `[fn=N]` 字面替换；官方 TitleImage、头像优化和 beta1 分页策略全部保留。
+- 评论请求链、目录、版权、正文、账号、Provider 全部冻结。
+- 继续执行解包后 `node --check` 语法门禁；未经真机确认不得晋升 Stable。
+
 ## 2026-09-14 · qidian-next 1.2.7-beta3
 - 修复 beta2 评论页一直加载：根因为内联图片 `onerror` 的引号转义破坏了 `review_local_ui` JavaScript 解析。
 - 图片失败处理改为统一 capture error 监听，避免生成 HTML 字符串中的嵌套引号风险。

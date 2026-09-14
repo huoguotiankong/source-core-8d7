@@ -1,0 +1,20 @@
+{
+  "version": "1.2.7-beta4",
+  "versionCode": 12074,
+  "betaSha256": "a93f73541a3f8ccc8d90ba9b3266703cbcee00e42280ff179eac89a680f3629e",
+  "baseline": "1.2.7-beta3 / Stable 1.2.6",
+  "reference": "妙想天开 plaintext comment renderer",
+  "rawOfficialContentFirst": true,
+  "literalFnEmojiMap": true,
+  "emojiMapReferenceRange": "1-64",
+  "officialTitleImagePreserved": true,
+  "avatarFallbackPreserved": true,
+  "firstPageStrict10Preserved": true,
+  "backgroundPrefetchPages": 0,
+  "scrollThresholdPx": 600,
+  "syntaxGate": "node --check",
+  "ruleTocFrozen": true,
+  "ruleBookInfoFrozen": true,
+  "ruleContentFrozen": true,
+  "bookSourceUrlFrozen": true
+}

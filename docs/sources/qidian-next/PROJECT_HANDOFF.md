@@ -1,3 +1,9 @@
+## 2026-09-14 · 1.2.7-beta4 — 评论原始 Content 表情修复
+
+- 参考妙想天开明文实现：评论/回复直接使用官方 `Content`，随后 `[fn=N]` 映射 Emoji。
+- beta3 的 canonical 曾优先 `item.text/item.content`，可能已在前置 normalizer 丢失 `[fn]` token；beta4 改为 raw official Content 优先。
+- TitleImage 标签、头像兜底、首屏10条/600px分页继续保留；其它业务域冻结。
+
 ## 2026-09-14 · 1.2.7-beta3 — 评论加载回归修复
 
 - beta2 的 `review_local_ui` 因内联 `onerror` 引号转义错误导致 JS parse failure，真机表现为评论数量0、原文和列表永久加载中。

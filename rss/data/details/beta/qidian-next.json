@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.7-beta3：修复 beta2 评论页脚本解析失败导致一直加载；保留官方标签、表情和头像优化。",
+  "summary": "Beta 1.2.7-beta4：按妙想天开明文实现，评论优先读取官方 raw Content 后再替换 [fn=N] 表情。",
   "badges": [
     "Beta",
-    "1.2.7-beta3",
-    "评论回归修复"
+    "1.2.7-beta4",
+    "原始Content表情"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12073",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12073",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12073",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12074",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12074",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12074",
   "sections": [
     {
+      "title": "根因",
+      "text": "妙想天开直接使用起点官方 Content 后再替换 [fn=N]。我们此前优先使用 item.text/item.content，表情 token 可能在前置 normalizer 中已变成缺字方框，因此后续映射无法命中。"
+    },
+    {
       "title": "本版修复",
-      "text": "beta2 的图片 onerror 内联字符串存在错误的引号转义，导致整个评论脚本无法解析，所以页面停在“加载原文…/加载中…”。beta3 已改为统一图片错误监听。"
+      "text": "评论正文与楼中楼统一优先读取 raw.Content/ReviewContent 等官方原始字段，再执行 1-64 的 [fn=N] Emoji 映射；item.text/item.content 仅末级兜底。"
     },
     {
       "title": "保留优化",
-      "text": "官方 TitleImage 标签、[fn] 表情映射、Emoji 字体、头像多字段兼容和首字兜底全部保留。"
-    },
-    {
-      "title": "分页",
-      "text": "继续保持首屏10条、无后台预取、距离底部600px再加载下一页。"
+      "text": "官方 TitleImage 标签、头像多字段兼容/首字兜底、首屏10条、无后台预取、600px近底翻页、楼中楼完成态全部保留。"
     },
     {
       "title": "冻结项",
-      "text": "评论请求/解析数据链、目录、版权、正文、账号和 Provider 均未修改。"
+      "text": "评论请求/签名/分页接口、目录、版权、正文、账号和 Provider 均未修改。"
     }
   ]
 }
