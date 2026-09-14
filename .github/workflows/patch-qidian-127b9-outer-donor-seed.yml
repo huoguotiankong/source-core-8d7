@@ -1,0 +1,42 @@
+name: patch-qidian-127b9-outer-donor-seed
+on:
+  push:
+    paths:
+      - '.staging/qidian-127b9-outer-donor-seed.trigger'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Apply beta9 patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.staging/patch_qidian_127b9_outer_donor_seed.py')
+          s=p.read_text(encoding='utf-8')
+          bad="items[pos]=ne if pos is not None else ne\nif pos is None: items.insert(0,ne)"
+          good="\nif pos is None: items.insert(0,ne)\nelse: items[pos]=ne"
+          if bad in s:
+              s=s.replace(bad,good,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          python .staging/patch_qidian_127b9_outer_donor_seed.py
+          node --check .staging/qidian-127b9-review-check.js
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('.staging/qidian-127b9-report.json').read_text(encoding='utf-8'))
+          assert r['version']=='1.2.7-beta9' and r['versionCode']==12079
+          print(r)
+          PY
+      - name: Commit beta9
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md .staging/qidian-127b9-report.json .staging/qidian-127b9-review-check.js .staging/patch_qidian_127b9_outer_donor_seed.py
+          git diff --cached --quiet || git commit -m 'qidian beta: 1.2.7-beta9 outer donor comment seed'
+          git push origin HEAD:main
