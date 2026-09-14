@@ -1,0 +1,2123 @@
+
+===== getBuiltInCommentHtmlV21 =====
+--- hit 1 at 235081 ---
+eturn true;}
+        if(model&&!model.ok&&model.message){try{j.longToast("书友圈："+String(model.message));}catch(_m){}}
+    }catch(e){try{QF_Diagnostic.warn(this,"official-domain","circle","open",e);}catch(_d){}}
+    return qfOfficialDispatchV400.call(this,"circleOpen",[]).value;
+}
+function qfOpenQidianCircleV2961(){return qfOpenQidianCircle.call(this);}
+function qfOpenRoleCard(j,src,bookObj,chapterObj){
+    if(!j)return;
+    try{
+        var p=QF_OfficialDomainService.page(this,"role",[bookObj,chapterObj]),model=p&&p.model,view=p&&p.view;
+        if(p&&p.ok&&model){
+            if(!model.ok||!Array.isArray(model.roles)||!model.roles.length){try{j.longToast("角色卡："+String(model.message||"该书暂无官方角色卡"));}catch(_tm){}return;}
+            if(view&&view.ok&&view.html){
+                var pre="window.java=java;"+qfV18BottomAnchorPre();
+                j.showBrowser(String(view.target||("https://h5.if.qidian.com/new/role/share/?bookId="+encodeURIComponent(String(model.bookId||"")))),String(view.html),pre,JSON.stringify(view.config||{}));return true;
+            }
+        }
+    }catch(e){try{QF_Diagnostic.warn(this,"official-domain","role","open",e);}catch(_d){}}
+    return qfOfficialDispatchV400.call(this,"roleOpen",[j,src,bookObj,chapterObj]).value;
+}
+function qfOpenRoleCardV20(j,src,bookObj,chapterObj){return qfOpenRoleCard.call(this,j,src,bookObj,chapterObj);}
+/* beta7.3：详情页按钮使用固定、短 ABI，避免复杂 onclick 表达式和相邻 Span 串点击。 */
+function qfBookInfoOpenCircleV373(){
+    return qfOpenQidianCircleV2961.call(this);
+}
+function qfBookInfoOpenRoleV373(){
+    var j=qfJava(this),s=qfSource(this),b=qfBook(this),c=qfChapter(this);
+    qfOpenRoleCardV20.call(this,j,s,b,c);
+    return true;
+}
+function qfBookInfoOpenSmartSourceV330(){
+    qfSmartStatusShowV330.call(this);
+    return true;
+}
+
+function getBuiltInCommentHtmlV21(){
+    return qfModuleFnV38.call(this,"review_local_ui","getBuiltInCommentHtmlV21").call(this);
+}
+
+/* ============================================================
+ * v2.1 CLEAN：搜索直连 + 段评渐进加载
+ * ============================================================ */
+
+/* ---------- 发现页搜索状态 ----------
+ * alpha10.9.1：搜索状态与“源变量”彻底隔离。
+ * 源变量专供同人共享 Token；搜索词只存 source KV。
+ */
+var QF_V21_SEARCH_STATE_KEY="qf_v21_search_state";
+function qfV21SearchState(){
+    var s=null,d={},raw="",legacy="",legacyObj=null;
+    try{s=this&&this.source?this.source:(typeof source!=="undefined"?source:null);}catch(e0){}
+    try{raw=String((s&&s.get?s.get(QF_V21_SEARCH_STATE_KEY):"")||"");}catch(e1){raw="";}
+    if(raw){
+        try{d=JSON.parse(raw)||{};}catch(e2){d={qfV21Search:raw};}
+    }
+    if(!d||typeof d!=="object")d={};
+    if(d.qfV21Search==null){
+        try{legacy=String((s&&s.getVariable?s.getVariable():"")||"").trim();}catch(e3){legacy="";}
+        if(legacy&&legacy.charAt(0)==="{"){
+            try{legacyObj=JSON.parse(legacy);}catch(e4){legacyObj=null;}
+            if(legacyObj&&typeof legacyObj==="object"&&Object.prototype.hasOwnProperty.call(legacyObj,"qfV21Search")){
+                d.qfV21Search=legacyObj.qfV21Search==null?"":String(legacyObj.qfV21Search);
+                try{if(s&&s.put)s.put(QF_V21_SEARCH_STATE_KEY,JSON.stringify(d));}catch(e5){}
+                try{
+                    var ks=Object.keys(legacyObj);
+                    if(ks.length===1&&ks[0]==="qfV21Search"&&s&&s.setVariable)s.setVariable("");
+                }catch(e6){}
+            }
+        }
+    }
+    return d;
+}
+function qfV21SetSearch(v){
+    var s=null,d=qfV21SearchState.call(this);
+    try{s=this&&this.source?this.source:(typeof source!=="undefined"?source:null);}catch(e0){}
+    d.qfV21Search=v==null?"":String(v);
+    try{if(s&&s.put)s.put(QF_V21_SEARCH_STATE_KEY,JSON.stringify(d));}catch(e1){}
+}
+function qfV21SearchKey(){
+    var d=qfV21SearchState.call(this);
+    return d.qfV21Search==null?"":String(d.qfV21Search);
+}
+function qfV21Search(){
+    var j=this&&this.java?this.java:(typeof java!=="undefined"?java:null);
+    var src=this&&this.source?this.source:(typeof source!=="undefined"?source:null);
+    var key=qfV21SearchKey.call(this).replace(/^\s+|\s+$/g,"");
+    if(!key){try{j.toast("请输入书名或作者");}catch(e0){}return;}
+    try{
+        j.searchBook(key,src);
+    }catch(e1){
+        try{j.open("search",key);}
+        catch(e2){try{j.toast("搜索失败："+e2);}catch(_e){}}
+    }
+}
+
+/* ---------- 段评：改为弹窗内渐进请求 ----------
+ * 页面打开只抓20条；
+ * 滚动到底自动继续；
+ * 配图/配音由官方 reviewList 结果在本地筛选；
+ 
+--- hit 2 at 235163 ---
+ring(model.message));}catch(_m){}}
+    }catch(e){try{QF_Diagnostic.warn(this,"official-domain","circle","open",e);}catch(_d){}}
+    return qfOfficialDispatchV400.call(this,"circleOpen",[]).value;
+}
+function qfOpenQidianCircleV2961(){return qfOpenQidianCircle.call(this);}
+function qfOpenRoleCard(j,src,bookObj,chapterObj){
+    if(!j)return;
+    try{
+        var p=QF_OfficialDomainService.page(this,"role",[bookObj,chapterObj]),model=p&&p.model,view=p&&p.view;
+        if(p&&p.ok&&model){
+            if(!model.ok||!Array.isArray(model.roles)||!model.roles.length){try{j.longToast("角色卡："+String(model.message||"该书暂无官方角色卡"));}catch(_tm){}return;}
+            if(view&&view.ok&&view.html){
+                var pre="window.java=java;"+qfV18BottomAnchorPre();
+                j.showBrowser(String(view.target||("https://h5.if.qidian.com/new/role/share/?bookId="+encodeURIComponent(String(model.bookId||"")))),String(view.html),pre,JSON.stringify(view.config||{}));return true;
+            }
+        }
+    }catch(e){try{QF_Diagnostic.warn(this,"official-domain","role","open",e);}catch(_d){}}
+    return qfOfficialDispatchV400.call(this,"roleOpen",[j,src,bookObj,chapterObj]).value;
+}
+function qfOpenRoleCardV20(j,src,bookObj,chapterObj){return qfOpenRoleCard.call(this,j,src,bookObj,chapterObj);}
+/* beta7.3：详情页按钮使用固定、短 ABI，避免复杂 onclick 表达式和相邻 Span 串点击。 */
+function qfBookInfoOpenCircleV373(){
+    return qfOpenQidianCircleV2961.call(this);
+}
+function qfBookInfoOpenRoleV373(){
+    var j=qfJava(this),s=qfSource(this),b=qfBook(this),c=qfChapter(this);
+    qfOpenRoleCardV20.call(this,j,s,b,c);
+    return true;
+}
+function qfBookInfoOpenSmartSourceV330(){
+    qfSmartStatusShowV330.call(this);
+    return true;
+}
+
+function getBuiltInCommentHtmlV21(){
+    return qfModuleFnV38.call(this,"review_local_ui","getBuiltInCommentHtmlV21").call(this);
+}
+
+/* ============================================================
+ * v2.1 CLEAN：搜索直连 + 段评渐进加载
+ * ============================================================ */
+
+/* ---------- 发现页搜索状态 ----------
+ * alpha10.9.1：搜索状态与“源变量”彻底隔离。
+ * 源变量专供同人共享 Token；搜索词只存 source KV。
+ */
+var QF_V21_SEARCH_STATE_KEY="qf_v21_search_state";
+function qfV21SearchState(){
+    var s=null,d={},raw="",legacy="",legacyObj=null;
+    try{s=this&&this.source?this.source:(typeof source!=="undefined"?source:null);}catch(e0){}
+    try{raw=String((s&&s.get?s.get(QF_V21_SEARCH_STATE_KEY):"")||"");}catch(e1){raw="";}
+    if(raw){
+        try{d=JSON.parse(raw)||{};}catch(e2){d={qfV21Search:raw};}
+    }
+    if(!d||typeof d!=="object")d={};
+    if(d.qfV21Search==null){
+        try{legacy=String((s&&s.getVariable?s.getVariable():"")||"").trim();}catch(e3){legacy="";}
+        if(legacy&&legacy.charAt(0)==="{"){
+            try{legacyObj=JSON.parse(legacy);}catch(e4){legacyObj=null;}
+            if(legacyObj&&typeof legacyObj==="object"&&Object.prototype.hasOwnProperty.call(legacyObj,"qfV21Search")){
+                d.qfV21Search=legacyObj.qfV21Search==null?"":String(legacyObj.qfV21Search);
+                try{if(s&&s.put)s.put(QF_V21_SEARCH_STATE_KEY,JSON.stringify(d));}catch(e5){}
+                try{
+                    var ks=Object.keys(legacyObj);
+                    if(ks.length===1&&ks[0]==="qfV21Search"&&s&&s.setVariable)s.setVariable("");
+                }catch(e6){}
+            }
+        }
+    }
+    return d;
+}
+function qfV21SetSearch(v){
+    var s=null,d=qfV21SearchState.call(this);
+    try{s=this&&this.source?this.source:(typeof source!=="undefined"?source:null);}catch(e0){}
+    d.qfV21Search=v==null?"":String(v);
+    try{if(s&&s.put)s.put(QF_V21_SEARCH_STATE_KEY,JSON.stringify(d));}catch(e1){}
+}
+function qfV21SearchKey(){
+    var d=qfV21SearchState.call(this);
+    return d.qfV21Search==null?"":String(d.qfV21Search);
+}
+function qfV21Search(){
+    var j=this&&this.java?this.java:(typeof java!=="undefined"?java:null);
+    var src=this&&this.source?this.source:(typeof source!=="undefined"?source:null);
+    var key=qfV21SearchKey.call(this).replace(/^\s+|\s+$/g,"");
+    if(!key){try{j.toast("请输入书名或作者");}catch(e0){}return;}
+    try{
+        j.searchBook(key,src);
+    }catch(e1){
+        try{j.open("search",key);}
+        catch(e2){try{j.toast("搜索失败："+e2);}catch(_e){}}
+    }
+}
+
+/* ---------- 段评：改为弹窗内渐进请求 ----------
+ * 页面打开只抓20条；
+ * 滚动到底自动继续；
+ * 配图/配音由官方 reviewList 结果在本地筛选；
+ * 本章说使用 segmentId=0 的官方 reviewList。
+ */
+var QF_COMMENT_HTML_CACHE_V2987="";
+functi
+--- hit 3 at 237852 ---
+cy&&legacy.charAt(0)==="{"){
+            try{legacyObj=JSON.parse(legacy);}catch(e4){legacyObj=null;}
+            if(legacyObj&&typeof legacyObj==="object"&&Object.prototype.hasOwnProperty.call(legacyObj,"qfV21Search")){
+                d.qfV21Search=legacyObj.qfV21Search==null?"":String(legacyObj.qfV21Search);
+                try{if(s&&s.put)s.put(QF_V21_SEARCH_STATE_KEY,JSON.stringify(d));}catch(e5){}
+                try{
+                    var ks=Object.keys(legacyObj);
+                    if(ks.length===1&&ks[0]==="qfV21Search"&&s&&s.setVariable)s.setVariable("");
+                }catch(e6){}
+            }
+        }
+    }
+    return d;
+}
+function qfV21SetSearch(v){
+    var s=null,d=qfV21SearchState.call(this);
+    try{s=this&&this.source?this.source:(typeof source!=="undefined"?source:null);}catch(e0){}
+    d.qfV21Search=v==null?"":String(v);
+    try{if(s&&s.put)s.put(QF_V21_SEARCH_STATE_KEY,JSON.stringify(d));}catch(e1){}
+}
+function qfV21SearchKey(){
+    var d=qfV21SearchState.call(this);
+    return d.qfV21Search==null?"":String(d.qfV21Search);
+}
+function qfV21Search(){
+    var j=this&&this.java?this.java:(typeof java!=="undefined"?java:null);
+    var src=this&&this.source?this.source:(typeof source!=="undefined"?source:null);
+    var key=qfV21SearchKey.call(this).replace(/^\s+|\s+$/g,"");
+    if(!key){try{j.toast("请输入书名或作者");}catch(e0){}return;}
+    try{
+        j.searchBook(key,src);
+    }catch(e1){
+        try{j.open("search",key);}
+        catch(e2){try{j.toast("搜索失败："+e2);}catch(_e){}}
+    }
+}
+
+/* ---------- 段评：改为弹窗内渐进请求 ----------
+ * 页面打开只抓20条；
+ * 滚动到底自动继续；
+ * 配图/配音由官方 reviewList 结果在本地筛选；
+ * 本章说使用 segmentId=0 的官方 reviewList。
+ */
+var QF_COMMENT_HTML_CACHE_V2987="";
+function qfCommentHtmlV2987(){
+    if(!QF_COMMENT_HTML_CACHE_V2987)QF_COMMENT_HTML_CACHE_V2987=getBuiltInCommentHtmlV21();
+    return QF_COMMENT_HTML_CACHE_V2987;
+}
+
+
+/* ============================================================
+ * v3.0.0-alpha15：限免源服务器段评路由
+ * - 段评来源=本地：完整保留 alpha14 起点 App/Web 本地链。
+ * - 段评来源=服务器 + 正文实际命中情无/神魔：段评/本章说/热评/作者说改走对应源服务器。
+ * - beta13 起选择服务器即独立选择服务器评论源，不再因正文 Provider 回本地。
+ * ============================================================ */
+/* ============================================================
+ * alpha83 Comment Capability Registry
+ *
+ * 评论源声明自身能力与差异策略，主流程不再硬编码服务器 Provider 名单。
+ * capabilities 可跨模块：例如晴天 decorate 位于 review_sunny，
+ * 其余服务器 API 位于 review_server_core。
+ * ============================================================ */
+var QF_COMMENT84={
+    "起点本地":{id:"qidian_local",mode:"local",capabilities:{summary:true,paragraph:true,chapter:true,author:true},policy:{}},
+    "情无":{id:"qingwu_server",mode:"server",bindProvider:"情无",module:"review_server_core",capabilities:{
+        summary:{entry:"qfServerSummaryV315",passProvider:true},
+        paragraph:{entry:"qfServerCommentPackV315",passProvider:true},
+        chapter:{entry:"qfServerChapterPackV315",passProvider:true},
+        author:{entry:"qfServerAuthorSayV315",passProvider:true},
+        open:{entry:"qfShowServerCommentV315",passProvider:true}
+    },policy:{titleLocal:true,chapterLocal:true,nativeDecorate:false,summaryForHot:true,chapterCardByTotal:false}},
+    "神魔":{id:"shenmo_server",mode:"server",bindProvider:"神魔",module:"review_server_core",capabilities:{
+        summary:{entry:"qfServerSummaryV315",passProvider:true},
+        paragraph:{entry:"qfServerCommentPackV315",passProvider:true},
+        chapter:{entry:"qfServerChapterPackV315",passProvider:true},
+        author:{entry:"qfServerAuthorSayV315",passProvider:true},
+        open:{entry:"qfShowServerCommentV315",passProvider:true}
+    },policy:{titleLocal:false,chapterLocal:false,nativeDecorate:false,summaryForHot:true,chapterCardByTotal:true}},
+    "晴天":{id:"qingtian_native",mode:"server",bindProvider:"晴天",module:"review_server_core",capabilities:{
+        summary:{entry:"qfServerSummaryV315",passProvider:true},
+        paragraph:{entry:"qfServerCommentPackV315",passProvider:true},
+        chapter:{entry:"qfServerChapterPackV315",passProvider:true},
+        author:{entry:"qfServerAuthorSayV315",passProvider:true},
+        authorCard:{module:"review_common",entry:"qdQtAuthorSayCardV332",passProvider:false},
+        open:{entry:"qfShowServerCommentV315",passProvider:true},
+        decorate:{module:"review_sunny",entry:"qdDecorateSunnyNativeV335",passProvider:true}
+    },policy:{titleLocal:false,chapt
+--- hit 4 at 733631 ---
+V44","qfDqPickChapterV44","qfDeqiContentV44"],"fallback_69":["s69HeadersV23","s69IsCfV23","s69AjaxV23","s69MaybeVerifyV23","s69SearchBooksV23","s69FindTocUrlV23","s69LoadTocV23","s69ContentByUrlV23","qf69ContentV23"],"egg":["qfEggData","qfEggRender","qfEggAbsV324","qfEggGoodImageV324","qfEggPushImageV325","qfEggHintV325","qfEggLooksV324","qfEggNodeHasHintV325","qfEggCollectV324","qfEggFromRawV324","qfEggWebProbeV325","qfLocalEggContentV324","qfEggArchiveJsonV326","qfEggArchiveApiV326","qfEggArchiveFindParentV326","qfEggArchiveFallbackV326","qfEggArchiveExactV327","qfEggOfficialAppV57","qfEggContentV326","qfEggDataV430","qfEggRenderV430"],"role":["qfRoleData","qfRoleView","qfRoleEsc2940","qfRoleArr2940","qfRoleNormImg2940","qfRoleParse2940","qfRoleFetchOfficial2940","qfRoleBestImg2940","qfRoleTags2940","qfRoleNum2943","qfRolePrettyNum2943","qfRoleNormalize2940","qfRoleBookName2940","qfRoleHtml2940","qfRoleDataV420","qfRoleViewV420","qfOpenRoleCardV20"],"circle":["qfCircleData","qfCircleView","qfCircleCleanResult2964","qfCircleExtractScript2965","qfCircleExtract2965","qfCircleFindRealUrl2965","qfCircleEsc2964","qfCircleBookName2964","qfCircleHtml2964","qfCircleApiJson2970","qfCircleApiKeys2970","qfCircleApiCode2970","qfCircleApiMsg2970","qfCircleFindIds2970","qfCirclePostText2970","qfCirclePostUser2970","qfCirclePostImage2970","qfCircleVideoInfo2975","qfCircleExtractPosts2970","qfCircleApiSummary2970","qfCircleCategoryMeta2984","qfCircleApiCall2970","qfCircleApiHtml2970","qfCircleApiProbe2970","qfCircleDataV430","qfCircleViewV430","qfOpenQidianCircleV2961"],"copyright":["qfCopyrightData","qfCopyrightRender","qfCopyrightDataV420","qfCopyrightRenderV420","qdCopyrightV2929","qdCopyrightV2928","qdCopyrightV17"],"review_sunny":["qdDecorateSunnyNativeV335"],"review_local_ui":["getBuiltInCommentHtmlV21"],"review_server_ui":["qfServerCommentHtmlV315"],"preferred_sq":["qfShuqiContentV44","qfSqPickBookV44","qfSqPickChapterV44"],"preferred_qq":["qfQQContentV50"],"qidian_app":["qfAppArrV57","qfAppValV57","qfAppJsonV57","qfAppCodeV57","qfAppMsgV57","qfAppHeadersV57","qfAppDeviceIdV67","qfAppSignedSpecV67","qfAppGetBytesV67","qfAppDecryptContentV67","qfAppFreeRichContentV67","qfAppFreeTextV74","qfAppRequestV57","qfAppProbeV57","qfAppBookDetailV57","qfAppBookInfoV530","qfAppCatalogFetchV57","qfAppMidpageFetchV57","qfAppLicenseFetchV57","qfAppFreeContentV60","qfAppImageUaV64","qfAppMidpageWidgetsV64","qfAppAuthorSayV402","qfAppAuthorSayMetaV404","qfAppAuthorCommentsInfoV406"],"preferred_qm":["qfQimaoContentV10"],"provider_runtime":["qfProviderHealthLoad","qfProviderHealthSave","qfProviderMarkFail","qfProviderMarkSuccess","qfProviderCooling","qfProviderAutoOrder","qfProviderLearnLoad","qfProviderLearnSave","qfProviderLearnMark","qfProviderLearnScore","qfProviderLearnOrder","qfProviderLearnBrief","qfProviderHealthLoadV69","qfProviderHealthSaveV69","qfProviderMarkFailV69","qfProviderMarkSuccessV69","qfAutoOrderV69","qfProviderLearnLoadV320","qfProviderLearnSaveV320","qfProviderLearnMarkV320","qfProviderLearnScoreV320","qfProviderLearnOrderV320","qfProviderLearnBriefV320"],"fallback_common":["qfV23Abs","qfV23HtmlToText","qfV23CleanProviderText","qfV23Doc","qfV23CacheListGet","qfV23CacheListPut"],"provider_common":["qfCacheGetFreshV56","qfCachePutFreshV56","qfChapterHintTryV56","qfChapterHintPutV56","qfNameVariantsV10","qfChapterWindowTryV310","qfChapterWindowPutV310"],"review_common":["qdBubbleDataV20","qdQtAuthorSayCardV332"],"review_server_core":["qfQwCommentApiV315","qfSmCommentApiV315","qfServerNormV315","qfServerDataV319","qfQtAuthorSayV332","qfQtShowAuthorV332","qfServerAuthorSayV315","qfServerSummaryV315","qfServerCommentPackV315","qfServerChapterPackV315","qfShowServerCommentV315"],"preferred_dj":["qfDejianContentV521"],"fallback_sdg":["qfSuduguContentV525"],"preferred_kw":["qfKuwoContentV526"],"fallback_wx":["qfWanxiangContentV527"],"limited_tr":["qfTrSetErrV102","qfTrGetErrV102","qfTrTokenV102","qfTrBaseV102","qfTrRequestV102","qfTrContentV102"],"limited_x":["qfXSetErrV32","qfXGetErrV32","qfXBaseV32","qfXTokenV32","qfXAcquireTokenV32","qfXContentV32"]};
+var QF_MOD38_CACHE={};
+var QF_MOD38_FN_CACHE={};
+var QF_MOD38_LOADING={};
+/* alpha80：依赖归属到模块本身。Provider 只负责选择正文源，不再承担内部工具依赖。 */
+var QF_MOD38_DEPS={"fallback_my":["fallback_common","provider_common"],"fallback_dq":["fallback_common","provider_common"],"fallback_69":["fallback_common
+--- hit 5 at 760958 ---
+nresolvedV);
+        var pr=a.previousRegression||{},proved=Array.isArray(pr.provedModuleRefs)?pr.provedModuleRefs:[],unk=Array.isArray(pr.unknownDynamic)?pr.unknownDynamic:[];
+        out.push("alpha10 回归复盘：误删 "+Number(pr.deletedCount||0)+" 个；其中 "+proved.length+" 个已由解压模块直接证明仍有引用，"+unk.length+" 个属于动态/隐式依赖未知区。");
+        if(proved.length)out.push("已证明模块依赖："+proved.slice(0,16).join(" / ")+(proved.length>16?" …":""));
+        out.push("结论：本版不删除代码；UNRESOLVED ≠ DEAD。只有完成动态 ABI 白名单、模块 export/deps 校验并分批真机回归后才允许删除。");
+        var ms=Array.isArray(a.moduleSummary)?a.moduleSummary:[];out.push("");
+        out.push("模块摘要：");
+        for(var i=0;i<ms.length;i++){
+            var m=ms[i]||{};
+            out.push("· "+String(m.name||"")+" · "+String(m.packed||"")+" · "+Number(m.bytes||0)+"B · exports "+Number(m.exports||0)+" · deps "+((m.deps||[]).length)+" · mainVRefs "+Number(m.mainVRefs||0));
+        }
+        return out.join("\n");
+    }
+    function refs(name){
+        try{var m=(QF_DEPENDENCY_AUDIT.moduleRefs||{})[String(name||"")];return Array.isArray(m)?m.slice():[];}catch(_e){return [];}
+    }
+    return {summary:summary,text:text,refs:refs};
+})();
+
+
+var QF_PROXY_AUDIT={"version":"4.2.0","policy":"FINAL_CURRENT_DEFINITIONS_NO_DELETE","modules":31,"historicalProxyCount":86,"removedCanaryCount":11,"proxyCount":75,"classes":{"SAFE-MIGRATE":43,"ABI-PROTECTED":1,"MODULE-PROTECTED":27,"UNKNOWN":4},"types":{"SERVICE-PROXY":34,"MODULE-DISPATCH":3,"LEGACY-ALIAS":38},"safeMigratePreview":[],"removedCompleted":["qfArgusOuterSpecV350","qfOfficialReviewApiV402","qfOfficialReviewRawV400","qfOfficialReviewSpecV400","qfPaidV38","qfProviderContentV38","qfReviewMetaGetV470","qfReviewMetaPutV470","qfReviewNetCanTryV510","qfReviewNetMarkV510","qfServerCommentProviderV315"],"proxies":[{"name":"getBuiltInCommentHtmlV21","type":"MODULE-DISPATCH","target":"review_local_ui.getBuiltInCommentHtmlV21","class":"MODULE-PROTECTED"},{"name":"qdAuthorSayPayloadV404","type":"LEGACY-ALIAS","target":"qfReviewAuthor","class":"SAFE-MIGRATE"},{"name":"qdCopyrightV17","type":"LEGACY-ALIAS","target":"qfCopyrightPage","class":"MODULE-PROTECTED"},{"name":"qdFetchChapterCommentsV22","type":"LEGACY-ALIAS","target":"qfReviewChapter","class":"MODULE-PROTECTED"},{"name":"qdFetchOfficialCommentsV20","type":"LEGACY-ALIAS","target":"qfReviewParagraph","class":"MODULE-PROTECTED"},{"name":"qdFetchParagraphHotV402","type":"LEGACY-ALIAS","target":"qfReviewHot","class":"MODULE-PROTECTED"},{"name":"qdParseReviewSummaryV350","type":"SERVICE-PROXY","target":"QF_ReviewNormalizer.summary","class":"SAFE-MIGRATE"},{"name":"qdReviewResponseOkV351","type":"SERVICE-PROXY","target":"QF_ReviewNormalizer.responseOk","class":"SAFE-MIGRATE"},{"name":"qdReviewSummaryV11","type":"LEGACY-ALIAS","target":"qfReviewSummary","class":"MODULE-PROTECTED"},{"name":"qdReviewSummaryV22","type":"LEGACY-ALIAS","target":"qfReviewSummary","class":"MODULE-PROTECTED"},{"name":"qdReviewSummaryV292","type":"LEGACY-ALIAS","target":"qfReviewSummary","class":"MODULE-PROTECTED"},{"name":"qdReviewSummaryV293","type":"LEGACY-ALIAS","target":"qfReviewSummary","class":"SAFE-MIGRATE"},{"name":"qfAdjacentProviderTakeV510","type":"LEGACY-ALIAS","target":"qfAdjacentProviderTake","class":"SAFE-MIGRATE"},{"name":"qfAdjacentProviderWarmV510","type":"LEGACY-ALIAS","target":"qfAdjacentProviderWarm","class":"SAFE-MIGRATE"},{"name":"qfBestChapterV10","type":"SERVICE-PROXY","target":"QF_ChapterMatcher.best","class":"MODULE-PROTECTED"},{"name":"qfBookInfoOpenCircleV373","type":"LEGACY-ALIAS","target":"qfOpenQidianCircleV2961","class":"ABI-PROTECTED"},{"name":"qfCacheDropV55","type":"SERVICE-PROXY","target":"QF_CacheManager.remove","class":"SAFE-MIGRATE"},{"name":"qfCacheKeyV56","type":"SERVICE-PROXY","target":"QF_CacheManager.key","class":"MODULE-PROTECTED"},{"name":"qfCacheMemTouchV55","type":"SERVICE-PROXY","target":"QF_CacheManager._touch","class":"SAFE-MIGRATE"},{"name":"qfChapterNoV10","type":"SERVICE-PROXY","target":"QF_ChapterMatcher.chapterNo","class":"MODULE-PROTECTED"},{"name":"qfChapterPerfSummaryV510","type":"SERVICE-PROXY","target":"QF_Service","class":"SAFE-MIGRATE"},{"name":"qfChineseNumV10","type":"SERVICE-PROXY","target":"QF_ChapterMatcher.chineseNumber","class":"SAFE-MIGRATE"},{"name":"qfCleanChapterTextV10","type":"SERVICE-PROXY","target":"QF_ContentCleaner.clean","class":"SAFE-MIGRATE"},{"name":"qfCommentCapFnV83"
+--- hit 6 at 761035 ---
+provedModuleRefs)?pr.provedModuleRefs:[],unk=Array.isArray(pr.unknownDynamic)?pr.unknownDynamic:[];
+        out.push("alpha10 回归复盘：误删 "+Number(pr.deletedCount||0)+" 个；其中 "+proved.length+" 个已由解压模块直接证明仍有引用，"+unk.length+" 个属于动态/隐式依赖未知区。");
+        if(proved.length)out.push("已证明模块依赖："+proved.slice(0,16).join(" / ")+(proved.length>16?" …":""));
+        out.push("结论：本版不删除代码；UNRESOLVED ≠ DEAD。只有完成动态 ABI 白名单、模块 export/deps 校验并分批真机回归后才允许删除。");
+        var ms=Array.isArray(a.moduleSummary)?a.moduleSummary:[];out.push("");
+        out.push("模块摘要：");
+        for(var i=0;i<ms.length;i++){
+            var m=ms[i]||{};
+            out.push("· "+String(m.name||"")+" · "+String(m.packed||"")+" · "+Number(m.bytes||0)+"B · exports "+Number(m.exports||0)+" · deps "+((m.deps||[]).length)+" · mainVRefs "+Number(m.mainVRefs||0));
+        }
+        return out.join("\n");
+    }
+    function refs(name){
+        try{var m=(QF_DEPENDENCY_AUDIT.moduleRefs||{})[String(name||"")];return Array.isArray(m)?m.slice():[];}catch(_e){return [];}
+    }
+    return {summary:summary,text:text,refs:refs};
+})();
+
+
+var QF_PROXY_AUDIT={"version":"4.2.0","policy":"FINAL_CURRENT_DEFINITIONS_NO_DELETE","modules":31,"historicalProxyCount":86,"removedCanaryCount":11,"proxyCount":75,"classes":{"SAFE-MIGRATE":43,"ABI-PROTECTED":1,"MODULE-PROTECTED":27,"UNKNOWN":4},"types":{"SERVICE-PROXY":34,"MODULE-DISPATCH":3,"LEGACY-ALIAS":38},"safeMigratePreview":[],"removedCompleted":["qfArgusOuterSpecV350","qfOfficialReviewApiV402","qfOfficialReviewRawV400","qfOfficialReviewSpecV400","qfPaidV38","qfProviderContentV38","qfReviewMetaGetV470","qfReviewMetaPutV470","qfReviewNetCanTryV510","qfReviewNetMarkV510","qfServerCommentProviderV315"],"proxies":[{"name":"getBuiltInCommentHtmlV21","type":"MODULE-DISPATCH","target":"review_local_ui.getBuiltInCommentHtmlV21","class":"MODULE-PROTECTED"},{"name":"qdAuthorSayPayloadV404","type":"LEGACY-ALIAS","target":"qfReviewAuthor","class":"SAFE-MIGRATE"},{"name":"qdCopyrightV17","type":"LEGACY-ALIAS","target":"qfCopyrightPage","class":"MODULE-PROTECTED"},{"name":"qdFetchChapterCommentsV22","type":"LEGACY-ALIAS","target":"qfReviewChapter","class":"MODULE-PROTECTED"},{"name":"qdFetchOfficialCommentsV20","type":"LEGACY-ALIAS","target":"qfReviewParagraph","class":"MODULE-PROTECTED"},{"name":"qdFetchParagraphHotV402","type":"LEGACY-ALIAS","target":"qfReviewHot","class":"MODULE-PROTECTED"},{"name":"qdParseReviewSummaryV350","type":"SERVICE-PROXY","target":"QF_ReviewNormalizer.summary","class":"SAFE-MIGRATE"},{"name":"qdReviewResponseOkV351","type":"SERVICE-PROXY","target":"QF_ReviewNormalizer.responseOk","class":"SAFE-MIGRATE"},{"name":"qdReviewSummaryV11","type":"LEGACY-ALIAS","target":"qfReviewSummary","class":"MODULE-PROTECTED"},{"name":"qdReviewSummaryV22","type":"LEGACY-ALIAS","target":"qfReviewSummary","class":"MODULE-PROTECTED"},{"name":"qdReviewSummaryV292","type":"LEGACY-ALIAS","target":"qfReviewSummary","class":"MODULE-PROTECTED"},{"name":"qdReviewSummaryV293","type":"LEGACY-ALIAS","target":"qfReviewSummary","class":"SAFE-MIGRATE"},{"name":"qfAdjacentProviderTakeV510","type":"LEGACY-ALIAS","target":"qfAdjacentProviderTake","class":"SAFE-MIGRATE"},{"name":"qfAdjacentProviderWarmV510","type":"LEGACY-ALIAS","target":"qfAdjacentProviderWarm","class":"SAFE-MIGRATE"},{"name":"qfBestChapterV10","type":"SERVICE-PROXY","target":"QF_ChapterMatcher.best","class":"MODULE-PROTECTED"},{"name":"qfBookInfoOpenCircleV373","type":"LEGACY-ALIAS","target":"qfOpenQidianCircleV2961","class":"ABI-PROTECTED"},{"name":"qfCacheDropV55","type":"SERVICE-PROXY","target":"QF_CacheManager.remove","class":"SAFE-MIGRATE"},{"name":"qfCacheKeyV56","type":"SERVICE-PROXY","target":"QF_CacheManager.key","class":"MODULE-PROTECTED"},{"name":"qfCacheMemTouchV55","type":"SERVICE-PROXY","target":"QF_CacheManager._touch","class":"SAFE-MIGRATE"},{"name":"qfChapterNoV10","type":"SERVICE-PROXY","target":"QF_ChapterMatcher.chapterNo","class":"MODULE-PROTECTED"},{"name":"qfChapterPerfSummaryV510","type":"SERVICE-PROXY","target":"QF_Service","class":"SAFE-MIGRATE"},{"name":"qfChineseNumV10","type":"SERVICE-PROXY","target":"QF_ChapterMatcher.chineseNumber","class":"SAFE-MIGRATE"},{"name":"qfCleanChapterTextV10","type":"SERVICE-PROXY","target":"QF_ContentCleaner.clean","class":"SAFE-MIGRATE"},{"name":"qfCommentCapFnV83","type":"MODULE-DISPATCH","target":"lazy-module","class":"SAFE-MIGRATE"},{"na
+--- hit 7 at 774612 ---
+ls,policy:String(a.policy||"")};
+    }
+    function text(){
+        var a=QF_PROXY_MIGRATION||{},s=summary(),out=[];
+        out.push("Safe Proxy Migration · "+String(s.version||""));
+        out.push("policy="+String(s.policy||"")+" / batch="+s.batch+" / targets="+s.targets+" / migratedCalls="+s.calls+" / status=COMPLETE");
+        var t=Array.isArray(a.targets)?a.targets:[];
+        for(var i=0;i<t.length;i++){
+            var x=t[i]||{};
+            var rm=Array.isArray(a.removedCanary)?a.removedCanary:[],isRemoved=rm.indexOf(String(x.proxy||""))>=0;
+            out.push("✓ "+String(x.proxy||"")+" → "+String(x.target||"")+" · calls "+Number(x.migrated||0)+" · proxy "+(isRemoved?"REMOVED-CANARY":"KEEP"));
+        }
+        out.push("原则：迁移历史与 Compatibility Registry 保留；11 个已迁移零命中代理已按 6 个小批次全部完成 Canary 真删除；不删除其它 Compatibility 代理。");
+        return out.join("\n");
+    }
+    return {summary:summary,text:text};
+})();
+
+var QF_PROXY_REAUDIT={"version":"4.2.0","policy":"FINAL_REAUDIT_NO_DELETE","sourceBaseline":"4.1.0-alpha10.9.7","modules":31,"historicalProxyCount":86,"removedCanaryCount":11,"proxyCount":75,"activityCounts":{"mainActive":13,"moduleActive":8,"overlap":3,"uniqueActive":18,"zeroAll":57,"mainOnly":10,"moduleOnly":5},"statusCounts":{"MAIN-ACTIVE":13,"MODULE-ACTIVE":5,"TOP-ACTIVE":0,"MIGRATED-ZERO-CALL":0,"STATIC-ZERO-CALL":52,"ABI-PROTECTED":1,"UNKNOWN":4},"zeroCallLegacyClasses":{"SAFE-MIGRATE":34,"MODULE-PROTECTED":18,"ABI-PROTECTED":1,"UNKNOWN":4},"migratedZero":[],"removedCompleted":["qfArgusOuterSpecV350","qfOfficialReviewApiV402","qfOfficialReviewRawV400","qfOfficialReviewSpecV400","qfPaidV38","qfProviderContentV38","qfReviewMetaGetV470","qfReviewMetaPutV470","qfReviewNetCanTryV510","qfReviewNetMarkV510","qfServerCommentProviderV315"],"activeMain":[{"name":"getBuiltInCommentHtmlV21","calls":1,"legacyClass":"MODULE-PROTECTED"},{"name":"qdParseReviewSummaryV350","calls":1,"legacyClass":"SAFE-MIGRATE"},{"name":"qdReviewResponseOkV351","calls":1,"legacyClass":"SAFE-MIGRATE"},{"name":"qfCacheKeyV56","calls":2,"legacyClass":"MODULE-PROTECTED"},{"name":"qfChapterNoV10","calls":2,"legacyClass":"MODULE-PROTECTED"},{"name":"qfChapterPerfSummaryV510","calls":1,"legacyClass":"SAFE-MIGRATE"},{"name":"qfCleanChapterTextV10","calls":5,"legacyClass":"SAFE-MIGRATE"},{"name":"qfCommentRouteL1PutV470","calls":3,"legacyClass":"SAFE-MIGRATE"},{"name":"qfDiagInvokeV85","calls":4,"legacyClass":"SAFE-MIGRATE"},{"name":"qfFirstV13","calls":41,"legacyClass":"SAFE-MIGRATE"},{"name":"qfOfficialCapabilityV400","calls":6,"legacyClass":"SAFE-MIGRATE"},{"name":"qfReviewNetJsonOkV510","calls":1,"legacyClass":"SAFE-MIGRATE"},{"name":"qfValidContentV10","calls":9,"legacyClass":"MODULE-PROTECTED"}],"activeModules":[{"name":"qfBestChapterV10","calls":7,"modules":{"fallback_69":1,"preferred_qm":2,"preferred_dj":1,"fallback_sdg":1,"preferred_kw":1,"fallback_wx":1},"legacyClass":"MODULE-PROTECTED"},{"name":"qfCacheKeyV56","calls":6,"modules":{"preferred_qq":2,"preferred_qm":1,"preferred_dj":2,"preferred_kw":1},"legacyClass":"MODULE-PROTECTED"},{"name":"qfChapterNoV10","calls":19,"modules":{"match":2,"limited_qt":2,"fallback_my":2,"fallback_dq":2,"preferred_sq":2,"provider_common":4,"fallback_sdg":3,"fallback_wx":2},"legacyClass":"MODULE-PROTECTED"},{"name":"qfFlattenChapterV10","calls":1,"modules":{"preferred_qm":1},"legacyClass":"MODULE-PROTECTED"},{"name":"qfQtShowAuthorV332","calls":2,"modules":{"limited_qt":1,"review_common":1},"legacyClass":"MODULE-PROTECTED"},{"name":"qfServerDataV319","calls":4,"modules":{"review_server_core":4},"legacyClass":"MODULE-PROTECTED"},{"name":"qfServerNormV315","calls":4,"modules":{"review":1,"review_server_core":3},"legacyClass":"MODULE-PROTECTED"},{"name":"qfValidContentV10","calls":17,"modules":{"official":4,"limited_sm":1,"limited_qt":1,"fallback_my":1,"fallback_dq":1,"fallback_69":1,"preferred_sq":1,"preferred_qq":1,"preferred_qm":1,"preferred_dj":2,"fallback_sdg":1,"preferred_kw":1,"fallback_wx":1},"legacyClass":"MODULE-PROTECTED"}],"records":[{"name":"getBuiltInCommentHtmlV21","type":"MODULE-DISPATCH","target":"review_local_ui.getBuiltInCommentHtmlV21","legacyClass":"MODULE-PROTECTED","status":"MAIN-ACTIVE","mainCalls":1,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"review_local_ui":1}},{"name":"qdAuthorSayPayloadV404","type":"LEGACY-
+--- hit 8 at 776852 ---
+fCleanChapterTextV10","calls":5,"legacyClass":"SAFE-MIGRATE"},{"name":"qfCommentRouteL1PutV470","calls":3,"legacyClass":"SAFE-MIGRATE"},{"name":"qfDiagInvokeV85","calls":4,"legacyClass":"SAFE-MIGRATE"},{"name":"qfFirstV13","calls":41,"legacyClass":"SAFE-MIGRATE"},{"name":"qfOfficialCapabilityV400","calls":6,"legacyClass":"SAFE-MIGRATE"},{"name":"qfReviewNetJsonOkV510","calls":1,"legacyClass":"SAFE-MIGRATE"},{"name":"qfValidContentV10","calls":9,"legacyClass":"MODULE-PROTECTED"}],"activeModules":[{"name":"qfBestChapterV10","calls":7,"modules":{"fallback_69":1,"preferred_qm":2,"preferred_dj":1,"fallback_sdg":1,"preferred_kw":1,"fallback_wx":1},"legacyClass":"MODULE-PROTECTED"},{"name":"qfCacheKeyV56","calls":6,"modules":{"preferred_qq":2,"preferred_qm":1,"preferred_dj":2,"preferred_kw":1},"legacyClass":"MODULE-PROTECTED"},{"name":"qfChapterNoV10","calls":19,"modules":{"match":2,"limited_qt":2,"fallback_my":2,"fallback_dq":2,"preferred_sq":2,"provider_common":4,"fallback_sdg":3,"fallback_wx":2},"legacyClass":"MODULE-PROTECTED"},{"name":"qfFlattenChapterV10","calls":1,"modules":{"preferred_qm":1},"legacyClass":"MODULE-PROTECTED"},{"name":"qfQtShowAuthorV332","calls":2,"modules":{"limited_qt":1,"review_common":1},"legacyClass":"MODULE-PROTECTED"},{"name":"qfServerDataV319","calls":4,"modules":{"review_server_core":4},"legacyClass":"MODULE-PROTECTED"},{"name":"qfServerNormV315","calls":4,"modules":{"review":1,"review_server_core":3},"legacyClass":"MODULE-PROTECTED"},{"name":"qfValidContentV10","calls":17,"modules":{"official":4,"limited_sm":1,"limited_qt":1,"fallback_my":1,"fallback_dq":1,"fallback_69":1,"preferred_sq":1,"preferred_qq":1,"preferred_qm":1,"preferred_dj":2,"fallback_sdg":1,"preferred_kw":1,"fallback_wx":1},"legacyClass":"MODULE-PROTECTED"}],"records":[{"name":"getBuiltInCommentHtmlV21","type":"MODULE-DISPATCH","target":"review_local_ui.getBuiltInCommentHtmlV21","legacyClass":"MODULE-PROTECTED","status":"MAIN-ACTIVE","mainCalls":1,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"review_local_ui":1}},{"name":"qdAuthorSayPayloadV404","type":"LEGACY-ALIAS","target":"qfReviewAuthor","legacyClass":"SAFE-MIGRATE","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdCopyrightV17","type":"LEGACY-ALIAS","target":"qfCopyrightPage","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{"copyright":1}},{"name":"qdFetchChapterCommentsV22","type":"LEGACY-ALIAS","target":"qfReviewChapter","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdFetchOfficialCommentsV20","type":"LEGACY-ALIAS","target":"qfReviewParagraph","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdFetchParagraphHotV402","type":"LEGACY-ALIAS","target":"qfReviewHot","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdParseReviewSummaryV350","type":"SERVICE-PROXY","target":"QF_ReviewNormalizer.summary","legacyClass":"SAFE-MIGRATE","status":"MAIN-ACTIVE","mainCalls":1,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdReviewResponseOkV351","type":"SERVICE-PROXY","target":"QF_ReviewNormalizer.responseOk","legacyClass":"SAFE-MIGRATE","status":"MAIN-ACTIVE","mainCalls":1,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdReviewSummaryV11","type":"LEGACY-ALIAS","target":"qfReviewSummary","legacyClass":"MODULE-PROTECTED","status":"STATIC-ZERO-CALL","mainCalls":0,"topCalls":0,"moduleCalls":0,"modules":{},"migrated":false,"migratedCalls":0,"definitionMain":1,"definitionModules":{}},{"name":"qdReviewSummaryV22","type":"LEGACY-ALIAS","targe
+
+===== showBrowser =====
+--- hit 1 at 200056 ---
+n.indexOf(nn) >= 0 || nn.indexOf(xn) >= 0) score += 75;
+    else {
+        var min = Math.min(xn.length, nn.length), same = 0;
+        for (var i = 0; i < min; i++) {
+            if (xn.charAt(i) !== nn.charAt(i)) break;
+            same++;
+        }
+        if (same >= Math.min(6, min)) score += 55;
+    }
+    if (na && xa) {
+        if (xa === na) score += 35;
+        else if (xa.indexOf(na) >= 0 || na.indexOf(xa) >= 0) score += 20;
+    }
+    return score;
+}
+function qfPickBookV10(items, name, author) {
+    items = qdList(items);
+    var best = null, bestScore = -1;
+    for (var i = 0; i < items.length; i++) {
+        var sc = qfBookScoreV10(items[i] || {}, name, author);
+        if (sc > bestScore) { bestScore = sc; best = items[i]; }
+    }
+    return bestScore >= 70 ? best : null;
+}
+function qfChineseNumV10(s){return QF_ChapterMatcher.chineseNumber(s);}
+function qfChapterNoV10(title){return QF_ChapterMatcher.chapterNo(title);}
+function qfFlattenChapterV10(node,nameKeys,idKeys,out,depth){return QF_ChapterMatcher.flatten(node,nameKeys,idKeys,out,depth);}
+function qfBestChapterV10(list,meta,nameKey,idKey){return QF_ChapterMatcher.best(list,meta,nameKey,idKey);}
+
+/* ============================================================
+ * v1.1：起点官方段评修复
+ * - 统一使用发现页已验证正常的 generateCsrfToken()
+ * - reviewSummary 失败时静默刷新 m.qidian.com document.cookie 后重试
+ * - 兼容 ParagraphId/TextCount 及常见字段变体
+ * ============================================================ */
+
+
+/* v1.1 最终正文出口：正文获取逻辑完全沿用 v1.0，只替换段评注入层 */
+
+/* ===== selected final UI helpers ===== */
+function qfCallableV13(obj,name){
+    try{return !!obj && typeof obj[name]==="function";}catch(e){return false;}
+}
+
+function qfRuntimeJavaV13(ctx){
+    var x=null;
+    try{x=ctx&&ctx.java?ctx.java:null;}catch(e0){}
+    if(x && qfCallableV13(x,"showBrowser") && qfCallableV13(x,"ajax"))return x;
+    try{x=(typeof java!=="undefined")?java:null;}catch(e1){}
+    if(x && qfCallableV13(x,"showBrowser") && qfCallableV13(x,"ajax"))return x;
+    return null;
+}
+
+function qfRuntimeCacheV13(ctx){
+    var x=null;
+    try{x=ctx&&ctx.cache?ctx.cache:null;}catch(e0){}
+    if(x && (qfCallableV13(x,"getFromMemory")||qfCallableV13(x,"putMemory")))return x;
+    try{x=(typeof cache!=="undefined")?cache:null;}catch(e1){}
+    return x;
+}
+
+function qfEscV13(v){
+    return String(v==null?"":v)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+function qfEscJsV13(v){
+    return String(v==null?"":v).replace(/\\/g,"\\\\").replace(/'/g,"\\'")
+      .replace(/\r/g,"").replace(/\n/g," ");
+}
+
+function qfArrV13(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{
+        if(v.size&&v.get){
+            var a=[];
+            for(var i=0;i<v.size();i++)a.push(v.get(i));
+            return a;
+        }
+    }catch(e){}
+    return [];
+}
+
+function qfFirstV13(o,keys,def){
+    return QF_Field.pick(o,keys,def);
+}
+
+function qfBoolV13(v){
+    if(v===true)return true;
+    var x=String(v==null?"":v).toLowerCase();
+    return x==="1"||x==="true"||x==="yes";
+}
+
+
+function qfEmojiV13(text){
+    var map={
+        1:"👏",2:"🌹",3:"🤝",4:"😁",5:"😄",6:"🥺",7:"🙂",8:"😏",9:"😙",10:"👆🏻🐽",
+        11:"🙄",12:"😭",13:"😵",14:"😥",15:"🖕🏻",16:"🥵",17:"😓",18:"🤫",19:"😂",
+        20:"😢",21:"😍",22:"🤕🔨",23:"😑",24:"😫",25:"🤗",26:"🤪",27:"🙏",28:"😣",
+        29:"💪",30:"💀",31:"😳",32:"😎",33:"🤭",34:"😄👏",35:"👍🏻",36:"🤓",37:"😡",
+        38:"🙁",39:"😄❓",40:"😞",41:"😧",42:"💋",43:"☺️",44:"🤬",45:"😴",46:"🤠🚬",
+        47:"😱",48:"🐷",49:"😪",50:"🤐",51:"🥴",52:"🌙",53:"❤️",54:"🔪",55:"🎁",
+        56:"💔",57:"👊🏻",58:"😒",59:"✌🏻️",60:"😮",61:"🤨",62:"😴",63:"👏🏻",64:"🐲",
+        65:"⭐",66:"🌧️",67:"🍉",68:"🍵",69:"🔥",70:"💯"
+    };
+    return String(text==null?"":text).replace(/\[fn=(\d+)\]/g,function(_,n){return map[Number(n)]||"";});
+}
+
+function qfTimeValueV13(v){
+    if(v===undefined||v===null||v==="")return 0;
+    var n=Number(v);
+    if(!isNaN(n)&&n>0){
+        if(n<100000000000)n*=1000;
+        return n;
+    }
+    try{
+        var d=new Date(String(v)).getTime();
+        return isNaN(d)?0:d;
+    }catch(e){return 0;}
+}
+
+/* beta24.1：起点原生用户身份/称号标签。 */
+function qfCommentTitlesV3241(x,u){
+    /* v4.0：保留旧函数名作为 ABI，但数据语义改为“只认官方 TitleInfoList”。 */
+    x=x||{};u=(u&&typeof u==='object')?u:qfFirstV13(x,["UserInfo","userInfo","user_info"],{})||{};
+    var raw=[];
+    try{raw=raw.concat(qfOfficialTitleListV400(x)||[]);}catch
+--- hit 2 at 200197 ---
+ar i = 0; i < min; i++) {
+            if (xn.charAt(i) !== nn.charAt(i)) break;
+            same++;
+        }
+        if (same >= Math.min(6, min)) score += 55;
+    }
+    if (na && xa) {
+        if (xa === na) score += 35;
+        else if (xa.indexOf(na) >= 0 || na.indexOf(xa) >= 0) score += 20;
+    }
+    return score;
+}
+function qfPickBookV10(items, name, author) {
+    items = qdList(items);
+    var best = null, bestScore = -1;
+    for (var i = 0; i < items.length; i++) {
+        var sc = qfBookScoreV10(items[i] || {}, name, author);
+        if (sc > bestScore) { bestScore = sc; best = items[i]; }
+    }
+    return bestScore >= 70 ? best : null;
+}
+function qfChineseNumV10(s){return QF_ChapterMatcher.chineseNumber(s);}
+function qfChapterNoV10(title){return QF_ChapterMatcher.chapterNo(title);}
+function qfFlattenChapterV10(node,nameKeys,idKeys,out,depth){return QF_ChapterMatcher.flatten(node,nameKeys,idKeys,out,depth);}
+function qfBestChapterV10(list,meta,nameKey,idKey){return QF_ChapterMatcher.best(list,meta,nameKey,idKey);}
+
+/* ============================================================
+ * v1.1：起点官方段评修复
+ * - 统一使用发现页已验证正常的 generateCsrfToken()
+ * - reviewSummary 失败时静默刷新 m.qidian.com document.cookie 后重试
+ * - 兼容 ParagraphId/TextCount 及常见字段变体
+ * ============================================================ */
+
+
+/* v1.1 最终正文出口：正文获取逻辑完全沿用 v1.0，只替换段评注入层 */
+
+/* ===== selected final UI helpers ===== */
+function qfCallableV13(obj,name){
+    try{return !!obj && typeof obj[name]==="function";}catch(e){return false;}
+}
+
+function qfRuntimeJavaV13(ctx){
+    var x=null;
+    try{x=ctx&&ctx.java?ctx.java:null;}catch(e0){}
+    if(x && qfCallableV13(x,"showBrowser") && qfCallableV13(x,"ajax"))return x;
+    try{x=(typeof java!=="undefined")?java:null;}catch(e1){}
+    if(x && qfCallableV13(x,"showBrowser") && qfCallableV13(x,"ajax"))return x;
+    return null;
+}
+
+function qfRuntimeCacheV13(ctx){
+    var x=null;
+    try{x=ctx&&ctx.cache?ctx.cache:null;}catch(e0){}
+    if(x && (qfCallableV13(x,"getFromMemory")||qfCallableV13(x,"putMemory")))return x;
+    try{x=(typeof cache!=="undefined")?cache:null;}catch(e1){}
+    return x;
+}
+
+function qfEscV13(v){
+    return String(v==null?"":v)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+function qfEscJsV13(v){
+    return String(v==null?"":v).replace(/\\/g,"\\\\").replace(/'/g,"\\'")
+      .replace(/\r/g,"").replace(/\n/g," ");
+}
+
+function qfArrV13(v){
+    if(!v)return [];
+    if(Array.isArray(v))return v;
+    try{
+        if(v.size&&v.get){
+            var a=[];
+            for(var i=0;i<v.size();i++)a.push(v.get(i));
+            return a;
+        }
+    }catch(e){}
+    return [];
+}
+
+function qfFirstV13(o,keys,def){
+    return QF_Field.pick(o,keys,def);
+}
+
+function qfBoolV13(v){
+    if(v===true)return true;
+    var x=String(v==null?"":v).toLowerCase();
+    return x==="1"||x==="true"||x==="yes";
+}
+
+
+function qfEmojiV13(text){
+    var map={
+        1:"👏",2:"🌹",3:"🤝",4:"😁",5:"😄",6:"🥺",7:"🙂",8:"😏",9:"😙",10:"👆🏻🐽",
+        11:"🙄",12:"😭",13:"😵",14:"😥",15:"🖕🏻",16:"🥵",17:"😓",18:"🤫",19:"😂",
+        20:"😢",21:"😍",22:"🤕🔨",23:"😑",24:"😫",25:"🤗",26:"🤪",27:"🙏",28:"😣",
+        29:"💪",30:"💀",31:"😳",32:"😎",33:"🤭",34:"😄👏",35:"👍🏻",36:"🤓",37:"😡",
+        38:"🙁",39:"😄❓",40:"😞",41:"😧",42:"💋",43:"☺️",44:"🤬",45:"😴",46:"🤠🚬",
+        47:"😱",48:"🐷",49:"😪",50:"🤐",51:"🥴",52:"🌙",53:"❤️",54:"🔪",55:"🎁",
+        56:"💔",57:"👊🏻",58:"😒",59:"✌🏻️",60:"😮",61:"🤨",62:"😴",63:"👏🏻",64:"🐲",
+        65:"⭐",66:"🌧️",67:"🍉",68:"🍵",69:"🔥",70:"💯"
+    };
+    return String(text==null?"":text).replace(/\[fn=(\d+)\]/g,function(_,n){return map[Number(n)]||"";});
+}
+
+function qfTimeValueV13(v){
+    if(v===undefined||v===null||v==="")return 0;
+    var n=Number(v);
+    if(!isNaN(n)&&n>0){
+        if(n<100000000000)n*=1000;
+        return n;
+    }
+    try{
+        var d=new Date(String(v)).getTime();
+        return isNaN(d)?0:d;
+    }catch(e){return 0;}
+}
+
+/* beta24.1：起点原生用户身份/称号标签。 */
+function qfCommentTitlesV3241(x,u){
+    /* v4.0：保留旧函数名作为 ABI，但数据语义改为“只认官方 TitleInfoList”。 */
+    x=x||{};u=(u&&typeof u==='object')?u:qfFirstV13(x,["UserInfo","userInfo","user_info"],{})||{};
+    var raw=[];
+    try{raw=raw.concat(qfOfficialTitleListV400(x)||[]);}catch(_x){}
+    try{raw=raw.concat(qfOfficialTitleListV400(u)||[]);}catch(_u){}
+    var out=[],seen={};
+    function clean(v){return String(v==nul
+--- hit 3 at 233095 ---
+4.0 Stage 2：优先官方客户端正文结构。成功解密即把“无作者说”视为有效空值，
+       不再为了证明为空继续下载整页 HTML。只有客户端接口不可用时才保留旧网页兜底。 */
+    try{
+        var ap=qfOfficialCallV400.call(this,'authorSay',[String(bid),String(cid),false]);
+        if(ap&&ap.ok){
+            var at=String(ap.text||'');
+            try{if(_ac&&qfCallableV13(_ac,'putMemory'))_ac.putMemory(_ak,JSON.stringify({ts:now,text:at,source:'app-structured'}));}catch(_as0){}
+            return at;
+        }
+    }catch(_app){}
+
+    /* 兼容兜底：付费未订阅等场景若 safegetcontent 无法解密，仍沿用旧网页语义容器解析。 */
+    var url="https://www.qidian.com/chapter/"+encodeURIComponent(String(bid))+"/"+encodeURIComponent(String(cid))+"/";
+    var ck="";try{ck=String(cookie.getCookie("https://www.qidian.com")||cookie.getCookie("https://m.qidian.com")||"");}catch(e0){}
+    var opt={headers:{"User-Agent":QF_UA,"Accept":"text/html,application/xhtml+xml","Referer":"https://www.qidian.com/book/"+encodeURIComponent(String(bid))+"/"},timeout:6500};
+    if(ck)opt.headers.Cookie=ck;
+    var raw=qfAjaxTextV20(this,url,opt),text="";
+    if(raw){try{text=qfAuthorSayExtractV341(String(raw))||"";}catch(_ex){text="";}}
+    try{if(_ac&&qfCallableV13(_ac,"putMemory"))_ac.putMemory(_ak,JSON.stringify({ts:now,text:text,source:'web-fallback'}));}catch(_as){}
+    return text;
+}
+/* ---------- 本章说：真实章评两条，目标图样式 ---------- */
+
+
+/* ============================================================
+ * v3.0.0-alpha39：功能模块懒入口
+ * 角色卡 / 书友圈不再常驻解析；只有用户真正点击时才解包对应模块。
+ * ============================================================ */
+function qfOpenQidianCircle(){
+    var j=qfJava(this);if(!j)return true;
+    try{j.toast("正在打开书友圈…");}catch(_t){}
+    try{
+        var p=QF_OfficialDomainService.page(this,"circle",[qfBook(this)]),model=p&&p.model,view=p&&p.view;
+        if(p&&p.ok&&model&&model.ok&&view&&view.ok&&view.html){j.showBrowser(String(view.target||"https://local.qidian.circle.api/"+encodeURIComponent(String(model.bookId||""))),String(view.html),String(view.pre||""),JSON.stringify(view.config||{}));return true;}
+        if(model&&!model.ok&&model.message){try{j.longToast("书友圈："+String(model.message));}catch(_m){}}
+    }catch(e){try{QF_Diagnostic.warn(this,"official-domain","circle","open",e);}catch(_d){}}
+    return qfOfficialDispatchV400.call(this,"circleOpen",[]).value;
+}
+function qfOpenQidianCircleV2961(){return qfOpenQidianCircle.call(this);}
+function qfOpenRoleCard(j,src,bookObj,chapterObj){
+    if(!j)return;
+    try{
+        var p=QF_OfficialDomainService.page(this,"role",[bookObj,chapterObj]),model=p&&p.model,view=p&&p.view;
+        if(p&&p.ok&&model){
+            if(!model.ok||!Array.isArray(model.roles)||!model.roles.length){try{j.longToast("角色卡："+String(model.message||"该书暂无官方角色卡"));}catch(_tm){}return;}
+            if(view&&view.ok&&view.html){
+                var pre="window.java=java;"+qfV18BottomAnchorPre();
+                j.showBrowser(String(view.target||("https://h5.if.qidian.com/new/role/share/?bookId="+encodeURIComponent(String(model.bookId||"")))),String(view.html),pre,JSON.stringify(view.config||{}));return true;
+            }
+        }
+    }catch(e){try{QF_Diagnostic.warn(this,"official-domain","role","open",e);}catch(_d){}}
+    return qfOfficialDispatchV400.call(this,"roleOpen",[j,src,bookObj,chapterObj]).value;
+}
+function qfOpenRoleCardV20(j,src,bookObj,chapterObj){return qfOpenRoleCard.call(this,j,src,bookObj,chapterObj);}
+/* beta7.3：详情页按钮使用固定、短 ABI，避免复杂 onclick 表达式和相邻 Span 串点击。 */
+function qfBookInfoOpenCircleV373(){
+    return qfOpenQidianCircleV2961.call(this);
+}
+function qfBookInfoOpenRoleV373(){
+    var j=qfJava(this),s=qfSource(this),b=qfBook(this),c=qfChapter(this);
+    qfOpenRoleCardV20.call(this,j,s,b,c);
+    return true;
+}
+function qfBookInfoOpenSmartSourceV330(){
+    qfSmartStatusShowV330.call(this);
+    return true;
+}
+
+function getBuiltInCommentHtmlV21(){
+    return qfModuleFnV38.call(this,"review_local_ui","getBuiltInCommentHtmlV21").call(this);
+}
+
+/* ============================================================
+ * v2.1 CLEAN：搜索直连 + 段评渐进加载
+ * ============================================================ */
+
+/* ---------- 发现页搜索状态 ----------
+ * alpha10.9.1：搜索状态与“源变量”彻底隔离。
+ * 源变量专供同人共享 Token；搜索词只存 source KV。
+ */
+var QF_V21_SEARCH_STATE_KEY="qf_v21_search_state";
+function qfV21SearchState(){
+    var s=null,d={},raw="",legacy="",legacyObj=null;
+    try{s=this&&this.source?this.source:(typeof source!=="undefined"?source:null);}catch(e0){
+--- hit 4 at 234137 ---
+xt=qfAuthorSayExtractV341(String(raw))||"";}catch(_ex){text="";}}
+    try{if(_ac&&qfCallableV13(_ac,"putMemory"))_ac.putMemory(_ak,JSON.stringify({ts:now,text:text,source:'web-fallback'}));}catch(_as){}
+    return text;
+}
+/* ---------- 本章说：真实章评两条，目标图样式 ---------- */
+
+
+/* ============================================================
+ * v3.0.0-alpha39：功能模块懒入口
+ * 角色卡 / 书友圈不再常驻解析；只有用户真正点击时才解包对应模块。
+ * ============================================================ */
+function qfOpenQidianCircle(){
+    var j=qfJava(this);if(!j)return true;
+    try{j.toast("正在打开书友圈…");}catch(_t){}
+    try{
+        var p=QF_OfficialDomainService.page(this,"circle",[qfBook(this)]),model=p&&p.model,view=p&&p.view;
+        if(p&&p.ok&&model&&model.ok&&view&&view.ok&&view.html){j.showBrowser(String(view.target||"https://local.qidian.circle.api/"+encodeURIComponent(String(model.bookId||""))),String(view.html),String(view.pre||""),JSON.stringify(view.config||{}));return true;}
+        if(model&&!model.ok&&model.message){try{j.longToast("书友圈："+String(model.message));}catch(_m){}}
+    }catch(e){try{QF_Diagnostic.warn(this,"official-domain","circle","open",e);}catch(_d){}}
+    return qfOfficialDispatchV400.call(this,"circleOpen",[]).value;
+}
+function qfOpenQidianCircleV2961(){return qfOpenQidianCircle.call(this);}
+function qfOpenRoleCard(j,src,bookObj,chapterObj){
+    if(!j)return;
+    try{
+        var p=QF_OfficialDomainService.page(this,"role",[bookObj,chapterObj]),model=p&&p.model,view=p&&p.view;
+        if(p&&p.ok&&model){
+            if(!model.ok||!Array.isArray(model.roles)||!model.roles.length){try{j.longToast("角色卡："+String(model.message||"该书暂无官方角色卡"));}catch(_tm){}return;}
+            if(view&&view.ok&&view.html){
+                var pre="window.java=java;"+qfV18BottomAnchorPre();
+                j.showBrowser(String(view.target||("https://h5.if.qidian.com/new/role/share/?bookId="+encodeURIComponent(String(model.bookId||"")))),String(view.html),pre,JSON.stringify(view.config||{}));return true;
+            }
+        }
+    }catch(e){try{QF_Diagnostic.warn(this,"official-domain","role","open",e);}catch(_d){}}
+    return qfOfficialDispatchV400.call(this,"roleOpen",[j,src,bookObj,chapterObj]).value;
+}
+function qfOpenRoleCardV20(j,src,bookObj,chapterObj){return qfOpenRoleCard.call(this,j,src,bookObj,chapterObj);}
+/* beta7.3：详情页按钮使用固定、短 ABI，避免复杂 onclick 表达式和相邻 Span 串点击。 */
+function qfBookInfoOpenCircleV373(){
+    return qfOpenQidianCircleV2961.call(this);
+}
+function qfBookInfoOpenRoleV373(){
+    var j=qfJava(this),s=qfSource(this),b=qfBook(this),c=qfChapter(this);
+    qfOpenRoleCardV20.call(this,j,s,b,c);
+    return true;
+}
+function qfBookInfoOpenSmartSourceV330(){
+    qfSmartStatusShowV330.call(this);
+    return true;
+}
+
+function getBuiltInCommentHtmlV21(){
+    return qfModuleFnV38.call(this,"review_local_ui","getBuiltInCommentHtmlV21").call(this);
+}
+
+/* ============================================================
+ * v2.1 CLEAN：搜索直连 + 段评渐进加载
+ * ============================================================ */
+
+/* ---------- 发现页搜索状态 ----------
+ * alpha10.9.1：搜索状态与“源变量”彻底隔离。
+ * 源变量专供同人共享 Token；搜索词只存 source KV。
+ */
+var QF_V21_SEARCH_STATE_KEY="qf_v21_search_state";
+function qfV21SearchState(){
+    var s=null,d={},raw="",legacy="",legacyObj=null;
+    try{s=this&&this.source?this.source:(typeof source!=="undefined"?source:null);}catch(e0){}
+    try{raw=String((s&&s.get?s.get(QF_V21_SEARCH_STATE_KEY):"")||"");}catch(e1){raw="";}
+    if(raw){
+        try{d=JSON.parse(raw)||{};}catch(e2){d={qfV21Search:raw};}
+    }
+    if(!d||typeof d!=="object")d={};
+    if(d.qfV21Search==null){
+        try{legacy=String((s&&s.getVariable?s.getVariable():"")||"").trim();}catch(e3){legacy="";}
+        if(legacy&&legacy.charAt(0)==="{"){
+            try{legacyObj=JSON.parse(legacy);}catch(e4){legacyObj=null;}
+            if(legacyObj&&typeof legacyObj==="object"&&Object.prototype.hasOwnProperty.call(legacyObj,"qfV21Search")){
+                d.qfV21Search=legacyObj.qfV21Search==null?"":String(legacyObj.qfV21Search);
+                try{if(s&&s.put)s.put(QF_V21_SEARCH_STATE_KEY,JSON.stringify(d));}catch(e5){}
+                try{
+                    var ks=Object.keys(legacyObj);
+                    if(ks.length===1&&ks[0]==="qfV21Search"&&s&&s.setVariable)s.setVariable("");
+                }catch(e6){}
+            }
+        }
+    }
+    return d;
+}
+function qfV21SetSearch(v){
+    va
+--- hit 5 at 242240 ---
+:false,chapterLocal:false,nativeDecorate:true,summaryForHot:false,chapterCardByTotal:true}}
+};
+/* alpha83 兼容别名；旧入口仍读取同一个 Comment Spec。 */
+var QF_COMMENT83=QF_COMMENT84;
+function qfCommentSpecV83(provider){return QF_COMMENT83[String(provider||"")]||null;}
+function qfCommentCapabilityV83(provider,cap){
+    var sp=qfCommentSpecV83(provider),c=sp&&sp.capabilities?sp.capabilities[String(cap||"")]:null;
+    if(!c)return null;
+    if(c===true)return {local:true};
+    if(typeof c==="string")return {entry:c};
+    return c;
+}
+function qfCommentPolicyV83(provider,key,def){
+    try{var sp=qfCommentSpecV83(provider),p=sp&&sp.policy;if(p&&p[key]!==undefined&&p[key]!==null)return p[key];}catch(_e){}
+    return def;
+}
+function qfCommentIsServerV83(provider){
+    var sp=qfCommentSpecV83(provider);
+    return !!(sp&&sp.mode==="server"&&String(sp.bindProvider||provider)===String(provider||""));
+}
+function qfCommentCapFnV83(provider,cap){
+    var sp=qfCommentSpecV83(provider),c=qfCommentCapabilityV83(provider,cap);
+    if(!sp||!c||c.local||!c.entry)return null;
+    if(!sp._capFnsV83)sp._capFnsV83={};
+    if(typeof sp._capFnsV83[cap]==="function")return sp._capFnsV83[cap];
+    var mod=String(c.module||sp.module||"");
+    if(!mod)return null;
+    var fn=qfModuleFnV38.call(this,mod,String(c.entry||""));
+    if(typeof fn!=="function")return null;
+    sp._capFnsV83[cap]=fn;
+    return fn;
+}
+function qfCommentCallV83(provider,cap,args){
+    var c=qfCommentCapabilityV83(provider,cap),fn=qfCommentCapFnV83.call(this,provider,cap);
+    if(!c||!fn)return null;
+    var a=Array.isArray(args)?args.slice():[];
+    if(c.passProvider)a.unshift(String(provider||""));
+    return qfDiagInvokeV85(this,"comment",String(provider||""),String(cap||""),fn,a);
+}
+/* alpha84.1：副作用型 capability（如 open）必须区分“已处理”与返回值。
+ * showBrowser/startBrowser 一类入口成功后通常返回 undefined；
+ * 不能把 undefined 当成未处理后继续执行本地 fallback，否则一次点击会叠两层段评。 */
+function qfCommentDispatchV841(provider,cap,args){
+    var c=qfCommentCapabilityV83(provider,cap),fn=qfCommentCapFnV83.call(this,provider,cap);
+    if(!c||!fn)return {handled:false,value:null};
+    var a=Array.isArray(args)?args.slice():[];
+    if(c.passProvider)a.unshift(String(provider||""));
+    var v=qfDiagInvokeV85(this,"comment",String(provider||""),String(cap||""),fn,a);
+    try{qfDiagFlushV85.call(this,{kind:"comment",provider:String(provider||""),cap:String(cap||"")});}catch(_df){}
+    return {handled:true,value:v};
+}
+
+function qfCommentPrefV315(){
+    return qfSetting.call(this,"段评来源","本地")==="服务器"?"服务器":"本地";
+}
+/* beta22：服务器评论自动路由。
+ * 限免正文源（情无/神魔/晴天）仍严格跟随各自服务器；
+ * 七猫/书旗/QQ浏览器/得间/酷我及所有兜底/官方正文在“自动”时统一使用晴天服务器评论。
+ * 用户若在“服务器源”中手动固定某一服务器，则始终尊重手动选择。 */
+function qfCommentServerPickV313(actual){
+    if(qfCommentPrefV315.call(this)!=="服务器")return "";
+    actual=String(actual||"");
+    var pick=String(qfSetting.call(this,"服务器评论源","自动")||"自动");
+    if(["情无","神魔","晴天"].indexOf(pick)>=0)return pick;
+    if(qfCommentIsServerV83(actual))return actual;
+    return "晴天";
+}
+
+/* alpha14 · server-comment route JS hot state.
+ * 持久 route 仍用于跨执行环境；同一 JS 引擎中的连续点击/重绘先命中这里，避免 source JSON 读取。 */
+var QF_COMMENT_ROUTE470={},QF_COMMENT_ROUTE470_ORDER=[],QF_COMMENT_ROUTE470_MAX=12;
+function qfCommentRouteL1PutV470(key,o){
+    key=String(key||'');if(!key||!o)return;
+    QF_COMMENT_ROUTE470[key]=o;var i=QF_COMMENT_ROUTE470_ORDER.indexOf(key);if(i>=0)QF_COMMENT_ROUTE470_ORDER.splice(i,1);QF_COMMENT_ROUTE470_ORDER.push(key);
+    while(QF_COMMENT_ROUTE470_ORDER.length>QF_COMMENT_ROUTE470_MAX){var old=QF_COMMENT_ROUTE470_ORDER.shift();if(old!==key)delete QF_COMMENT_ROUTE470[old];}
+}
+function qfCommentRouteL1GetV470(key){
+    key=String(key||'');var o=QF_COMMENT_ROUTE470[key];if(!o)return null;
+    if(Date.now()-Number(o.ts||0)>30*60*1000){delete QF_COMMENT_ROUTE470[key];return null;}
+    return o;
+}
+function qfCommentRouteSetV315(bid,cid,provider,plan){
+    /* alpha13：若正文入口已经给出 Capability Plan，评论路由不再重新读取“段评来源/服务器评论源”。
+       默认本地模式下 showCmt 根本不会读取服务器 route，因此不再为每章 parse/write 32项持久 JSON。
+       服务器模式仍完整保存 actualProvider，保证点击气泡后的跨执行环境路由不变。 */
+    var actual=String(provider||""),server="",hasPlan=!!(plan&&typeof plan==="object"&&plan.commentMode);
+    if(hasPlan){
+        if(String(plan.commentMode||"本地")!=="服务器")return "";
+        var pick=String(plan.serverPick||"自动");
+        if(["情无","神魔","晴天"].indexOf(pick)>=0)server=pick;
+        else if(qfCommentIsServerV83(actual))server=a
+--- hit 6 at 255623 ---
+if.qidian.com/new/chapterreview/?"+
+            "qfSheet=1"+
+            "&bookid="+encodeURIComponent(String(bid))+
+            "&chapterid="+encodeURIComponent(String(cid))+
+            "&paragraphid="+encodeURIComponent(String(p))+
+            "&segmentid="+encodeURIComponent(String(sg))+
+            "&qfcount="+encodeURIComponent(String(expected))+
+            "&qfmode="+encodeURIComponent(tp)+
+            "&_qfctx="+encodeURIComponent(ctxId);
+
+        var ctxJson="{}";
+        try{
+            ctxJson=JSON.stringify({
+                bid:String(bid),
+                cid:String(cid),
+                para:p,
+                segment:sg,
+                type:tp,
+                expected:expected,
+                ctxId:ctxId
+            });
+        }catch(e4){ctxJson="{}";}
+
+        var pre=
+            "window.java=java;"+
+            "window.__QF_COMMENT_CTX__="+ctxJson+";"+
+            "window.qdBid='"+q(bid)+"';"+
+            "window.qdCid='"+q(cid)+"';"+
+            "window.qdPara='"+q(p)+"';"+
+            "window.qdSeg='"+q(sg)+"';"+
+            "window.qdExpectedCount='"+q(expected)+"';"+
+            "window.qdCmtType='"+q(tp)+"';"+
+            "window.qdCsrf='"+q(csrf)+"';"+
+            "window.qdCookie='"+q(qdCookie)+"';"+
+            "window.qdQuote='"+q(quote)+"';"+
+            "window.qdAuthorSay='"+q(authorSay)+"';"+
+            "window.qdAuthorName='"+q(authorName)+"';"+
+            "window.qdAuthorAvatar='"+q(authorAvatar)+"';"+
+            "window.qdAuthorReviewId='"+q(authorReviewId)+"';"+
+            "window.qdAuthorParagraphId='"+q(authorParagraphId)+"';"+
+            "window.qdAuthorReplies='"+q(authorReplyCount)+"';"+
+            "window.qdAuthorReplyList='"+q(JSON.stringify(authorReplyList||[]))+"';"+
+            qfV18BottomAnchorPre();
+
+        j.showBrowser(
+            url,
+            qfCommentHtmlV2987(),
+            pre,
+            JSON.stringify(qfV18CommentConfig.call(this))
+        );
+    }catch(e5){
+        try{j.longToast("评论页打开失败："+e5);}catch(_e){}
+    }
+}
+/* ============================================================
+ * v2.2 CLEAN：付费章节段评 / 本章说专项修复
+ *
+ * 核心差异：
+ * - 免费章：m.qidian reviewSummary 通常能返回正文段落。
+ * - 付费章：未解锁时 reviewSummary 经常只剩 ParagraphId=-1 的章名统计。
+ * - 成熟起点源使用 官方reviewSummary，可拿付费章正文各段 ParagraphId。
+ *
+ * 因此：
+ * 1. 付费 Provider 正文 -> 官方reviewSummary 优先；
+ * 2. 免费起点正文 -> reviewSummary 优先；
+ * 3. 官方章评 改成成熟源同款直接 ajax；
+ * 4. 正文来源和起点评论来源彻底解耦。
+ * ============================================================ */
+
+
+
+
+
+
+
+
+
+/* ============================================================
+ * v3.5 beta18 · 正文评论附加数据并发预取
+ * - 只并发“起点本地 reviewSummary + getchapterendreview”两条彼此独立的请求；
+ * - 不并发/改写正文 Provider 请求，不改变评论来源；
+ * - 任一请求失败都不写失败缓存，后续原函数自动按旧链路重试/兜底；
+ * - 预取只发生在正文确实需要本地气泡/热评/本章说时。
+ * ============================================================ */
+function qdParseReviewSummaryV350(raw){return QF_ReviewNormalizer.summary(raw);}
+function qdParseChapterPackV350(root){
+    root=root||{};
+    var x=(root&&(root.Data||root.data))||{};
+    var chapter=x.ChapterDataList||x.chapterDataList||[],segments=x.SegmentDataList||x.segmentDataList||[];
+    if(!Array.isArray(chapter))chapter=[];if(!Array.isArray(segments))segments=[];
+    var rows=[],seen={};
+    function key(r){r=r||{};var id=String(r.ReviewId||r.reviewId||r.CommentId||r.commentId||r.Id||r.id||r.PostId||r.postId||'');return id?'id:'+id:'sig:'+String(r.UserName||r.userName||r.NickName||r.nickName||'')+'|'+String(r.Content||r.content||'')+'|'+String(r.CreateTime||r.createTime||'');}
+    function add(r,q){if(!r||typeof r!=='object')return;try{if(r.Category!=null&&Number(r.Category)===0)return;if(r.category!=null&&Number(r.category)===0)return;}catch(_c){}var k=key(r);if(k&&seen[k])return;if(k)seen[k]=1;if(q&&!r.RefferContent&&!r.refferContent&&!r.ReferContent&&!r.referContent){try{r.RefferContent=String(q||'');}catch(_q){}}rows.push(r);}
+    for(var ci=0;ci<chapter.length;ci++)add(chapter[ci],'');
+    for(var si=0;si<segments.length;si++){var sg=segments[si]||{},q=String(sg.QuoteContent||sg.quoteContent||sg.RefferContent||sg.refferContent||''),dl=sg.DataList||sg.dataList||sg.List||sg.list||[];if(!Array.isArray(dl))dl=[];for(var di=0;di<dl.length;di++)add(dl[di],q);}
+    var ct=Number(x.ChapterReviewTotalCount||x.chapterReviewTotalCount||x.ChapterReviewCount||x.chapterReviewCount||0)||0;
+    var st=Number(x.SegmentReviewTotalCount||x.segmentReviewTot
+--- hit 7 at 335665 ---
+
+        try{host=String(list[0].host||"");}catch(e3){}
+    }
+
+    var base="";
+    if(host){
+        base=/^https?:\/\//i.test(host)?qfSmNormBaseV30(host):qfSmNormBaseV30("https://"+host);
+    }
+    if(!base)base=cached||auth||qfSmBootV30();
+
+    qfSmMirrorV30.call(this,base);
+    try{
+        this.source.put("qf_sm_base",base);
+        this.source.put("qf_sm_base_ts",String(Date.now()));
+    }catch(e4){}
+    return base;
+}
+function qfSmHostV30(u){
+    return String(u||"").replace(/^[a-z]+:\/\//i,"").split("/")[0];
+}
+function qfSmBrowserUrlV30(path){
+    path=String(path||"/user");
+    if(path.charAt(0)!="/")path="/"+path;
+    var web=qfSmChosenBaseV30.call(this,false);
+    var auth=qfSmAuthBaseV30.call(this);
+    var s=qfSmSessV30.call(this);
+    var wh=qfSmHostV30(web),ah=qfSmHostV30(auth);
+
+    if(s&&wh&&ah&&wh!==ah){
+        try{
+            var r=JSON.parse(String(this.java.ajax(
+                auth+"/sso/issue?json=1&to="+encodeURIComponent(wh)+
+                "&_s="+encodeURIComponent(s)+
+                "&r="+encodeURIComponent(path),12000
+            )||""));
+            if(r&&r.code===0&&r.url)return String(r.url);
+        }catch(e0){}
+    }
+
+    if(s){
+        return web+path+(path.indexOf("?")>=0?"&":"?")+
+            "_s="+encodeURIComponent(s)+
+            "&dev="+encodeURIComponent(qfSmDeviceIdV30.call(this));
+    }
+    return web+path;
+}
+function qfQtNormBaseV328(v){
+    var x=String(v||'').trim();
+    if(!x)return '';
+    if(!/^https?:\/\//i.test(x))x='https://'+x;
+    return x.replace(/[?#].*$/g,'').replace(/\/+$/g,'');
+}
+function qfQtBaseV328(){
+    var d='https://sb.shazi.tk';
+    try{var x=qfQtNormBaseV328(this.source.get('qf_qt_base')||'');if(x)return x;}catch(e0){}
+    return d;
+}
+function qfQtDeviceV328(){
+    /* alpha31：不要再经 qfRuntimeJavaV13(showBrowser+ajax 双能力门槛)取 java。
+       晴天正文只要求 ajax/androidId/deviceID；部分正文执行环境没有 showBrowser，
+       alpha30 会因此把 java 判空，最终所有 /catalog /chapter 请求静默返回空。 */
+    var j=qfJava(this),d='';
+    if(!j)return '';
+    try{if(typeof j.androidId==='function')d=String(j.androidId()||'');}catch(e0){}
+    if(!d)try{if(typeof j.deviceID==='function')d=String(j.deviceID()||'');}catch(e1){}
+    return d;
+}
+
+function qfQtCredV328(){
+    var key='',dt='';
+    try{key=String(this.source.get('qf_qt_key')||'');dt=String(this.source.get('qf_qt_dttoken')||'');}catch(e0){}
+    return {key:key,dttoken:dt};
+}
+function qfQtRequestV328(path,method,body,timeout){
+    /* v3.5 beta21：timeout 从第一次 ajax 就进入 options。
+       旧链首请求没有 timeout，只有“返回空”后第二次请求才带超时；服务端卡住时可能先被默认超时拖很久。 */
+    method=String(method||'GET').toUpperCase();body=body||{};
+    var j=qfJava(this);if(!j)return '';
+    var b=qfQtBaseV328.call(this),u=/^https?:\/\//i.test(String(path||''))?String(path):b+String(path||'');
+    var c=qfQtCredV328.call(this),dev=qfQtDeviceV328.call(this);
+    u+=(u.indexOf('?')>=0?'&':'?')+'key='+String(c.key||'')+'&device='+String(dev||'')+'&dttoken='+String(c.dttoken||'');
+    var to=Math.max(2500,Number(timeout)||12000),opt={method:method,body:JSON.stringify(body||{}),timeout:to};
+    var spec=u+','+JSON.stringify(opt),raw='';
+    try{if(typeof j.ajax==='function')raw=String(j.ajax(spec)||'');}catch(e0){raw='';}
+    if(!raw&&method==='GET'){
+        try{
+            if(typeof j.get==='function'){
+                var r=j.get(u,{},to);
+                if(r){
+                    if(typeof r.body==='function')raw=String(r.body()||'');
+                    else if(r.body!==undefined)raw=String(r.body||'');
+                    else raw=String(r||'');
+                }
+            }
+        }catch(e2){raw='';}
+    }
+    return raw;
+}
+function qfQtBrowserUrlV328(path){
+    var b=qfQtBaseV328.call(this),u=/^https?:\/\//i.test(String(path||''))?String(path):b+String(path||'');
+    var c=qfQtCredV328.call(this),dev=qfQtDeviceV328.call(this),sep=u.indexOf('?')>=0?'&':'?';
+    return u+sep+'key='+encodeURIComponent(c.key||'')+'&device='+encodeURIComponent(dev||'')+'&dttoken='+encodeURIComponent(c.dttoken||'');
+}
+function qfQtNativeMetaV328(bid,cid){return qfServerChapterMetaGetV316(this,'晴天',String(bid),String(cid));}
+/* ============================================================
+ * v3.0.0-alpha44：本地模块化运行时（评论算法细拆）
+ *
+ * 参考大型聚合源的“统一路由 + 按来源分发 + 只执行当前分支”思路，
+ * 但保持本书源全部核心解析代码本地，不依赖新增中转服务器。
+ *
+ * 这次先处理每章都会解析的 ruleContent：
+ *   core/router  常驻：只负责识别章节、来源类别、功能开关和调度；
+ *   official     懒加载：仅免费起点正文；
+ *   match  
+--- hit 8 at 335746 ---
+   if(host){
+        base=/^https?:\/\//i.test(host)?qfSmNormBaseV30(host):qfSmNormBaseV30("https://"+host);
+    }
+    if(!base)base=cached||auth||qfSmBootV30();
+
+    qfSmMirrorV30.call(this,base);
+    try{
+        this.source.put("qf_sm_base",base);
+        this.source.put("qf_sm_base_ts",String(Date.now()));
+    }catch(e4){}
+    return base;
+}
+function qfSmHostV30(u){
+    return String(u||"").replace(/^[a-z]+:\/\//i,"").split("/")[0];
+}
+function qfSmBrowserUrlV30(path){
+    path=String(path||"/user");
+    if(path.charAt(0)!="/")path="/"+path;
+    var web=qfSmChosenBaseV30.call(this,false);
+    var auth=qfSmAuthBaseV30.call(this);
+    var s=qfSmSessV30.call(this);
+    var wh=qfSmHostV30(web),ah=qfSmHostV30(auth);
+
+    if(s&&wh&&ah&&wh!==ah){
+        try{
+            var r=JSON.parse(String(this.java.ajax(
+                auth+"/sso/issue?json=1&to="+encodeURIComponent(wh)+
+                "&_s="+encodeURIComponent(s)+
+                "&r="+encodeURIComponent(path),12000
+            )||""));
+            if(r&&r.code===0&&r.url)return String(r.url);
+        }catch(e0){}
+    }
+
+    if(s){
+        return web+path+(path.indexOf("?")>=0?"&":"?")+
+            "_s="+encodeURIComponent(s)+
+            "&dev="+encodeURIComponent(qfSmDeviceIdV30.call(this));
+    }
+    return web+path;
+}
+function qfQtNormBaseV328(v){
+    var x=String(v||'').trim();
+    if(!x)return '';
+    if(!/^https?:\/\//i.test(x))x='https://'+x;
+    return x.replace(/[?#].*$/g,'').replace(/\/+$/g,'');
+}
+function qfQtBaseV328(){
+    var d='https://sb.shazi.tk';
+    try{var x=qfQtNormBaseV328(this.source.get('qf_qt_base')||'');if(x)return x;}catch(e0){}
+    return d;
+}
+function qfQtDeviceV328(){
+    /* alpha31：不要再经 qfRuntimeJavaV13(showBrowser+ajax 双能力门槛)取 java。
+       晴天正文只要求 ajax/androidId/deviceID；部分正文执行环境没有 showBrowser，
+       alpha30 会因此把 java 判空，最终所有 /catalog /chapter 请求静默返回空。 */
+    var j=qfJava(this),d='';
+    if(!j)return '';
+    try{if(typeof j.androidId==='function')d=String(j.androidId()||'');}catch(e0){}
+    if(!d)try{if(typeof j.deviceID==='function')d=String(j.deviceID()||'');}catch(e1){}
+    return d;
+}
+
+function qfQtCredV328(){
+    var key='',dt='';
+    try{key=String(this.source.get('qf_qt_key')||'');dt=String(this.source.get('qf_qt_dttoken')||'');}catch(e0){}
+    return {key:key,dttoken:dt};
+}
+function qfQtRequestV328(path,method,body,timeout){
+    /* v3.5 beta21：timeout 从第一次 ajax 就进入 options。
+       旧链首请求没有 timeout，只有“返回空”后第二次请求才带超时；服务端卡住时可能先被默认超时拖很久。 */
+    method=String(method||'GET').toUpperCase();body=body||{};
+    var j=qfJava(this);if(!j)return '';
+    var b=qfQtBaseV328.call(this),u=/^https?:\/\//i.test(String(path||''))?String(path):b+String(path||'');
+    var c=qfQtCredV328.call(this),dev=qfQtDeviceV328.call(this);
+    u+=(u.indexOf('?')>=0?'&':'?')+'key='+String(c.key||'')+'&device='+String(dev||'')+'&dttoken='+String(c.dttoken||'');
+    var to=Math.max(2500,Number(timeout)||12000),opt={method:method,body:JSON.stringify(body||{}),timeout:to};
+    var spec=u+','+JSON.stringify(opt),raw='';
+    try{if(typeof j.ajax==='function')raw=String(j.ajax(spec)||'');}catch(e0){raw='';}
+    if(!raw&&method==='GET'){
+        try{
+            if(typeof j.get==='function'){
+                var r=j.get(u,{},to);
+                if(r){
+                    if(typeof r.body==='function')raw=String(r.body()||'');
+                    else if(r.body!==undefined)raw=String(r.body||'');
+                    else raw=String(r||'');
+                }
+            }
+        }catch(e2){raw='';}
+    }
+    return raw;
+}
+function qfQtBrowserUrlV328(path){
+    var b=qfQtBaseV328.call(this),u=/^https?:\/\//i.test(String(path||''))?String(path):b+String(path||'');
+    var c=qfQtCredV328.call(this),dev=qfQtDeviceV328.call(this),sep=u.indexOf('?')>=0?'&':'?';
+    return u+sep+'key='+encodeURIComponent(c.key||'')+'&device='+encodeURIComponent(dev||'')+'&dttoken='+encodeURIComponent(c.dttoken||'');
+}
+function qfQtNativeMetaV328(bid,cid){return qfServerChapterMetaGetV316(this,'晴天',String(bid),String(cid));}
+/* ============================================================
+ * v3.0.0-alpha44：本地模块化运行时（评论算法细拆）
+ *
+ * 参考大型聚合源的“统一路由 + 按来源分发 + 只执行当前分支”思路，
+ * 但保持本书源全部核心解析代码本地，不依赖新增中转服务器。
+ *
+ * 这次先处理每章都会解析的 ruleContent：
+ *   core/router  常驻：只负责识别章节、来源类别、功能开关和调度；
+ *   official     懒加载：仅免费起点正文；
+ *   match        懒加载：仅需要公共书籍/章节匹配的 Provider；
+ *   fallback     懒加载：仅猫眼/得奇/69书吧/速读谷/万相；
+ *   
+
+===== __QF_COMMENT_CTX__ =====
+--- hit 1 at 254679 ---
+w.qidian.com")||
+                    ckObj.getCookie("https://m.qidian.com")||
+                    ""
+                );
+            }
+        }catch(e31){qdCookie="";}
+        if(!csrf&&qdCookie){
+            try{
+                var cm=qdCookie.match(/(?:^|;\s*)_csrfToken=([^;]+)/);
+                if(cm&&cm[1])csrf=String(cm[1]);
+            }catch(e32){}
+        }
+
+        function q(v){
+            return String(v==null?"":v)
+                .replace(/\\/g,"\\\\")
+                .replace(/'/g,"\\'")
+                .replace(/\r/g,"\\r")
+                .replace(/\n/g,"\\n");
+        }
+
+        var ctxId=String(bid)+"-"+String(cid)+"-"+String(p)+"-"+String(sg)+"-"+String(Date.now());
+
+        /* v2.9.37：自定义评论页挂到起点当前 chapterreview H5 同源环境。
+         * 这样“查看更多回复”可以在完全隐藏的 iframe 中加载真正的官方楼中楼页面，
+         * 父页面直接读取同源 DOM/运行时状态；iframe 不具备 top-navigation 权限，
+         * 因此不会再把用户从我们的段评 BottomSheet 跳到起点网页。 */
+        var url="https://h5.if.qidian.com/new/chapterreview/?"+
+            "qfSheet=1"+
+            "&bookid="+encodeURIComponent(String(bid))+
+            "&chapterid="+encodeURIComponent(String(cid))+
+            "&paragraphid="+encodeURIComponent(String(p))+
+            "&segmentid="+encodeURIComponent(String(sg))+
+            "&qfcount="+encodeURIComponent(String(expected))+
+            "&qfmode="+encodeURIComponent(tp)+
+            "&_qfctx="+encodeURIComponent(ctxId);
+
+        var ctxJson="{}";
+        try{
+            ctxJson=JSON.stringify({
+                bid:String(bid),
+                cid:String(cid),
+                para:p,
+                segment:sg,
+                type:tp,
+                expected:expected,
+                ctxId:ctxId
+            });
+        }catch(e4){ctxJson="{}";}
+
+        var pre=
+            "window.java=java;"+
+            "window.__QF_COMMENT_CTX__="+ctxJson+";"+
+            "window.qdBid='"+q(bid)+"';"+
+            "window.qdCid='"+q(cid)+"';"+
+            "window.qdPara='"+q(p)+"';"+
+            "window.qdSeg='"+q(sg)+"';"+
+            "window.qdExpectedCount='"+q(expected)+"';"+
+            "window.qdCmtType='"+q(tp)+"';"+
+            "window.qdCsrf='"+q(csrf)+"';"+
+            "window.qdCookie='"+q(qdCookie)+"';"+
+            "window.qdQuote='"+q(quote)+"';"+
+            "window.qdAuthorSay='"+q(authorSay)+"';"+
+            "window.qdAuthorName='"+q(authorName)+"';"+
+            "window.qdAuthorAvatar='"+q(authorAvatar)+"';"+
+            "window.qdAuthorReviewId='"+q(authorReviewId)+"';"+
+            "window.qdAuthorParagraphId='"+q(authorParagraphId)+"';"+
+            "window.qdAuthorReplies='"+q(authorReplyCount)+"';"+
+            "window.qdAuthorReplyList='"+q(JSON.stringify(authorReplyList||[]))+"';"+
+            qfV18BottomAnchorPre();
+
+        j.showBrowser(
+            url,
+            qfCommentHtmlV2987(),
+            pre,
+            JSON.stringify(qfV18CommentConfig.call(this))
+        );
+    }catch(e5){
+        try{j.longToast("评论页打开失败："+e5);}catch(_e){}
+    }
+}
+/* ============================================================
+ * v2.2 CLEAN：付费章节段评 / 本章说专项修复
+ *
+ * 核心差异：
+ * - 免费章：m.qidian reviewSummary 通常能返回正文段落。
+ * - 付费章：未解锁时 reviewSummary 经常只剩 ParagraphId=-1 的章名统计。
+ * - 成熟起点源使用 官方reviewSummary，可拿付费章正文各段 ParagraphId。
+ *
+ * 因此：
+ * 1. 付费 Provider 正文 -> 官方reviewSummary 优先；
+ * 2. 免费起点正文 -> reviewSummary 优先；
+ * 3. 官方章评 改成成熟源同款直接 ajax；
+ * 4. 正文来源和起点评论来源彻底解耦。
+ * ============================================================ */
+
+
+
+
+
+
+
+
+
+/* ============================================================
+ * v3.5 beta18 · 正文评论附加数据并发预取
+ * - 只并发“起点本地 reviewSummary + getchapterendreview”两条彼此独立的请求；
+ * - 不并发/改写正文 Provider 请求，不改变评论来源；
+ * - 任一请求失败都不写失败缓存，后续原函数自动按旧链路重试/兜底；
+ * - 预取只发生在正文确实需要本地气泡/热评/本章说时。
+ * ============================================================ */
+function qdParseReviewSummaryV350(raw){return QF_ReviewNormalizer.summary(raw);}
+function qdParseChapterPackV350(root){
+    root=root||{};
+    var x=(root&&(root.Data||root.data))||{};
+    var chapter=x.ChapterDataList||x.chapterDataList||[],segments=x.SegmentDataList||x.segmentDataList||[];
+    if(!Array.isArray(chapter))chapter=[];if(!Array.isArray(segments))segments=[];
+    var rows=[],seen={};
+    function key(r){r=r||{};var id=String(r.ReviewId||r.reviewId||r.CommentId||r.commentId||r.Id||r.id||r.PostId||r.postId||'');return id?'id:'+id:'sig:'+String(r.UserName||r.userName||r.NickName||r.nickName||'')+'|'+String(r.Content
+
+===== review_local_ui =====
+--- hit 1 at 8815 ---
+odule。
+ *
+ * 不改 Provider 路由/顺序/学习状态，不改评论算法，不改 Official Domains，
+ * 不删模块，不改 Egg/Circle/Review 网络。
+ */
+/* v4.2.0-alpha8.1.1：Circle Canonical Compatibility Recovery。
+ * alpha8 回归根因：Canonical 化重建 tabs/totals 容器时裁掉旧扩展键，
+ * 破坏动态子分类及帖子元数据读取。
+ * 本版将 Circle 数据层恢复到 alpha7.1.1 已证明 ABI：
+ * 保留完整 result，只增量添加 schema/contractVersion 与核心缺省字段。
+ * Egg Canonical + alpha8.1 Egg Health 语义保持。
+ */
+/* v4.2.0-alpha8.1：Egg pageinfo Impact Semantics。
+ * alpha8 真机证据：
+ * pageinfo -280015，但 safegetcontent-blocks HIT / images=1 / OUTPUT images=1。
+ * 本版只调整 OfficialSeverity：仅在近期 EggReport 已有成功输出时，
+ * 将 midpage/pageinfo -280015 从 ACTIONABLE 降为 OPTIONAL。
+ * Egg 抓取、fallback、Circle、四域 Contract 与所有业务请求均不改。
+ */
+/* v4.2.0-alpha8：Official Domains Batch2。
+ * 基线：alpha7.1.1 真机通过。
+ * 本版仅收敛 Circle + Egg Canonical Contract。
+ * 抓取算法、分类逻辑、书友圈 HTML、彩蛋 APP pageinfo 与渲染全部冻结。
+ */
+/* v4.2.0-alpha7.1.1：Copyright getsimple time-field hotfix。
+ * 根因：官方 v2/getsimple 使用 ChapterData.time，
+ * alpha7.1 的 earliestChapterTime 漏识别 time/Time。
+ * 本版只补这两个字段；角色卡88%及其它业务全部保持。
+ */
+/* v4.2.0-alpha7.1：Official Domains Batch1 UX Fix。
+ * Copyright：补强官方日期来源；getsimple 最早章节时间仅作为“首发”兜底。
+ * Role：BottomSheet 80% → 88%，布局比例/圆角/交互不改。
+ */
+/* v4.2.0-alpha7：Official Domains Batch1，Copyright + Role Canonical Contract。 */
+/* v4.2.0-alpha6.1：Review Health Single-Summary Semantics。
+ * 基线：alpha6。
+ * 真机证据：Official rawErr=0 / impactErr=0 / recentError=0，
+ * 仅 summary:www 一个镜像处于约0.7s尾部冷却，却被旧 health 误报成“评论核心接口冷却 1”。
+ *
+ * 本版仅修 Runtime Governance 的 Review Health 诊断语义：
+ * - 单个 summary:* 活动冷却 => DEGRADED，不升级全局告警；
+ * - 多个 summary:* 同时冷却且无明确成功镜像 => 仍告警；
+ * - 非 summary Review key 活动冷却 => 仍告警；
+ * - fails>0 但 cooldown=0 仅保留遥测。
+ *
+ * Review 请求、cooldown阈值、fallback、alpha6 Context、Row/Payload/UI 全部不改。
+ */
+/* v4.2.0-alpha6：Review UI Context Canonical。
+ * 基线：alpha5 真机通过。
+ * 单域：review_local_ui。
+ * 统一 paragraph/chapter/author 上下文 metadata；
+ * 请求、分页、Row/Payload、媒体、回复、布局均不改。
+ */
+/* v4.2.0-alpha5：Review UI Payload Canonical。
+ * 基线：alpha4 真机通过。
+ * 单域：review_local_ui。
+ * 统一根评论/楼中楼完全同义的 content/image/audio payload；
+ * frame/replies/replyTo/god/request/layout 均保持各自原逻辑。
+ */
+/* v4.2.0-alpha4：Review UI Row Canonical。
+ * 基线：alpha3 真机通过。
+ * 单域：review_local_ui。
+ * 统一根评论/楼中楼基础字段 id/name/avatar/titles/time/ip/like/floor；
+ * content/replyCount/media/god/replyTo/request/layout 均保持。
+ */
+/* v4.2.0-alpha3：Review UI Canonical Identity Adapter。
+ * 基线：alpha2.1 Recovery 真机通过。
+ * 单域：review_local_ui。
+ * 根评论与楼中楼共享 id/name/avatar/TitleInfoList 身份字段适配；
+ * content/replyCount/media/god/request/layout 均保持原逻辑。
+ */
+/* v4.2.0-alpha2.1 Recovery：Review UI Visual Rollback。
+ * alpha2 真机回归：评论接口请求成功，但 H5 评论渲染进入“评论加载失败”。
+ * alpha1 已真机证明：身份标签、用户名防误识别、根评论、楼中楼正常。
+ *
+ * 本版直接以 alpha1 为代码基线：
+ * - 完整撤销 alpha2 badge visual layer；
+ * - 保留 alpha1 TitleInfoList canonical；
+ * - 保留用户名 exact-match guard；
+ * - 保留 rank / activity / LV level 分类；
+ * - Review Network / Catalog / Provider / Detail 等全部不改。
+ */
+/* v4.2.0-alpha1：Qidian Native Review Identity。
+ * 基线：v4.1.8 Stable（真机通过）。
+ * 单域变化：Review Identity / TitleInfoList。
+ * Catalog / Content / Provider / Review Network / Detail / Official Domains / Proxy 全冻结。
+ */
+/* v4.1.8 Stable Maintenance：Rollback Baseline Dynamic Display。
+ * 基线：v4.1.7 真机通过。
+ * 业务行为变化：0。
+ *
+ * 仅修诊断文本债：
+ * Stable Freeze 已有 manifest.baseline，但活动说明长期硬编码旧回退基线。
+ * 本版活动诊断直接显示 QF_RELEASE_FREEZE.baseline。
+ *
+ * Catalog / Network / Review / Provider / Detail / Official Domains / Proxy / Modules 均不改。
+ */
+/* v4.1.7 Stable Maintenance：Recent Error Severity Alignment。
+ * 基线：v4.1.6 Stable。
+ * 业务请求变化：0。
+ *
+ * 修复诊断不一致：
+ * endpoint summary 已能在 Catalog 成功时把 chapterlist/chapterlist -1004 判为 OPTIONAL，
+ * 但 recent error record 因缺少 endpoint/cap 上下文仍会显示 ACTIONABLE。
+ *
+ * 新 recordLevel 只在强交叉证据下将匿名 app/-1004 降为 OPTIONAL：
+ * 1) official-request；
+ * 2) Catalog 已成功输出；
+ * 3) OfficialSeverity summary actionable=0；
+ * 4) OfficialSeverity summary optional>0；
+ * 5) record 为 app 且 detail/code 包含 -1004。
+ *
+ * 不修改 Official endpoint 分类、网络、fallback、Catalog、Review、Provider。
+ */
+/* v4.1.6 Stable Maintenance：Warm-Probe Revalidation Closeout。
+ * 真机证据（v4.1.5.1）：
+ * - cached=115 / probe=114 / changed；
+ * - changed 后成功触发 dual-simple+web；
+ * - simple0=114 / simple1=115，正确选择 simple1；
+ * - 最终 115章 / 时间115；
+ * - full-refresh 550ms，低于 1500ms 预算。
+ *
+ * 结论：v4.1.5 warm-probe revalidation 修复已真机证明。
+ * 本版不带任何 one-shot 测试钩子，也不带未命中的 WEB-SUPERSET Canary。
+ *
+ * 正式行为：
+ * - unchanged warm probe -> CACHE-PROBE；
+ * - safe delta -> 
+--- hit 2 at 8986 ---
+8 回归根因：Canonical 化重建 tabs/totals 容器时裁掉旧扩展键，
+ * 破坏动态子分类及帖子元数据读取。
+ * 本版将 Circle 数据层恢复到 alpha7.1.1 已证明 ABI：
+ * 保留完整 result，只增量添加 schema/contractVersion 与核心缺省字段。
+ * Egg Canonical + alpha8.1 Egg Health 语义保持。
+ */
+/* v4.2.0-alpha8.1：Egg pageinfo Impact Semantics。
+ * alpha8 真机证据：
+ * pageinfo -280015，但 safegetcontent-blocks HIT / images=1 / OUTPUT images=1。
+ * 本版只调整 OfficialSeverity：仅在近期 EggReport 已有成功输出时，
+ * 将 midpage/pageinfo -280015 从 ACTIONABLE 降为 OPTIONAL。
+ * Egg 抓取、fallback、Circle、四域 Contract 与所有业务请求均不改。
+ */
+/* v4.2.0-alpha8：Official Domains Batch2。
+ * 基线：alpha7.1.1 真机通过。
+ * 本版仅收敛 Circle + Egg Canonical Contract。
+ * 抓取算法、分类逻辑、书友圈 HTML、彩蛋 APP pageinfo 与渲染全部冻结。
+ */
+/* v4.2.0-alpha7.1.1：Copyright getsimple time-field hotfix。
+ * 根因：官方 v2/getsimple 使用 ChapterData.time，
+ * alpha7.1 的 earliestChapterTime 漏识别 time/Time。
+ * 本版只补这两个字段；角色卡88%及其它业务全部保持。
+ */
+/* v4.2.0-alpha7.1：Official Domains Batch1 UX Fix。
+ * Copyright：补强官方日期来源；getsimple 最早章节时间仅作为“首发”兜底。
+ * Role：BottomSheet 80% → 88%，布局比例/圆角/交互不改。
+ */
+/* v4.2.0-alpha7：Official Domains Batch1，Copyright + Role Canonical Contract。 */
+/* v4.2.0-alpha6.1：Review Health Single-Summary Semantics。
+ * 基线：alpha6。
+ * 真机证据：Official rawErr=0 / impactErr=0 / recentError=0，
+ * 仅 summary:www 一个镜像处于约0.7s尾部冷却，却被旧 health 误报成“评论核心接口冷却 1”。
+ *
+ * 本版仅修 Runtime Governance 的 Review Health 诊断语义：
+ * - 单个 summary:* 活动冷却 => DEGRADED，不升级全局告警；
+ * - 多个 summary:* 同时冷却且无明确成功镜像 => 仍告警；
+ * - 非 summary Review key 活动冷却 => 仍告警；
+ * - fails>0 但 cooldown=0 仅保留遥测。
+ *
+ * Review 请求、cooldown阈值、fallback、alpha6 Context、Row/Payload/UI 全部不改。
+ */
+/* v4.2.0-alpha6：Review UI Context Canonical。
+ * 基线：alpha5 真机通过。
+ * 单域：review_local_ui。
+ * 统一 paragraph/chapter/author 上下文 metadata；
+ * 请求、分页、Row/Payload、媒体、回复、布局均不改。
+ */
+/* v4.2.0-alpha5：Review UI Payload Canonical。
+ * 基线：alpha4 真机通过。
+ * 单域：review_local_ui。
+ * 统一根评论/楼中楼完全同义的 content/image/audio payload；
+ * frame/replies/replyTo/god/request/layout 均保持各自原逻辑。
+ */
+/* v4.2.0-alpha4：Review UI Row Canonical。
+ * 基线：alpha3 真机通过。
+ * 单域：review_local_ui。
+ * 统一根评论/楼中楼基础字段 id/name/avatar/titles/time/ip/like/floor；
+ * content/replyCount/media/god/replyTo/request/layout 均保持。
+ */
+/* v4.2.0-alpha3：Review UI Canonical Identity Adapter。
+ * 基线：alpha2.1 Recovery 真机通过。
+ * 单域：review_local_ui。
+ * 根评论与楼中楼共享 id/name/avatar/TitleInfoList 身份字段适配；
+ * content/replyCount/media/god/request/layout 均保持原逻辑。
+ */
+/* v4.2.0-alpha2.1 Recovery：Review UI Visual Rollback。
+ * alpha2 真机回归：评论接口请求成功，但 H5 评论渲染进入“评论加载失败”。
+ * alpha1 已真机证明：身份标签、用户名防误识别、根评论、楼中楼正常。
+ *
+ * 本版直接以 alpha1 为代码基线：
+ * - 完整撤销 alpha2 badge visual layer；
+ * - 保留 alpha1 TitleInfoList canonical；
+ * - 保留用户名 exact-match guard；
+ * - 保留 rank / activity / LV level 分类；
+ * - Review Network / Catalog / Provider / Detail 等全部不改。
+ */
+/* v4.2.0-alpha1：Qidian Native Review Identity。
+ * 基线：v4.1.8 Stable（真机通过）。
+ * 单域变化：Review Identity / TitleInfoList。
+ * Catalog / Content / Provider / Review Network / Detail / Official Domains / Proxy 全冻结。
+ */
+/* v4.1.8 Stable Maintenance：Rollback Baseline Dynamic Display。
+ * 基线：v4.1.7 真机通过。
+ * 业务行为变化：0。
+ *
+ * 仅修诊断文本债：
+ * Stable Freeze 已有 manifest.baseline，但活动说明长期硬编码旧回退基线。
+ * 本版活动诊断直接显示 QF_RELEASE_FREEZE.baseline。
+ *
+ * Catalog / Network / Review / Provider / Detail / Official Domains / Proxy / Modules 均不改。
+ */
+/* v4.1.7 Stable Maintenance：Recent Error Severity Alignment。
+ * 基线：v4.1.6 Stable。
+ * 业务请求变化：0。
+ *
+ * 修复诊断不一致：
+ * endpoint summary 已能在 Catalog 成功时把 chapterlist/chapterlist -1004 判为 OPTIONAL，
+ * 但 recent error record 因缺少 endpoint/cap 上下文仍会显示 ACTIONABLE。
+ *
+ * 新 recordLevel 只在强交叉证据下将匿名 app/-1004 降为 OPTIONAL：
+ * 1) official-request；
+ * 2) Catalog 已成功输出；
+ * 3) OfficialSeverity summary actionable=0；
+ * 4) OfficialSeverity summary optional>0；
+ * 5) record 为 app 且 detail/code 包含 -1004。
+ *
+ * 不修改 Official endpoint 分类、网络、fallback、Catalog、Review、Provider。
+ */
+/* v4.1.6 Stable Maintenance：Warm-Probe Revalidation Closeout。
+ * 真机证据（v4.1.5.1）：
+ * - cached=115 / probe=114 / changed；
+ * - changed 后成功触发 dual-simple+web；
+ * - simple0=114 / simple1=115，正确选择 simple1；
+ * - 最终 115章 / 时间115；
+ * - full-refresh 550ms，低于 1500ms 预算。
+ *
+ * 结论：v4.1.5 warm-probe revalidation 修复已真机证明。
+ * 本版不带任何 one-shot 测试钩子，也不带未命中的 WEB-SUPERSET Canary。
+ *
+ * 正式行为：
+ * - unchanged warm probe -> CACHE-PROBE；
+ * - safe delta -> CACHE-DELTA；
+ * - changed/shrink/lastId mismatch/delta rejected -> dual-simple+web revalidate。
+ *
+ * Catalog 之外全部冻结。
+ */
+/* v4.1.5 Catalog Canary：Warm-Probe Divergence Rev
+--- hit 3 at 9175 ---
+ Health 语义保持。
+ */
+/* v4.2.0-alpha8.1：Egg pageinfo Impact Semantics。
+ * alpha8 真机证据：
+ * pageinfo -280015，但 safegetcontent-blocks HIT / images=1 / OUTPUT images=1。
+ * 本版只调整 OfficialSeverity：仅在近期 EggReport 已有成功输出时，
+ * 将 midpage/pageinfo -280015 从 ACTIONABLE 降为 OPTIONAL。
+ * Egg 抓取、fallback、Circle、四域 Contract 与所有业务请求均不改。
+ */
+/* v4.2.0-alpha8：Official Domains Batch2。
+ * 基线：alpha7.1.1 真机通过。
+ * 本版仅收敛 Circle + Egg Canonical Contract。
+ * 抓取算法、分类逻辑、书友圈 HTML、彩蛋 APP pageinfo 与渲染全部冻结。
+ */
+/* v4.2.0-alpha7.1.1：Copyright getsimple time-field hotfix。
+ * 根因：官方 v2/getsimple 使用 ChapterData.time，
+ * alpha7.1 的 earliestChapterTime 漏识别 time/Time。
+ * 本版只补这两个字段；角色卡88%及其它业务全部保持。
+ */
+/* v4.2.0-alpha7.1：Official Domains Batch1 UX Fix。
+ * Copyright：补强官方日期来源；getsimple 最早章节时间仅作为“首发”兜底。
+ * Role：BottomSheet 80% → 88%，布局比例/圆角/交互不改。
+ */
+/* v4.2.0-alpha7：Official Domains Batch1，Copyright + Role Canonical Contract。 */
+/* v4.2.0-alpha6.1：Review Health Single-Summary Semantics。
+ * 基线：alpha6。
+ * 真机证据：Official rawErr=0 / impactErr=0 / recentError=0，
+ * 仅 summary:www 一个镜像处于约0.7s尾部冷却，却被旧 health 误报成“评论核心接口冷却 1”。
+ *
+ * 本版仅修 Runtime Governance 的 Review Health 诊断语义：
+ * - 单个 summary:* 活动冷却 => DEGRADED，不升级全局告警；
+ * - 多个 summary:* 同时冷却且无明确成功镜像 => 仍告警；
+ * - 非 summary Review key 活动冷却 => 仍告警；
+ * - fails>0 但 cooldown=0 仅保留遥测。
+ *
+ * Review 请求、cooldown阈值、fallback、alpha6 Context、Row/Payload/UI 全部不改。
+ */
+/* v4.2.0-alpha6：Review UI Context Canonical。
+ * 基线：alpha5 真机通过。
+ * 单域：review_local_ui。
+ * 统一 paragraph/chapter/author 上下文 metadata；
+ * 请求、分页、Row/Payload、媒体、回复、布局均不改。
+ */
+/* v4.2.0-alpha5：Review UI Payload Canonical。
+ * 基线：alpha4 真机通过。
+ * 单域：review_local_ui。
+ * 统一根评论/楼中楼完全同义的 content/image/audio payload；
+ * frame/replies/replyTo/god/request/layout 均保持各自原逻辑。
+ */
+/* v4.2.0-alpha4：Review UI Row Canonical。
+ * 基线：alpha3 真机通过。
+ * 单域：review_local_ui。
+ * 统一根评论/楼中楼基础字段 id/name/avatar/titles/time/ip/like/floor；
+ * content/replyCount/media/god/replyTo/request/layout 均保持。
+ */
+/* v4.2.0-alpha3：Review UI Canonical Identity Adapter。
+ * 基线：alpha2.1 Recovery 真机通过。
+ * 单域：review_local_ui。
+ * 根评论与楼中楼共享 id/name/avatar/TitleInfoList 身份字段适配；
+ * content/replyCount/media/god/request/layout 均保持原逻辑。
+ */
+/* v4.2.0-alpha2.1 Recovery：Review UI Visual Rollback。
+ * alpha2 真机回归：评论接口请求成功，但 H5 评论渲染进入“评论加载失败”。
+ * alpha1 已真机证明：身份标签、用户名防误识别、根评论、楼中楼正常。
+ *
+ * 本版直接以 alpha1 为代码基线：
+ * - 完整撤销 alpha2 badge visual layer；
+ * - 保留 alpha1 TitleInfoList canonical；
+ * - 保留用户名 exact-match guard；
+ * - 保留 rank / activity / LV level 分类；
+ * - Review Network / Catalog / Provider / Detail 等全部不改。
+ */
+/* v4.2.0-alpha1：Qidian Native Review Identity。
+ * 基线：v4.1.8 Stable（真机通过）。
+ * 单域变化：Review Identity / TitleInfoList。
+ * Catalog / Content / Provider / Review Network / Detail / Official Domains / Proxy 全冻结。
+ */
+/* v4.1.8 Stable Maintenance：Rollback Baseline Dynamic Display。
+ * 基线：v4.1.7 真机通过。
+ * 业务行为变化：0。
+ *
+ * 仅修诊断文本债：
+ * Stable Freeze 已有 manifest.baseline，但活动说明长期硬编码旧回退基线。
+ * 本版活动诊断直接显示 QF_RELEASE_FREEZE.baseline。
+ *
+ * Catalog / Network / Review / Provider / Detail / Official Domains / Proxy / Modules 均不改。
+ */
+/* v4.1.7 Stable Maintenance：Recent Error Severity Alignment。
+ * 基线：v4.1.6 Stable。
+ * 业务请求变化：0。
+ *
+ * 修复诊断不一致：
+ * endpoint summary 已能在 Catalog 成功时把 chapterlist/chapterlist -1004 判为 OPTIONAL，
+ * 但 recent error record 因缺少 endpoint/cap 上下文仍会显示 ACTIONABLE。
+ *
+ * 新 recordLevel 只在强交叉证据下将匿名 app/-1004 降为 OPTIONAL：
+ * 1) official-request；
+ * 2) Catalog 已成功输出；
+ * 3) OfficialSeverity summary actionable=0；
+ * 4) OfficialSeverity summary optional>0；
+ * 5) record 为 app 且 detail/code 包含 -1004。
+ *
+ * 不修改 Official endpoint 分类、网络、fallback、Catalog、Review、Provider。
+ */
+/* v4.1.6 Stable Maintenance：Warm-Probe Revalidation Closeout。
+ * 真机证据（v4.1.5.1）：
+ * - cached=115 / probe=114 / changed；
+ * - changed 后成功触发 dual-simple+web；
+ * - simple0=114 / simple1=115，正确选择 simple1；
+ * - 最终 115章 / 时间115；
+ * - full-refresh 550ms，低于 1500ms 预算。
+ *
+ * 结论：v4.1.5 warm-probe revalidation 修复已真机证明。
+ * 本版不带任何 one-shot 测试钩子，也不带未命中的 WEB-SUPERSET Canary。
+ *
+ * 正式行为：
+ * - unchanged warm probe -> CACHE-PROBE；
+ * - safe delta -> CACHE-DELTA；
+ * - changed/shrink/lastId mismatch/delta rejected -> dual-simple+web revalidate。
+ *
+ * Catalog 之外全部冻结。
+ */
+/* v4.1.5 Catalog Canary：Warm-Probe Divergence Revalidation。
+ * 基线：v4.1.3 Stable Maintenance。
+ *
+ * v4.1.4.1 真机定位：
+ * cold dual-simple: s0=114 / s1=115 / web=115，正确选择 simple1 后 WEB-EXACT，362ms。
+ * 因此此前 1750ms 慢路径根因不是 Web superset，而是 warm-p
+--- hit 4 at 9406 ---
+fo -280015 从 ACTIONABLE 降为 OPTIONAL。
+ * Egg 抓取、fallback、Circle、四域 Contract 与所有业务请求均不改。
+ */
+/* v4.2.0-alpha8：Official Domains Batch2。
+ * 基线：alpha7.1.1 真机通过。
+ * 本版仅收敛 Circle + Egg Canonical Contract。
+ * 抓取算法、分类逻辑、书友圈 HTML、彩蛋 APP pageinfo 与渲染全部冻结。
+ */
+/* v4.2.0-alpha7.1.1：Copyright getsimple time-field hotfix。
+ * 根因：官方 v2/getsimple 使用 ChapterData.time，
+ * alpha7.1 的 earliestChapterTime 漏识别 time/Time。
+ * 本版只补这两个字段；角色卡88%及其它业务全部保持。
+ */
+/* v4.2.0-alpha7.1：Official Domains Batch1 UX Fix。
+ * Copyright：补强官方日期来源；getsimple 最早章节时间仅作为“首发”兜底。
+ * Role：BottomSheet 80% → 88%，布局比例/圆角/交互不改。
+ */
+/* v4.2.0-alpha7：Official Domains Batch1，Copyright + Role Canonical Contract。 */
+/* v4.2.0-alpha6.1：Review Health Single-Summary Semantics。
+ * 基线：alpha6。
+ * 真机证据：Official rawErr=0 / impactErr=0 / recentError=0，
+ * 仅 summary:www 一个镜像处于约0.7s尾部冷却，却被旧 health 误报成“评论核心接口冷却 1”。
+ *
+ * 本版仅修 Runtime Governance 的 Review Health 诊断语义：
+ * - 单个 summary:* 活动冷却 => DEGRADED，不升级全局告警；
+ * - 多个 summary:* 同时冷却且无明确成功镜像 => 仍告警；
+ * - 非 summary Review key 活动冷却 => 仍告警；
+ * - fails>0 但 cooldown=0 仅保留遥测。
+ *
+ * Review 请求、cooldown阈值、fallback、alpha6 Context、Row/Payload/UI 全部不改。
+ */
+/* v4.2.0-alpha6：Review UI Context Canonical。
+ * 基线：alpha5 真机通过。
+ * 单域：review_local_ui。
+ * 统一 paragraph/chapter/author 上下文 metadata；
+ * 请求、分页、Row/Payload、媒体、回复、布局均不改。
+ */
+/* v4.2.0-alpha5：Review UI Payload Canonical。
+ * 基线：alpha4 真机通过。
+ * 单域：review_local_ui。
+ * 统一根评论/楼中楼完全同义的 content/image/audio payload；
+ * frame/replies/replyTo/god/request/layout 均保持各自原逻辑。
+ */
+/* v4.2.0-alpha4：Review UI Row Canonical。
+ * 基线：alpha3 真机通过。
+ * 单域：review_local_ui。
+ * 统一根评论/楼中楼基础字段 id/name/avatar/titles/time/ip/like/floor；
+ * content/replyCount/media/god/replyTo/request/layout 均保持。
+ */
+/* v4.2.0-alpha3：Review UI Canonical Identity Adapter。
+ * 基线：alpha2.1 Recovery 真机通过。
+ * 单域：review_local_ui。
+ * 根评论与楼中楼共享 id/name/avatar/TitleInfoList 身份字段适配；
+ * content/replyCount/media/god/request/layout 均保持原逻辑。
+ */
+/* v4.2.0-alpha2.1 Recovery：Review UI Visual Rollback。
+ * alpha2 真机回归：评论接口请求成功，但 H5 评论渲染进入“评论加载失败”。
+ * alpha1 已真机证明：身份标签、用户名防误识别、根评论、楼中楼正常。
+ *
+ * 本版直接以 alpha1 为代码基线：
+ * - 完整撤销 alpha2 badge visual layer；
+ * - 保留 alpha1 TitleInfoList canonical；
+ * - 保留用户名 exact-match guard；
+ * - 保留 rank / activity / LV level 分类；
+ * - Review Network / Catalog / Provider / Detail 等全部不改。
+ */
+/* v4.2.0-alpha1：Qidian Native Review Identity。
+ * 基线：v4.1.8 Stable（真机通过）。
+ * 单域变化：Review Identity / TitleInfoList。
+ * Catalog / Content / Provider / Review Network / Detail / Official Domains / Proxy 全冻结。
+ */
+/* v4.1.8 Stable Maintenance：Rollback Baseline Dynamic Display。
+ * 基线：v4.1.7 真机通过。
+ * 业务行为变化：0。
+ *
+ * 仅修诊断文本债：
+ * Stable Freeze 已有 manifest.baseline，但活动说明长期硬编码旧回退基线。
+ * 本版活动诊断直接显示 QF_RELEASE_FREEZE.baseline。
+ *
+ * Catalog / Network / Review / Provider / Detail / Official Domains / Proxy / Modules 均不改。
+ */
+/* v4.1.7 Stable Maintenance：Recent Error Severity Alignment。
+ * 基线：v4.1.6 Stable。
+ * 业务请求变化：0。
+ *
+ * 修复诊断不一致：
+ * endpoint summary 已能在 Catalog 成功时把 chapterlist/chapterlist -1004 判为 OPTIONAL，
+ * 但 recent error record 因缺少 endpoint/cap 上下文仍会显示 ACTIONABLE。
+ *
+ * 新 recordLevel 只在强交叉证据下将匿名 app/-1004 降为 OPTIONAL：
+ * 1) official-request；
+ * 2) Catalog 已成功输出；
+ * 3) OfficialSeverity summary actionable=0；
+ * 4) OfficialSeverity summary optional>0；
+ * 5) record 为 app 且 detail/code 包含 -1004。
+ *
+ * 不修改 Official endpoint 分类、网络、fallback、Catalog、Review、Provider。
+ */
+/* v4.1.6 Stable Maintenance：Warm-Probe Revalidation Closeout。
+ * 真机证据（v4.1.5.1）：
+ * - cached=115 / probe=114 / changed；
+ * - changed 后成功触发 dual-simple+web；
+ * - simple0=114 / simple1=115，正确选择 simple1；
+ * - 最终 115章 / 时间115；
+ * - full-refresh 550ms，低于 1500ms 预算。
+ *
+ * 结论：v4.1.5 warm-probe revalidation 修复已真机证明。
+ * 本版不带任何 one-shot 测试钩子，也不带未命中的 WEB-SUPERSET Canary。
+ *
+ * 正式行为：
+ * - unchanged warm probe -> CACHE-PROBE；
+ * - safe delta -> CACHE-DELTA；
+ * - changed/shrink/lastId mismatch/delta rejected -> dual-simple+web revalidate。
+ *
+ * Catalog 之外全部冻结。
+ */
+/* v4.1.5 Catalog Canary：Warm-Probe Divergence Revalidation。
+ * 基线：v4.1.3 Stable Maintenance。
+ *
+ * v4.1.4.1 真机定位：
+ * cold dual-simple: s0=114 / s1=115 / web=115，正确选择 simple1 后 WEB-EXACT，362ms。
+ * 因此此前 1750ms 慢路径根因不是 Web superset，而是 warm-probe changed 后继续复用单个 simple probe。
+ *
+ * 本版：
+ * - RETIRE 未命中的 WEB-SUPERSET Canary，不带入本版；
+ * - warm-probe unchanged：原样 CACHE-PROBE；
+ * - warm-delta 安全追加成功：原样 CACHE-DELTA；
+ * - 其余 changed / shrink / lastId mismatch / delta rejected：
+
+--- hit 5 at 39010 ---
+ 官方请求传输层；QDSign/QDInfo/deviceId/URL/Headers/micro-cache/error metrics 只保留一份主实现。qidian_app 与旧 qfOfficialRequest / qfArgusOuter 仅做代理；官方请求指标可在开发者诊断开启时跨规则执行持久化，解决诊断页 calls=0 的上下文隔离问题。 */
+/* v4.0.0-alpha31.4：历史目录时间根因修复。严格对齐起点助手 qdzslib Reader QDSign/QDInfo：
+ * Rv1rPTnczce|t|0|deviceId||||md5|f189... + 7.9.394/Android/1526 完整 QDInfo；
+ * qfAppRequestCore 与 qfAppSignedSpec 统一同一签名，不再使用旧简化身份；起点助手原始无 splitEpub 目录优先；目录缓存升级 toc74。 */
+/* v4.0.0-alpha31：目录时间与章节字数增强。APP chapterlist 使用 uT 生成更新时间、cnt 生成章节字数，并统一写入章节信息 T；Web 目录异常兜底时也尽量提取时间/字数。目录缓存升级 toc71，确保旧缓存不会遮蔽新字段。正文/段评/Provider/详情页不改。 */
+/* v4.0.0-alpha29.1：作者说真实 ReviewId/回复数修复。修正 safegetcontent 富元数据父节点丢失与普通 id 误判；作者详情低频合并 authorMeta + ParagraphCount。 */
+/* v4.0.0-alpha27：新增兜底源“万相”。Provider V1 独立 fallback_wx lazy module；基于万相书城公开页面结构自研搜索/详情校验/完整目录/正文解析，并保留 wxscs/wxsck/wwxsc Host 池。 */
+/* v4.0.0-alpha26：新增优选源“酷我”。Provider V1 独立 preferred_kw lazy module；酷我 JSON API 搜索/详情/目录/正文链，既有 Provider 与评论模块不改。 */
+/* v4.0.0-alpha25：新增兜底源“速读谷”。Provider V1 独立 fallback_sdg lazy module；搜索/目录/正文均按独立速读谷源直连实现，不改评论与既有 Provider 模块。 */
+/* v4.0.0-alpha24：新增优选源“得间”。Provider V1 独立 lazy module；主链 wechat.idejian.com API，备用链 Palmestore 目录 + m.idejian.com 正文；不改既有 Provider/评论模块。 */
+/* v4.0.0-alpha23：Provider V1 标准接口 + 新正文源模板。冻结正文性能热路径；新增 qf.provider/1 Contract、Provider Spec 校验/注册、统一 ContentResult Envelope 与模板工厂。现有 9 个 Provider 仅打 ABI 元数据，不改变入口、排序、请求、缓存和兜底行为；26 个 lazy 模块完全不改。 */
+/* v4.0.0-alpha22：正文 Runtime 收口与性能阶段封版。仅移除静态确认无调用的旧主线程 helper（旧气泡 HTML 包装、旧发现页 WebView/JSON fallback）；26 个 lazy 业务模块、Provider、评论 UI/TitleInfoList/楼中楼链完全不改。正文性能后续只针对明确瓶颈修复。 */
+/* v4.0.0-alpha21：正文性能最终收口①——章节生命周期诊断 + 相邻 Provider 轻量预热。不预取下一章正文/评论；开发者诊断开启时拆分 Provider/官方正文/彩蛋判断/评论装饰/来源标记耗时；连续顺序翻章用纯 JS next-index hint 直达当前成功 Provider。业务模块不改。 */
+/* v4.0.0-alpha20：正文性能⑫——评论请求预算与失败快速退避。只改主 Runtime 请求调度；review_local_ui/TitleInfoList/楼中楼数据模型完全不动。慢/失败 endpoint 短期冷却，正常响应立即恢复。 */
+/* v4.0.0-alpha19：正文性能⑪——热评/本章说/作者说 SVG 视觉层短 LRU，命中时跳过 Java base64Encode；低频卡片数据链与评论标签/楼中楼完全不改。 */
+/* v4.0.0-alpha18.4：评论配图误识别与楼中楼标签注册表修复。review_local_ui 收紧正文配图语义，Reader TitleInfoList 建立用户级身份注册表；其余 alpha18.3 逻辑不变。 */
+/* v4.0.0-alpha18.2：评论 canonical 骨架融合修复。 */
+/* v4.0.0-alpha18.1：标签与楼中楼数据融合回归修复。富 TitleInfoList 与完整 Reply 结构分层合并；章名/本章说特殊流开放 Reader v2 富回复。 */
+/* v4.0.0-alpha18：正文性能⑩——评论装饰对象池与点击参数延迟构建。review 的 Decoration Plan 改为可复用紧凑行对象；段落 quote URI/JS escape 只在真正生成可点击元素时计算并复用；review_common 缓存同章点击上下文。TitleInfoList/见习等标签链不改。 */
+/* v4.0.0-alpha17：正文性能⑨——最终输出单次组装 + 字符串复制减负。段评/热评先记录行级追加片段，正文与作者说/本章说尾卡最后一次 join；尾卡-only 场景跳过 textIdx/媒体索引，热评单开跳过非 hot 段 planning。业务数据与 UI 不变。 */
+/* v4.0.0-alpha16：正文性能⑧——媒体检测快路径 + 字符串减负。纯文字正文不再执行 Markdown/img 全局 replace；正文行无 CR 时不做无效 replace；纯文字段落索引不再逐行执行 img regex；彩蛋预判改为 indexOf 门控后才进入媒体 regex。业务数据与 UI 不变。 */
+/* v4.0.0-alpha15：正文性能⑦——段落装饰单遍化 + 气泡 SVG Base64 LRU。正文 lines/textIdx 一次构建，评论 item 单次规划，热评不再 sort，共享气泡视觉层复用；章名 quote 仅有章名气泡时写缓存。 */
+/* v4.0.0-alpha14：正文性能⑥——章节评论 Runtime State。段评 summary/章末预览增加 JS L1 小型 LRU，确认空 summary 也短期复用；服务器评论 route 增加 JS 热状态并消除重复设置读取。业务接口与评论来源不变。 */
+/* v4.0.0-alpha13：正文性能⑤——Chapter Capability Plan。章节入口一次性快照评论显示、评论路由、正文来源标记与兜底智能对齐设置；Provider 请求完成后不再二次读取配置。默认本地段评模式不再为每章写 qf_cmt_routes_v315 持久路由，服务器模式保持原路由持久化。纯文字/评论全关仍保持零 review 解包快路径。 */
+/* v4.0.0-alpha12：正文性能④——Provider 热车道 + 冷源延迟加载。连续翻章的当前 Provider/正文增加 JS 一级热缓存，RuntimeCache 继续作为跨执行环境二级缓存；热路由成功不再每章重复读取/比较持久化 Provider 书籍变量，每 24 次热命中才同步一次。非当前 Provider 仍保持真正按失败才解包。 */
+/* v4.0.0-alpha11：正文首屏性能阶段③——章节评论快照与返回复用。对最终评论装饰结果建立短 TTL 小型 LRU，短时间返回/重复进入同章时跳过 summary、章末预览、热评、段落映射与 SVG 重建；快照键绑定 Provider/评论路由/显示开关/智能对齐/正文签名，标题气泡副作用单独恢复。评论数据源与长期缓存策略不变。 */
+/* v4.0.0-alpha10：正文首屏性能阶段②——请求调度与热评并发。命中两个热评段落时用 Reader 专用签名 ajaxAll 并行预取 getparagraphshotcomments，并写回原热评缓存供既有渲染链零改动消费；评论装饰移除逐段 Java memory 写入，热评卡改为随点击直接携带段落引用。数据来源/展示数量/Provider 策略不变。 */
+/* v4.0.0-alpha9：正文首屏性能阶段①——热路径减负。评论 flags/服务器路由单次计算并传入 review；作者说原始页解析延后到真正需要官方兜底时；仅热评模式不再预取本章说；开发者诊断开关短缓存。正文 Provider/评论来源/展示功能不变。 */
+/* v4.0.0-alpha8：第三阶段⑤ Official Request Runtime。起点官方 Argus/APP 请求统一进入微缓存、请求统计与诊断层；业务长缓存继续保留，微缓存只合并同一流程的近重复请求。彩蛋移除对 qidian_app 模块名的直接依赖，改走 midpageWidgets capability。正文 Provider/评论业务算法不改。 */
+/* v4.0.0-alpha7：第三阶段④ Egg/Circle Domain+Renderer。彩蛋拆为 eggData→EggSetModel→eggView；书友圈拆为 circleData→CircleSetModel→circleView，并由 Official Adapter 统一编排。网络/解析算法保持原链，正文/评论/Provider 模块不改，遗留评论 Bug 继续冻结。 */
+/* v4.0.0-alpha6：第三阶段③ Copyright/Role Domain+Renderer。版权页拆为 copyrightData→CopyrightModel→Renderer；角色卡拆为 roleData→RoleSetModel→View，并由 Official Adapte
+--- hit 6 at 39221 ---
+修复。严格对齐起点助手 qdzslib Reader QDSign/QDInfo：
+ * Rv1rPTnczce|t|0|deviceId||||md5|f189... + 7.9.394/Android/1526 完整 QDInfo；
+ * qfAppRequestCore 与 qfAppSignedSpec 统一同一签名，不再使用旧简化身份；起点助手原始无 splitEpub 目录优先；目录缓存升级 toc74。 */
+/* v4.0.0-alpha31：目录时间与章节字数增强。APP chapterlist 使用 uT 生成更新时间、cnt 生成章节字数，并统一写入章节信息 T；Web 目录异常兜底时也尽量提取时间/字数。目录缓存升级 toc71，确保旧缓存不会遮蔽新字段。正文/段评/Provider/详情页不改。 */
+/* v4.0.0-alpha29.1：作者说真实 ReviewId/回复数修复。修正 safegetcontent 富元数据父节点丢失与普通 id 误判；作者详情低频合并 authorMeta + ParagraphCount。 */
+/* v4.0.0-alpha27：新增兜底源“万相”。Provider V1 独立 fallback_wx lazy module；基于万相书城公开页面结构自研搜索/详情校验/完整目录/正文解析，并保留 wxscs/wxsck/wwxsc Host 池。 */
+/* v4.0.0-alpha26：新增优选源“酷我”。Provider V1 独立 preferred_kw lazy module；酷我 JSON API 搜索/详情/目录/正文链，既有 Provider 与评论模块不改。 */
+/* v4.0.0-alpha25：新增兜底源“速读谷”。Provider V1 独立 fallback_sdg lazy module；搜索/目录/正文均按独立速读谷源直连实现，不改评论与既有 Provider 模块。 */
+/* v4.0.0-alpha24：新增优选源“得间”。Provider V1 独立 lazy module；主链 wechat.idejian.com API，备用链 Palmestore 目录 + m.idejian.com 正文；不改既有 Provider/评论模块。 */
+/* v4.0.0-alpha23：Provider V1 标准接口 + 新正文源模板。冻结正文性能热路径；新增 qf.provider/1 Contract、Provider Spec 校验/注册、统一 ContentResult Envelope 与模板工厂。现有 9 个 Provider 仅打 ABI 元数据，不改变入口、排序、请求、缓存和兜底行为；26 个 lazy 模块完全不改。 */
+/* v4.0.0-alpha22：正文 Runtime 收口与性能阶段封版。仅移除静态确认无调用的旧主线程 helper（旧气泡 HTML 包装、旧发现页 WebView/JSON fallback）；26 个 lazy 业务模块、Provider、评论 UI/TitleInfoList/楼中楼链完全不改。正文性能后续只针对明确瓶颈修复。 */
+/* v4.0.0-alpha21：正文性能最终收口①——章节生命周期诊断 + 相邻 Provider 轻量预热。不预取下一章正文/评论；开发者诊断开启时拆分 Provider/官方正文/彩蛋判断/评论装饰/来源标记耗时；连续顺序翻章用纯 JS next-index hint 直达当前成功 Provider。业务模块不改。 */
+/* v4.0.0-alpha20：正文性能⑫——评论请求预算与失败快速退避。只改主 Runtime 请求调度；review_local_ui/TitleInfoList/楼中楼数据模型完全不动。慢/失败 endpoint 短期冷却，正常响应立即恢复。 */
+/* v4.0.0-alpha19：正文性能⑪——热评/本章说/作者说 SVG 视觉层短 LRU，命中时跳过 Java base64Encode；低频卡片数据链与评论标签/楼中楼完全不改。 */
+/* v4.0.0-alpha18.4：评论配图误识别与楼中楼标签注册表修复。review_local_ui 收紧正文配图语义，Reader TitleInfoList 建立用户级身份注册表；其余 alpha18.3 逻辑不变。 */
+/* v4.0.0-alpha18.2：评论 canonical 骨架融合修复。 */
+/* v4.0.0-alpha18.1：标签与楼中楼数据融合回归修复。富 TitleInfoList 与完整 Reply 结构分层合并；章名/本章说特殊流开放 Reader v2 富回复。 */
+/* v4.0.0-alpha18：正文性能⑩——评论装饰对象池与点击参数延迟构建。review 的 Decoration Plan 改为可复用紧凑行对象；段落 quote URI/JS escape 只在真正生成可点击元素时计算并复用；review_common 缓存同章点击上下文。TitleInfoList/见习等标签链不改。 */
+/* v4.0.0-alpha17：正文性能⑨——最终输出单次组装 + 字符串复制减负。段评/热评先记录行级追加片段，正文与作者说/本章说尾卡最后一次 join；尾卡-only 场景跳过 textIdx/媒体索引，热评单开跳过非 hot 段 planning。业务数据与 UI 不变。 */
+/* v4.0.0-alpha16：正文性能⑧——媒体检测快路径 + 字符串减负。纯文字正文不再执行 Markdown/img 全局 replace；正文行无 CR 时不做无效 replace；纯文字段落索引不再逐行执行 img regex；彩蛋预判改为 indexOf 门控后才进入媒体 regex。业务数据与 UI 不变。 */
+/* v4.0.0-alpha15：正文性能⑦——段落装饰单遍化 + 气泡 SVG Base64 LRU。正文 lines/textIdx 一次构建，评论 item 单次规划，热评不再 sort，共享气泡视觉层复用；章名 quote 仅有章名气泡时写缓存。 */
+/* v4.0.0-alpha14：正文性能⑥——章节评论 Runtime State。段评 summary/章末预览增加 JS L1 小型 LRU，确认空 summary 也短期复用；服务器评论 route 增加 JS 热状态并消除重复设置读取。业务接口与评论来源不变。 */
+/* v4.0.0-alpha13：正文性能⑤——Chapter Capability Plan。章节入口一次性快照评论显示、评论路由、正文来源标记与兜底智能对齐设置；Provider 请求完成后不再二次读取配置。默认本地段评模式不再为每章写 qf_cmt_routes_v315 持久路由，服务器模式保持原路由持久化。纯文字/评论全关仍保持零 review 解包快路径。 */
+/* v4.0.0-alpha12：正文性能④——Provider 热车道 + 冷源延迟加载。连续翻章的当前 Provider/正文增加 JS 一级热缓存，RuntimeCache 继续作为跨执行环境二级缓存；热路由成功不再每章重复读取/比较持久化 Provider 书籍变量，每 24 次热命中才同步一次。非当前 Provider 仍保持真正按失败才解包。 */
+/* v4.0.0-alpha11：正文首屏性能阶段③——章节评论快照与返回复用。对最终评论装饰结果建立短 TTL 小型 LRU，短时间返回/重复进入同章时跳过 summary、章末预览、热评、段落映射与 SVG 重建；快照键绑定 Provider/评论路由/显示开关/智能对齐/正文签名，标题气泡副作用单独恢复。评论数据源与长期缓存策略不变。 */
+/* v4.0.0-alpha10：正文首屏性能阶段②——请求调度与热评并发。命中两个热评段落时用 Reader 专用签名 ajaxAll 并行预取 getparagraphshotcomments，并写回原热评缓存供既有渲染链零改动消费；评论装饰移除逐段 Java memory 写入，热评卡改为随点击直接携带段落引用。数据来源/展示数量/Provider 策略不变。 */
+/* v4.0.0-alpha9：正文首屏性能阶段①——热路径减负。评论 flags/服务器路由单次计算并传入 review；作者说原始页解析延后到真正需要官方兜底时；仅热评模式不再预取本章说；开发者诊断开关短缓存。正文 Provider/评论来源/展示功能不变。 */
+/* v4.0.0-alpha8：第三阶段⑤ Official Request Runtime。起点官方 Argus/APP 请求统一进入微缓存、请求统计与诊断层；业务长缓存继续保留，微缓存只合并同一流程的近重复请求。彩蛋移除对 qidian_app 模块名的直接依赖，改走 midpageWidgets capability。正文 Provider/评论业务算法不改。 */
+/* v4.0.0-alpha7：第三阶段④ Egg/Circle Domain+Renderer。彩蛋拆为 eggData→EggSetModel→eggView；书友圈拆为 circleData→CircleSetModel→circleView，并由 Official Adapter 统一编排。网络/解析算法保持原链，正文/评论/Provider 模块不改，遗留评论 Bug 继续冻结。 */
+/* v4.0.0-alpha6：第三阶段③ Copyright/Role Domain+Renderer。版权页拆为 copyrightData→CopyrightModel→Renderer；角色卡拆为 roleData→RoleSetModel→View，并由 Official Adapter 编排。正文/评论/Provider 模块不改，遗留评论 Bug 继续冻结。 */
+/* v4.0.0-alpha5：第三阶段② Official Data Kernel。Official Adapter 新增统一调用 Envelope、Domain Mapper、Model ABI 与兼容序列化层；目录正式迁移为 Legacy API → TocModel/ChapterModel → 阅读 N/C/V/Vo/T 
+--- hit 7 at 235145 ---
+ongToast("书友圈："+String(model.message));}catch(_m){}}
+    }catch(e){try{QF_Diagnostic.warn(this,"official-domain","circle","open",e);}catch(_d){}}
+    return qfOfficialDispatchV400.call(this,"circleOpen",[]).value;
+}
+function qfOpenQidianCircleV2961(){return qfOpenQidianCircle.call(this);}
+function qfOpenRoleCard(j,src,bookObj,chapterObj){
+    if(!j)return;
+    try{
+        var p=QF_OfficialDomainService.page(this,"role",[bookObj,chapterObj]),model=p&&p.model,view=p&&p.view;
+        if(p&&p.ok&&model){
+            if(!model.ok||!Array.isArray(model.roles)||!model.roles.length){try{j.longToast("角色卡："+String(model.message||"该书暂无官方角色卡"));}catch(_tm){}return;}
+            if(view&&view.ok&&view.html){
+                var pre="window.java=java;"+qfV18BottomAnchorPre();
+                j.showBrowser(String(view.target||("https://h5.if.qidian.com/new/role/share/?bookId="+encodeURIComponent(String(model.bookId||"")))),String(view.html),pre,JSON.stringify(view.config||{}));return true;
+            }
+        }
+    }catch(e){try{QF_Diagnostic.warn(this,"official-domain","role","open",e);}catch(_d){}}
+    return qfOfficialDispatchV400.call(this,"roleOpen",[j,src,bookObj,chapterObj]).value;
+}
+function qfOpenRoleCardV20(j,src,bookObj,chapterObj){return qfOpenRoleCard.call(this,j,src,bookObj,chapterObj);}
+/* beta7.3：详情页按钮使用固定、短 ABI，避免复杂 onclick 表达式和相邻 Span 串点击。 */
+function qfBookInfoOpenCircleV373(){
+    return qfOpenQidianCircleV2961.call(this);
+}
+function qfBookInfoOpenRoleV373(){
+    var j=qfJava(this),s=qfSource(this),b=qfBook(this),c=qfChapter(this);
+    qfOpenRoleCardV20.call(this,j,s,b,c);
+    return true;
+}
+function qfBookInfoOpenSmartSourceV330(){
+    qfSmartStatusShowV330.call(this);
+    return true;
+}
+
+function getBuiltInCommentHtmlV21(){
+    return qfModuleFnV38.call(this,"review_local_ui","getBuiltInCommentHtmlV21").call(this);
+}
+
+/* ============================================================
+ * v2.1 CLEAN：搜索直连 + 段评渐进加载
+ * ============================================================ */
+
+/* ---------- 发现页搜索状态 ----------
+ * alpha10.9.1：搜索状态与“源变量”彻底隔离。
+ * 源变量专供同人共享 Token；搜索词只存 source KV。
+ */
+var QF_V21_SEARCH_STATE_KEY="qf_v21_search_state";
+function qfV21SearchState(){
+    var s=null,d={},raw="",legacy="",legacyObj=null;
+    try{s=this&&this.source?this.source:(typeof source!=="undefined"?source:null);}catch(e0){}
+    try{raw=String((s&&s.get?s.get(QF_V21_SEARCH_STATE_KEY):"")||"");}catch(e1){raw="";}
+    if(raw){
+        try{d=JSON.parse(raw)||{};}catch(e2){d={qfV21Search:raw};}
+    }
+    if(!d||typeof d!=="object")d={};
+    if(d.qfV21Search==null){
+        try{legacy=String((s&&s.getVariable?s.getVariable():"")||"").trim();}catch(e3){legacy="";}
+        if(legacy&&legacy.charAt(0)==="{"){
+            try{legacyObj=JSON.parse(legacy);}catch(e4){legacyObj=null;}
+            if(legacyObj&&typeof legacyObj==="object"&&Object.prototype.hasOwnProperty.call(legacyObj,"qfV21Search")){
+                d.qfV21Search=legacyObj.qfV21Search==null?"":String(legacyObj.qfV21Search);
+                try{if(s&&s.put)s.put(QF_V21_SEARCH_STATE_KEY,JSON.stringify(d));}catch(e5){}
+                try{
+                    var ks=Object.keys(legacyObj);
+                    if(ks.length===1&&ks[0]==="qfV21Search"&&s&&s.setVariable)s.setVariable("");
+                }catch(e6){}
+            }
+        }
+    }
+    return d;
+}
+function qfV21SetSearch(v){
+    var s=null,d=qfV21SearchState.call(this);
+    try{s=this&&this.source?this.source:(typeof source!=="undefined"?source:null);}catch(e0){}
+    d.qfV21Search=v==null?"":String(v);
+    try{if(s&&s.put)s.put(QF_V21_SEARCH_STATE_KEY,JSON.stringify(d));}catch(e1){}
+}
+function qfV21SearchKey(){
+    var d=qfV21SearchState.call(this);
+    return d.qfV21Search==null?"":String(d.qfV21Search);
+}
+function qfV21Search(){
+    var j=this&&this.java?this.java:(typeof java!=="undefined"?java:null);
+    var src=this&&this.source?this.source:(typeof source!=="undefined"?source:null);
+    var key=qfV21SearchKey.call(this).replace(/^\s+|\s+$/g,"");
+    if(!key){try{j.toast("请输入书名或作者");}catch(e0){}return;}
+    try{
+        j.searchBook(key,src);
+    }catch(e1){
+        try{j.open("search",key);}
+        catch(e2){try{j.toast("搜索失败："+e2);}catch(_e){}}
+    }
+}
+
+/* ---------- 段评：改为弹窗内渐进请求 ----------
+ * 页面打开只抓20条；
+ * 滚动到底自动继续；
+ * 配图/配音由官方 reviewList 结果在本地筛选；
+ * 本章说使用 segmentId=0 的官方 reviewList。
+ */
+var QF_COMMENT_HTML_CACH
+--- hit 8 at 338530 ---
+)+'key='+String(c.key||'')+'&device='+String(dev||'')+'&dttoken='+String(c.dttoken||'');
+    var to=Math.max(2500,Number(timeout)||12000),opt={method:method,body:JSON.stringify(body||{}),timeout:to};
+    var spec=u+','+JSON.stringify(opt),raw='';
+    try{if(typeof j.ajax==='function')raw=String(j.ajax(spec)||'');}catch(e0){raw='';}
+    if(!raw&&method==='GET'){
+        try{
+            if(typeof j.get==='function'){
+                var r=j.get(u,{},to);
+                if(r){
+                    if(typeof r.body==='function')raw=String(r.body()||'');
+                    else if(r.body!==undefined)raw=String(r.body||'');
+                    else raw=String(r||'');
+                }
+            }
+        }catch(e2){raw='';}
+    }
+    return raw;
+}
+function qfQtBrowserUrlV328(path){
+    var b=qfQtBaseV328.call(this),u=/^https?:\/\//i.test(String(path||''))?String(path):b+String(path||'');
+    var c=qfQtCredV328.call(this),dev=qfQtDeviceV328.call(this),sep=u.indexOf('?')>=0?'&':'?';
+    return u+sep+'key='+encodeURIComponent(c.key||'')+'&device='+encodeURIComponent(dev||'')+'&dttoken='+encodeURIComponent(c.dttoken||'');
+}
+function qfQtNativeMetaV328(bid,cid){return qfServerChapterMetaGetV316(this,'晴天',String(bid),String(cid));}
+/* ============================================================
+ * v3.0.0-alpha44：本地模块化运行时（评论算法细拆）
+ *
+ * 参考大型聚合源的“统一路由 + 按来源分发 + 只执行当前分支”思路，
+ * 但保持本书源全部核心解析代码本地，不依赖新增中转服务器。
+ *
+ * 这次先处理每章都会解析的 ruleContent：
+ *   core/router  常驻：只负责识别章节、来源类别、功能开关和调度；
+ *   official     懒加载：仅免费起点正文；
+ *   match        懒加载：仅需要公共书籍/章节匹配的 Provider；
+ *   fallback     懒加载：仅猫眼/得奇/69书吧/速读谷/万相；
+ *   limited      懒加载：限免 Provider 独立模块（情无/神魔/晴天/同人）；
+ *   review       懒加载：本地起点/情无/神魔评论基础装饰；
+ *   review_align 懒加载：仅兜底正文校验/智能段评对齐时加载文本相似度/锚点算法；
+ *   review_sunny 懒加载：仅晴天服务器气泡/作者说/本章说；
+ *   review_local_ui  懒加载：仅真正点击本地段评/楼中楼/配音时；
+ *   review_server_ui 懒加载：仅真正打开情无/神魔服务器评论页时；
+ *   review_server_core 懒加载：仅服务器段评真正命中时解析情无/神魔/晴天评论业务核心；
+ *   qidian_app   懒加载：仅版权/彩蛋等需要 APP 官方数据增强时；
+ *   egg          懒加载：仅彩蛋目录项或正文出现图片/彩蛋迹象。
+ *
+ * 模块以字符串保存，不在书源初始化时构建完整函数 AST；首次真正用到时才 eval。
+ * alpha41 将本地段评 UI/楼中楼/配音脚本和服务器评论 UI 移入懒模块。
+ * alpha42 再把兜底段评智能对齐算法从通用 review 中拆出；优选源/免费章/情无/神魔不再解析该算法。
+ * circle/role/egg/copyright/review_*_ui 等低频大模块再使用 gzip+base64 压缩保存，首次使用时才解压。
+ * 后续新增正文源时只需要增加 provider 模块并登记到路由，不再继续堆进正文规则。
+ * ============================================================ */
+
+/* ============================================================
+ * alpha40 fallback shared core
+ * 仅保留兜底源共同使用的轻量 URL/HTML/缓存辅助；
+ * 每个兜底源的网络、搜索、目录、正文实现仍独立懒加载。
+ * ============================================================ */
+
+/* ============================================================
+ * v2.3 CLEAN：双层正文 Provider
+ *
+ * 优选源：七猫 / 书旗 / QQ浏览器 / 得间 / 酷我
+ * 兜底源：猫眼 / 得奇 / 69书吧 / 速读谷 / 万相（直连）
+ *
+ * 自动模式永远：
+ *   先按“优选源顺序”逐个尝试
+ *   -> 优选全部失败
+ *   -> 再按“兜底源顺序”逐个尝试
+ *
+ * 每类内部顺序由登录页独立配置。
+ * ============================================================ */
+
+var QF_V23_PREFERRED = ["七猫","书旗","QQ浏览器","得间","酷我"];
+var QF_V23_FALLBACK = ["猫眼","得奇","69书吧","速读谷","万相"];
+
+
+/* ============================================================
+ * 通用 Provider 工具
+ * ============================================================ */
+
+
+/* ============================================================
+ * 猫眼 Provider
+ * 来自上传书源：
+ * search -> /search?keyword=&page=
+ * toc    -> /novel/{novelId}/chapters
+ * path   -> AES/CBC/PKCS5Padding 解密
+ * content-> $.content
+ * ============================================================ */
+
+
+var QF_MOD38_PACK={"review":"gz:H4sIAAAAAAACA+19a1cbR9Lw9/yKQc9zQLMIIYm7hMxxfNn1Prl47azfC2Y5QhKgWEhCEr4scA5ObINjY3Bixzd8IbFjJ47BzsWxwdjnvD8ly0ji0/6Ft6qru6d7ZgT27vPh/fCSGGZ6uqu7q7urq6qrqlv/YBxvD4aCoZZEtjCaCPf889XNypNvK1/PVmYe1j7f+P3yD7/PXIH/q58/qa2ead3cWKrNnK2t/tJaWfqx+vgePNUenqs9PG89+6x694nxwaG//mPms+qrr6wn16trq8bhI3803k+U0p3t/3x1sfrZS2t23RhLlxOpRDlhbK7PVy6eRyhffGZ98agyc7p65W5lbvGfr25Zlzc2XzypXHte++3n2ptZBsd6cq3643ebL36q3Dljra/9Y+b0nxPHE0bt0m/WwtfWlxeNIVbRvlwyn0pDK6C9tZW1ytWnlfmV1k8y5Wz6QG44/0GmVG6tPHiF4B+82vrq9eaL+cqVl5Df+EPre60OfHS78PE94YOA1749u/XgqbX6svZsufLsntFsUB+thc+gXmv9ee3NXdHaz/amk/liopzJ54yD2UTOgFqrVx5ZC6vW/Xl4qP7y0Jq9XFu+SOAACeMT+XLaqN48Y/z10IHWPx820qVkopA2rIUfrKVH1aW70DLCGAChiitPr1R+Xm6l0UL0rSxXV65tvpip/IgQrcWLgG4jmc0kjxnJfK6cPlk2qHr4ms3k0vtOlosJw7q0vnXjvvV0AXpRXT9DLYIuOLB4b7b65HXt4beVO4s7IbLLhchHhMjK0kx1fa72+itrds2avwrthAoBrwCH8gNGALJ1bt5amIemGs1xQ+slNNxjVvIiqy+t334yPs1ncojHytVf4CuBra4/rK4/AWi
+
+===== qfReviewUiContextV420 =====
