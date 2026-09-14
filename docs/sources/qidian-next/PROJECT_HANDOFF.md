@@ -1,3 +1,11 @@
+## 2026-09-14 · 1.2.4-beta8 — 当前活动 Beta
+
+- 真机证据：`qidian-next-toc-phase-diag.json` 目录已正常，时间+字数均正常；缺失项只剩版权信息与分卷目录。
+- 当前 Beta 基线直接使用该诊断源请求生命周期；不得再把 Argus 签名提前回 `ruleBookInfo.init`。
+- beta8 仅替换 `ruleToc` 结果组织：调用 Stable `qfTocNormalizeAppV70` 恢复版权/分卷/VIP/章节 URL，再用当前 `Data.Chapters.T/W` 覆盖章节信息。
+- 若真机只显示“正文”卷而非真实卷名，说明当前 Argus v1 响应没有暴露分卷数组；下一步只为分卷结构增加独立 donor，不动已通过的目录主请求。
+- Stable 仍为 1.2.2，未获得用户确认前不得晋升。
+
 ## 2026-09-14 · 1.2.4-beta7 — 当前目录测试
 - 真机证据：最小目录诊断源可正常显示目录。
 - 当前 Beta：在 Stable 1.2.2 上仅集成已验证 Argus v1 目录链，关键是把 tocUrl 生成放入 `ruleBookInfo.init` 内，避免 init 后丢失原始 bookId 上下文。

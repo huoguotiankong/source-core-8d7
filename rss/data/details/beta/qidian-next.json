@@ -1,32 +1,33 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.4-beta7：按真机通过的最小目录链修复 qidian-next 的 bookInfo.init → tocUrl 生命周期。",
+  "summary": "Beta 1.2.4-beta8：沿用真机已通过的目录阶段请求链，恢复版权信息、分卷目录并保留时间+字数。",
   "badges": [
     "Beta",
-    "1.2.4-beta7",
-    "目录生命周期",
-    "Argus v1"
+    "1.2.4-beta8",
+    "目录恢复",
+    "版权信息",
+    "分卷"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12047",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12047",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12047",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12048",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12048",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12048",
   "sections": [
     {
-      "title": "真机结论",
-      "text": "独立最小目录源可以正常显示目录，当前阅读环境中的 Argus v1 与 QDSign/QDInfo 本身可用。"
+      "title": "真机基线",
+      "text": "目录阶段诊断已确认：目录可以加载，时间与字数正常。beta8 保持该请求生命周期不变。"
     },
     {
-      "title": "根因修正",
-      "text": "qidian-next 会先执行 ruleBookInfo.init。此前 beta5 在 init 后再生成 tocUrl，和最小源的生命周期不同；本版改为在 init 已解析出 bookId 时直接生成 tocUrl。"
+      "title": "本版补齐",
+      "text": "只调整目录结果组织：恢复 Stable 的版权信息行、分卷行、VIP 与章节 URL 结构；章节 T/W 继续从同一 Argus 响应回填。"
     },
     {
-      "title": "目录输出",
-      "text": "直接解析 Data.Chapters，保留章节名、章节链接、VIP 标记、更新时间，并将官方 W 字数字段合并到更新时间显示。"
+      "title": "分卷策略",
+      "text": "优先使用 Argus 返回的 Volumes / VolumeList / vs；若接口当前只返回扁平 Chapters，则保守显示“正文”卷，不额外切回旧 CatalogService。"
     },
     {
       "title": "冻结范围",
-      "text": "正文、评论、账号、搜索、详情主体、Provider 与其它运行模块继续沿用 Stable 1.2.2。"
+      "text": "正文、评论、账号、搜索、详情主体、情无/小雨及其它 Provider 不修改。"
     }
   ]
 }

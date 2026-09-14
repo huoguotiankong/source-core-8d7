@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-14T20:30:00+08:00",
+  "updatedAt": "2026-09-14T20:50:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -91,32 +91,33 @@
       "category": "novel",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "1.2.4-beta7",
-      "versionCode": 12047,
-      "updatedAt": "2026-09-14T20:30:00+08:00",
+      "version": "1.2.4-beta8",
+      "versionCode": 12048,
+      "updatedAt": "2026-09-14T20:50:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12047",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12047",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12047",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12048",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12048",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12048",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "Beta 1.2.4-beta7：按真机通过的最小目录链修复 qidian-next 的 bookInfo.init → tocUrl 生命周期。",
+      "summary": "Beta 1.2.4-beta8：沿用真机已通过的目录阶段请求链，恢复版权信息、分卷目录并保留时间+字数。",
       "tags": [
         "起点",
         "测试版",
         "目录修复",
-        "Argus v1",
-        "生命周期",
-        "章节字数"
+        "版权信息",
+        "分卷目录",
+        "章节字数",
+        "Argus v1"
       ],
       "changelog": [
-        "最小诊断源真机确认能正常显示目录，证明 Argus v1 与 QDSign/QDInfo 在当前阅读环境可用",
-        "定位此前 beta5 的集成差异：qidian-next 存在非空 ruleBookInfo.init，init 后再生成 tocUrl 可能丢失原始 Data.BookId",
-        "本版在 ruleBookInfo.init 已得到 bid 时直接生成已验证的 Argus v1 tocUrl，保留原 $.tocUrl 取值方式",
-        "ruleToc 直接解析 Data.Chapters，并输出 N/C/V/T/W；T 同时显示章节时间与官方字数",
-        "正文、评论、账号、搜索、详情主体、情无/小雨及其它 Provider 全部保持 Stable 1.2.2"
+        "沿用“目录阶段诊断”已真机确认可用的 ruleBookInfo.init → tocUrl 执行时机，目录请求和签名逻辑不改",
+        "目录输出改回 Stable 1.2.2 成熟行结构，恢复版权信息行、分卷行、VIP 标记与原章节 URL 结构",
+        "若 Argus 响应包含 Volumes/VolumeList/vs，直接恢复真实分卷；若仅有 Chapters，则保守生成正文卷",
+        "继续从 Data.Chapters 的 T/W 回填每章更新时间与官方字数，不增加额外字数请求",
+        "正文、评论、账号、搜索、详情主体、情无/小雨与其它 Provider 全部冻结"
       ],
-      "sha256": "cfa211a519b1b24d66127e5263511cad7c306444251013804381f50be2e94823"
+      "sha256": "9108bf5b294bdf37e5599b5a172045341a326076ce1dd89a9b6682ea0dad0831"
     },
     {
       "id": "picacg",

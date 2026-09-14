@@ -1,3 +1,10 @@
+## 2026-09-14 · qidian-next 1.2.4-beta8 — 目录结果层恢复
+- 用户真机确认独立“目录阶段诊断”可以正常显示目录，且章节时间、字数均正常；目录请求时机问题已定位。
+- beta8 直接沿用该诊断源的 `ruleBookInfo.init → tocUrl` 生命周期与 Argus v1 签名请求，不再修改请求层。
+- 仅恢复目录结果层：版权信息、分卷行、VIP 标记、Stable 章节 URL 结构；T/W 继续从同一响应回填。
+- 优先读取 Argus 的 `Volumes/VolumeList/vs`；若只返回 `Chapters`，保守生成“正文”卷，避免重新引入旧 CatalogService。
+- Stable 1.2.2 不变，等待真机确认版权信息、分卷及正文衔接。
+
 ## 2026-09-14 · qidian-next 1.2.4-beta7 — 目录生命周期修复
 - 用户真机确认独立最小目录源可以正常显示目录，证明 Argus v1 + QDSign/QDInfo 当前可用。
 - 根因进一步收敛到 qidian-next 的 `ruleBookInfo.init → tocUrl` 生命周期；此前 beta5 在 init 后生成直连 tocUrl，和最小源执行上下文不同。

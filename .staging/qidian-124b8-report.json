@@ -1,0 +1,14 @@
+{
+  "version": "1.2.4-beta8",
+  "phaseDiagSha256": "269813aa8586e05872c30f48f0f3ea2a40dec680807943372f34c1816f7635a8",
+  "betaSha256": "9108bf5b294bdf37e5599b5a172045341a326076ce1dd89a9b6682ea0dad0831",
+  "requestLifecycleFrozen": true,
+  "ruleContentFrozen": true,
+  "restored": [
+    "copyright",
+    "volume rows",
+    "vip",
+    "stable chapter URL",
+    "T+W"
+  ]
+}
