@@ -1,0 +1,9 @@
+{
+  "baseline": "Stable 1.2.2",
+  "stableSha256": "1eaffa24543b2af58aed1368578368ea326ffb0170338971bde558df725bed87",
+  "diagSha256": "3d678c97dcfcb427607e25b38cc4602011577ce7b56ecdeede1697b718b7dfc7",
+  "hypothesis": "fresh import fails before mature catalog chain because ruleBookInfo.init emits data:;base64 qfTocV71 pseudo tocUrl",
+  "change": "force tocUrl to HTTPS mobile catalog while preserving ruleToc/qfCatalogLoad/jsLib exactly",
+  "sourcePath": "sources/novel/qidian-next/qidian-next-toc-http-diag.json",
+  "identity": "https://m.qidian.com/?qf_source=qidian_next_toc_http_diag_1247"
+}
