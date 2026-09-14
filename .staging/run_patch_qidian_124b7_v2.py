@@ -11,4 +11,4 @@ assert n==1, f'bookInfo.init toc regex match count={n}'
 s['ruleBookInfo']['init']=init_out'''
 out,n=pat.subn(replacement,src,count=1)
 assert n==1, f'patch-script transform count={n}'
-exec(compile(out,'.staging/patch_qidian_124b7_catalog_lifecycle.py','exec'),{'__name__':'__main__'})
+exec(compile(out,'.staging/patch_qidian_124b7_catalog_lifecycle.py','exec'),{'__name__':'__main__','re':re})
