@@ -1,0 +1,22 @@
+{
+  "version": "1.2.5-beta2",
+  "versionCode": 12052,
+  "betaSha256": "40ab7526050e48f87dc9fdbbb9e2e10153006f4944cfc6d3985ebf631072a364",
+  "stableRuleTocFrozen": true,
+  "stableRuleBookInfoFrozen": true,
+  "stableRuleContentFrozen": true,
+  "bookSourceUrlFrozen": true,
+  "copyrightModuleOnly": true,
+  "wholePageSvgRemoved": true,
+  "htmlSinglePageLayout": true,
+  "noExtraNetworkRequest": true,
+  "features": [
+    "large title",
+    "3-column metrics",
+    "copyright statement",
+    "author signature",
+    "optional intro",
+    "small cover",
+    "tags"
+  ]
+}
