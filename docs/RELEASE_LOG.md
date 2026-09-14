@@ -1,3 +1,11 @@
+## 2026-09-14 · qidian-next Stable 1.2.6
+- 用户真机确认 `1.2.6-beta1` 功能均正常，并明确要求先晋升正式版后继续优化。
+- Stable 直接沿用该 Beta 运行代码，不新增业务逻辑。
+- 目录继续冻结在 1.2.4 已确认基线：Argus v1 + QDSign/QDInfo，自包含 `N/C/P/V/Vo/T`，支持时间、字数、真实分卷与版权信息。
+- 版权页沿用 1.2.5-beta3 紧凑固定版式。
+- 评论页参考妙想天开：首屏 10 条 + 后续分页；官方 v2 结构明确时走快速组织，保留 TitleInfoList、头像、时间/IP、点赞、配图、配音、楼中楼与回复分页。
+- 发布同步完成 Stable Source / Manifest / Stable Subscription / Novel Catalog / Stable Bundle / Stable Detail；活动 Beta 条目与 Beta Bundle 中的同逻辑源移除，Beta 物理文件保留作下一轮开发基线。
+
 ## 2026-09-14 · qidian-next 1.2.6-beta1 — 妙想天开评论页参考优化
 - 用户接受 1.2.5-beta3 版权页后，开发域切换到 Review；本版从当前 Beta 继续，但严格只替换 `review_local_ui`。
 - 复用此前以“妙想天开”为参考准备的评论模块：Reader 富身份首屏10条、严格结构快通道、真实 TitleInfoList、楼中楼/媒体与滚动分页。

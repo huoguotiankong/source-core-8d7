@@ -2,46 +2,46 @@
   "schemaVersion": 1,
   "channel": "stable",
   "name": "正式版",
-  "updatedAt": "2026-09-14T21:00:00+08:00",
+  "updatedAt": "2026-09-14T21:55:00+08:00",
   "items": [
     {
       "id": "qidian-next",
       "name": "🌈 起点增强",
-      "summary": "正式版 1.2.4：由真机确认的 1.2.4-beta10 直接晋升；目录恢复并支持时间、字数、分卷和版权信息。",
+      "summary": "正式版 1.2.6：真机确认评论功能正常；合并紧凑版权页与妙想天开参考评论优化。",
       "icon": "",
       "channel": "stable",
-      "version": "1.2.4",
-      "updatedAt": "2026-09-14T21:00:00+08:00",
+      "version": "1.2.6",
+      "updatedAt": "2026-09-14T21:55:00+08:00",
       "tags": [
         "起点",
         "正式版",
-        "目录修复",
-        "X-QD参考",
-        "分卷目录",
-        "版权信息",
+        "目录",
         "章节字数",
-        "Argus v1",
-        "限免源",
-        "情无",
-        "小雨用户系统",
-        "评论页",
+        "分卷",
+        "版权信息",
         "段评",
-        "书友圈",
-        "本章说"
+        "本章说",
+        "楼中楼",
+        "10条分页",
+        "TitleInfoList",
+        "配图",
+        "配音",
+        "情无",
+        "小雨用户系统"
       ],
       "changelog": [
-        "由用户真机确认的 1.2.4-beta10 直接晋升 Stable，不新增业务逻辑",
-        "目录采用自包含 N/C/P/V/Vo/T 扁平行，不再在 ruleToc 中调用旧大型目录转换模块",
-        "保留已验证的 Argus v1 + QDSign/QDInfo 目录请求时机，章节显示更新时间 + 官方字数",
-        "恢复真实分卷与版权信息目录项",
-        "正文、评论、账号、搜索、详情主体、情无/小雨及其它 Provider 保持原功能链"
+        "由用户真机确认的 1.2.6-beta1 直接晋升 Stable，不新增业务逻辑",
+        "目录继续使用已确认的 Argus v1 + QDSign/QDInfo 与轻量 N/C/P/V/Vo/T 输出，支持时间、字数、真实分卷和版权信息",
+        "版权页沿用 1.2.5-beta3 紧凑固定版式",
+        "评论页参考妙想天开：首屏 10 条、后续分页；官方 v2 结构明确时走快速组织，否则保留成熟 Web/mobile 骨架链",
+        "保留真实 TitleInfoList 身份标签、头像、时间/IP、点赞、配图、配音、楼中楼与回复分页；正文/账号/Provider 不变"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12040",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12040",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12040",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12060",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12060",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12060",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json",
-      "versionCode": 12040,
-      "sha256": "d9870a0f2d1224ad836f1516268977ac1c24c2e05fb4dfd622e6d77c207773eb",
+      "versionCode": 12060,
+      "sha256": "7bac9ae6cd240c397f58793225be71811ecbcd6ffa90e98c91697691c993848c",
       "sourcePath": "sources/novel/qidian-next/qidian-next.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7"
     },
@@ -111,5 +111,5 @@
       "type": "comic"
     }
   ],
-  "generatedAt": "2026-09-14T21:00:00+08:00"
+  "generatedAt": "2026-09-14T21:55:00+08:00"
 }

@@ -1,34 +1,33 @@
 {
   "kind": "source",
   "title": "🌈 起点增强",
-  "summary": "正式版 1.2.4：由真机确认的 1.2.4-beta10 直接晋升；目录恢复并支持时间、字数、分卷和版权信息。",
+  "summary": "正式版 1.2.6：真机确认评论功能正常；合并紧凑版权页与妙想天开参考评论优化。",
   "badges": [
     "Stable",
-    "1.2.4",
-    "目录恢复",
-    "分卷",
+    "1.2.6",
+    "目录",
     "版权信息",
-    "章节字数"
+    "评论优化"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12040",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12040",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12040",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12060",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12060",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12060",
   "sections": [
     {
       "title": "当前正式版",
-      "text": "1.2.4 由用户真机确认的 1.2.4-beta10 原业务逻辑晋升，不新增功能改动。"
+      "text": "1.2.6 由用户真机确认的 1.2.6-beta1 原业务逻辑直接晋升。"
     },
     {
-      "title": "目录",
-      "text": "目录采用参考起点X-QD的轻量扁平结构 N/C/P/V/Vo/T；保留已验证 Argus v1 + QDSign/QDInfo 请求时机，支持章节时间、字数、真实分卷与版权信息。"
+      "title": "目录与版权",
+      "text": "继续使用已确认的 Argus v1 目录主链，支持章节时间、字数、真实分卷和版权信息；版权页采用紧凑固定版式。"
+    },
+    {
+      "title": "评论",
+      "text": "参考妙想天开：首屏10条、后续分页；官方 v2 结构明确时快速组织主评论/楼中楼，保留 TitleInfoList、头像、时间/IP、点赞、配图、配音与回复分页。"
     },
     {
       "title": "其它功能",
-      "text": "正文、评论、账号、搜索、详情主体、情无/小雨和其它 Provider 沿用既有稳定功能链。"
-    },
-    {
-      "title": "发布状态",
-      "text": "已完成真机确认并晋升 Stable；活动 Beta 条目已从测试目录和 Beta Bundle 移除，Beta 物理文件保留作历史开发基线。"
+      "text": "正文、账号、搜索、情无/小雨及其它 Provider 沿用既有稳定功能链。"
     }
   ]
 }
