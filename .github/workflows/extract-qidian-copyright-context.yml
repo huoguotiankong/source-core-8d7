@@ -1,0 +1,41 @@
+name: extract-qidian-copyright-context
+on:
+  push:
+    paths:
+      - '.staging/qidian-copyright-context.trigger'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract copyright context
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next.json')
+          arr=json.loads(p.read_text(encoding='utf-8'))
+          s=arr[0] if isinstance(arr,list) else arr
+          out=[]
+          out.append('BOOK_SOURCE_COMMENT\n'+str(s.get('bookSourceComment',''))+'\n')
+          out.append('RULE_TOC\n'+json.dumps(s.get('ruleToc',{}),ensure_ascii=False,indent=2)+'\n')
+          out.append('RULE_CONTENT\n'+json.dumps(s.get('ruleContent',{}),ensure_ascii=False,indent=2)+'\n')
+          js=str(s.get('jsLib',''))
+          pats=['版权信息','copyright','qfType','license','License','Copyright']
+          for pat in pats:
+            out.append('\n### PATTERN '+pat+' ###\n')
+            for m in list(re.finditer(re.escape(pat),js,re.I))[:80]:
+              a=max(0,m.start()-900); b=min(len(js),m.end()+1500)
+              out.append(js[a:b]+'\n---\n')
+          Path('.staging/qidian-copyright-context.txt').write_text('\n'.join(out),encoding='utf-8')
+          PY
+      - name: Commit extract
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .staging/qidian-copyright-context.txt
+          git commit -m 'chore: extract qidian copyright context' || exit 0
+          git push
