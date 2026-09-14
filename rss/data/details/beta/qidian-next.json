@@ -1,27 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.7-beta9：把妙想天开的评论请求执行层也复制过来，首批评论在 showBrowser 前由书源规则上下文预取并注入。",
+  "summary": "Beta 1.2.7-beta10：表情协议兼容层，支持旧 fn 映射之外的 Emoji/Face/Expression/Sticker 元数据与图片表情，并显示未知码点。",
   "badges": [
     "Beta",
-    "1.2.7-beta9",
-    "妙想天开外层请求"
+    "1.2.7-beta10",
+    "Emoji协议兼容"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12079",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12079",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12079",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12080",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12080",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12080",
   "sections": [
     {
-      "title": "根因方向",
-      "text": "妙想天开首屏评论请求发生在书源规则上下文，而不是 showBrowser WebView 内。前几版只复制协议参数，没有复制执行层。"
-    },
-    {
-      "title": "本版",
-      "text": "showBrowser 前精确使用妙想天开的 createSymmetricCrypto/qdBuildReq/java.ajax 语义预取当前段落原始 DataList，再注入现有评论 UI。"
+      "title": "判断",
+      "text": "真机反馈表现为“少数表情正常、部分表情方框”，因此本轮不再继续改签名与请求层，而是直接扩展表情 token/结构字段兼容。"
     },
     {
       "title": "兼容",
-      "text": "现有 WebView 评论链保留为外层预取失败或超出预取范围时的兜底。"
+      "text": "保留 fn 映射，新增 Emoji/Face/Expression/Sticker 等字段递归识别和图片型表情显示。"
+    },
+    {
+      "title": "诊断",
+      "text": "如果某个表情仍无法恢复，Beta 会在该占位符旁显示 U+码点；用同一条评论截图即可确定下一步映射。"
+    },
+    {
+      "title": "冻结",
+      "text": "Stable 1.2.6 的目录、正文、版权、账号、Provider 以及评论请求/分页均不修改。"
     }
   ]
 }

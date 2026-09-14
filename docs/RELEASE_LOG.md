@@ -1,3 +1,10 @@
+## 2026-09-15 · qidian-next 1.2.7-beta10
+- 真机表现为少数表情正常、部分表情仍为方框；停止继续修改签名/请求执行层，转向表情协议兼容。
+- 保留旧 `[fn=N]` 映射，并增加 `[emoji=N]` / `[face=N]` / `[emot=N]` / `[expression=N]` token 支持。
+- 递归识别 Emoji/Face/Expression/Sticker 等元数据；有官方图片 URL 时以内联图片渲染。
+- 未识别占位符在 Beta 显示真实 U+码点，便于下一轮按证据补映射。
+- 其它业务域冻结。
+
 ## 2026-09-15 · qidian-next 1.2.7-beta9
 - beta8 真机仍有方框，确认妙想天开与当前实现最大的剩余差异是请求执行层：妙想天开在 showBrowser 前的书源规则上下文请求评论。
 - 新增外层 donor seed：精确使用妙想天开的 DESede/createSymmetricCrypto、qdBuildReq 和 java.ajax 语义，pz=10，并发预取当前段落最多10页。

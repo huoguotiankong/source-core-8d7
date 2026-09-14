@@ -544,3 +544,10 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - beta9 新增 outer donor seed，评论页优先使用该原始 DataList，现有 WebView 链作为兜底。
 - 这是当前表情问题首次对“执行层”而不只是签名字段进行对齐。
 
+
+
+## 2026-09-15 · 1.2.7-beta10 表情协议兼容
+- beta9 真机仍有方框，但同时确认部分表情可以正常显示。后续不再优先怀疑 QDSign/请求执行层。
+- 妙想天开公开的 replaceEmoji 仅有 fn=1..64；beta10 新增多格式 token、Emoji/Face/Expression/Sticker 元数据与图片 URL 支持。
+- 对仍无法恢复的占位符显示真实 Unicode U+码点，用于下一轮建立精确映射，不再猜测。
+- Stable 1.2.6 与目录/正文/版权/账号/Provider/评论分页请求链保持冻结。

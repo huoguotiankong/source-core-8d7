@@ -1,0 +1,14 @@
+{
+  "version": "1.2.7-beta10",
+  "versionCode": 12080,
+  "sha256": "1a019a887ed0d7e6fd44270bfd1b8c71367ee0ec257e4937193351b37c02e738",
+  "baseline": "1.2.7-beta9",
+  "focus": "emoji protocol/mapping rather than request chain",
+  "features": [
+    "multi token formats",
+    "structured emoji hints",
+    "image emoji",
+    "unknown codepoint display"
+  ],
+  "stableBusinessFrozen": true
+}
