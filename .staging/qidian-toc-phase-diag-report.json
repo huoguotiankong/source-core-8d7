@@ -1,0 +1,13 @@
+{
+  "stableSha256": "1eaffa24543b2af58aed1368578368ea326ffb0170338971bde558df725bed87",
+  "diagSha256": "269813aa8586e05872c30f48f0f3ea2a40dec680807943372f34c1816f7635a8",
+  "identity": "https://m.qidian.com/?qf_source=qidian_next_toc_phase_diag_1248",
+  "changedTopFields": [
+    "jsLib",
+    "ruleBookInfo.init",
+    "ruleBookInfo.tocUrl",
+    "ruleToc",
+    "display identity"
+  ],
+  "ruleContentFrozen": true
+}
