@@ -1,0 +1,19 @@
+{
+  "version": "1.2.7-beta3",
+  "versionCode": 12073,
+  "betaSha256": "69e6dc75b31495f4eeff1358a00834de893028f31fef241208953daad761d625",
+  "baseline": "1.2.7-beta2 / Stable 1.2.6",
+  "rootCause": "malformed inline onerror quote escaping caused review_local_ui JavaScript parse failure",
+  "malformedHandlersFixed": 2,
+  "syntaxGate": "node --check",
+  "officialTitleImagePreserved": true,
+  "emojiPreserved": true,
+  "avatarFallbackPreserved": true,
+  "firstPageStrict10Preserved": true,
+  "backgroundPrefetchPages": 0,
+  "scrollThresholdPx": 600,
+  "ruleTocFrozen": true,
+  "ruleBookInfoFrozen": true,
+  "ruleContentFrozen": true,
+  "bookSourceUrlFrozen": true
+}

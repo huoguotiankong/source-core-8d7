@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.7-beta2：评论标签改用起点官方图形 TitleImage，补强表情与头像显示；继承 beta1 按需分页。",
+  "summary": "Beta 1.2.7-beta3：修复 beta2 评论页脚本解析失败导致一直加载；保留官方标签、表情和头像优化。",
   "badges": [
     "Beta",
-    "1.2.7-beta2",
-    "评论显示"
+    "1.2.7-beta3",
+    "评论回归修复"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12072",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12072",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12072",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12073",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12073",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12073",
   "sections": [
     {
-      "title": "标签",
-      "text": "TitleInfoList 优先使用起点官方 TitleImage 图形称号，视觉向妙想天开靠拢；没有官方图片时仍保留原文字标签兜底。"
+      "title": "本版修复",
+      "text": "beta2 的图片 onerror 内联字符串存在错误的引号转义，导致整个评论脚本无法解析，所以页面停在“加载原文…/加载中…”。beta3 已改为统一图片错误监听。"
     },
     {
-      "title": "表情",
-      "text": "[fn=N] 使用与参考源一致的起点表情映射，并增加 WebView Emoji 字体兜底及转义形式兼容。"
+      "title": "保留优化",
+      "text": "官方 TitleImage 标签、[fn] 表情映射、Emoji 字体、头像多字段兼容和首字兜底全部保留。"
     },
     {
-      "title": "头像",
-      "text": "扩展官方头像字段和 URL 规范化；远程头像加载失败时直接显示用户名首字，不再出现空白/破图头像。"
+      "title": "分页",
+      "text": "继续保持首屏10条、无后台预取、距离底部600px再加载下一页。"
     },
     {
       "title": "冻结项",
-      "text": "继承 beta1 的10条首屏/按需分页；评论请求和数据链、目录、版权、正文、账号、Provider 全部不修改。"
+      "text": "评论请求/解析数据链、目录、版权、正文、账号和 Provider 均未修改。"
     }
   ]
 }

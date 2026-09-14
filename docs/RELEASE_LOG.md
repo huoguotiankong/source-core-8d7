@@ -1,3 +1,10 @@
+## 2026-09-14 · qidian-next 1.2.7-beta3
+- 修复 beta2 评论页一直加载：根因为内联图片 `onerror` 的引号转义破坏了 `review_local_ui` JavaScript 解析。
+- 图片失败处理改为统一 capture error 监听，避免生成 HTML 字符串中的嵌套引号风险。
+- 官方 TitleImage 标签、表情、头像优化与 beta1 按需分页全部保留。
+- 评论请求链、目录、版权、正文、账号、Provider 全部冻结。
+- 新增 Node `--check` 语法门禁；未经真机确认不得晋升 Stable。
+
 ## 2026-09-14 · qidian-next 1.2.7-beta2
 - 用户真机截图要求评论标签继续向妙想天开靠拢，并修复表情、少量头像显示失败。
 - 仅修改 `review_local_ui`：TitleInfoList 优先官方 TitleImage；表情增加参考映射/Emoji 字体兜底；头像扩展字段、URL规范化和首字兜底。

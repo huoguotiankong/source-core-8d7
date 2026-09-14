@@ -2,20 +2,20 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-09-14T22:25:00+08:00",
+  "updatedAt": "2026-09-14T22:35:00+08:00",
   "items": [
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "Beta 1.2.7-beta2：评论标签改用起点官方图形 TitleImage，补强表情与头像显示；继承 beta1 按需分页。",
+      "summary": "Beta 1.2.7-beta3：修复 beta2 评论页脚本解析失败导致一直加载；保留官方标签、表情和头像优化。",
       "channel": "beta",
-      "version": "1.2.7-beta2",
-      "updatedAt": "2026-09-14T22:25:00+08:00",
+      "version": "1.2.7-beta3",
+      "updatedAt": "2026-09-14T22:35:00+08:00",
       "tags": [
         "起点",
         "测试版",
         "评论优化",
-        "妙想天开参考",
+        "回归修复",
         "官方标签",
         "TitleImage",
         "Emoji",
@@ -25,18 +25,18 @@
         "Stable 1.2.6基线"
       ],
       "changelog": [
-        "基于 1.2.7-beta1，仅修改 review_local_ui；首屏10条、取消后台预取、600px近底翻页原样保留",
-        "参考妙想天开：TitleInfoList 同时存在 TitleName/TitleImage 时优先渲染起点官方 TitleImage，不再默认把图形称号降级成 CSS 文字标签",
-        "表情继续使用起点 [fn=N] 映射，改为 HTML 转义后识别并加入 Noto/Segoe/Apple Color Emoji 字体兜底，兼容带反斜杠及实体括号形式",
-        "头像扩展 UserAvatar/AvatarUrl/HeadIcon/HeadUrl/FaceUrl 等官方字段；统一 //、转义斜杠、http/https，并用用户名首字作为图片失败兜底",
-        "评论接口/签名、TitleInfoList 数据融合、配图/配音、楼中楼请求链、目录、版权、正文、账号和 Provider 全部冻结"
+        "修复 beta2 内联图片 onerror 引号转义错误导致 review_local_ui 整段 JavaScript 无法解析的问题",
+        "图片失败处理改为 capture error 统一监听，避免再次把嵌套引号写入 HTML 字符串",
+        "保留官方 TitleImage 标签、[fn=N] 表情映射、Emoji 字体兜底、头像字段扩展与用户名首字兜底",
+        "保留首屏10条、取消后台预取、600px近底翻页和楼中楼完成态",
+        "评论请求/解析数据链、目录、版权、正文、账号、Provider 全部冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12072",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12072",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12072",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12073",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12073",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12073",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2",
-      "versionCode": 12072,
-      "sha256": "20f43e7c1eee9d2add48659209dea8a0eb3bbed6a45fa24824716de5ae024d36",
+      "versionCode": 12073,
+      "sha256": "69e6dc75b31495f4eeff1358a00834de893028f31fef241208953daad761d625",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7"
     },
@@ -103,5 +103,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-09-14T22:25:00+08:00"
+  "generatedAt": "2026-09-14T22:35:00+08:00"
 }
