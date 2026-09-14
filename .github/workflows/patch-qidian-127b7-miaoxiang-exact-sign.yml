@@ -1,0 +1,37 @@
+name: patch-qidian-127b7-miaoxiang-exact-sign
+on:
+  push:
+    paths:
+      - '.staging/patch_qidian_127b7_miaoxiang_exact_sign.trigger'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Build qidian-next 1.2.7-beta7
+        run: python3 .staging/patch_qidian_127b7_miaoxiang_exact_sign.py
+      - name: Syntax check unpacked review module
+        run: node --check .staging/qidian-127b7-review-check.js
+      - name: Verify exact donor signing semantics
+        run: |
+          grep -Fq 'QF_READER_DONOR_DEVICES_V1277' .staging/qidian-127b7-review-check.js
+          grep -Fq "'QDSign':donorOne('QDSign')" .staging/qidian-127b7-review-check.js
+          grep -Fq "'QDInfo':donorOne('QDInfo')" .staging/qidian-127b7-review-check.js
+          grep -Fq "'tstamp':String(donorOne('tstamp'))" .staging/qidian-127b7-review-check.js
+          grep -Fq "'User-Agent':donorOne('UA')" .staging/qidian-127b7-review-check.js
+          grep -Fq 'qfEmojiRecoverContentV1275' .staging/qidian-127b7-review-check.js
+          grep -Fq "qfReaderSignedRequestV3245('v2/chapterreview/getparagraphscomments'" .staging/qidian-127b7-review-check.js
+      - name: Commit generated Beta
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md .staging/qidian-127b7-report.json .staging/qidian-127b7-review-check.js
+          git diff --cached --quiet && exit 0
+          git commit -m "qidian beta: exact Miaoxiang qdBuildReq semantics in 1.2.7-beta7"
+          git push origin HEAD:main
