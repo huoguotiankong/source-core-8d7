@@ -1,0 +1,35 @@
+name: patch-qidian-127b11-pua-emoji-restore
+on:
+  push:
+    paths:
+      - '.staging/qidian-127b11-pua-emoji-restore.trigger'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Apply beta11 patch
+        run: |
+          python .staging/patch_qidian_127b11_pua_emoji_restore.py
+          node --check .staging/qidian-127b11-review-check.js
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('.staging/qidian-127b11-report.json').read_text(encoding='utf-8'))
+          assert r['version']=='1.2.7-beta11'
+          assert r['versionCode']==12081
+          assert r['evidence']=='U+F60D -> U+1F60D -> 😍'
+          assert r['stableBusinessFrozen'] is True
+          print(r)
+          PY
+      - name: Commit beta11
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md .staging/qidian-127b11-report.json .staging/qidian-127b11-review-check.js
+          git diff --cached --quiet || git commit -m 'qidian beta: 1.2.7-beta11 restore truncated emoji codepoints'
+          git push origin HEAD:main
