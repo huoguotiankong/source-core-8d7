@@ -1,0 +1,62 @@
+name: build-qidian-http-toc-diag
+on:
+  push:
+    paths:
+      - '.staging/build-qidian-http-toc-diag.trigger'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Build HTTPS toc diagnostic source
+        run: |
+          python3 - <<'PY'
+          import json,hashlib,os
+          src='sources/novel/qidian-next/qidian-next.json'
+          dst='sources/novel/qidian-next/qidian-next-toc-http-diag.json'
+          root=json.load(open(src,encoding='utf-8'))
+          stable=root[0] if isinstance(root,list) else root
+          d=json.loads(json.dumps(stable,ensure_ascii=False))
+          init=(d.get('ruleBookInfo') or {}).get('init','')
+          old="info.tocUrl=bid?(qfTocLocalV71||('https://m.qidian.com/book/'+bid+'/catalog/')):String(baseUrl||'');"
+          new="info.tocUrl=bid?('https://m.qidian.com/book/'+bid+'/catalog/'):String(baseUrl||'');"
+          assert old in init, 'expected data-toc assignment not found'
+          d['ruleBookInfo']['init']=init.replace(old,new,1)
+          d['bookSourceName']='🌈 起点增强 · HTTP目录诊断'
+          d['bookSourceGroup']='🧪 目录诊断'
+          d['bookSourceUrl']='https://m.qidian.com/?qf_source=qidian_next_toc_http_diag_1247'
+          d['bookSourceComment']='目录冷启动诊断：业务代码基于 Stable 1.2.2，仅禁用详情页生成的 data:;base64 qfTocV71 目录伪 URL，强制 tocUrl 使用 https://m.qidian.com/book/{bookId}/catalog/；ruleToc/qfCatalogLoad/QF_CatalogService 完全不改。用于验证新导入目录失败是否来自 data: 目录入口在当前 Legado 冷启动路径失效。'
+          out=[d] if isinstance(root,list) else d
+          open(dst,'w',encoding='utf-8').write(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+          # Hard isolation checks.
+          allowed={'bookSourceName','bookSourceGroup','bookSourceUrl','bookSourceComment','ruleBookInfo'}
+          for k,v in stable.items():
+              if k not in allowed: assert d.get(k)==v, 'unexpected top-level diff '+k
+          for k,v in stable.get('ruleBookInfo',{}).items():
+              if k!='init': assert d['ruleBookInfo'].get(k)==v, 'unexpected bookInfo diff '+k
+          assert d.get('ruleToc')==stable.get('ruleToc')
+          assert d.get('jsLib')==stable.get('jsLib')
+          report={
+            'baseline':'Stable 1.2.2',
+            'stableSha256':hashlib.sha256(open(src,'rb').read()).hexdigest(),
+            'diagSha256':hashlib.sha256(open(dst,'rb').read()).hexdigest(),
+            'hypothesis':'fresh import fails before mature catalog chain because ruleBookInfo.init emits data:;base64 qfTocV71 pseudo tocUrl',
+            'change':'force tocUrl to HTTPS mobile catalog while preserving ruleToc/qfCatalogLoad/jsLib exactly',
+            'sourcePath':dst,
+            'identity':d['bookSourceUrl']
+          }
+          os.makedirs('.staging',exist_ok=True)
+          open('.staging/qidian-http-toc-diag-report.json','w',encoding='utf-8').write(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+          PY
+      - name: Commit diagnostic source
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-toc-http-diag.json .staging/qidian-http-toc-diag-report.json
+          git commit -m 'qidian diag: force HTTPS toc entry on stable runtime' || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
