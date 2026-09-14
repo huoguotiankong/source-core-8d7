@@ -1,0 +1,49 @@
+name: diag-qidian-cold-catalog
+on:
+  push:
+    paths:
+      - '.staging/diag-qidian-cold-catalog.trigger'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Extract catalog client and endpoint evidence
+        run: |
+          python3 - <<'PY'
+          import json,re,hashlib,os
+          p='sources/novel/qidian-next/qidian-next.json'
+          o=json.load(open(p,encoding='utf-8'))
+          js=o.get('jsLib','')
+          out=[]
+          out.append('stable_sha256='+hashlib.sha256(open(p,'rb').read()).hexdigest())
+          for name in ['QF_CatalogClient','QF_CatalogService','QF_CatalogNormalizer','QF_LegadoCatalogAdapter','QF_CacheManager']:
+              pats=[f'var {name}=',f'var {name} =',f'{name}=(',f'{name} = (']
+              pos=-1
+              for pat in pats:
+                  pos=js.find(pat)
+                  if pos>=0: break
+              out.append(f'\n===== {name} pos={pos} =====')
+              if pos>=0:
+                  out.append(js[pos:pos+26000])
+          out.append('\n===== URL/endpoint occurrences =====')
+          keys=['getsimple','chapterlist','chapterList','druidv6','book.qidian.com/ajax/book/category','api.m.qidian.com','bookId=','start=0','start=1']
+          for k in keys:
+              poss=[m.start() for m in re.finditer(re.escape(k),js,re.I)]
+              out.append(f'\n-- {k}: {len(poss)} hits --')
+              for pos in poss[:20]: out.append(js[max(0,pos-700):pos+1400])
+          os.makedirs('.staging',exist_ok=True)
+          open('.staging/qidian-cold-catalog-evidence.txt','w',encoding='utf-8').write('\n'.join(out))
+          PY
+      - name: Commit evidence
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-cold-catalog-evidence.txt
+          git commit -m 'diag: extract qidian cold catalog evidence' || exit 0
+          git push origin HEAD:main
