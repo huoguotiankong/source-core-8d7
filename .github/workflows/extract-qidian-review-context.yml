@@ -38,7 +38,7 @@ jobs:
                   if depth==0: end=i+1; break
           pack=json.loads(js[start:end])
           Path('.staging/qidian-review-pack-index.json').write_text(json.dumps(sorted(pack.keys()),ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          for key in ('review','review_local_ui','review_server_ui','review_server_core'):
+          for key in ('review','review_local_ui','review_server_ui'):
               if key not in pack: continue
               raw=pack[key]
               if raw.startswith('gz:'):
@@ -52,7 +52,7 @@ jobs:
       - name: Commit extracts
         run: |
           git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .staging/qidian-review-pack-index.json .staging/qidian-review*.js || true
+          git config user.email '41898282+huoguotiankong@users.noreply.github.com'
+          git add .staging/qidian-review-pack-index.json .staging/qidian-review.js .staging/qidian-review_local_ui.js .staging/qidian-review_server_ui.js
           git commit -m 'chore: extract qidian review modules' || exit 0
           git push
