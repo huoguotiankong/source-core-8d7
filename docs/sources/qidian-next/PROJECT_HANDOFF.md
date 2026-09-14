@@ -1,3 +1,11 @@
+## 2026-09-14 · 1.2.4-beta10 — 当前活动 Beta：X-QD 风格目录
+
+- 新参考源 `起点X-QD` 的关键不是复杂 Legado 目录解析，而是把目录先整理成 `N/C/P/V/Vo/T` 扁平行再交给阅读。
+- beta10 从已真机通过的 `qidian-next-toc-phase-diag.json` 出发，只重写 `ruleToc`；`jsLib`、`ruleBookInfo`、`ruleContent` 与通过版保持一致。
+- 禁止在该路径重新调用 `qfTocNormalizeAppV70`/旧 CatalogService；它们在 beta8 的当前执行阶段导致目录再次失败。
+- 分卷：优先 `Data.Volumes.VolumeCode` ↔ `Chapter.Vc`，兼容嵌套 volume.chapters；版权：首行手工构造旧 qfType=copyright URL；章节：T/W 直接输出时间+字数。
+- 未经真机确认不得晋升 Stable。
+
 ## 2026-09-14 · 1.2.4-beta9 — 当前活动 Beta：身份 A/B
 
 - 已通过对照：独立 `qidian-next-toc-phase-diag.json` 能加载目录并显示时间+字数。

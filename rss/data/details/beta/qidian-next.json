@@ -1,28 +1,32 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.4-beta9：与真机已通过的目录阶段诊断源业务代码完全一致，仅切回 qidian-next 正常身份做 A/B。",
+  "summary": "Beta 1.2.4-beta10：参考起点X-QD，目录改为自包含 N/C/P/V/Vo/T 扁平行，恢复时间字数/分卷/版权信息且不调用旧目录模块。",
   "badges": [
     "Beta",
-    "1.2.4-beta9",
-    "身份A/B",
-    "目录诊断"
+    "1.2.4-beta10",
+    "X-QD目录结构",
+    "分卷/版权"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12049",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12049",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12049",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=120410",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=120410",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=120410",
   "sections": [
     {
-      "title": "唯一变量",
-      "text": "beta9 与已经真机通过的目录阶段诊断源业务运行代码完全一致；唯一关键变量是 bookSourceUrl 恢复为 qidian-next 正常身份。"
+      "title": "参考结论",
+      "text": "起点X-QD 的 ruleToc 很薄：catalog.php 已返回 N/C/P/V/Vo/T 完整行，阅读只按字段消费。beta10 按这个思路把 qidian-next 的目录结果层改成自包含扁平行。"
     },
     {
-      "title": "为什么撤回 beta8",
-      "text": "beta8 在工作诊断源基础上调用 Stable 目录结果转换器后再次无法加载，因此先撤销版权/分卷补丁，不继续叠加猜测。"
+      "title": "为什么不同于 beta8",
+      "text": "beta8 在 ruleToc 阶段调用 qfTocNormalizeAppV70，可能依赖未在该阶段加载的 lazy 目录模块。beta10 完全不调用这些函数，只用当前 Argus JSON 和原生 JS。"
     },
     {
-      "title": "判定标准",
-      "text": "若 beta9 失败但独立目录阶段诊断继续成功，说明问题来自正常身份下的阅读持久化状态/旧书籍记录；若 beta9 成功，则 beta8 的结果转换层是故障点。"
+      "title": "版权与分卷",
+      "text": "版权信息首行直接构造 qidian-next 原 qfType=copyright 入口；分卷优先使用 Data.Volumes 与章节 Vc/VolumeCode 映射，时间字数继续用 T/W。"
+    },
+    {
+      "title": "冻结范围",
+      "text": "正文、评论、账号、搜索、详情主体及所有正文 Provider 不修改。"
     }
   ]
 }

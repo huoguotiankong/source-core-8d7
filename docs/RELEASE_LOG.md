@@ -1,3 +1,10 @@
+## 2026-09-14 · qidian-next 1.2.4-beta10 — X-QD 风格自包含目录结果层
+- 用户提供 `起点X-QD` 作为参考：其目录规则直接消费服务端已整理好的 `N/C/P/V/Vo/T` 行，分卷与版权信息都作为普通目录行返回。
+- beta10 保留已真机通过的“目录阶段诊断” Argus v1 请求生命周期与签名链；不再调用 `qfTocNormalizeAppV70` 或旧 CatalogService。
+- `ruleToc` 自包含构造版权信息、分卷、章节行；章节 T/W 直接形成时间+字数，分卷优先按 `Data.Volumes.VolumeCode` ↔ `Chapter.Vc` 映射。
+- 版权信息沿用 qidian-next 原 `qfType=copyright` 内容入口；不依赖 X-QD 的服务器。
+- Stable 1.2.2 不变，等待真机确认目录、分卷、版权信息与正文衔接。
+
 ## 2026-09-14 · qidian-next 1.2.4-beta9 — 目录身份 A/B
 - 真机：独立“目录阶段诊断”可正常加载目录且时间/字数正常；beta8 恢复版权/分卷后再次无法加载。
 - beta9 撤销 beta8 的结果层补丁，业务代码完整回到已通过的目录阶段诊断源。

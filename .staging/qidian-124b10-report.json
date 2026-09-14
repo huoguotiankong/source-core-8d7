@@ -1,0 +1,23 @@
+{
+  "version": "1.2.4-beta10",
+  "phaseDiagSha256": "269813aa8586e05872c30f48f0f3ea2a40dec680807943372f34c1816f7635a8",
+  "betaSha256": "fd7c4e47a937f063c633cb03dcf56d31fe2c712194494bb75714bc372453f145",
+  "requestLifecycleFrozen": true,
+  "ruleContentFrozen": true,
+  "ruleTocSelfContained": true,
+  "usesLegacyNormalizer": false,
+  "rowSchema": [
+    "N",
+    "C",
+    "P",
+    "V",
+    "Vo",
+    "T"
+  ],
+  "features": [
+    "copyright",
+    "volumes",
+    "time",
+    "wordCount"
+  ]
+}

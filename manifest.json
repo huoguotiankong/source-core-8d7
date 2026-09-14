@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-14T21:00:00+08:00",
+  "updatedAt": "2026-09-14T20:44:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -91,32 +91,34 @@
       "category": "novel",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "1.2.4-beta9",
-      "versionCode": 12049,
-      "updatedAt": "2026-09-14T21:00:00+08:00",
+      "version": "1.2.4-beta10",
+      "versionCode": 120410,
+      "updatedAt": "2026-09-14T20:44:00+08:00",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12049",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12049",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12049",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=120410",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=120410",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=120410",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "summary": "Beta 1.2.4-beta9：与真机已通过的目录阶段诊断源业务代码完全一致，仅切回 qidian-next 正常身份做 A/B。",
+      "summary": "Beta 1.2.4-beta10：参考起点X-QD，目录改为自包含 N/C/P/V/Vo/T 扁平行，恢复时间字数/分卷/版权信息且不调用旧目录模块。",
       "tags": [
         "起点",
         "测试版",
-        "目录诊断",
-        "身份A/B",
-        "Argus v1",
-        "章节字数"
+        "目录修复",
+        "X-QD参考",
+        "分卷目录",
+        "版权信息",
+        "章节字数",
+        "Argus v1"
       ],
       "changelog": [
-        "业务运行代码逐字段等于已真机确认可正常加载目录的“目录阶段诊断”源",
-        "仅将 bookSourceUrl 从独立诊断身份切回 qidian-next 正常身份，用于隔离阅读持久化状态/书籍记录影响",
-        "本版故意不补版权信息和分卷，避免再次混入目录结果层变化",
-        "若 beta9 仍失败而独立目录阶段诊断仍成功，即可确认故障与 qidian-next 正常身份的持久化状态强相关",
-        "正文、评论、账号、搜索、详情主体、Provider 等均与目录阶段诊断/Stable 对应业务代码保持不变"
+        "参考起点X-QD：目录规则只消费当前响应并直接输出 N/C/P/V/Vo/T 行，不在 ruleToc 中调用大型旧目录转换模块",
+        "保留已经真机通过的目录阶段 Argus v1 请求时机与 QDSign/QDInfo 签名链，jsLib/ruleBookInfo 不改",
+        "章节信息直接用 T + W；分卷优先按 Data.Volumes.VolumeCode 与 Chapter.Vc 对应，兼容嵌套 Volumes 结构",
+        "首行恢复版权信息，沿用 qidian-next 已有 qfType=copyright 内容入口，不引入第三方正文/目录服务器",
+        "正文、评论、账号、搜索、详情主体、情无/小雨与其它 Provider 全部冻结"
       ],
-      "sha256": "30b6d0253e1e58439320d948033c34eba5e91303a015a7e13c9b3ff2ca17f299"
+      "sha256": "fd7c4e47a937f063c633cb03dcf56d31fe2c712194494bb75714bc372453f145"
     },
     {
       "id": "picacg",
