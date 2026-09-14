@@ -1,3 +1,9 @@
+## 2026-09-15 · qidian-next 1.2.7-beta9
+- beta8 真机仍有方框，确认妙想天开与当前实现最大的剩余差异是请求执行层：妙想天开在 showBrowser 前的书源规则上下文请求评论。
+- 新增外层 donor seed：精确使用妙想天开的 DESede/createSymmetricCrypto、qdBuildReq 和 java.ajax 语义，pz=10，并发预取当前段落最多10页。
+- 评论页优先消费外层原始 DataList；可疑回复按 ID 优先从 seed 恢复 Content；原 WebView 链仅作兜底。
+- 其它业务域冻结。
+
 ## 2026-09-15 · qidian-next 1.2.7-beta8
 - beta7 真机仍有乱码；代码核对确认富身份融合 `qfReviewFusePackV502` 只复制 Reader 的 TitleInfoList，没有复制 Reader 原始 Content。
 - 新增受限 Content 融合：结构正文含占位字符，或 Reader 行明确带 `[fn=N]` 时，将 Reader Content 回填到同一结构行。

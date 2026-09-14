@@ -1,31 +1,27 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.7-beta8：修复评论融合层只复制标签、不复制 Reader 原始 Content，确保 [fn=N] 真正进入 Emoji 渲染。",
+  "summary": "Beta 1.2.7-beta9：把妙想天开的评论请求执行层也复制过来，首批评论在 showBrowser 前由书源规则上下文预取并注入。",
   "badges": [
     "Beta",
-    "1.2.7-beta8",
-    "Reader Content融合"
+    "1.2.7-beta9",
+    "妙想天开外层请求"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12078",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12078",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12078",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12079",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12079",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12079",
   "sections": [
     {
-      "title": "根因",
-      "text": "当前 qfReviewFusePack 用 Web/mobile 做结构骨架、Reader 做富身份补充，但此前只复制了 TitleInfoList，Reader 中的原始 Content 没有进入最终评论行。"
+      "title": "根因方向",
+      "text": "妙想天开首屏评论请求发生在书源规则上下文，而不是 showBrowser WebView 内。前几版只复制协议参数，没有复制执行层。"
     },
     {
-      "title": "本版修复",
-      "text": "同一评论匹配成功后，若结构正文已经是占位符，或 Reader 明确带 [fn=N]，只把 Reader Content 回填到结构行，再走既有 Emoji 映射。"
+      "title": "本版",
+      "text": "showBrowser 前精确使用妙想天开的 createSymmetricCrypto/qdBuildReq/java.ajax 语义预取当前段落原始 DataList，再注入现有评论 UI。"
     },
     {
-      "title": "结构保护",
-      "text": "ReviewId、ReplyCount、Replies、父子关系、分页全部继续使用原结构骨架；主评论与 embedded 回复共用同一融合函数。"
-    },
-    {
-      "title": "冻结",
-      "text": "beta7 签名、目录、正文、版权、账号、Provider 均不修改。"
+      "title": "兼容",
+      "text": "现有 WebView 评论链保留为外层预取失败或超出预取范围时的兜底。"
     }
   ]
 }

@@ -539,3 +539,8 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - 这条路径天然覆盖根评论及 embedded 回复，同时不改变 ReviewId/ReplyCount/Replies/分页。
 - beta7 精确妙想天开签名继续保留；其它业务域冻结。
 
+## 2026-09-15 · 1.2.7-beta9 评论执行层对齐
+- beta8 真机仍无效。重新对照妙想天开确认其 `showQdCmt()` 会先在书源规则上下文执行 `fetchQdCmtData -> qdGetPageWithReplies -> qdBuildReq -> java.ajax`，然后把结果注入 Browser；而 qidian-next 旧架构把首屏请求放在 Browser/WebView 内。
+- beta9 新增 outer donor seed，评论页优先使用该原始 DataList，现有 WebView 链作为兜底。
+- 这是当前表情问题首次对“执行层”而不只是签名字段进行对齐。
+

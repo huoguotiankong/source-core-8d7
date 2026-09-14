@@ -246,8 +246,9 @@ def beta_entry(old=None,typed=False):
     e=dict(old or {});e.update({'id':'qidian-next-beta','name':'🌈 起点增强 · Beta','summary':summary,'channel':'beta','version':VERSION,'updatedAt':TS,'tags':tags,'changelog':changes,'sourceUrl':RAW,'backupUrl':BACKUP,'importUrl':IMPORT,'detailUrl':DETAIL,'versionCode':VC,'sha256':sha,'sourcePath':'sources/novel/qidian-next/qidian-next-beta.json','bookSourceUrl':IDENTITY})
     if typed:e['type']='novel'
     return e
-mp=ROOT/'manifest.json';m=json.loads(mp.read_text(encoding='utf-8'));m['updatedAt']=TS;items=m.setdefault('sources',[]);pos=next((i for i,e in enumerate(items) if isinstance(e,dict) and e.get('id')=='qidian-next-beta'),None);ne=beta_entry(items[pos] if pos is not None else None);ne['category']='novel';ne['artifactType']='bookSource';items[pos]=ne if pos is not None else ne
+mp=ROOT/'manifest.json';m=json.loads(mp.read_text(encoding='utf-8'));m['updatedAt']=TS;items=m.setdefault('sources',[]);pos=next((i for i,e in enumerate(items) if isinstance(e,dict) and e.get('id')=='qidian-next-beta'),None);ne=beta_entry(items[pos] if pos is not None else None);ne['category']='novel';ne['artifactType']='bookSource';
 if pos is None: items.insert(0,ne)
+else: items[pos]=ne
 mp.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 bp=ROOT/'subscription/beta.json';bd=json.loads(bp.read_text(encoding='utf-8'));bd['updatedAt']=TS;bd['generatedAt']=TS;bi=bd.setdefault('items',[]);pos=next((i for i,e in enumerate(bi) if isinstance(e,dict) and e.get('id')=='qidian-next-beta'),None);(bi.insert(0,beta_entry()) if pos is None else bi.__setitem__(pos,beta_entry(bi[pos])));bp.write_text(json.dumps(bd,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 np=ROOT/'subscription/novel.json';nd=json.loads(np.read_text(encoding='utf-8'));nd['updatedAt']=TS;nd['generatedAt']=TS;ni=[e for e in nd.get('items',[]) if not (isinstance(e,dict) and e.get('id') in ('qidian-next','qidian-next-beta'))];ni.insert(0,beta_entry(typed=True));nd['items']=ni;np.write_text(json.dumps(nd,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
