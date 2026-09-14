@@ -1,43 +1,34 @@
 {
   "kind": "source",
   "title": "🌈 起点增强",
-  "summary": "Stable 1.2.2：由已真机确认的 1.2.2-beta5 直接晋升，本章说卡片主题统一。",
+  "summary": "正式版 1.2.4：由真机确认的 1.2.4-beta10 直接晋升；目录恢复并支持时间、字数、分卷和版权信息。",
   "badges": [
     "Stable",
-    "1.2.2",
-    "本地段评",
-    "本章说",
-    "UI统一"
+    "1.2.4",
+    "目录恢复",
+    "分卷",
+    "版权信息",
+    "章节字数"
   ],
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12040",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12040",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12040",
   "sections": [
     {
-      "title": "本章说卡片",
-      "text": "近白浅灰卡片、浅灰边框、评论页同系珊瑚红标签；昵称、正文、点赞与回复统一中性灰阶。"
+      "title": "当前正式版",
+      "text": "1.2.4 由用户真机确认的 1.2.4-beta10 原业务逻辑晋升，不新增功能改动。"
     },
     {
-      "title": "功能保持",
-      "text": "评论总数、两条真实评论预览、点赞/回复统计及点击进入本章说均保持 Beta5 原逻辑。"
+      "title": "目录",
+      "text": "目录采用参考起点X-QD的轻量扁平结构 N/C/P/V/Vo/T；保留已验证 Argus v1 + QDSign/QDInfo 请求时机，支持章节时间、字数、真实分卷与版权信息。"
     },
     {
-      "title": "晋升说明",
-      "text": "本版直接沿用真机确认的 1.2.2-beta5 业务代码，不新增业务逻辑；Beta5 物理文件继续保留。"
-    }
-  ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12020",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12020",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12020",
-  "links": [
-    {
-      "label": "导入正式版",
-      "url": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12020"
+      "title": "其它功能",
+      "text": "正文、评论、账号、搜索、详情主体、情无/小雨和其它 Provider 沿用既有稳定功能链。"
     },
     {
-      "label": "Raw",
-      "url": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12020"
-    },
-    {
-      "label": "备用",
-      "url": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12020"
+      "title": "发布状态",
+      "text": "已完成真机确认并晋升 Stable；活动 Beta 条目已从测试目录和 Beta Bundle 移除，Beta 物理文件保留作历史开发基线。"
     }
   ]
 }

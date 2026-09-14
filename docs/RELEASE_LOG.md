@@ -1,3 +1,10 @@
+## 2026-09-14 · qidian-next Stable 1.2.4
+- 用户真机确认 `1.2.4-beta10` 目录已恢复正常，并明确要求晋升正式版。
+- Stable 直接沿用 beta10 业务运行代码：参考起点X-QD，以自包含 `N/C/P/V/Vo/T` 扁平结构输出目录，不再调用旧大型目录转换模块。
+- 已确认支持章节时间、字数、真实分卷和版权信息；保留已通过的 Argus v1 + QDSign/QDInfo 目录请求时机。
+- 正文、评论、账号、搜索、详情主体、情无/小雨及其它 Provider 不新增改动。
+- 发布同步完成 Stable Source / Manifest / Stable Subscription / Novel Catalog / Stable Bundle / Stable Detail；活动 Beta 条目与 Beta Bundle 中的同逻辑源已移除，Beta 物理文件保留作历史基线。
+
 ## 2026-09-14 · qidian-next 1.2.4-beta10 — X-QD 风格自包含目录结果层
 - 用户提供 `起点X-QD` 作为参考：其目录规则直接消费服务端已整理好的 `N/C/P/V/Vo/T` 行，分卷与版权信息都作为普通目录行返回。
 - beta10 保留已真机通过的“目录阶段诊断” Argus v1 请求生命周期与签名链；不再调用 `qfTocNormalizeAppV70` 或旧 CatalogService。

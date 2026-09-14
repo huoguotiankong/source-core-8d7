@@ -1,0 +1,13 @@
+{
+  "version": "1.2.4",
+  "versionCode": 12040,
+  "promotedFrom": "1.2.4-beta10",
+  "betaSha256": "fd7c4e47a937f063c633cb03dcf56d31fe2c712194494bb75714bc372453f145",
+  "stableSha256": "d9870a0f2d1224ad836f1516268977ac1c24c2e05fb4dfd622e6d77c207773eb",
+  "runtimeEqualToBeta10": true,
+  "stableIdentity": "https://m.qidian.com/?qf_source=qidian_next_8d7",
+  "betaCatalogRemoved": true,
+  "betaBundleRemoved": true,
+  "stableCatalogUpdated": true,
+  "novelCatalogUpdated": true
+}
