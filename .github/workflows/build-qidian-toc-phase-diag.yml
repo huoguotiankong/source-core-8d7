@@ -1,0 +1,24 @@
+name: build-qidian-toc-phase-diag
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/build-qidian-toc-phase-diag.trigger'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Build qidian toc phase diagnostic
+        run: python3 .staging/build_qidian_toc_phase_diag.py
+      - name: Commit diagnostic source
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add sources/novel/qidian-next/qidian-next-toc-phase-diag.json .staging/qidian-toc-phase-diag-report.json
+          git diff --cached --quiet && { echo 'No generated changes'; exit 1; }
+          git commit -m 'diag: build qidian toc phase source'
+          git push origin main
