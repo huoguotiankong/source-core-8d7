@@ -1,0 +1,58 @@
+name: extract-qidian-review-context
+on:
+  push:
+    paths:
+      - '.staging/qidian-review-context.trigger'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract review modules
+        run: |
+          python - <<'PY'
+          import json,base64,gzip
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next-beta.json')
+          arr=json.loads(p.read_text(encoding='utf-8'))
+          s=arr[0] if isinstance(arr,list) else arr
+          js=str(s.get('jsLib',''))
+          mark='var QF_MOD38_PACK='
+          pos=js.find(mark)
+          if pos<0: raise SystemExit('pack not found')
+          start=js.find('{',pos+len(mark)); depth=0; quote=''; esc=False; end=-1
+          for i in range(start,len(js)):
+              ch=js[i]
+              if quote:
+                  if esc: esc=False
+                  elif ch=='\\': esc=True
+                  elif ch==quote: quote=''
+                  continue
+              if ch in ('"',"'"): quote=ch; continue
+              if ch=='{': depth+=1
+              elif ch=='}':
+                  depth-=1
+                  if depth==0: end=i+1; break
+          pack=json.loads(js[start:end])
+          Path('.staging/qidian-review-pack-index.json').write_text(json.dumps(sorted(pack.keys()),ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          for key in ('review','review_local_ui','review_server_ui','review_server_core'):
+              if key not in pack: continue
+              raw=pack[key]
+              if raw.startswith('gz:'):
+                  b=raw[3:]+'='*(-len(raw[3:])%4)
+                  code=gzip.decompress(base64.b64decode(b)).decode('utf-8')
+              else:
+                  code=raw
+              Path(f'.staging/qidian-{key}.js').write_text(code,encoding='utf-8')
+              print(key,len(code))
+          PY
+      - name: Commit extracts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .staging/qidian-review-pack-index.json .staging/qidian-review*.js || true
+          git commit -m 'chore: extract qidian review modules' || exit 0
+          git push
