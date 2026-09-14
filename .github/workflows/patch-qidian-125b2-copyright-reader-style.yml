@@ -1,0 +1,22 @@
+name: patch-qidian-125b2-copyright-reader-style
+on:
+  push:
+    paths:
+      - '.staging/qidian-125b2-copyright.trigger'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build qidian-next 1.2.5-beta2
+        run: python .staging/patch_qidian_125b2_copyright_reader_style.py
+      - name: Commit generated Beta
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md .staging/qidian-125b2-report.json
+          git commit -m 'qidian: publish 1.2.5-beta2 copyright reader-style page' || exit 0
+          git push
