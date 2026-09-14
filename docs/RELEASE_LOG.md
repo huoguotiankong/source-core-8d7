@@ -1,3 +1,11 @@
+## 2026-09-15 · qidian-next Stable 1.2.7
+- 用户真机确认 `1.2.7-beta11` 已解决测试评论中的截断 Emoji 显示问题，并明确要求晋升正式版。
+- Stable 直接沿用该 Beta 运行代码，不在发布阶段新增业务逻辑。
+- 评论：首屏10条、按需滚动分页、官方 TitleImage 标签、头像兼容/兜底、配图/配音、楼中楼与回复分页继续保留。
+- 表情：保留 `[fn]` 等 token 兼容；新增 U+F000..U+F8FF -> U+1F000..U+1F8FF 截断 Emoji 恢复，真机已确认 `U+F60D -> U+1F60D 😍` 正常显示。
+- 目录继续冻结在 Stable 1.2.4 已确认的 Argus v1 + QDSign/QDInfo / `N/C/P/V/Vo/T` 主链；版权、正文、账号、搜索、Provider 不变。
+- 发布同步 Stable Source / Manifest / Stable Subscription / Novel Catalog / Stable Bundle / Stable Detail；活动 Beta 条目与 Beta Bundle 中同逻辑源移除，Beta 物理文件保留作历史/后续开发基线。
+
 ## 2026-09-15 · qidian-next 1.2.7-beta11
 - beta10 真机码点诊断抓到 `U+F60D`；这是 `U+1F60D`（😍）截掉最高 `0x10000` 后的低16位。
 - 新增受限 PUA 恢复：`U+F000..U+F8FF -> U+1F000..U+1F8FF`，用 surrogate pair 输出，修复 supplementary-plane Emoji 的 16-bit 截断。

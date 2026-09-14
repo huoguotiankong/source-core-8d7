@@ -1,0 +1,14 @@
+{
+  "version": "1.2.7",
+  "versionCode": 12070,
+  "promotedFrom": "1.2.7-beta11",
+  "betaSha256": "6f301896ab694ac1c9fab18ce34a45c9c2596bec65c8f656a8b838ea9d13c852",
+  "stableSha256": "2e17a6fb199fd3bb358b9cbaa169b2a33fc6b8d1276004cc2fe0cb105569a315",
+  "runtimeEqualToBeta11": true,
+  "stableIdentity": "https://m.qidian.com/?qf_source=qidian_next_8d7",
+  "emojiEvidence": "U+F60D -> U+1F60D -> 😍 user confirmed",
+  "betaCatalogRemoved": true,
+  "betaBundleRemoved": true,
+  "stableCatalogUpdated": true,
+  "novelCatalogUpdated": true
+}

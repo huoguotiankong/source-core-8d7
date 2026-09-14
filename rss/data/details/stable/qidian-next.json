@@ -1,29 +1,34 @@
 {
   "kind": "source",
   "title": "🌈 起点增强",
-  "summary": "正式版 1.2.6：真机确认评论功能正常；合并紧凑版权页与妙想天开参考评论优化。",
+  "summary": "正式版 1.2.7：真机确认评论页与表情恢复正常；合并评论按需分页、官方标签/头像兼容及截断 Emoji 恢复。",
   "badges": [
     "Stable",
-    "1.2.6",
+    "1.2.7",
     "目录",
     "版权信息",
-    "评论优化"
+    "评论优化",
+    "表情修复"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12060",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12060",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12060",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12070",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12070",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12070",
   "sections": [
     {
       "title": "当前正式版",
-      "text": "1.2.6 由用户真机确认的 1.2.6-beta1 原业务逻辑直接晋升。"
+      "text": "1.2.7 由用户真机确认的 1.2.7-beta11 原运行代码直接晋升。"
     },
     {
       "title": "目录与版权",
-      "text": "继续使用已确认的 Argus v1 目录主链，支持章节时间、字数、真实分卷和版权信息；版权页采用紧凑固定版式。"
+      "text": "继续使用已确认的 Argus v1 目录主链，支持章节时间、字数、真实分卷和版权信息；版权页保持已确认的紧凑固定版式。"
     },
     {
       "title": "评论",
-      "text": "参考妙想天开：首屏10条、后续分页；官方 v2 结构明确时快速组织主评论/楼中楼，保留 TitleInfoList、头像、时间/IP、点赞、配图、配音与回复分页。"
+      "text": "首屏10条并按需滚动加载，保留官方 TitleImage 标签、头像兼容/兜底、时间/IP、点赞、配图、配音、楼中楼与回复分页。"
+    },
+    {
+      "title": "表情兼容",
+      "text": "兼容 [fn] 等起点评论表情 token，并恢复部分被截断为 U+Fxxx 的 Emoji；例如 U+F60D 恢复为 U+1F60D 😍。"
     },
     {
       "title": "其它功能",

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-15T01:18:00+08:00",
+  "updatedAt": "2026-09-15T00:10:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -47,11 +47,11 @@
     {
       "id": "qidian-next",
       "name": "🌈 起点增强",
-      "summary": "正式版 1.2.6：真机确认评论功能正常；合并紧凑版权页与妙想天开参考评论优化。",
+      "summary": "正式版 1.2.7：真机确认评论页与表情恢复正常；合并评论按需分页、官方标签/头像兼容及截断 Emoji 恢复。",
       "icon": "",
       "channel": "stable",
-      "version": "1.2.6",
-      "updatedAt": "2026-09-14T21:55:00+08:00",
+      "version": "1.2.7",
+      "updatedAt": "2026-09-15T00:10:00+08:00",
       "tags": [
         "起点",
         "正式版",
@@ -64,61 +64,27 @@
         "楼中楼",
         "10条分页",
         "TitleInfoList",
+        "头像兼容",
+        "表情修复",
         "配图",
         "配音",
         "情无",
         "小雨用户系统"
       ],
       "changelog": [
-        "由用户真机确认的 1.2.6-beta1 直接晋升 Stable，不新增业务逻辑",
-        "目录继续使用已确认的 Argus v1 + QDSign/QDInfo 与轻量 N/C/P/V/Vo/T 输出，支持时间、字数、真实分卷和版权信息",
-        "版权页沿用 1.2.5-beta3 紧凑固定版式",
-        "评论页参考妙想天开：首屏 10 条、后续分页；官方 v2 结构明确时走快速组织，否则保留成熟 Web/mobile 骨架链",
-        "保留真实 TitleInfoList 身份标签、头像、时间/IP、点赞、配图、配音、楼中楼与回复分页；正文/账号/Provider 不变"
+        "由用户真机确认的 1.2.7-beta11 原运行代码直接晋升 Stable，不在发布阶段新增业务逻辑",
+        "评论页保留首屏10条、按需滚动分页、楼中楼/回复分页以及官方 TitleImage 身份标签",
+        "头像增加多字段兼容与失败兜底；评论配图、配音、时间/IP、点赞等既有能力继续保留",
+        "表情兼容保留 [fn] 等 token 映射，并修复部分 Emoji 被截断为 U+Fxxx 私用区码点的问题：U+F000..U+F8FF 自动恢复到 U+1F000..U+1F8FF，例如 U+F60D -> U+1F60D 😍",
+        "目录继续冻结在已确认的 Argus v1 + QDSign/QDInfo、N/C/P/V/Vo/T 主链；版权、正文、账号、搜索和 Provider 不变"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12060",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12060",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12060",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12070",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12070",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12070",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json",
-      "versionCode": 12060,
-      "sha256": "7bac9ae6cd240c397f58793225be71811ecbcd6ffa90e98c91697691c993848c",
+      "versionCode": 12070,
+      "sha256": "2e17a6fb199fd3bb358b9cbaa169b2a33fc6b8d1276004cc2fe0cb105569a315",
       "sourcePath": "sources/novel/qidian-next/qidian-next.json",
-      "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
-      "category": "novel",
-      "artifactType": "bookSource"
-    },
-    {
-      "id": "qidian-next-beta",
-      "name": "🌈 起点增强 · Beta",
-      "summary": "Beta 1.2.7-beta11：按真机暴露的 U+F60D 修复 Emoji 低16位截断，恢复 U+1Fxxx supplementary-plane 表情。",
-      "channel": "beta",
-      "version": "1.2.7-beta11",
-      "updatedAt": "2026-09-15T01:18:00+08:00",
-      "tags": [
-        "起点",
-        "测试版",
-        "评论优化",
-        "表情修复",
-        "U+F60D",
-        "PUA恢复",
-        "UTF-16",
-        "Emoji码点",
-        "Stable 1.2.6基线"
-      ],
-      "changelog": [
-        "beta10 真机直接显示 U+F60D，证明至少部分乱码不是缺少 fn 表，而是非 BMP Emoji 被截断为低16位",
-        "U+F60D 恰好恢复为 U+1F60D（😍）；新增 U+F000..U+F8FF -> U+1F000..U+1F8FF 的受限恢复",
-        "使用手工 surrogate pair 生成字符，避免旧 WebView 对 String.fromCodePoint 的兼容差异",
-        "U+2612/FFFD/其它未知 PUA 不猜测，继续保留码点诊断，便于下一轮按真机证据补齐",
-        "评论请求/签名/分页、目录、正文、版权、账号、Provider 全部冻结"
-      ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12081",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12081",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12081",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2",
-      "versionCode": 12081,
-      "sha256": "6f301896ab694ac1c9fab18ce34a45c9c2596bec65c8f656a8b838ea9d13c852",
-      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
       "category": "novel",
       "artifactType": "bookSource"
