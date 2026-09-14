@@ -1,0 +1,9 @@
+{
+  "version": "1.2.7-beta11",
+  "versionCode": 12081,
+  "sha256": "6f301896ab694ac1c9fab18ce34a45c9c2596bec65c8f656a8b838ea9d13c852",
+  "baseline": "1.2.7-beta10",
+  "evidence": "U+F60D -> U+1F60D -> 😍",
+  "mappingRange": "U+F000..U+F8FF + 0x10000",
+  "stableBusinessFrozen": true
+}

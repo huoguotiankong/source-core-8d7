@@ -551,3 +551,10 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - 妙想天开公开的 replaceEmoji 仅有 fn=1..64；beta10 新增多格式 token、Emoji/Face/Expression/Sticker 元数据与图片 URL 支持。
 - 对仍无法恢复的占位符显示真实 Unicode U+码点，用于下一轮建立精确映射，不再猜测。
 - Stable 1.2.6 与目录/正文/版权/账号/Provider/评论分页请求链保持冻结。
+
+
+## 2026-09-15 · 1.2.7-beta11 评论 Emoji 低16位截断修复
+- beta10 真机明确暴露 `U+F60D`，由此确认至少一类乱码来自 supplementary-plane Emoji 的 16-bit 截断，而不是 fn=1..64 映射缺失。
+- `U+F60D + 0x10000 = U+1F60D`（😍）。beta11 仅在最终评论渲染层将 `U+F000..U+F8FF` 恢复到 `U+1F000..U+1F8FF`。
+- 不能确定的 `U+2612`/FFFD/其它未知码点仍保留诊断，不做盲替换。
+- Stable 1.2.6 不变；未真机确认前不得晋升。

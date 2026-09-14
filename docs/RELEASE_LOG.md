@@ -1,3 +1,8 @@
+## 2026-09-15 · qidian-next 1.2.7-beta11
+- beta10 真机码点诊断抓到 `U+F60D`；这是 `U+1F60D`（😍）截掉最高 `0x10000` 后的低16位。
+- 新增受限 PUA 恢复：`U+F000..U+F8FF -> U+1F000..U+1F8FF`，用 surrogate pair 输出，修复 supplementary-plane Emoji 的 16-bit 截断。
+- 其它未知字符继续显示码点，不猜映射；评论请求链及其它业务域冻结。
+
 ## 2026-09-15 · qidian-next 1.2.7-beta10
 - 真机表现为少数表情正常、部分表情仍为方框；停止继续修改签名/请求执行层，转向表情协议兼容。
 - 保留旧 `[fn=N]` 映射，并增加 `[emoji=N]` / `[face=N]` / `[emot=N]` / `[expression=N]` token 支持。

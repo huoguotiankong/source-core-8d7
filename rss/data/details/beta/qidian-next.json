@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.7-beta10：表情协议兼容层，支持旧 fn 映射之外的 Emoji/Face/Expression/Sticker 元数据与图片表情，并显示未知码点。",
+  "summary": "Beta 1.2.7-beta11：按真机暴露的 U+F60D 修复 Emoji 低16位截断，恢复 U+1Fxxx supplementary-plane 表情。",
   "badges": [
     "Beta",
-    "1.2.7-beta10",
-    "Emoji协议兼容"
+    "1.2.7-beta11",
+    "PUA Emoji恢复"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12080",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12080",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12080",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12081",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12081",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12081",
   "sections": [
     {
-      "title": "判断",
-      "text": "真机反馈表现为“少数表情正常、部分表情方框”，因此本轮不再继续改签名与请求层，而是直接扩展表情 token/结构字段兼容。"
+      "title": "真机证据",
+      "text": "beta10 将未知字符显示为码点后，真机明确暴露 U+F60D。U+F60D 是 U+1F60D（😍）丢失最高 0x10000 后的低16位。"
     },
     {
-      "title": "兼容",
-      "text": "保留 fn 映射，新增 Emoji/Face/Expression/Sticker 等字段递归识别和图片型表情显示。"
+      "title": "本版修复",
+      "text": "评论最终渲染前，U+F000..U+F8FF 私用区字符按 +0x10000 恢复 supplementary-plane 码点，并用 UTF-16 surrogate pair 输出。"
     },
     {
-      "title": "诊断",
-      "text": "如果某个表情仍无法恢复，Beta 会在该占位符旁显示 U+码点；用同一条评论截图即可确定下一步映射。"
+      "title": "仍保留诊断",
+      "text": "不能由该规则确定的 U+2612、FFFD 或其它未知字符继续显示码点，不做猜测式替换。"
     },
     {
       "title": "冻结",
-      "text": "Stable 1.2.6 的目录、正文、版权、账号、Provider 以及评论请求/分页均不修改。"
+      "text": "评论请求/签名/分页及目录、正文、版权、账号、Provider 均未修改。"
     }
   ]
 }
