@@ -1,0 +1,19 @@
+{
+  "version": "1.2.7-beta2",
+  "versionCode": 12072,
+  "betaSha256": "20f43e7c1eee9d2add48659209dea8a0eb3bbed6a45fa24824716de5ae024d36",
+  "baseline": "1.2.7-beta1 / Stable 1.2.6",
+  "changedPackedModule": "review_local_ui",
+  "officialTitleImagePreferred": true,
+  "emojiMapReferenceCompatible": true,
+  "emojiFontFallback": true,
+  "avatarAliasExpansion": true,
+  "avatarInitialFallback": true,
+  "firstPageStrict10Preserved": true,
+  "backgroundPrefetchPages": 0,
+  "scrollThresholdPx": 600,
+  "ruleTocFrozen": true,
+  "ruleBookInfoFrozen": true,
+  "ruleContentFrozen": true,
+  "bookSourceUrlFrozen": true
+}
