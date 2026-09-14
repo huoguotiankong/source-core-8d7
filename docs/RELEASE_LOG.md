@@ -1,3 +1,10 @@
+## 2026-09-14 · qidian-next 1.2.7-beta6
+- 真机确认 beta5 仍有大量乱码表情，旧 7.9.394 身份的二次原始 Content 回查不足以恢复。
+- 评论 `reader_ext` 与异常行 ID 回查统一切换为妙想天开同款 QDReader 7.9.378/1436 + RMX3366/realme + 每请求独立 qimei。
+- 成功拿到 reference-profile 评论列表后直接采用，避免启发式退回 legacy 响应；仍保留 beta5 的精确 ID 回查安全网。
+- 不再改 CSS/字体或猜方框编号；继续只对官方原始 `[fn=N]` 做 Emoji 映射。
+- 目录、正文、版权、账号、Provider 冻结；未经真机确认不得晋升 Stable。
+
 ## 2026-09-14 · qidian-next 1.2.7-beta5
 - 真机确认 beta4 仍出现 `☒`：`[fn=N]` 在 UI formatter 前已损坏。
 - beta5 仅对可疑评论按 ID 回查官方 Argus v2 原始 `Content`，再执行 `[fn=N]` 映射；禁止根据方框猜表情。

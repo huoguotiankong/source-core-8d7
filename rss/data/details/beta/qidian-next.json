@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.7-beta5：对已变成方框的评论按 ID 回查起点官方原始 Content，再恢复 [fn=N] 表情。",
+  "summary": "Beta 1.2.7-beta6：评论主链与异常回查统一切换妙想天开同款 QDReader 7.9.378/1436，直接保住原始 [fn=N] 表情 token。",
   "badges": [
     "Beta",
-    "1.2.7-beta5",
-    "表情原始Content恢复"
+    "1.2.7-beta6",
+    "参考客户端评论签名"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12075",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12075",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12075",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12076",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12076",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12076",
   "sections": [
     {
-      "title": "根因",
-      "text": "beta4 真机仍显示方框，说明部分评论的 [fn=N] 在进入评论 UI 之前已经被替换成占位字符，formatter 已无法知道原表情编号。"
+      "title": "真机结论",
+      "text": "beta5 对乱码行按 ID 二次回查仍有大量乱码，说明旧 7.9.394 请求身份本身可能已经拿不到原始 [fn=N]。"
     },
     {
       "title": "本版修复",
-      "text": "只对含 ☒/�/PUA 的异常评论，按评论 ID 回查起点官方 Argus v2 原始 Content；取回 [fn=N] 后再执行既有 Emoji 映射。"
+      "text": "评论主请求与异常行回查统一使用妙想天开同款 QDReader 7.9.378/1436、RMX3366/realme、逐请求 qimei。"
     },
     {
-      "title": "请求控制",
-      "text": "正常评论零额外请求；异常评论按上下文/页共享一次回查并缓存，不做模糊正文匹配。"
+      "title": "表情链",
+      "text": "目标是让 Argus v2 直接返回含 [fn=N] 的原始 Content，再由现有映射转换 Emoji；不从方框反猜编号。"
     },
     {
       "title": "冻结项",
-      "text": "目录、正文、版权、账号、Provider 与其他评论结构保持不变。"
+      "text": "beta5 的 ID 精确回查仍保留作安全网；目录、正文、版权、账号、Provider 不变。"
     }
   ]
 }

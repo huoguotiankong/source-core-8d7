@@ -1,0 +1,18 @@
+{
+  "version": "1.2.7-beta6",
+  "versionCode": 12076,
+  "sha256": "a42de1cd285e534e6a50799f4f8bd0eae020e296eceea968edbe5b204f871751",
+  "baseline": "1.2.7-beta5",
+  "changes": [
+    "review reader_ext -> QDReader 7.9.378/1436 RMX3366 realme per-request qimei",
+    "suspicious-row recovery uses same reader_ext signer",
+    "reader_ext successful list wins before legacy richness fallback"
+  ],
+  "frozen": [
+    "ruleToc",
+    "ruleBookInfo",
+    "ruleContent",
+    "bookSourceUrl",
+    "shared qfDirectSignedRequest"
+  ]
+}

@@ -518,3 +518,11 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - usehtml 双列不要依赖 inline-block 百分比宽度；当前改用预格式等宽文本。
 - 详情“正文设置”快捷入口直接调用 qfMultiContentV423。
 - 本版仍为 Beta。
+
+## 2026-09-14 · 1.2.7-beta6 评论表情请求身份修复
+- 真机：beta5 的“异常字符 → ID 回查原始 Content”仍有大量乱码，说明旧 QDReader 7.9.394/1526 请求身份可能已在服务端返回占位字符。
+- beta6 仅修改 `review_local_ui`：主评论 signer 切到妙想天开同款 7.9.378/1436 + RMX3366/realme + 每请求 qimei；异常行回查也走同一 `reader_ext` signer。
+- reader_ext 成功返回列表时直接采用，避免 richness 启发式替换为 legacy。reader_legacy 仍留作兼容兜底。
+- 既有 `[fn=N]` Emoji 映射、TitleImage、头像、10条首屏、600px滚动分页、beta5 ID 回查均保留。
+- 目录/正文/版权/账号/Provider 冻结；等待真机验证乱码表情是否明显消失。
+
