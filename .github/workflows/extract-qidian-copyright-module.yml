@@ -14,16 +14,36 @@ jobs:
       - name: Extract copyright module
         run: |
           python - <<'PY'
-          import json,re,base64,gzip
+          import json,base64,gzip
           from pathlib import Path
           arr=json.loads(Path('sources/novel/qidian-next/qidian-next.json').read_text(encoding='utf-8'))
           s=arr[0] if isinstance(arr,list) else arr
           js=str(s.get('jsLib',''))
-          m=re.search(r'var\s+QF_MOD38_PACK\s*=\s*(\{.*?\});',js,re.S)
-          if not m: raise SystemExit('pack not found')
-          pack=json.loads(m.group(1))
+          mark='var QF_MOD38_PACK='
+          p=js.find(mark)
+          if p<0: raise SystemExit('pack not found')
+          start=js.find('{',p+len(mark))
+          if start<0: raise SystemExit('pack object start not found')
+          depth=0; quote=''; esc=False; end=-1
+          for i in range(start,len(js)):
+              ch=js[i]
+              if quote:
+                  if esc: esc=False
+                  elif ch=='\\': esc=True
+                  elif ch==quote: quote=''
+                  continue
+              if ch in ('"',"'"):
+                  quote=ch; continue
+              if ch=='{': depth+=1
+              elif ch=='}':
+                  depth-=1
+                  if depth==0:
+                      end=i+1; break
+          if end<0: raise SystemExit('pack object end not found')
+          pack=json.loads(js[start:end])
           raw=pack['copyright']
           if raw.startswith('gz:'): raw=raw[3:]
+          raw += '=' * (-len(raw)%4)
           code=gzip.decompress(base64.b64decode(raw)).decode('utf-8')
           Path('.staging/qidian-copyright-module.js').write_text(code,encoding='utf-8')
           print('len',len(code))
