@@ -1,0 +1,33 @@
+name: patch-qidian-124b8-catalog-rows
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/patch-qidian-124b8-catalog-rows.trigger'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Build qidian-next 1.2.4-beta8
+        run: python3 .staging/patch_qidian_124b8_catalog_rows.py
+      - name: Commit generated Beta
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            sources/novel/qidian-next/qidian-next-beta.json \
+            manifest.json \
+            subscription/beta.json \
+            subscription/novel.json \
+            bundles/all-beta.json \
+            rss/data/details/beta/qidian-next.json \
+            docs/RELEASE_LOG.md \
+            docs/sources/qidian-next/PROJECT_HANDOFF.md \
+            .staging/qidian-124b8-report.json
+          git diff --cached --quiet && { echo 'No generated changes'; exit 1; }
+          git commit -m 'qidian beta: 1.2.4-beta8 restore copyright and volumes'
+          git push origin main
