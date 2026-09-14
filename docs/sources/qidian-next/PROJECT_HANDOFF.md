@@ -533,3 +533,9 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - 评论主请求与 beta5 异常行 ID 回查都自动复用新 signer；旧 legacy 只作兼容 fallback。
 - 其它评论 UI、[fn=N] 映射、目录、正文、版权、账号、Provider 冻结。若 beta7 仍失败，下一步不要再猜映射，直接做 raw Content 三段诊断。
 
+## 2026-09-15 · 1.2.7-beta8 评论 Content 融合修复
+- beta7 真机仍显示方框。复核 review_local_ui 发现：Reader 富身份包与 Web/mobile 结构包融合时，只复制 TitleInfoList；最终 `adapt()` 仍读取结构包的损坏 Content。
+- beta8 在 qfReviewFusePackV502 的“已匹配同一评论”分支加入受限 Content 回填：仅结构 Content 可疑或 Reader 明确带 `[fn=N]` 时复制 Reader Content。
+- 这条路径天然覆盖根评论及 embedded 回复，同时不改变 ReviewId/ReplyCount/Replies/分页。
+- beta7 精确妙想天开签名继续保留；其它业务域冻结。
+

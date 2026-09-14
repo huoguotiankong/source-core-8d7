@@ -1,3 +1,9 @@
+## 2026-09-15 · qidian-next 1.2.7-beta8
+- beta7 真机仍有乱码；代码核对确认富身份融合 `qfReviewFusePackV502` 只复制 Reader 的 TitleInfoList，没有复制 Reader 原始 Content。
+- 新增受限 Content 融合：结构正文含占位字符，或 Reader 行明确带 `[fn=N]` 时，将 Reader Content 回填到同一结构行。
+- 回复数、父子关系、ID、分页仍由 Web/mobile 结构骨架负责；embedded 楼中楼通过同一融合函数一起覆盖。
+- beta7 donor signer 与 Emoji 表保持不变；目录、正文、版权、账号、Provider 冻结。
+
 ## 2026-09-14 · qidian-next 1.2.7-beta7
 - beta6 真机仍有大量乱码；重新逐行核对妙想天开后发现此前“同款签名”仍漏掉 qdBuildReq 的关键语义。
 - donor 对 `QDSign` / `QDInfo` / `tstamp` / `User-Agent` 分别调用 `signByUrl`，每次都会独立生成时间戳与 qimei；beta7 精确复刻。

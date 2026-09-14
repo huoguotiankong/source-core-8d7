@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.7-beta7：按妙想天开真实 qdBuildReq 语义重做评论签名，每个 Header 独立生成 ts/qimei。",
+  "summary": "Beta 1.2.7-beta8：修复评论融合层只复制标签、不复制 Reader 原始 Content，确保 [fn=N] 真正进入 Emoji 渲染。",
   "badges": [
     "Beta",
-    "1.2.7-beta7",
-    "妙想天开 qdBuildReq 精确复刻"
+    "1.2.7-beta8",
+    "Reader Content融合"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12077",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12077",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12077",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12078",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12078",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12078",
   "sections": [
     {
-      "title": "beta6 真机结论",
-      "text": "仍有大量乱码，说明仅复制 QDReader 7.9.378/1436、RMX3366/realme 与单次 qimei 还不等于妙想天开的真实请求。"
-    },
-    {
-      "title": "重新核对 donor",
-      "text": "妙想天开 qdBuildReq 为 QDSign、QDInfo、tstamp、UA 分别调用 qdSign/signByUrl；每次调用都会独立创建时间戳与 qimei。"
+      "title": "根因",
+      "text": "当前 qfReviewFusePack 用 Web/mobile 做结构骨架、Reader 做富身份补充，但此前只复制了 TitleInfoList，Reader 中的原始 Content 没有进入最终评论行。"
     },
     {
       "title": "本版修复",
-      "text": "reader_ext 精确复刻上述四次独立签名行为，并恢复 donor 8 组品牌/机型池；主评论和异常 ID 回查共用。"
+      "text": "同一评论匹配成功后，若结构正文已经是占位符，或 Reader 明确带 [fn=N]，只把 Reader Content 回填到结构行，再走既有 Emoji 映射。"
     },
     {
-      "title": "冻结项",
-      "text": "不改评论 UI 与 Emoji 映射表；目录、正文、版权、账号、Provider 完全不动。"
+      "title": "结构保护",
+      "text": "ReviewId、ReplyCount、Replies、父子关系、分页全部继续使用原结构骨架；主评论与 embedded 回复共用同一融合函数。"
+    },
+    {
+      "title": "冻结",
+      "text": "beta7 签名、目录、正文、版权、账号、Provider 均不修改。"
     }
   ]
 }
