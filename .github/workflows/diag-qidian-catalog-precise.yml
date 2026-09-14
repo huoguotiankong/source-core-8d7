@@ -1,0 +1,34 @@
+name: diag-qidian-catalog-precise
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/diag-qidian-catalog-precise.trigger'
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Extract exact catalog runtime
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          s=json.loads(Path('sources/novel/qidian-next/qidian-next.json').read_text(encoding='utf-8'))[0]
+          lib=s['jsLib']
+          out={'ruleContent':s.get('ruleContent'),'ruleToc':s.get('ruleToc'),'tocUrl':(s.get('ruleBookInfo') or {}).get('tocUrl')}
+          for needle in ['function qfCatalogLoad','qfCatalogLoad=function','function QF_LegadoCatalogAdapter','QF_LegadoCatalogAdapter=function']:
+            i=lib.find(needle)
+            out[needle]={'pos':i,'snippet':lib[i:i+50000] if i>=0 else ''}
+          Path('.staging/qidian-catalog-precise.json').write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding='utf-8')
+          PY
+      - name: Commit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-catalog-precise.json
+          git commit -m 'diag: extract precise qidian catalog runtime' || exit 0
+          git push origin main
