@@ -1,0 +1,32 @@
+name: patch-qidian-124b5-direct-catalog
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/patch-qidian-124b5-direct-catalog.trigger'
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Generate qidian-next 1.2.4-beta5
+        run: python3 .staging/patch_qidian_124b5_direct_catalog.py
+      - name: Commit generated Beta
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            sources/novel/qidian-next/qidian-next-beta.json \
+            manifest.json \
+            subscription/beta.json \
+            subscription/novel.json \
+            bundles/all-beta.json \
+            rss/data/details/beta/qidian-next.json \
+            docs/RELEASE_LOG.md \
+            docs/sources/qidian-next/PROJECT_HANDOFF.md
+          git diff --cached --quiet && { echo 'No generated changes'; exit 1; }
+          git commit -m 'qidian beta: 1.2.4-beta5 direct Argus catalog recovery'
+          git push origin main
