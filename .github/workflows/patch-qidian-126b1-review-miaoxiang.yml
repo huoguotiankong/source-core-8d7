@@ -1,0 +1,28 @@
+name: patch-qidian-126b1-review-miaoxiang
+on:
+  push:
+    paths:
+      - '.staging/qidian-126b1-review.trigger'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Fetch historical review donor
+        run: |
+          git fetch --depth=1 origin a4b26b8435c1bc49a7da7de976f178a90b7b2925
+          git show a4b26b8435c1bc49a7da7de976f178a90b7b2925:sources/novel/qidian-next/qidian-next-beta.json > /tmp/qidian-review-donor.json
+      - name: Build qidian-next 1.2.6-beta1
+        run: python .staging/patch_qidian_126b1_review_miaoxiang.py /tmp/qidian-review-donor.json
+      - name: Commit generated Beta
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+huoguotiankong@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md .staging/qidian-126b1-report.json
+          git commit -m 'qidian: publish 1.2.6-beta1 review optimization' || exit 0
+          git push
