@@ -1,0 +1,45 @@
+name: diag-qidian-catalog-current
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/diag-qidian-catalog-current.trigger'
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Extract current stable catalog fields
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          p=Path('sources/novel/qidian-next/qidian-next.json')
+          arr=json.loads(p.read_text(encoding='utf-8')); s=arr[0] if isinstance(arr,list) else arr
+          out={
+            'bookSourceUrl':s.get('bookSourceUrl'),
+            'ruleBookInfo.tocUrl':(s.get('ruleBookInfo') or {}).get('tocUrl'),
+            'ruleToc':s.get('ruleToc'),
+          }
+          lib=s.get('jsLib','')
+          pats=['chapterlist','getsimple','toc','catalog','QDSign','QDInfo']
+          hits=[]
+          for pat in pats:
+            for m in re.finditer(pat,lib,re.I):
+              a=max(0,m.start()-1000); b=min(len(lib),m.start()+3000)
+              hits.append({'pattern':pat,'pos':m.start(),'snippet':lib[a:b]})
+              if len([x for x in hits if x['pattern']==pat])>=8: break
+          out['jsLibHits']=hits
+          Path('.staging/qidian-catalog-current.json').write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding='utf-8')
+          PY
+      - name: Commit diagnostic extract
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-catalog-current.json
+          git commit -m 'diag: extract current qidian catalog fields' || exit 0
+          git push origin main
