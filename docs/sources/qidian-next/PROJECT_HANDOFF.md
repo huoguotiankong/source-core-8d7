@@ -1,3 +1,8 @@
+## 2026-09-14 · 1.2.4-beta5 — 当前目录恢复测试
+- 真机结论：beta4 与独立身份 Stable 1.2.2 诊断源都无法加载目录，因此不要继续把问题归因于旧 Beta 缓存或 review_local_ui。
+- 当前 Beta 仅替换 Catalog：使用 Argus v1 chapterlist 直连并解析 N/C/V/T/W；正文及其它模块保持 Stable 1.2.2。
+- 真机下一步：先确认目录恢复与章节完整度，再确认免费/VIP正文衔接；未确认前不得晋升 Stable。
+
 ## 2026-09-13 · qidian-next 1.2.4-beta4 — 目录恢复隔离版
 - 真机确认 `1.2.4-beta3` 目录仍无法加载，因此停止在现有 Beta 上继续猜测式修补。
 - 从已真机确认的 Stable 1.2.2 重新完整复制业务源；不继承 beta1 的目录 W 字段扩展，也不继承 beta2/beta3 的 `review_local_ui` 重打包。

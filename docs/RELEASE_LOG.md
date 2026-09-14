@@ -1,3 +1,10 @@
+## 2026-09-14 · qidian-next 1.2.4-beta5 — Argus v1 目录主链恢复
+- 独立身份、全量复用 Stable 1.2.2 的目录诊断源仍真机失败，排除 Legado 旧身份/旧目录缓存为主要原因。
+- 目录主链改为 `druidv6.if.qidian.com/argus/api/v1/chapterlist/chapterlist`，参考当前 `妙想天开` 已工作的直接目录方案。
+- 本地解析 `N/C/V/T/W`；`T + W字` 直接作为目录更新时间展示，不增加额外字数请求。
+- 章节 URL 映射回 qidian-next 既有 `/chapter/{bookId}/{chapterId}` 正文入口；正文、评论、账号、搜索、详情、情无/小雨和其它 Provider 不改。
+- Stable 1.2.2 保持不变，等待真机确认目录与正文衔接。
+
 ## 2026-09-13 · qidian-next 1.2.4-beta4 — 目录恢复隔离版
 - 真机确认 `1.2.4-beta3` 目录仍无法加载，因此停止在现有 Beta 上继续猜测式修补。
 - 从已真机确认的 Stable 1.2.2 重新完整复制业务源；不继承 beta1 的目录 W 字段扩展，也不继承 beta2/beta3 的 `review_local_ui` 重打包。

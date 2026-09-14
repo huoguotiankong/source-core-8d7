@@ -1,32 +1,32 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.4-beta4：目录恢复隔离版，业务运行代码完整复制已确认 Stable 1.2.2。",
+  "summary": "Beta 1.2.4-beta5：目录改走起点 Argus v1 chapterlist 直接链，恢复章节并带时间+字数。",
   "badges": [
     "Beta",
-    "1.2.4-beta4",
+    "1.2.4-beta5",
     "目录恢复",
-    "Stable 1.2.2 隔离基线"
+    "Argus v1"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12044",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12044",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12044",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12045",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12045",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12045",
   "sections": [
     {
-      "title": "为什么再回退一层",
-      "text": "真机确认 beta3 目录仍为空，说明仅撤销 W 字段还不足以恢复。beta3 仍保留了重新打包后的评论模块，因此本版把整个业务运行代码恢复为 Stable 1.2.2。"
+      "title": "根因收敛",
+      "text": "Stable 1.2.2 的独立身份诊断源重新搜索新书后目录仍为空，说明旧身份/旧书籍缓存不是主因，当前成熟目录链本身已失效。"
     },
     {
-      "title": "强隔离门禁",
-      "text": "除 bookSourceName / bookSourceComment 外，Beta 源每一个字段都必须与 Stable 1.2.2 相同；jsLib、ruleToc、ruleContent 等均做精确相等校验。"
+      "title": "本版目录",
+      "text": "改用起点 Argus v1 chapterlist 直接请求，解析 N/C/V/T/W；更新时间后直接附带官方章节字数。"
     },
     {
-      "title": "本版暂时撤出的优化",
-      "text": "章节字数 W、评论首屏10条快通道和 beta2/beta3 评论排版实验全部暂时撤出。先恢复目录，再逐个模块重新引入。"
+      "title": "正文兼容",
+      "text": "目录只更换获取与解析，章节链接重新接入 qidian-next 原有正文入口，正文 Provider、评论和账号等运行时不改。"
     },
     {
       "title": "测试重点",
-      "text": "只需确认目录能否恢复正常加载、章节数量和更新时间是否正常。"
+      "text": "确认目录能否恢复、章节数量是否完整、时间+字数是否显示，以及免费/VIP章节能否继续打开正文。"
     }
   ]
 }
