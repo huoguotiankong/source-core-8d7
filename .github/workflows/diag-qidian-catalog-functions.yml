@@ -1,0 +1,38 @@
+name: diag-qidian-catalog-functions
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.staging/diag-qidian-catalog-functions.trigger'
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Extract catalog implementation neighborhoods
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          s=json.loads(Path('sources/novel/qidian-next/qidian-next.json').read_text(encoding='utf-8'))[0]
+          lib=s['jsLib']
+          needles=['qfCatalogLoad','QF_Catalog','getsimple','chapterlist/chapterlist','parallelCold','WEB-EXACT']
+          out={}
+          for needle in needles:
+            arr=[]
+            for m in re.finditer(re.escape(needle),lib,re.I):
+              arr.append({'pos':m.start(),'snippet':lib[max(0,m.start()-2500):min(len(lib),m.start()+10000)]})
+              if len(arr)>=10: break
+            out[needle]=arr
+          Path('.staging/qidian-catalog-functions.json').write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding='utf-8')
+          PY
+      - name: Commit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .staging/qidian-catalog-functions.json
+          git commit -m 'diag: extract qidian catalog implementation' || exit 0
+          git push origin main
