@@ -1,6 +1,6 @@
 [
   {
-    "bookSourceComment": "v1.2.4-beta8：基于已真机确认能加载目录的“目录阶段诊断”直接转入 Beta。保持其 ruleBookInfo.init → tocUrl 执行时机和 Argus v1 QDSign/QDInfo 请求完全不变；目录输出层恢复 Stable 1.2.2 的版权信息、分卷行、VIP 标记和章节 URL 结构，并从当前 Argus Data.Chapters 回填 T + W 时间/字数。正文、评论、账号、搜索、详情主体、情无/小雨及其它 Provider 不变。",
+    "bookSourceComment": "v1.2.4-beta9：目录身份 A/B 诊断版。业务运行代码与已真机确认“能加载目录、时间和字数正常”的目录阶段诊断源完全一致；仅把 bookSourceUrl 切回 qidian-next 正常身份。用于确认剩余故障是否来自阅读对该身份的持久化状态/书籍记录，而不是目录代码。版权信息与分卷本版暂不补，避免再次混入结果层变量。",
     "bookSourceGroup": "﹅🧪 测试源",
     "bookSourceName": "🌈 起点增强 · Beta",
     "bookSourceType": 0,
@@ -58,13 +58,14 @@
       "wordCount": ""
     },
     "ruleToc": {
-      "chapterList": "@js:\nvar root=JSON.parse(String(result||'{}'));\nvar d=(root&&root.Data)?root.Data:{};\nvar bm=String(baseUrl||'').match(/[?&]bookId=(\\d+)/i),bid=bm?bm[1]:'';\nif(!bid)try{bid=String(d.BookId||d.bookId||'');}catch(_b){}\nif(!bid)throw new Error('QF beta8: catalog response has no bookId');\nvar bname='',author='';\ntry{bname=String(book&&book.name||'');author=String(book&&book.author||'');}catch(_ba){}\nvar out=qfTocNormalizeAppV70.call(this,root,bid,bname,author);\nif(!Array.isArray(out)||!out.length)throw new Error('QF beta8: normalized catalog empty');\nvar direct=Array.isArray(d.Chapters)?d.Chapters:(Array.isArray(d.chapters)?d.chapters:[]),imap={};\nfor(var i=0;i<direct.length;i++){\n  var x=direct[i]||{},cid=String(x.C||x.ChapterId||x.chapterId||'').trim();\n  if(!cid)continue;\n  var sj='';\n  if(x.T!==undefined&&x.T!==null&&String(x.T)!==''){try{sj=String(java.timeFormat(x.T)||'');}catch(_t){sj=String(x.T);}}\n  if(x.W!==undefined&&x.W!==null&&String(x.W)!=='')sj+=(sj?' ':'')+String(x.W)+'字';\n  if(sj)imap[cid]=sj;\n}\nfor(var j=0;j<out.length;j++){\n  var r=out[j]||{};if(r.Vo||r.N==='版权信息'||!r.C)continue;\n  var m=String(r.C||'').match(/\\/chapter\\/\\d+\\/(\\d+)/i)||String(r.C||'').match(/[?&#](?:chapterId|cid)=(\\d+)/i);\n  var id=m&&m[1]?String(m[1]):'';if(id&&imap[id])r.T=imap[id];\n}\nout",
-      "chapterName": "N\\n@js:\\ntry{var _cid='';try{var _o=JSON.parse(java.hexDecodeToString(result));_cid=String(_o.chapterId||'')}catch(e){}var _b=_cid?String(source.get('qf_qw_title_'+_cid)||''):'';if(_b)result=String(result||title||'')+_b;}catch(e){}",
-      "chapterUrl": "C",
-      "isPay": "V",
-      "isVip": "V",
-      "isVolume": "Vo",
-      "updateTime": "T"
+      "chapterList": "@js:\nvar root=JSON.parse(String(result||'{}'));\nvar chapters=root&&root.Data&&Array.isArray(root.Data.Chapters)?root.Data.Chapters:[];\nif(!chapters.length)throw new Error('QF phase diag: Data.Chapters empty');\nvar bm=String(baseUrl||'').match(/[?&]bookId=(\\d+)/i),bid=bm?bm[1]:'';\nif(!bid)try{bid=String(root.Data.BookId||'');}catch(_b){}\nvar out=[];\nfor(var i=0;i<chapters.length;i++){var item=chapters[i]||{},title=String(item.N||'').trim();if(!title||title.indexOf('版权信息')!==-1)continue;var cid=String(item.C||'').trim();if(!cid)continue;var sj='';if(item.T&&item.W)sj=java.timeFormat(item.T)+' '+String(item.W)+'字';out.push({title:title,url:'https://www.qidian.com/chapter/'+bid+'/'+cid,sj:sj,vip:item.V||0});}\nout",
+      "chapterName": "title",
+      "chapterUrl": "url",
+      "isPay": "vip",
+      "isVip": "vip",
+      "isVolume": "",
+      "nextTocUrl": "",
+      "updateTime": "sj"
     },
     "searchUrl": "https://m.qidian.com/search?kw={{key}}{{page==1?'':'&page='+page}},{\"method\":\"GET\",\"headers\":{\"User-Agent\":\"Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1\",\"Referer\":\"https://m.qidian.com/\",\"Accept-Language\":\"zh-CN,zh;q=0.9\",\"Accept\":\"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\"},\"timeout\":10000}",
     "variableComment": "【同人限免源共享Token · 独占源变量】\n这里填写“起点限免（同人小说网）”使用的共享Token。\n同人 Provider 通过 source.getVariable() 读取，并以 Authorization: Bearer <Token> 验证服务器。\n\nv4.1.0-alpha10.9.1 起：\n· “源变量”只用于同人共享Token；\n· 发现页搜索词已迁移到独立 source KV，不再写入/覆盖源变量；\n· 若旧版曾把源变量写成 {\"qfV21Search\":\"...\"}，会自动迁移搜索词并清理这段旧JSON；\n· 旧版已经覆盖掉的Token无法自动恢复，请重新填写一次；之后不会再被搜索挤掉。\n\n不需要填写账号和密码；可在登录设置 → 正文与 Provider → 限免源账号 → 同人 中检测Token。\n每本书固定正文源（如 11情无 / 12神魔 / 13晴天 / 14同人）请使用阅读的“书籍变量”功能设置。",

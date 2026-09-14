@@ -1,33 +1,28 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.4-beta8：沿用真机已通过的目录阶段请求链，恢复版权信息、分卷目录并保留时间+字数。",
+  "summary": "Beta 1.2.4-beta9：与真机已通过的目录阶段诊断源业务代码完全一致，仅切回 qidian-next 正常身份做 A/B。",
   "badges": [
     "Beta",
-    "1.2.4-beta8",
-    "目录恢复",
-    "版权信息",
-    "分卷"
+    "1.2.4-beta9",
+    "身份A/B",
+    "目录诊断"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12048",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12048",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12048",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12049",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12049",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12049",
   "sections": [
     {
-      "title": "真机基线",
-      "text": "目录阶段诊断已确认：目录可以加载，时间与字数正常。beta8 保持该请求生命周期不变。"
+      "title": "唯一变量",
+      "text": "beta9 与已经真机通过的目录阶段诊断源业务运行代码完全一致；唯一关键变量是 bookSourceUrl 恢复为 qidian-next 正常身份。"
     },
     {
-      "title": "本版补齐",
-      "text": "只调整目录结果组织：恢复 Stable 的版权信息行、分卷行、VIP 与章节 URL 结构；章节 T/W 继续从同一 Argus 响应回填。"
+      "title": "为什么撤回 beta8",
+      "text": "beta8 在工作诊断源基础上调用 Stable 目录结果转换器后再次无法加载，因此先撤销版权/分卷补丁，不继续叠加猜测。"
     },
     {
-      "title": "分卷策略",
-      "text": "优先使用 Argus 返回的 Volumes / VolumeList / vs；若接口当前只返回扁平 Chapters，则保守显示“正文”卷，不额外切回旧 CatalogService。"
-    },
-    {
-      "title": "冻结范围",
-      "text": "正文、评论、账号、搜索、详情主体、情无/小雨及其它 Provider 不修改。"
+      "title": "判定标准",
+      "text": "若 beta9 失败但独立目录阶段诊断继续成功，说明问题来自正常身份下的阅读持久化状态/旧书籍记录；若 beta9 成功，则 beta8 的结果转换层是故障点。"
     }
   ]
 }

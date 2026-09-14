@@ -1,0 +1,8 @@
+{
+  "version": "1.2.4-beta9",
+  "phaseDiagSha256": "269813aa8586e05872c30f48f0f3ea2a40dec680807943372f34c1816f7635a8",
+  "betaSha256": "30b6d0253e1e58439320d948033c34eba5e91303a015a7e13c9b3ff2ca17f299",
+  "runtimeEqualToPhaseDiag": true,
+  "onlyRuntimeIdentityDifference": "bookSourceUrl/name/group/comment",
+  "ruleContentFrozen": true
+}

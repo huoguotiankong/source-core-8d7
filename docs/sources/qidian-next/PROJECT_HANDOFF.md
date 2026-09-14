@@ -1,3 +1,11 @@
+## 2026-09-14 · 1.2.4-beta9 — 当前活动 Beta：身份 A/B
+
+- 已通过对照：独立 `qidian-next-toc-phase-diag.json` 能加载目录并显示时间+字数。
+- beta8 仅补目录结果层后再次失败，因此当前不能假定 `qfTocNormalizeAppV70` 在该执行阶段安全。
+- beta9 业务运行代码与通过版逐字段一致，仅恢复正常 qidian-next `bookSourceUrl`。
+- 若 beta9 失败而独立诊断源仍成功，下一步优先处理 Legado 身份/持久化状态，不再修改目录请求或解析。
+- 版权信息/分卷暂缓。Stable 不变。
+
 ## 2026-09-14 · 1.2.4-beta8 — 当前活动 Beta
 
 - 真机证据：`qidian-next-toc-phase-diag.json` 目录已正常，时间+字数均正常；缺失项只剩版权信息与分卷目录。
