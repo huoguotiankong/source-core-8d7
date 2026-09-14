@@ -526,3 +526,10 @@ Beta changes: restore 情无-specific content headers; retry only authentication
 - 既有 `[fn=N]` Emoji 映射、TitleImage、头像、10条首屏、600px滚动分页、beta5 ID 回查均保留。
 - 目录/正文/版权/账号/Provider 冻结；等待真机验证乱码表情是否明显消失。
 
+## 2026-09-14 · 1.2.7-beta7 妙想天开 qdBuildReq 精确签名语义
+- 真机：beta6 仍有大量乱码，说明固定 7.9.378/1436 + RMX3366/realme + 单次 qimei 不是 donor 的完整行为。
+- 重新核对用户上传的妙想天开：`qdBuildReq` 对 QDSign/QDInfo/tstamp/UA 分别调用 `qdSign -> signByUrl`，而 `signByUrl` 每次都会重新生成 ts/qimei。
+- beta7 只替换 `qfReaderSignedRequestV3245` 的 reader_ext：四个 Header 独立签名快照，并恢复 donor 的 8 组品牌/机型池。
+- 评论主请求与 beta5 异常行 ID 回查都自动复用新 signer；旧 legacy 只作兼容 fallback。
+- 其它评论 UI、[fn=N] 映射、目录、正文、版权、账号、Provider 冻结。若 beta7 仍失败，下一步不要再猜映射，直接做 raw Content 三段诊断。
+

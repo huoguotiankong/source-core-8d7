@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.7-beta6：评论主链与异常回查统一切换妙想天开同款 QDReader 7.9.378/1436，直接保住原始 [fn=N] 表情 token。",
+  "summary": "Beta 1.2.7-beta7：按妙想天开真实 qdBuildReq 语义重做评论签名，每个 Header 独立生成 ts/qimei。",
   "badges": [
     "Beta",
-    "1.2.7-beta6",
-    "参考客户端评论签名"
+    "1.2.7-beta7",
+    "妙想天开 qdBuildReq 精确复刻"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12076",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12076",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12076",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12077",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12077",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12077",
   "sections": [
     {
-      "title": "真机结论",
-      "text": "beta5 对乱码行按 ID 二次回查仍有大量乱码，说明旧 7.9.394 请求身份本身可能已经拿不到原始 [fn=N]。"
+      "title": "beta6 真机结论",
+      "text": "仍有大量乱码，说明仅复制 QDReader 7.9.378/1436、RMX3366/realme 与单次 qimei 还不等于妙想天开的真实请求。"
+    },
+    {
+      "title": "重新核对 donor",
+      "text": "妙想天开 qdBuildReq 为 QDSign、QDInfo、tstamp、UA 分别调用 qdSign/signByUrl；每次调用都会独立创建时间戳与 qimei。"
     },
     {
       "title": "本版修复",
-      "text": "评论主请求与异常行回查统一使用妙想天开同款 QDReader 7.9.378/1436、RMX3366/realme、逐请求 qimei。"
-    },
-    {
-      "title": "表情链",
-      "text": "目标是让 Argus v2 直接返回含 [fn=N] 的原始 Content，再由现有映射转换 Emoji；不从方框反猜编号。"
+      "text": "reader_ext 精确复刻上述四次独立签名行为，并恢复 donor 8 组品牌/机型池；主评论和异常 ID 回查共用。"
     },
     {
       "title": "冻结项",
-      "text": "beta5 的 ID 精确回查仍保留作安全网；目录、正文、版权、账号、Provider 不变。"
+      "text": "不改评论 UI 与 Emoji 映射表；目录、正文、版权、账号、Provider 完全不动。"
     }
   ]
 }

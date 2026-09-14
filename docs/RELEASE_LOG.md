@@ -1,3 +1,9 @@
+## 2026-09-14 · qidian-next 1.2.7-beta7
+- beta6 真机仍有大量乱码；重新逐行核对妙想天开后发现此前“同款签名”仍漏掉 qdBuildReq 的关键语义。
+- donor 对 `QDSign` / `QDInfo` / `tstamp` / `User-Agent` 分别调用 `signByUrl`，每次都会独立生成时间戳与 qimei；beta7 精确复刻。
+- 同时恢复 donor 的 8 组品牌/机型随机池；评论主链与异常 ID 回查共用新的 `reader_ext` signer。
+- 不修改评论 UI、Emoji 映射、目录、正文、版权、账号或 Provider；未经真机确认不得晋升 Stable。
+
 ## 2026-09-14 · qidian-next 1.2.7-beta6
 - 真机确认 beta5 仍有大量乱码表情，旧 7.9.394 身份的二次原始 Content 回查不足以恢复。
 - 评论 `reader_ext` 与异常行 ID 回查统一切换为妙想天开同款 QDReader 7.9.378/1436 + RMX3366/realme + 每请求独立 qimei。

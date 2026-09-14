@@ -1,0 +1,21 @@
+{
+  "version": "1.2.7-beta7",
+  "versionCode": 12077,
+  "sha256": "979323f27b5daff581a54fa0a9a10a50952b71e37470d26820939c2b71ced5ff",
+  "baseline": "1.2.7-beta6",
+  "donorFinding": "Miaoxiang qdBuildReq invokes signByUrl separately for QDSign/QDInfo/tstamp/UA; each invocation creates an independent ts/qimei",
+  "changes": [
+    "reader_ext exact per-header donor signing semantics",
+    "restore 8 donor brand/model pairs",
+    "primary comments and suspicious-row recovery share exact signer"
+  ],
+  "frozen": [
+    "ruleToc",
+    "ruleBookInfo",
+    "ruleContent",
+    "bookSourceUrl",
+    "shared qfDirectSignedRequest",
+    "review UI",
+    "emoji map"
+  ]
+}

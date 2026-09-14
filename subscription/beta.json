@@ -2,21 +2,22 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-09-14T23:35:00+08:00",
+  "updatedAt": "2026-09-14T23:58:00+08:00",
   "items": [
     {
       "id": "qidian-next-beta",
       "name": "🌈 起点增强 · Beta",
-      "summary": "Beta 1.2.7-beta6：评论主链与异常回查统一切换妙想天开同款 QDReader 7.9.378/1436，直接保住原始 [fn=N] 表情 token。",
+      "summary": "Beta 1.2.7-beta7：按妙想天开真实 qdBuildReq 语义重做评论签名，每个 Header 独立生成 ts/qimei。",
       "channel": "beta",
-      "version": "1.2.7-beta6",
-      "updatedAt": "2026-09-14T23:35:00+08:00",
+      "version": "1.2.7-beta7",
+      "updatedAt": "2026-09-14T23:58:00+08:00",
       "tags": [
         "起点",
         "测试版",
         "评论优化",
         "表情修复",
-        "妙想天开参考",
+        "妙想天开精确复刻",
+        "qdBuildReq",
         "QDReader 7.9.378",
         "原始Content",
         "ID回查",
@@ -26,18 +27,18 @@
         "Stable 1.2.6基线"
       ],
       "changelog": [
-        "真机确认 beta5 仍有大量乱码，证明用旧 7.9.394 身份做二次回查仍可能拿到已损坏占位字符",
-        "评论 reader_ext 精确切换到妙想天开同款 QDReader 7.9.378/1436 + RMX3366/realme + 每请求独立 qimei",
-        "段评主请求成功拿到 reader_ext 列表后直接采用，避免 richness 启发式再次换回 legacy 响应",
-        "beta5 的异常行 ID 回查也统一改用 reader_ext；恢复原始 Content 后继续执行 [fn=N]→Emoji 映射",
-        "共享 direct signer、目录、正文、版权、账号、Provider 与其它业务域冻结"
+        "beta6 真机仍有大量乱码；重新逐行核对妙想天开后确认 beta6 并非完整复刻 donor 请求行为",
+        "妙想天开 qdBuildReq 会分别调用 QDSign/QDInfo/tstamp/UA，每次 signByUrl 都重新生成 ts/qimei；beta7 精确复制这一行为",
+        "恢复 donor 的 8 组品牌/机型随机池，并保持同一次模块运行中品牌与机型配对一致",
+        "评论主请求与 beta5 异常行 ID 回查均自动复用新的 reader_ext signer；reader_legacy 只保留兼容 fallback",
+        "评论 UI、映射表、目录、正文、版权、账号、Provider 与 Stable 业务字段冻结"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12076",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12076",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12076",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12077",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12077",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12077",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2",
-      "versionCode": 12076,
-      "sha256": "a42de1cd285e534e6a50799f4f8bd0eae020e296eceea968edbe5b204f871751",
+      "versionCode": 12077,
+      "sha256": "979323f27b5daff581a54fa0a9a10a50952b71e37470d26820939c2b71ced5ff",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7"
     },
@@ -104,5 +105,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
     }
   ],
-  "generatedAt": "2026-09-14T23:35:00+08:00"
+  "generatedAt": "2026-09-14T23:58:00+08:00"
 }
