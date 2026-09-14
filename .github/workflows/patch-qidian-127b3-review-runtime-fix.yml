@@ -1,0 +1,28 @@
+name: patch-qidian-127b3-review-runtime-fix
+on:
+  push:
+    paths:
+      - '.staging/patch_qidian_127b3_review_runtime_fix.trigger'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Build qidian-next 1.2.7-beta3
+        run: python3 .staging/patch_qidian_127b3_review_runtime_fix.py
+      - name: Syntax check unpacked review module
+        run: node --check .staging/qidian-127b3-review-check.js
+      - name: Commit generated Beta
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md .staging/qidian-127b3-report.json .staging/qidian-127b3-review-check.js
+          git diff --cached --quiet && exit 0
+          git commit -m "qidian beta: fix 1.2.7-beta2 comment runtime regression"
+          git push origin HEAD:main
