@@ -14,7 +14,7 @@ jobs:
         with:
           ref: main
       - name: Build Beta 1.2.8-beta1
-        run: python .staging/patch_qidian_128b1_sq_match.py
+        run: python .staging/run_patch_qidian_128b1_sq_match.py
       - name: JavaScript syntax gate
         run: node --check .staging/qidian-128b1-preferred-sq.js
       - name: Strict match smoke tests
@@ -68,7 +68,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md .staging/qidian-128b1-report.json .staging/qidian-128b1-preferred-sq.js
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md .staging/qidian-128b1-report.json .staging/qidian-128b1-preferred-sq.js .staging/patch_qidian_128b1_sq_match.py
           git diff --cached --quiet && exit 0
           git commit -m 'qidian beta: 1.2.8-beta1 strict Shuqi matching'
           git push origin HEAD:main
