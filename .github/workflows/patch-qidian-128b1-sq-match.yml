@@ -1,0 +1,74 @@
+name: patch-qidian-128b1-sq-match
+on:
+  push:
+    paths:
+      - '.staging/qidian-128b1-sq-match.trigger'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Build Beta 1.2.8-beta1
+        run: python .staging/patch_qidian_128b1_sq_match.py
+      - name: JavaScript syntax gate
+        run: node --check .staging/qidian-128b1-preferred-sq.js
+      - name: Strict match smoke tests
+        run: |
+          node <<'JS'
+          const fs=require('fs');
+          global.qfText=v=>String(v==null?'':v).trim();
+          global.qfNorm=v=>String(v==null?'':v).toLowerCase().replace(/[\s·•・\-—_：:（）()【】\[\]《》<>“”"'，,。.!！?？]/g,'');
+          global.qfNormChapter=v=>qfNorm(v).replace(/^第0*(\d+)章/,'第$1章');
+          global.qdList=v=>Array.isArray(v)?v:[];
+          global.qfChapterNoV10=v=>{let s=String(v||''),m=s.match(/第\s*0*(\d+)\s*章/i);return m?Number(m[1]):-1;};
+          const pc={
+            qfChapterHintTryV56:()=>null,
+            qfChapterHintPutV56:()=>{},
+            qfChapterWindowTryV310:()=>null,
+            qfChapterWindowPutV310:()=>{},
+            qfNameVariantsV10:v=>[String(v||'')]
+          };
+          global.QF_MOD38_CACHE={provider_common:pc};
+          global.qfModuleEnsureV38=()=>pc;
+          eval(fs.readFileSync('.staging/qidian-128b1-preferred-sq.js','utf8'));
+          function ok(cond,msg){if(!cond){console.error('FAIL',msg);process.exit(1);}console.log('OK',msg);}
+          const wrong={bookId:'8880120',bookName:'惊悚乐园',authorName:'傀儡先生'};
+          const right={bookId:'1000001',bookName:'惊悚乐园',authorName:'三天两觉'};
+          ok(qfSqPickBookV44([wrong,right],'惊悚乐园','三天两觉').bookId==='1000001','same title picks matching author');
+          ok(qfSqPickBookV44([wrong],'惊悚乐园','三天两觉')===null,'same title wrong author rejected');
+          ok(qfSqBindValidV48({id:'8880120',name:'惊悚乐园',author:'傀儡先生'},{bookName:'惊悚乐园',author:'三天两觉'})===false,'cached wrong author rejected');
+          ok(qfSqBindValidV48({id:'1000001',name:'惊悚乐园',author:'三天两觉'},{bookName:'惊悚乐园',author:'三天两觉'})===true,'correct cached binding accepted');
+          const meta={title:'第079章 校园七不思议（八）',index:78};
+          const chWrongNo={chapterName:'第078章 校园七不思议（八）'};
+          const chRight={chapterName:'第079章 校园七不思议（八）'};
+          const chPreview={chapterName:'番外预告'};
+          ok(qfSqChapterCompatibleV48(chWrongNo,meta)===false,'different chapter number hard rejected');
+          ok(qfSqChapterCompatibleV48(chRight,meta)===true,'matching chapter accepted');
+          ok(qfSqPickChapterV44([chPreview,chWrongNo,chRight],meta,'1000001')===chRight,'chapter picker selects exact number/title');
+          ok(qfSqPickChapterV44([chPreview,chWrongNo],meta,'1000001')===null,'low-confidence wrong chapters return null');
+          JS
+      - name: JSON and isolation gates
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          json.loads(Path('sources/novel/qidian-next/qidian-next-beta.json').read_text(encoding='utf-8'))
+          r=json.loads(Path('.staging/qidian-128b1-report.json').read_text(encoding='utf-8'))
+          assert r['onlyLazyModuleChanged']=='preferred_sq'
+          assert r['bookSourceUrlFrozen'] and r['ruleTocFrozen'] and r['ruleBookInfoFrozen'] and r['ruleContentFrozen']
+          assert r['strictBookMatch'] and r['authorRequired'] and r['chapterNumberHardGuard']
+          print(r)
+          PY
+      - name: Commit Beta publication
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/novel/qidian-next/qidian-next-beta.json manifest.json subscription/beta.json subscription/novel.json bundles/all-beta.json rss/data/details/beta/qidian-next.json docs/RELEASE_LOG.md docs/sources/qidian-next/PROJECT_HANDOFF.md .staging/qidian-128b1-report.json .staging/qidian-128b1-preferred-sq.js
+          git diff --cached --quiet && exit 0
+          git commit -m 'qidian beta: 1.2.8-beta1 strict Shuqi matching'
+          git push origin HEAD:main
