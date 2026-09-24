@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-15T00:10:00+08:00",
+  "updatedAt": "2026-09-24T19:55:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -85,6 +85,41 @@
       "versionCode": 12070,
       "sha256": "2e17a6fb199fd3bb358b9cbaa169b2a33fc6b8d1276004cc2fe0cb105569a315",
       "sourcePath": "sources/novel/qidian-next/qidian-next.json",
+      "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
+      "category": "novel",
+      "artifactType": "bookSource"
+    },
+    {
+      "id": "qidian-next-beta",
+      "name": "🌈 起点增强 · Beta",
+      "summary": "Beta 1.2.8-beta1：书旗改为书名+作者双重严格绑定，并强化章节号校验，避免同名异作者串书和错章。",
+      "channel": "beta",
+      "version": "1.2.8-beta1",
+      "updatedAt": "2026-09-24T19:55:00+08:00",
+      "tags": [
+        "起点",
+        "测试版",
+        "书旗",
+        "正文匹配",
+        "作者校验",
+        "章节匹配",
+        "防串书",
+        "防串章"
+      ],
+      "changelog": [
+        "书旗候选书必须同时通过书名与作者校验；仅书名相同但作者不一致的候选直接拒绝",
+        "书旗绑定缓存升级为 v48，并在每次使用前重新校验书名/作者，旧错误绑定不会继续命中",
+        "章节匹配增加章节号硬约束：目标和候选都能解析出章节号时，号码不一致直接淘汰",
+        "章节 Hint/Window 缓存加入已绑定书旗 bookId，避免更换正确书籍后复用旧书的章节命中",
+        "低置信度不强行返回正文，直接让 Provider Runtime 继续后续优选/兜底源；其它业务域冻结"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12082",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12082",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12082",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2",
+      "versionCode": 12082,
+      "sha256": "204684e2dd148dbbec7a9013fe504e63bbe44dc589760ee9cbe377b71ede4c75",
+      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
       "category": "novel",
       "artifactType": "bookSource"

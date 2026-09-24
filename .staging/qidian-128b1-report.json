@@ -1,0 +1,16 @@
+{
+  "version": "1.2.8-beta1",
+  "versionCode": 12082,
+  "stableBaseline": "1.2.7",
+  "betaSha256": "204684e2dd148dbbec7a9013fe504e63bbe44dc589760ee9cbe377b71ede4c75",
+  "bookSourceUrlFrozen": true,
+  "ruleTocFrozen": true,
+  "ruleBookInfoFrozen": true,
+  "ruleContentFrozen": true,
+  "onlyLazyModuleChanged": "preferred_sq",
+  "strictBookMatch": true,
+  "authorRequired": true,
+  "chapterNumberHardGuard": true,
+  "bindingCache": "qf_v48_bind_sq_",
+  "chapterCacheScopedByBoundBookId": true
+}

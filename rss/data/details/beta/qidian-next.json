@@ -1,31 +1,31 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.7-beta11：按真机暴露的 U+F60D 修复 Emoji 低16位截断，恢复 U+1Fxxx supplementary-plane 表情。",
+  "summary": "Beta 1.2.8-beta1：书旗改为书名+作者双重严格绑定，并强化章节号校验，避免同名异作者串书和错章。",
   "badges": [
     "Beta",
-    "1.2.7-beta11",
-    "PUA Emoji恢复"
+    "1.2.8-beta1",
+    "书旗严格匹配"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12081",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12081",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12081",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12082",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12082",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12082",
   "sections": [
     {
-      "title": "真机证据",
-      "text": "beta10 将未知字符显示为码点后，真机明确暴露 U+F60D。U+F60D 是 U+1F60D（😍）丢失最高 0x10000 后的低16位。"
+      "title": "本版范围",
+      "text": "只修改书旗正文 Provider 的书籍绑定和章节匹配；Stable 1.2.7 的目录、评论、版权、账号及其它 Provider 冻结。"
     },
     {
-      "title": "本版修复",
-      "text": "评论最终渲染前，U+F000..U+F8FF 私用区字符按 +0x10000 恢复 supplementary-plane 码点，并用 UTF-16 surrogate pair 输出。"
+      "title": "书籍绑定",
+      "text": "书旗候选必须书名和作者同时匹配；同名异作者候选直接拒绝。绑定缓存升级并在使用前二次校验，旧错误绑定不会继续复用。"
     },
     {
-      "title": "仍保留诊断",
-      "text": "不能由该规则确定的 U+2612、FFFD 或其它未知字符继续显示码点，不做猜测式替换。"
+      "title": "章节匹配",
+      "text": "当目标章和候选章都能解析章节号时，号码不一致直接淘汰；标题/正文名匹配只在章节号兼容时参与评分。Hint/Window 缓存按书旗 bookId 隔离。"
     },
     {
-      "title": "冻结",
-      "text": "评论请求/签名/分页及目录、正文、版权、账号、Provider 均未修改。"
+      "title": "失败策略",
+      "text": "匹配置信度不足时不返回错误章节，而是让 Provider Runtime 继续尝试后续优选/兜底源。"
     }
   ]
 }

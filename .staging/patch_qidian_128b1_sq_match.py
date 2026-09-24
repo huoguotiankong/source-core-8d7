@@ -271,7 +271,8 @@ hand=(f"## 2026-09-24 · {VERSION} — 书旗匹配测试\n\n"
 '- 基线：Stable 1.2.7。用户真机发现书旗固定源可把正确书名绑定到错误作者的同名书，继而章节目录完全不对应。\n'
 '- 当前 Beta 只修改 `preferred_sq`：书名+作者必须同时匹配；旧绑定缓存升级并二次校验。\n'
 '- 章节匹配加入章节号硬约束，Hint/Window 缓存按绑定的书旗 bookId 隔离；低置信度放弃书旗并继续后续 Provider。\n'
-'- 重点真机复测：《惊悚乐园》作者“三天两觉”，第079章《校园七不思议（八）》；不得再绑定“傀儡先生#8880120”。\n'- 未经用户真机确认不得晋升 Stable。\n\n')
+'- 重点真机复测：《惊悚乐园》作者“三天两觉”，第079章《校园七不思议（八）》；不得再绑定“傀儡先生#8880120”。\n'
+'- 未经用户真机确认不得晋升 Stable。\n\n')
 hp.write_text(hand+hp.read_text(encoding='utf-8'),encoding='utf-8')
 
 report={'version':VERSION,'versionCode':VC,'stableBaseline':'1.2.7','betaSha256':sha,'bookSourceUrlFrozen':s['bookSourceUrl']==stable['bookSourceUrl'],'ruleTocFrozen':s['ruleToc']==stable['ruleToc'],'ruleBookInfoFrozen':s['ruleBookInfo']==stable['ruleBookInfo'],'ruleContentFrozen':s['ruleContent']==stable['ruleContent'],'onlyLazyModuleChanged':'preferred_sq','strictBookMatch':True,'authorRequired':True,'chapterNumberHardGuard':True,'bindingCache':'qf_v48_bind_sq_','chapterCacheScopedByBoundBookId':True}
