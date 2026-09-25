@@ -1,0 +1,54 @@
+[
+  {
+    "bookSourceComment": "0.1.0-beta1｜万相书城基础版：搜索、分类发现、详情、目录、正文；直接访问 wwxsc.com，未经真机确认。",
+    "bookSourceGroup": "◈ source-core · 测试",
+    "bookSourceName": "◈ 万相书城",
+    "bookSourceType": 0,
+    "bookSourceUrl": "https://sc8d7.invalid/legado/wanxiang-8d7",
+    "customOrder": 0,
+    "enabled": true,
+    "enabledCookieJar": false,
+    "enabledExplore": true,
+    "enabledReview": false,
+    "exploreUrl": "[{\"title\":\"━━ 玄幻·奇幻 ━━\",\"url\":\"\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":1}},{\"title\":\"热门\",\"url\":\"https://www.wwxsc.com/nav/xuanhuan.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"全部\",\"url\":\"https://www.wwxsc.com/nav/xuanhuan_{{page}}.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"━━ 仙侠·武侠 ━━\",\"url\":\"\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":1}},{\"title\":\"热门\",\"url\":\"https://www.wwxsc.com/nav/xianxia.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"全部\",\"url\":\"https://www.wwxsc.com/nav/xianxia_{{page}}.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"━━ 都市·娱乐 ━━\",\"url\":\"\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":1}},{\"title\":\"热门\",\"url\":\"https://www.wwxsc.com/nav/dushi.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"全部\",\"url\":\"https://www.wwxsc.com/nav/dushi_{{page}}.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"━━ 历史·军事 ━━\",\"url\":\"\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":1}},{\"title\":\"热门\",\"url\":\"https://www.wwxsc.com/nav/lishi.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"全部\",\"url\":\"https://www.wwxsc.com/nav/lishi_{{page}}.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"━━ 科幻·游戏 ━━\",\"url\":\"\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":1}},{\"title\":\"热门\",\"url\":\"https://www.wwxsc.com/nav/kehuan.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"全部\",\"url\":\"https://www.wwxsc.com/nav/kehuan_{{page}}.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"━━ 恐怖·悬疑 ━━\",\"url\":\"\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":1}},{\"title\":\"热门\",\"url\":\"https://www.wwxsc.com/nav/kongbu.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"全部\",\"url\":\"https://www.wwxsc.com/nav/kongbu_{{page}}.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"━━ 耽美·纯爱 ━━\",\"url\":\"\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":1}},{\"title\":\"热门\",\"url\":\"https://www.wwxsc.com/nav/chunai.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"全部\",\"url\":\"https://www.wwxsc.com/nav/chunai_{{page}}.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"━━ 女生·言情 ━━\",\"url\":\"\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":1}},{\"title\":\"热门\",\"url\":\"https://www.wwxsc.com/nav/yanqing.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"全部\",\"url\":\"https://www.wwxsc.com/nav/yanqing_{{page}}.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"━━ 轻小说 ━━\",\"url\":\"\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":1}},{\"title\":\"热门\",\"url\":\"https://www.wwxsc.com/nav/erciyuan.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}},{\"title\":\"全部\",\"url\":\"https://www.wwxsc.com/nav/erciyuan_{{page}}.html\",\"style\":{\"layout_flexGrow\":1,\"layout_flexBasisPercent\":0.5}}]",
+    "header": "{\n  \"User-Agent\": \"Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36\",\n  \"Referer\": \"https://www.wwxsc.com/\"\n}",
+    "lastUpdateTime": 1790308920000,
+    "respondTime": 180000,
+    "ruleBookInfo": {
+      "author": "[property$=author]@content",
+      "coverUrl": "[property$=image]@content\n@js:\nvar u=(result||\"\").trim();\nif(!u) \"\";\nelse if(u.indexOf(\"//\")===0) \"https:\"+u;\nelse if(u.indexOf(\"/\")===0) \"https://www.wwxsc.com\"+u;\nelse u;",
+      "intro": "[property$=description]@content",
+      "kind": "[property~=category|status|update_time]@content##\\s.*",
+      "lastChapter": "{{@@[property$=chapter_name]@content}} · {{@@[property$=update_time]@content}}",
+      "name": "[property$=book_name]@content",
+      "tocUrl": "{{baseUrl}}"
+    },
+    "ruleContent": {
+      "content": "#cont-body@html",
+      "nextContentUrl": "//i[contains(@class, 'fa fa-arrow-circle-right')]/ancestor::a[1]/@href",
+      "replaceRegex": ""
+    },
+    "ruleExplore": {
+      "author": "@js:\nvar d=org.jsoup.Jsoup.parse(src);\nvar a=\"\";\nvar td=d.select(\"td\");\nif(td.size()>2) a=td.get(2).text();\nif(!a){\n  var xs=d.select(\".media-body .row a\");\n  if(xs.size()>0) a=xs.last().text();\n}\na;",
+      "bookList": "@js:\norg.jsoup.Jsoup.parse(src).select(\"table tbody tr:has(td),.col-left .panel-body .row>div\");",
+      "bookUrl": "a.0@href\n@js:\nvar u=(result||\"\").trim();\nif(!u) \"\";\nelse if(u.indexOf(\"//\")===0) \"https:\"+u;\nelse if(u.indexOf(\"/\")===0) \"https://www.wwxsc.com\"+u;\nelse u;",
+      "coverUrl": ".media-left img@src\n@js:\nvar u=(result||\"\").trim();\nif(!u) \"\";\nelse if(u.indexOf(\"//\")===0) \"https:\"+u;\nelse if(u.indexOf(\"/\")===0) \"https://www.wwxsc.com\"+u;\nelse u;",
+      "intro": ".media-info@text",
+      "name": "@js:\nvar d=org.jsoup.Jsoup.parse(src);\nvar a=d.select(\"a\").first();\nvar n=\"\";\nif(a!=null){\n  n=a.attr(\"title\");\n  if(!n) n=a.text();\n}\nvar mt=d.select(\".media-title a\").text();\nif(mt) n=mt;\nn;"
+    },
+    "ruleSearch": {
+      "author": "td.1@text",
+      "bookList": "table tbody tr",
+      "bookUrl": "td a.0@href\n@js:\nvar u=(result||\"\").trim();\nif(!u) \"\";\nelse if(u.indexOf(\"//\")===0) \"https:\"+u;\nelse if(u.indexOf(\"/\")===0) \"https://www.wwxsc.com\"+u;\nelse u;",
+      "checkKeyWord": "万相",
+      "name": "td a.0@title"
+    },
+    "ruleToc": {
+      "chapterList": "#all-chapter .panel-body div.item a",
+      "chapterName": "text",
+      "chapterUrl": "href\n@js:\nvar u=(result||\"\").trim();\nif(!u) \"\";\nelse if(u.indexOf(\"//\")===0) \"https:\"+u;\nelse if(u.indexOf(\"/\")===0) \"https://www.wwxsc.com\"+u;\nelse u;"
+    },
+    "searchUrl": "https://www.wwxsc.com/plus/search.php?q={{key}}",
+    "weight": 0
+  }
+]
