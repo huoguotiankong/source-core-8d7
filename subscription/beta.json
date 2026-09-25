@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-09-24T19:55:00+08:00",
+  "updatedAt": "2026-09-25T12:02:00+08:00",
   "items": [
     {
       "id": "qidian-next-beta",
@@ -11,16 +11,7 @@
       "channel": "beta",
       "version": "1.2.8-beta1",
       "updatedAt": "2026-09-24T19:55:00+08:00",
-      "tags": [
-        "起点",
-        "测试版",
-        "书旗",
-        "正文匹配",
-        "作者校验",
-        "章节匹配",
-        "防串书",
-        "防串章"
-      ],
+      "tags": ["起点","测试版","书旗","正文匹配","作者校验","章节匹配","防串书","防串章"],
       "changelog": [
         "书旗候选书必须同时通过书名与作者校验；仅书名相同但作者不一致的候选直接拒绝",
         "书旗绑定缓存升级为 v48，并在每次使用前重新校验书名/作者，旧错误绑定不会继续命中",
@@ -45,16 +36,7 @@
       "channel": "beta",
       "version": "4.2.1-alpha2",
       "updatedAt": "2026-08-25",
-      "tags": [
-        "起点",
-        "官方目录",
-        "段评",
-        "本章说",
-        "作者说",
-        "书友圈",
-        "STV",
-        "多正文 Provider"
-      ],
+      "tags": ["起点","官方目录","段评","本章说","作者说","书友圈","STV","多正文 Provider"],
       "changelog": [
         "基于 v4.2.0 Stable 的 STV 接入测试主线",
         "登录页补充 STV API 密钥设置",
@@ -76,16 +58,7 @@
       "channel": "beta",
       "version": "0.1.0-beta13",
       "updatedAt": "2026-08-28",
-      "tags": [
-        "漫蛙",
-        "漫画",
-        "测试版",
-        "评论加载",
-        "原生DOM",
-        "加载监控",
-        "CSS Grid",
-        "动态域名"
-      ],
+      "tags": ["漫蛙","漫画","测试版","评论加载","原生DOM","加载监控","CSS Grid","动态域名"],
       "changelog": [
         "移除 Beta12 generic fetch 翻页，避免未知请求永久 pending",
         "不再搬移 #comment，保留漫蛙原父级结构、事件委托与懒加载环境",
@@ -98,7 +71,27 @@
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/comic/manwa/manwa-beta.json?v=1013",
       "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1013",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/manwa.json"
+    },
+    {
+      "id": "wanxiang",
+      "name": "◈ 万相书城",
+      "summary": "万相书城基础 Beta：直连 www.wwxsc.com，支持分类发现、关键词搜索、详情、完整目录、正文及长章节续页。",
+      "channel": "beta",
+      "version": "0.1.0-beta1",
+      "updatedAt": "2026-09-25T12:02:00+08:00",
+      "tags": ["万相书城","小说","测试版","发现","搜索","目录","正文"],
+      "changelog": [
+        "新增九大分类发现：玄幻、仙侠、都市、历史、科幻、恐怖、纯爱、言情、轻小说",
+        "新增 /plus/search.php 关键词搜索",
+        "新增书籍详情、完整章节目录和正文解析",
+        "保留站点长章节下一页续读规则",
+        "首次发布仅进入 Beta，等待 Android 阅读端真机验证"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/wanxiang/bookSource_%E2%97%88%E4%B8%87%E7%9B%B8%E4%B9%A6%E5%9F%8E.json",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/wanxiang/bookSource_%E2%97%88%E4%B8%87%E7%9B%B8%E4%B9%A6%E5%9F%8E.json",
+      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/wanxiang/bookSource_%E2%97%88%E4%B8%87%E7%9B%B8%E4%B9%A6%E5%9F%8E.json",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/wanxiang.json"
     }
   ],
-  "generatedAt": "2026-09-24T19:55:00+08:00"
+  "generatedAt": "2026-09-25T12:02:00+08:00"
 }
