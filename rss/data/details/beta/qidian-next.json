@@ -5,27 +5,23 @@
   "badges": [
     "Beta",
     "1.2.8-beta1",
-    "书旗严格匹配"
+    "书旗"
+  ],
+  "sections": [
+    {
+      "title": "本版更新",
+      "text": "书旗候选书必须同时通过书名与作者校验；仅书名相同但作者不一致的候选直接拒绝；书旗绑定缓存升级为 v48，并在每次使用前重新校验书名/作者，旧错误绑定不会继续命中；章节匹配增加章节号硬约束：目标和候选都能解析出章节号时，号码不一致直接淘汰；章节 Hint/Window 缓存加入已绑定书旗 bookId，避免更换正确书籍后复用旧书的章节命中；低置信度不强行返回正文，直接让 Provider Runtime 继续后续优选/兜底源；其它业务域冻结"
+    },
+    {
+      "title": "版本状态",
+      "text": "当前为 Beta / 测试通道，需真机确认后才会晋升正式版。"
+    },
+    {
+      "title": "更新方式",
+      "text": "从本订阅页重新导入/更新即可覆盖现有 🌈 起点增强 · Beta。"
+    }
   ],
   "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12082",
   "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12082",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12082",
-  "sections": [
-    {
-      "title": "本版范围",
-      "text": "只修改书旗正文 Provider 的书籍绑定和章节匹配；Stable 1.2.7 的目录、评论、版权、账号及其它 Provider 冻结。"
-    },
-    {
-      "title": "书籍绑定",
-      "text": "书旗候选必须书名和作者同时匹配；同名异作者候选直接拒绝。绑定缓存升级并在使用前二次校验，旧错误绑定不会继续复用。"
-    },
-    {
-      "title": "章节匹配",
-      "text": "当目标章和候选章都能解析章节号时，号码不一致直接淘汰；标题/正文名匹配只在章节号兼容时参与评分。Hint/Window 缓存按书旗 bookId 隔离。"
-    },
-    {
-      "title": "失败策略",
-      "text": "匹配置信度不足时不返回错误章节，而是让 Provider Runtime 继续尝试后续优选/兜底源。"
-    }
-  ]
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12082"
 }
