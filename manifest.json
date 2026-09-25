@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-24T19:55:00+08:00",
+  "updatedAt": "2026-09-25T12:02:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -26,23 +26,8 @@
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian/qidian-official.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=v2922_audio_webview_crypto_bridge_fix",
       "summary": "起点官方生态大型书源：官方搜索/目录/评论体系 + 多正文 Provider；本测试版新增 STV 独立正文入口。",
-      "tags": [
-        "起点",
-        "官方目录",
-        "段评",
-        "本章说",
-        "作者说",
-        "书友圈",
-        "STV",
-        "多正文 Provider"
-      ],
-      "changelog": [
-        "基于 v4.2.0 Stable 的 STV 接入测试主线",
-        "登录页补充 STV API 密钥设置",
-        "正文启动源类别新增 STV·自动 / STV·qidian",
-        "STV 不加入限免/优选/兜底及 9=全源智能",
-        "保持官方搜索、详情、目录、评论等其它域不变"
-      ]
+      "tags": ["起点","官方目录","段评","本章说","作者说","书友圈","STV","多正文 Provider"],
+      "changelog": ["基于 v4.2.0 Stable 的 STV 接入测试主线","登录页补充 STV API 密钥设置","正文启动源类别新增 STV·自动 / STV·qidian","STV 不加入限免/优选/兜底及 9=全源智能","保持官方搜索、详情、目录、评论等其它域不变"]
     },
     {
       "id": "qidian-next",
@@ -52,32 +37,8 @@
       "channel": "stable",
       "version": "1.2.7",
       "updatedAt": "2026-09-15T00:10:00+08:00",
-      "tags": [
-        "起点",
-        "正式版",
-        "目录",
-        "章节字数",
-        "分卷",
-        "版权信息",
-        "段评",
-        "本章说",
-        "楼中楼",
-        "10条分页",
-        "TitleInfoList",
-        "头像兼容",
-        "表情修复",
-        "配图",
-        "配音",
-        "情无",
-        "小雨用户系统"
-      ],
-      "changelog": [
-        "由用户真机确认的 1.2.7-beta11 原运行代码直接晋升 Stable，不在发布阶段新增业务逻辑",
-        "评论页保留首屏10条、按需滚动分页、楼中楼/回复分页以及官方 TitleImage 身份标签",
-        "头像增加多字段兼容与失败兜底；评论配图、配音、时间/IP、点赞等既有能力继续保留",
-        "表情兼容保留 [fn] 等 token 映射，并修复部分 Emoji 被截断为 U+Fxxx 私用区码点的问题：U+F000..U+F8FF 自动恢复到 U+1F000..U+1F8FF，例如 U+F60D -> U+1F60D 😍",
-        "目录继续冻结在已确认的 Argus v1 + QDSign/QDInfo、N/C/P/V/Vo/T 主链；版权、正文、账号、搜索和 Provider 不变"
-      ],
+      "tags": ["起点","正式版","目录","章节字数","分卷","版权信息","段评","本章说","楼中楼","10条分页","TitleInfoList","头像兼容","表情修复","配图","配音","情无","小雨用户系统"],
+      "changelog": ["由用户真机确认的 1.2.7-beta11 原运行代码直接晋升 Stable，不在发布阶段新增业务逻辑","评论页保留首屏10条、按需滚动分页、楼中楼/回复分页以及官方 TitleImage 身份标签","头像增加多字段兼容与失败兜底；评论配图、配音、时间/IP、点赞等既有能力继续保留","表情兼容保留 [fn] 等 token 映射，并修复部分 Emoji 被截断为 U+Fxxx 私用区码点的问题：U+F000..U+F8FF 自动恢复到 U+1F000..U+1F8FF，例如 U+F60D -> U+1F60D 😍","目录继续冻结在已确认的 Argus v1 + QDSign/QDInfo、N/C/P/V/Vo/T 主链；版权、正文、账号、搜索和 Provider 不变"],
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12070",
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12070",
       "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12070",
@@ -96,23 +57,8 @@
       "channel": "beta",
       "version": "1.2.8-beta1",
       "updatedAt": "2026-09-24T19:55:00+08:00",
-      "tags": [
-        "起点",
-        "测试版",
-        "书旗",
-        "正文匹配",
-        "作者校验",
-        "章节匹配",
-        "防串书",
-        "防串章"
-      ],
-      "changelog": [
-        "书旗候选书必须同时通过书名与作者校验；仅书名相同但作者不一致的候选直接拒绝",
-        "书旗绑定缓存升级为 v48，并在每次使用前重新校验书名/作者，旧错误绑定不会继续命中",
-        "章节匹配增加章节号硬约束：目标和候选都能解析出章节号时，号码不一致直接淘汰",
-        "章节 Hint/Window 缓存加入已绑定书旗 bookId，避免更换正确书籍后复用旧书的章节命中",
-        "低置信度不强行返回正文，直接让 Provider Runtime 继续后续优选/兜底源；其它业务域冻结"
-      ],
+      "tags": ["起点","测试版","书旗","正文匹配","作者校验","章节匹配","防串书","防串章"],
+      "changelog": ["书旗候选书必须同时通过书名与作者校验；仅书名相同不再允许绑定","书旗绑定缓存升级为 v48，并在使用前二次校验书名/作者，避免旧错误绑定继续生效","章节匹配增加章节号硬约束；可解析章节号不一致时直接淘汰，索引距离只作低权重 tie-break","Hint/Window 缓存加入已绑定书旗 bookId，避免换书后复用旧章节命中。低置信度直接失败并交给后续 Provider","仅 preferred_sq 懒模块变更；Stable 1.2.7 与目录/评论/版权/账号/其它 Provider 不变"],
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12082",
       "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12082",
       "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12082",
@@ -137,23 +83,8 @@
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/picacg/picacg.json",
       "bookSourceUrl": "https://sc8d7.invalid/legado/picacg-8d7",
       "summary": "正式版：Beta9 真机确认后原样晋升；详情顶部定制按钮恢复，相关推荐保持首批一次性返回与强去重。",
-      "tags": [
-        "哔咔",
-        "漫画",
-        "正式版",
-        "APP API",
-        "网页线路",
-        "评论",
-        "楼中楼",
-        "定制按钮",
-        "双线路"
-      ],
-      "changelog": [
-        "由 1.0.0-beta9 真机确认基线原样晋升 Stable，不新增业务逻辑",
-        "详情页顶部定制按钮已真机确认恢复，可直接进入独立哔咔评论中心",
-        "相关推荐保留 page>1 硬终止和漫画 ID/标题/封面路径三层独立去重",
-        "保留登录、账户中心、签到、点赞收藏、评论/楼中楼、标签、目录、漫画图片正文及 APP/Web 双线路"
-      ],
+      "tags": ["哔咔","漫画","正式版","APP API","网页线路","评论","楼中楼","定制按钮","双线路"],
+      "changelog": ["由 1.0.0-beta9 真机确认基线原样晋升 Stable，不新增业务逻辑","详情页顶部定制按钮已真机确认恢复，可直接进入独立哔咔评论中心","相关推荐保留 page>1 硬终止和漫画 ID/标题/封面路径三层独立去重","保留登录、账户中心、签到、点赞收藏、评论/楼中楼、标签、目录、漫画图片正文及 APP/Web 双线路"],
       "sha256": "59fbc28ba9d168e95be9dc76a653391b111309009c3ae9d710e7b9aeda61170f",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     },
@@ -170,27 +101,8 @@
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/jmcomic/jmcomic.json?v=10000",
       "bookSourceUrl": "https://sc8d7.invalid/legado/jmcomic-8d7",
       "summary": "正式版 1.0.0：由 0.1.0-beta8 基线原样晋升；保留双线路、登录/AVS、账户收藏、评论楼中楼、详情标签、目录正文与图片反混淆。",
-      "tags": [
-        "禁漫天堂",
-        "漫画",
-        "正式版",
-        "APP API",
-        "网页线路",
-        "动态域名",
-        "登录",
-        "账户",
-        "评论",
-        "楼中楼",
-        "收藏",
-        "双线路"
-      ],
-      "changelog": [
-        "由 0.1.0-beta8 基线原样晋升 Stable，不新增业务逻辑",
-        "保留 getLoginInfoMap 登录兼容、18comicAPP + 2.1.2/2.0.20 登录和 AVS 持久鉴权",
-        "保留详情评论入口、顶部定制按钮、独立评论中心、楼中楼、发表与回复",
-        "保留可点击作者/原作/标签以及浏览、点赞、评论、章节、JM编号等作品数据",
-        "保留已验证的网页目录、漫画正文、APP /chapter image 兼容、图片分流 1-4 与 JM 反混淆"
-      ],
+      "tags": ["禁漫天堂","漫画","正式版","APP API","网页线路","动态域名","登录","账户","评论","楼中楼","收藏","双线路"],
+      "changelog": ["由 0.1.0-beta8 基线原样晋升 Stable，不新增业务逻辑","保留 getLoginInfoMap 登录兼容、18comicAPP + 2.1.2/2.0.20 登录和 AVS 持久鉴权","保留详情评论入口、顶部定制按钮、独立评论中心、楼中楼、发表与回复","保留可点击作者/原作/标签以及浏览、点赞、评论、章节、JM编号等作品数据","保留已验证的网页目录、漫画正文、APP /chapter image 兼容、图片分流 1-4 与 JM 反混淆"],
       "sha256": "e181e0c0dd917687e98441a4208192977f6799f921591405a4c729d9dd46cb69",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
     },
@@ -207,29 +119,30 @@
       "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/comic/manwa/manwa-beta.json?v=1013",
       "bookSourceUrl": "https://sc8d7.invalid/legado/manwa-8d7",
       "summary": "Beta13：取消猜测式 fetch，保留漫蛙原评论 DOM 与原生滚动环境，并加入 8 秒加载 watchdog，避免永久“加载中”。",
-      "tags": [
-        "漫蛙",
-        "漫画",
-        "测试版",
-        "评论加载",
-        "原生DOM",
-        "加载监控",
-        "CSS Grid",
-        "动态域名"
-      ],
-      "changelog": [
-        "移除 Beta12 generic fetch 翻页，避免未知请求永久 pending",
-        "不再搬移 #comment，保留漫蛙原父级结构、事件委托与懒加载环境",
-        "到底时触发 window/document/jQuery 原生 scroll，并优先点击站内真实更多评论/下一页控件",
-        "每次加载增加 8 秒 watchdog；无新增时自动解除加载中并允许继续重试",
-        "MutationObserver 保留，官网一旦追加评论立即恢复正常状态",
-        "保留 Beta12 Grid 排版；正文、详情、目录、登录页和域名模块冻结"
-      ],
+      "tags": ["漫蛙","漫画","测试版","评论加载","原生DOM","加载监控","CSS Grid","动态域名"],
+      "changelog": ["移除 Beta12 generic fetch 翻页，避免未知请求永久 pending","不再搬移 #comment，保留漫蛙原父级结构、事件委托与懒加载环境","到底时触发 window/document/jQuery 原生 scroll，并优先点击站内真实更多评论/下一页控件","每次加载增加 8 秒 watchdog；无新增时自动解除加载中并允许继续重试","MutationObserver 保留，官网一旦追加评论立即恢复正常状态","保留 Beta12 Grid 排版；正文、详情、目录、登录页和域名模块冻结"],
       "sha256": "64348d1e056f8cf9c1126e3fad1be5601eae8f4b84e7f80738da659e81fcd2a5",
       "icon": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/assets/source-core-source-icon.svg"
+    },
+    {
+      "id": "wanxiang",
+      "name": "◈ 万相书城",
+      "category": "novel",
+      "artifactType": "bookSource",
+      "channel": "beta",
+      "version": "0.1.0-beta1",
+      "updatedAt": "2026-09-25T12:02:00+08:00",
+      "sourcePath": "sources/novel/wanxiang/bookSource_◈万相书城.json",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/wanxiang/bookSource_%E2%97%88%E4%B8%87%E7%9B%B8%E4%B9%A6%E5%9F%8E.json",
+      "bookSourceUrl": "https://sc8d7.invalid/legado/wanxiang-8d7",
+      "summary": "万相书城基础 Beta：直连 www.wwxsc.com，支持分类发现、关键词搜索、详情、完整目录、正文及长章节续页。",
+      "tags": ["万相书城","小说","测试版","发现","搜索","目录","正文"],
+      "changelog": ["新增九大分类发现入口","新增关键词搜索","新增详情、完整目录与正文解析","保留长章节下一页续读规则","首次发布仅进入 Beta，等待真机验证"],
+      "sha256": "1a70ed81edca3e41cbded5239dbe9630067e2080b4627350eba88bca8cc004cb"
     }
   ],
   "typeCatalogs": {
+    "novel": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/novel.json",
     "comic": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/comic.json",
     "rss": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/rss.json"
   }
