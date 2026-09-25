@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "source-core-8d7",
-  "updatedAt": "2026-09-25T12:02:00+08:00",
+  "updatedAt": "2026-09-25T12:40:00+08:00",
   "channels": {
     "stable": {
       "catalog": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/subscription/stable.json",
@@ -130,15 +130,15 @@
       "category": "novel",
       "artifactType": "bookSource",
       "channel": "beta",
-      "version": "0.1.0-beta1",
-      "updatedAt": "2026-09-25T12:02:00+08:00",
+      "version": "0.1.0-beta2",
+      "updatedAt": "2026-09-25T12:40:00+08:00",
       "sourcePath": "sources/novel/wanxiang/bookSource_◈万相书城.json",
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/wanxiang/bookSource_%E2%97%88%E4%B8%87%E7%9B%B8%E4%B9%A6%E5%9F%8E.json",
-      "bookSourceUrl": "https://sc8d7.invalid/legado/wanxiang-8d7",
-      "summary": "万相书城基础 Beta：直连 www.wwxsc.com，支持分类发现、关键词搜索、详情、完整目录、正文及长章节续页。",
-      "tags": ["万相书城","小说","测试版","发现","搜索","目录","正文"],
-      "changelog": ["新增九大分类发现入口","新增关键词搜索","新增详情、完整目录与正文解析","保留长章节下一页续读规则","首次发布仅进入 Beta，等待真机验证"],
-      "sha256": "1a70ed81edca3e41cbded5239dbe9630067e2080b4627350eba88bca8cc004cb"
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/wanxiang/bookSource_%E2%97%88%E4%B8%87%E7%9B%B8%E4%B9%A6%E5%9F%8E.json?v=102",
+      "bookSourceUrl": "https://www.wwxsc.com",
+      "summary": "Beta2：修复上一版错误的 bookSourceUrl 基准域名，恢复 www.wwxsc.com 原生相对路径规则。",
+      "tags": ["万相书城","小说","测试版","发现","搜索","目录","正文","基准域名修复"],
+      "changelog": ["bookSourceUrl 修正为 https://www.wwxsc.com","搜索和发现恢复站点原生相对路径","目录、封面等相对链接统一基于实际站点根地址解析","正文保留 #cont-body 与长章节续页","等待本轮真机验证后再决定是否继续修复或晋升"],
+      "sha256": "pending-beta2-device-test"
     }
   ],
   "typeCatalogs": {
