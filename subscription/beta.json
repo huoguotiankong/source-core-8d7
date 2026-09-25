@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-09-25T12:02:00+08:00",
+  "updatedAt": "2026-09-25T12:40:00+08:00",
   "items": [
     {
       "id": "qidian-next-beta",
@@ -75,23 +75,23 @@
     {
       "id": "wanxiang",
       "name": "◈ 万相书城",
-      "summary": "万相书城基础 Beta：直连 www.wwxsc.com，支持分类发现、关键词搜索、详情、完整目录、正文及长章节续页。",
+      "summary": "Beta2：修复上一版错误的 bookSourceUrl 基准域名，恢复以 www.wwxsc.com 为源根地址和原生相对路径规则。",
       "channel": "beta",
-      "version": "0.1.0-beta1",
-      "updatedAt": "2026-09-25T12:02:00+08:00",
-      "tags": ["万相书城","小说","测试版","发现","搜索","目录","正文"],
+      "version": "0.1.0-beta2",
+      "updatedAt": "2026-09-25T12:40:00+08:00",
+      "tags": ["万相书城","小说","测试版","发现","搜索","目录","正文","基准域名修复"],
       "changelog": [
-        "新增九大分类发现：玄幻、仙侠、都市、历史、科幻、恐怖、纯爱、言情、轻小说",
-        "新增 /plus/search.php 关键词搜索",
-        "新增书籍详情、完整章节目录和正文解析",
-        "保留站点长章节下一页续读规则",
-        "首次发布仅进入 Beta，等待 Android 阅读端真机验证"
+        "bookSourceUrl 从错误的 sc8d7.invalid 修正为 https://www.wwxsc.com",
+        "搜索恢复 /plus/search.php?q={{key}} 相对路径，由实际站点根地址统一解析",
+        "发现恢复 /nav/*.html 相对路径，避免人为拼接绝对 URL 造成基准混乱",
+        "目录、封面等相对链接恢复 source.getKey() + result 的原生规则结构",
+        "正文继续使用 #cont-body，并保留长章节下一页续读"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/wanxiang/bookSource_%E2%97%88%E4%B8%87%E7%9B%B8%E4%B9%A6%E5%9F%8E.json",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/wanxiang/bookSource_%E2%97%88%E4%B8%87%E7%9B%B8%E4%B9%A6%E5%9F%8E.json",
-      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/wanxiang/bookSource_%E2%97%88%E4%B8%87%E7%9B%B8%E4%B9%A6%E5%9F%8E.json",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/wanxiang/bookSource_%E2%97%88%E4%B8%87%E7%9B%B8%E4%B9%A6%E5%9F%8E.json?v=102",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/wanxiang/bookSource_%E2%97%88%E4%B8%87%E7%9B%B8%E4%B9%A6%E5%9F%8E.json?v=102",
+      "importUrl": "legado://import/bookSource?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/wanxiang/bookSource_%E2%97%88%E4%B8%87%E7%9B%B8%E4%B9%A6%E5%9F%8E.json?v=102",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/wanxiang.json"
     }
   ],
-  "generatedAt": "2026-09-25T12:02:00+08:00"
+  "generatedAt": "2026-09-25T12:40:00+08:00"
 }
