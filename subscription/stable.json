@@ -2,48 +2,41 @@
   "schemaVersion": 1,
   "channel": "stable",
   "name": "正式版",
-  "updatedAt": "2026-09-15T00:10:00+08:00",
+  "updatedAt": "2026-11-08T00:56:08.618+08:00",
   "items": [
     {
       "id": "qidian-next",
       "name": "🌈 起点增强",
-      "summary": "正式版 1.2.7：真机确认评论页与表情恢复正常；合并评论按需分页、官方标签/头像兼容及截断 Emoji 恢复。",
+      "summary": "正式版 1.2.8：书旗 APP 接口修复已获真机确认；加密搜索、全量目录、CDN 正文及备用链恢复，保留严格书籍/章节匹配。",
       "icon": "",
       "channel": "stable",
-      "version": "1.2.7",
-      "updatedAt": "2026-09-15T00:10:00+08:00",
+      "version": "1.2.8",
+      "updatedAt": "2026-11-08T00:56:08.618+08:00",
       "tags": [
         "起点",
         "正式版",
+        "书旗",
+        "APP接口",
+        "CDN正文",
+        "严格匹配",
         "目录",
-        "章节字数",
-        "分卷",
-        "版权信息",
         "段评",
         "本章说",
-        "楼中楼",
-        "10条分页",
-        "TitleInfoList",
-        "头像兼容",
-        "表情修复",
-        "配图",
-        "配音",
-        "情无",
-        "小雨用户系统"
+        "评论",
+        "多正文源"
       ],
       "changelog": [
-        "由用户真机确认的 1.2.7-beta11 原运行代码直接晋升 Stable，不在发布阶段新增业务逻辑",
-        "评论页保留首屏10条、按需滚动分页、楼中楼/回复分页以及官方 TitleImage 身份标签",
-        "头像增加多字段兼容与失败兜底；评论配图、配音、时间/IP、点赞等既有能力继续保留",
-        "表情兼容保留 [fn] 等 token 映射，并修复部分 Emoji 被截断为 U+Fxxx 私用区码点的问题：U+F000..U+F8FF 自动恢复到 U+1F000..U+1F8FF，例如 U+F60D -> U+1F60D 😍",
-        "目录继续冻结在已确认的 Argus v1 + QDSign/QDInfo、N/C/P/V/Vo/T 主链；版权、正文、账号、搜索和 Provider 不变"
+        "用户真机确认 1.2.8-beta2 书旗正文恢复正常，正式版直接沿用已验证代码，不新增业务修改",
+        "书旗使用 APP 加密搜索、H5 全量目录及 OpenAPI 回退，CDN JSONP 正文及 chapterinfo 备用链",
+        "书名+作者双重严格命中；章节号与标题核心严格校验，避免串书、串章",
+        "书旗 Provider 继续独立懒加载，使用新版独立缓存；起点官方搜索、目录、评论、账号及其它 Provider 不变"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12070",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12070",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12070",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12080",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12080",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12080",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json",
-      "versionCode": 12070,
-      "sha256": "2e17a6fb199fd3bb358b9cbaa169b2a33fc6b8d1276004cc2fe0cb105569a315",
+      "versionCode": 12080,
+      "sha256": "25bc6553f3a3260446e4b8d961ffa4ce9fd7451c4f87b2a41ffff94f709c7785",
       "sourcePath": "sources/novel/qidian-next/qidian-next.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7"
     },
@@ -113,5 +106,5 @@
       "type": "comic"
     }
   ],
-  "generatedAt": "2026-09-15T00:10:00+08:00"
+  "generatedAt": "2026-11-08T00:56:08.618+08:00"
 }
