@@ -1,3 +1,10 @@
+## 2026-11-08 · qidian-next Stable 1.2.8 — 书旗 APP 修复真机确认晋升
+- 用户真机确认 1.2.8-beta2 书旗正文恢复正常，正式版直接沿用已验证代码，不新增业务修改
+- 书旗使用 APP 加密搜索、H5 全量目录及 OpenAPI 回退，CDN JSONP 正文及 chapterinfo 备用链
+- 书名+作者双重严格命中；章节号与标题核心严格校验，避免串书、串章
+- 书旗 Provider 继续独立懒加载，使用新版独立缓存；起点官方搜索、目录、评论、账号及其它 Provider 不变
+- 发布同步：Stable Source、Manifest、Stable Subscription、Novel Catalog、Stable Bundle、RSS Stable Detail、Release Log；从活动 Beta/Novel 目录与 Beta Bundle 移除该逻辑源，Beta JSON 与详情文件作为历史保留。
+
 ## 2026-11-08 · qidian-next 1.2.8-beta2 — 书旗 APP 接口修复
 - 参考 2026-11-04 书旗 APP 接口书源重接官方 APP 加密搜索（native_v3），替换旧书旗接口链
 - 书旗目录使用 H5 全量真章名，失败降级 OpenAPI chapterlist；按绑定 bookId 缓存，避免跨书复用
