@@ -34,7 +34,7 @@
       "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12083",
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2",
       "versionCode": 12083,
-      "sha256": "2634144258fcff9f814566fc3da63f2574c4189c536be61ca270da44add3513c",
+      "sha256": "e14034e80d4a85c2fa0b634c532d9c8bd15b7ea44b5707d8feeab7d4048f145e",
       "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7"
     },
