@@ -2,40 +2,42 @@
   "schemaVersion": 1,
   "type": "novel",
   "name": "小说源",
-  "updatedAt": "2026-11-08T00:28:56.311+08:00",
+  "updatedAt": "2026-11-08T00:56:08.618+08:00",
   "items": [
     {
-      "id": "qidian-next-beta",
-      "name": "🌈 起点增强 · Beta",
-      "summary": "Beta 1.2.8-beta2：重接书旗 APP 加密搜索、目录与 CDN 正文；保留书名+作者双重校验和章节号防串章。",
-      "channel": "beta",
-      "version": "1.2.8-beta2",
-      "updatedAt": "2026-11-08T00:28:56.311+08:00",
+      "id": "qidian-next",
+      "name": "🌈 起点增强",
+      "summary": "正式版 1.2.8：书旗 APP 接口修复已获真机确认；加密搜索、全量目录、CDN 正文及备用链恢复，保留严格书籍/章节匹配。",
+      "icon": "",
+      "channel": "stable",
+      "version": "1.2.8",
+      "updatedAt": "2026-11-08T00:56:08.618+08:00",
       "tags": [
         "起点",
-        "测试版",
+        "正式版",
         "书旗",
-        "APP加密接口",
+        "APP接口",
         "CDN正文",
-        "官方目录",
         "严格匹配",
-        "防串书",
-        "防串章"
+        "目录",
+        "段评",
+        "本章说",
+        "评论",
+        "多正文源"
       ],
       "changelog": [
-        "参考 2026-11-04 书旗 APP 接口书源重接官方 APP 加密搜索（native_v3），替换旧书旗接口链",
-        "书旗目录使用 H5 全量真章名，失败降级 OpenAPI chapterlist；按绑定 bookId 缓存，避免跨书复用",
-        "书旗正文优先 c1/c2 CDN JSONP 多线路，失败降级 chapterinfo ROT13+Base64",
-        "匹配继续要求起点书名+作者双重一致，章节号不一致拒绝；低置信度转交后续 Provider",
-        "仅替换 preferred_sq 懒模块，Stable 1.2.7、起点搜索/目录/评论、账号和其他 Provider 不变；待真机确认"
+        "用户真机确认 1.2.8-beta2 书旗正文恢复正常，正式版直接沿用已验证代码，不新增业务修改",
+        "书旗使用 APP 加密搜索、H5 全量目录及 OpenAPI 回退，CDN JSONP 正文及 chapterinfo 备用链",
+        "书名+作者双重严格命中；章节号与标题核心严格校验，避免串书、串章",
+        "书旗 Provider 继续独立懒加载，使用新版独立缓存；起点官方搜索、目录、评论、账号及其它 Provider 不变"
       ],
-      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12083",
-      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12083",
-      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12083",
-      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json?article=2",
-      "versionCode": 12083,
-      "sha256": "e14034e80d4a85c2fa0b634c532d9c8bd15b7ea44b5707d8feeab7d4048f145e",
-      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12080",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12080",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12080",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/stable/qidian-next.json",
+      "versionCode": 12080,
+      "sha256": "25bc6553f3a3260446e4b8d961ffa4ce9fd7451c4f87b2a41ffff94f709c7785",
+      "sourcePath": "sources/novel/qidian-next/qidian-next.json",
       "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7",
       "type": "novel"
     },
@@ -103,5 +105,5 @@
       "type": "novel"
     }
   ],
-  "generatedAt": "2026-11-08T00:28:56.311+08:00"
+  "generatedAt": "2026-11-08T00:56:08.618+08:00"
 }
