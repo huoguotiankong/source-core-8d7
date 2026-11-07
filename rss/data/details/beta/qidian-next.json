@@ -10,7 +10,7 @@
   "sections": [
     {
       "title": "本版更新",
-      "text": "参考 2026-11-04 书旗 APP 接口书源重接官方 APP 加密搜索（native_v3），替换旧书旗接口链；书旗目录使用 H5 全量真章名，失败降级 OpenAPI chapterlist；按绑定 bookId 缓存，避免跨书复用；书旗正文优先 c1/c2 CDN JSONP 多线路，失败降级 chapterinfo ROT13+Base64；匹配继续要求起点书名+作者双重一致，章节号不一致拒绝；低置信度转交后续 Provider；仅替换 preferred_sq 懒模块，Stable 1.2.7、起点搜索/目录/评论、账号和其他 Provider 不变；待真机确认"
+      "text": "参考 2026-11-04 书旗 APP 接口书源重接官方 APP 加密搜索（native_v3），替换旧书旗接口链；书旗目录使用 H5 全量真章名，失败降级 OpenAPI chapterlist；按绑定 bookId 缓存，避免跨书复用；书旗正文优先 c1/c2 CDN JSONP 多线路，失败降级 chapterinfo ROT13+Base64；匹配继续要求起点书名+作者双重一致，章节号不一致拒绝；章节号相同但标题核心不一致也拒绝，防止同号错章；低置信度转交后续 Provider；仅替换 preferred_sq 懒模块，Stable 1.2.7、起点搜索/目录/评论、账号和其他 Provider 不变；待真机确认"
     },
     {
       "title": "版本状态",
