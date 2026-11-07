@@ -1,27 +1,27 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.8-beta1：书旗改为书名+作者双重严格绑定，并强化章节号校验，避免同名异作者串书和错章。",
+  "summary": "Beta 1.2.8-beta2：重接书旗 APP 加密搜索、目录与 CDN 正文；保留书名+作者双重校验和章节号防串章。",
   "badges": [
     "Beta",
-    "1.2.8-beta1",
-    "书旗"
+    "1.2.8-beta2",
+    "书旗 APP"
   ],
   "sections": [
     {
       "title": "本版更新",
-      "text": "书旗候选书必须同时通过书名与作者校验；仅书名相同但作者不一致的候选直接拒绝；书旗绑定缓存升级为 v48，并在每次使用前重新校验书名/作者，旧错误绑定不会继续命中；章节匹配增加章节号硬约束：目标和候选都能解析出章节号时，号码不一致直接淘汰；章节 Hint/Window 缓存加入已绑定书旗 bookId，避免更换正确书籍后复用旧书的章节命中；低置信度不强行返回正文，直接让 Provider Runtime 继续后续优选/兜底源；其它业务域冻结"
+      "text": "参考 2026-11-04 书旗 APP 接口书源重接官方 APP 加密搜索（native_v3），替换旧书旗接口链；书旗目录使用 H5 全量真章名，失败降级 OpenAPI chapterlist；按绑定 bookId 缓存，避免跨书复用；书旗正文优先 c1/c2 CDN JSONP 多线路，失败降级 chapterinfo ROT13+Base64；匹配继续要求起点书名+作者双重一致，章节号不一致拒绝；低置信度转交后续 Provider；仅替换 preferred_sq 懒模块，Stable 1.2.7、起点搜索/目录/评论、账号和其他 Provider 不变；待真机确认"
     },
     {
       "title": "版本状态",
-      "text": "当前为 Beta / 测试通道，需真机确认后才会晋升正式版。"
+      "text": "当前为 Beta 测试通道。只完成静态验证；书旗接口、目录和付费/免费正文仍需真机测试后确认。"
     },
     {
       "title": "更新方式",
       "text": "从本订阅页重新导入/更新即可覆盖现有 🌈 起点增强 · Beta。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12082",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12082",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12082"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12083",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12083",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12083"
 }
