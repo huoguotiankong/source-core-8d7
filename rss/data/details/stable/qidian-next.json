@@ -1,38 +1,30 @@
 {
   "kind": "source",
   "title": "🌈 起点增强",
-  "summary": "正式版 1.2.7：真机确认评论页与表情恢复正常；合并评论按需分页、官方标签/头像兼容及截断 Emoji 恢复。",
+  "summary": "正式版 1.2.8：书旗 APP 接口修复已获真机确认；加密搜索、全量目录、CDN 正文及备用链恢复，保留严格书籍/章节匹配。",
   "badges": [
     "Stable",
-    "1.2.7",
-    "目录",
-    "版权信息",
-    "评论优化",
-    "表情修复"
+    "1.2.8",
+    "书旗接口修复",
+    "官方目录",
+    "评论",
+    "多 Provider"
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12070",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12070",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12070",
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12080",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next.json?v=12080",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next.json?v=12080",
   "sections": [
     {
-      "title": "当前正式版",
-      "text": "1.2.7 由用户真机确认的 1.2.7-beta11 原运行代码直接晋升。"
+      "title": "本版更新",
+      "text": "用户真机确认 1.2.8-beta2 书旗正文恢复正常，正式版直接沿用已验证代码，不新增业务修改；书旗使用 APP 加密搜索、H5 全量目录及 OpenAPI 回退，CDN JSONP 正文及 chapterinfo 备用链；书名+作者双重严格命中；章节号与标题核心严格校验，避免串书、串章；书旗 Provider 继续独立懒加载，使用新版独立缓存；起点官方搜索、目录、评论、账号及其它 Provider 不变"
     },
     {
-      "title": "目录与版权",
-      "text": "继续使用已确认的 Argus v1 目录主链，支持章节时间、字数、真实分卷和版权信息；版权页保持已确认的紧凑固定版式。"
+      "title": "版本状态",
+      "text": "正式版 1.2.8。由用户真机确认的 1.2.8-beta2 原运行代码直接晋升 Stable。"
     },
     {
-      "title": "评论",
-      "text": "首屏10条并按需滚动加载，保留官方 TitleImage 标签、头像兼容/兜底、时间/IP、点赞、配图、配音、楼中楼与回复分页。"
-    },
-    {
-      "title": "表情兼容",
-      "text": "兼容 [fn] 等起点评论表情 token，并恢复部分被截断为 U+Fxxx 的 Emoji；例如 U+F60D 恢复为 U+1F60D 😍。"
-    },
-    {
-      "title": "其它功能",
-      "text": "正文、账号、搜索、情无/小雨及其它 Provider 沿用既有稳定功能链。"
+      "title": "更新方式",
+      "text": "从本订阅页重新导入或更新即可覆盖旧版 🌈 起点增强，bookSourceUrl 保持不变。"
     }
   ]
 }
