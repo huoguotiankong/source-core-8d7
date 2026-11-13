@@ -1,3 +1,11 @@
+## 2026-11-14 · qidian-next 1.2.9-beta1 — 猫眼→顶点接口迁移（待真机确认）
+- 参考用户上传的「🐈 顶点小说」书源，将 fallback_my 从失效的猫眼 /search、/novel 旧接口改为顶点 s.yutinglu.com 加密搜索、d.yutinglu.com 线路、catalog.yutinglu.com 目录、chapter.yutinglu.com AES 正文。
+- 书籍匹配严格校验起点书名与作者；目录逐章解密后按章节号+核心标题精确匹配，拒绝同名异作者与低置信度串章。
+- 按用户选择率优先线路，章节不可用时尝试其他线路；独立缓存防止复用旧猫眼映射。
+- 保留「猫眼」选项和书籍变量 31，保留已有 Provider 接口六个导出名；书旗与其它 Provider、起点官方搜索/目录/评论不变。
+- JS 语法/导出静态检查及模拟接口功能（成功正文、错误作者、错章节、备用线路）已过；真实网络及阅读真机未验证，按规则只发 Beta。
+- 同步 Beta source、Beta Subscription、Novel Catalog、Manifest、Beta Bundle、RSS Beta Detail 和本 Release Log；Stable 1.2.8 不变。
+
 ## 2026-11-08 · qidian-next Stable 1.2.8 — 书旗 APP 修复真机确认晋升
 - 用户真机确认 1.2.8-beta2 书旗正文恢复正常，正式版直接沿用已验证代码，不新增业务修改
 - 书旗使用 APP 加密搜索、H5 全量目录及 OpenAPI 回退，CDN JSONP 正文及 chapterinfo 备用链
