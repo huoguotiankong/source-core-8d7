@@ -1,16 +1,16 @@
 {
   "kind": "source",
   "title": "🌈 起点增强 · Beta",
-  "summary": "Beta 1.2.8-beta2：重接书旗 APP 加密搜索、目录与 CDN 正文；保留书名+作者双重校验和章节号防串章。",
+  "summary": "Beta 1.2.9-beta1：修复原猫眼改名顶点后的失效接口；接入加密搜索、多线路目录与 AES 正文，保留猫眼选项及书籍变量 31。",
   "badges": [
     "Beta",
-    "1.2.8-beta2",
-    "书旗"
+    "1.2.9-beta1",
+    "猫眼"
   ],
   "sections": [
     {
       "title": "本版更新",
-      "text": "参考 2026-11-04 书旗 APP 接口书源重接官方 APP 加密搜索（native_v3），替换旧书旗接口链；书旗目录使用 H5 全量真章名，失败降级 OpenAPI chapterlist；按绑定 bookId 缓存，避免跨书复用；书旗正文优先 c1/c2 CDN JSONP 多线路，失败降级 chapterinfo ROT13+Base64；匹配继续要求起点书名+作者双重一致，章节号不一致拒绝；低置信度转交后续 Provider；仅替换 preferred_sq 懒模块，Stable 1.2.7、起点搜索/目录/评论、账号和其他 Provider 不变；待真机确认"
+      "text": "从用户提供的「🐈 顶点小说」书源迁移原猫眼已更新的 API，停用旧 /search 与 /novel/{id}/chapters 链；书籍绑定须书名和作者完全对应，目录按章号及真实章名严格匹配，避免误入同名不同作者或串章；章节线路优先选原站用户选择率高的来源，不可用时尝试其它目录和章节线路；只替换 fallback_my 懒模块并使用独立缓存；「猫眼」名称、书籍变量31、起点官方目录/评论、书旗等其它 Provider 不变；已通过静态语法、模拟搜索/目录/正文、错误作者/章节拒绝和备用线路回退检查；真实 API 与阅读端仍需真机测试"
     },
     {
       "title": "版本状态",
@@ -21,7 +21,7 @@
       "text": "从本订阅页重新导入/更新即可覆盖现有 🌈 起点增强 · Beta。"
     }
   ],
-  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12083",
-  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12083",
-  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12083"
+  "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12091",
+  "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12091",
+  "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12091"
 }
