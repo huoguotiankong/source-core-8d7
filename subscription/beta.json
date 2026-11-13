@@ -2,8 +2,44 @@
   "schemaVersion": 1,
   "channel": "beta",
   "name": "测试版",
-  "updatedAt": "2026-11-08T00:56:08.618+08:00",
+  "updatedAt": "2026-11-14T00:39:00+08:00",
   "items": [
+    {
+      "id": "qidian-next-beta",
+      "name": "🌈 起点增强 · Beta",
+      "summary": "Beta 1.2.9-beta1：修复原猫眼改名顶点后的失效接口；接入加密搜索、多线路目录与 AES 正文，保留猫眼选项及书籍变量 31。",
+      "icon": "",
+      "channel": "beta",
+      "version": "1.2.9-beta1",
+      "updatedAt": "2026-11-14T00:39:00+08:00",
+      "tags": [
+        "起点",
+        "测试版",
+        "猫眼",
+        "顶点小说",
+        "AES正文",
+        "多线路",
+        "严格匹配",
+        "官方目录",
+        "段评",
+        "本章说"
+      ],
+      "changelog": [
+        "从用户提供的「🐈 顶点小说」书源迁移原猫眼已更新的 API，停用旧 /search 与 /novel/{id}/chapters 链",
+        "书籍绑定须书名和作者完全对应，目录按章号及真实章名严格匹配，避免误入同名不同作者或串章",
+        "章节线路优先选原站用户选择率高的来源，不可用时尝试其它目录和章节线路",
+        "只替换 fallback_my 懒模块并使用独立缓存；「猫眼」名称、书籍变量31、起点官方目录/评论、书旗等其它 Provider 不变",
+        "已通过静态语法、模拟搜索/目录/正文、错误作者/章节拒绝和备用线路回退检查；真实 API 与阅读端仍需真机测试"
+      ],
+      "sourceUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12091",
+      "backupUrl": "https://cdn.jsdelivr.net/gh/huoguotiankong/source-core-8d7@main/sources/novel/qidian-next/qidian-next-beta.json?v=12091",
+      "importUrl": "legado://import/importonline?src=https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/sources/novel/qidian-next/qidian-next-beta.json?v=12091",
+      "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/qidian-next.json",
+      "versionCode": 12091,
+      "sha256": "fb5eb5f1ba22090c5d883df397e92a676ed65718d483611bc9d32e16bbceb6ba",
+      "sourcePath": "sources/novel/qidian-next/qidian-next-beta.json",
+      "bookSourceUrl": "https://m.qidian.com/?qf_source=qidian_next_8d7"
+    },
     {
       "id": "qidian-official",
       "name": "🔅 起点官方生态",
@@ -96,5 +132,5 @@
       "detailUrl": "https://raw.githubusercontent.com/huoguotiankong/source-core-8d7/main/rss/data/details/beta/wanxiang.json"
     }
   ],
-  "generatedAt": "2026-11-08T00:56:08.618+08:00"
+  "generatedAt": "2026-11-14T00:39:00+08:00"
 }
